@@ -1,0 +1,14 @@
+Operator class names should always start like thsi 
+
+AETHER_OT_OperatorName
+
+bl_Idnames should always look like this 
+
+aether.operator_name
+
+functions should always be lowercase like this 
+
+function_name
+
+console messages should always satrt with "[AetherBlend] ..."
+
