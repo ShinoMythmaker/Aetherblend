@@ -1,4 +1,5 @@
 import bpy
+import os
 
 def get_preferences():
     """Retrieve addon preferences."""
@@ -8,13 +9,13 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
 
     github_repo: bpy.props.StringProperty(
-        name="GitHub Repository URL",
-        default="https://github.com/your-user/your-repo/archive/refs/heads/"
+        name= "GitHub Repository URL",
+        default= "https://github.com/ShinoMythmaker/Aetherblend/archive/refs/heads/"
     )
 
     addon_path: bpy.props.StringProperty(
-        name="Addon Path",
-        default=bpy.utils.resource_path('USER') + "/scripts/addons/aetherblend"
+        name= "Addon Path",
+        default= os.path.join(bpy.utils.user_resource('EXTENSIONS', path="user_default"), "AetherBlend")
     )
 
     branch: bpy.props.EnumProperty(

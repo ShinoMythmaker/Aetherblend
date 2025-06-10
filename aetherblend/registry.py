@@ -1,13 +1,15 @@
 import bpy
 import importlib
 import os
-import pkgutil
+from . import preferences
 
 MODULE_FOLDERS = ["operators", "ui"]
 
 def register():
     """Automatically registers all operators and UI panels."""
     package = __package__
+    
+    preferences.register()
 
     for folder in MODULE_FOLDERS:
         path = os.path.join(os.path.dirname(__file__), folder)
@@ -58,3 +60,5 @@ def unregister():
                             mod.unregister()
                     except Exception as e:
                         print(f"[AetherBlend] Failed to unregister {full_module_name}: {e}")
+    
+    preferences.unregister()
