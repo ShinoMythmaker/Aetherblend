@@ -14,7 +14,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         prefs = get_preferences()
 
         layout.label(text="Active Branch:")
-        layout.label(text=f"dev")
+        layout.label(text=f"main")
 
         layout.separator()
         layout.operator("aether.switch_branch", text="Switch Branch")
