@@ -31,7 +31,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout
         layout.prop(self, "branch")
-        layout.operator("aether.switch_branch", text="Switch Branch")
+        layout.operator("aether.update", text="Update")
 
 def register():
     bpy.utils.register_class(AetherBlendPreferences)

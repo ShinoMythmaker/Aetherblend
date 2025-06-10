@@ -16,9 +16,6 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         layout.label(text="Active Branch:")
         layout.label(text=f"dev")
 
-        layout.separator()
-        layout.operator("aether.switch_branch", text="Switch Branch")
-
 def register():
     bpy.utils.register_class(AETHER_PT_InfoPanel)
 

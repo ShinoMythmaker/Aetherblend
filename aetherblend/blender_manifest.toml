@@ -6,6 +6,7 @@ name = "AetherBlend"
 tagline = "This is another extension"
 maintainer = "Shino Mythmaker"
 type = "add-on"
+branch = "dev"
 
 website = "https://github.com/ShinoMythmaker/Aetherblend"
 

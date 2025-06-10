@@ -11,20 +11,6 @@ def confirm_action(message):
     """Show a confirmation popup and return True if accepted."""
     return bpy.ops.aether.confirm_dialog('INVOKE_DEFAULT', message=message)
 
-class AETHER_OT_ConfirmDialog(bpy.types.Operator):
-    """Confirmation Dialog"""
-    bl_idname = "aether.confirm_dialog"
-    bl_label = "Confirm Action"
-
-    message: bpy.props.StringProperty(name="Message")
-
-    def execute(self, context):
-        self.report({'INFO'}, f"[AetherBlend] Confirmed: {self.message}")
-        return {'FINISHED'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
-
 def download_branch(branch):
     """Download the selected branch from GitHub and return the ZIP path."""
     prefs = get_preferences()

@@ -1,4 +1,4 @@
-Operator class names should always start like thsi 
+Operator class names should always start like this
 
 AETHER_OT_OperatorName
 
@@ -11,4 +11,6 @@ functions should always be lowercase like this
 function_name
 
 console messages should always satrt with "[AetherBlend] ..."
+
+operators should use self.report and modules should use prints 
 
