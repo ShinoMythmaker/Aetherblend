@@ -1,0 +1,19 @@
+schema_version = "0.0.2"
+
+id = "Aetherblend"
+version = "0.0.1"
+name = "Aetherblend"
+tagline = "This is another extension"
+maintainer = "Shino Mythmaker"
+type = "add-on"
+
+website = "https://github.com/ShinoMythmaker/Aetherblend"
+
+license = [
+  "SPDX:AGPL-3.0-or-later",
+]
+
+blender_version_min = "4.4.0"
+
+[permissions]
+files = "Import files for most Aetherblends functions"
