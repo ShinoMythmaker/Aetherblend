@@ -1,4 +1,3 @@
-import bpy
 import importlib
 import os
 from . import preferences
