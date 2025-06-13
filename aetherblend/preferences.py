@@ -77,23 +77,17 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
 
     def draw(self, context):
         layout = self.layout
-        indent = 0.2  # Adjust for your preferred spacing
-    
-
+        indent = 0.2  
     
         # --- Main Status Box ---
         box = layout.box()
         col = box.column(align=False)
 
-        # --- Status Row with Dynamic Button ---
         split = col.split(factor=indent)
-
         col1 = split.column(align=True)
         col1.alignment = 'RIGHT'
         col2 = split.column(align=True)
-
         col1.label(text="AetherBlend Branch:")
-
         right = col2.row(align=False)
         right.prop(self, "branch", text="")
         right.operator("aether.check_installs", text="Check for Updates", icon='RECOVER_LAST')
@@ -102,13 +96,10 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
     
         # AetherBlend
         split = col.split(factor=indent)
-
         col1 = split.column(align=True)
         col1.alignment = 'RIGHT'
         col2 = split.column(align=False)
-
         col1.label(text="AetherBlend")
-
         status_text = "Up to date"
         status_icon = 'CHECKMARK'
         if not BRANCH_MATCH_RESULT:
@@ -117,27 +108,22 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         elif not VERSION_MATCH_RESULT:
             status_text = "Old version!"
             status_icon = 'ERROR'
-
-    
         right = col2.row(align=True) 
         right.label(text=status_text, icon=status_icon)
         if PROMPT_USER_AETHER:
             right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
-        elif not VERSION_MATCH_RESULT:
+        elif not VERSION_MATCH_RESULT or not BRANCH_MATCH_RESULT:
             right.operator("aether.update", text="Update", icon='IMPORT')  
 
         col.separator() 
     
         # Meddle 
         split = col.split(factor=indent)
-
         col1 = split.column(align=True)
         col1.alignment = 'RIGHT'    
         col2 = split.column(align=False)
-
         col1.label(text="Meddle Tools")
         right = col2.row(align=True)
-
         if not MEDDLE_INSTALLED: 
             right.label(text="Not installed", icon='CANCEL')
             if PROMPT_USER_MEDDLE:
