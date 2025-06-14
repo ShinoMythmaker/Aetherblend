@@ -53,7 +53,7 @@ def register():
                     except Exception as e:
                         print(f"[AetherBlend] Failed to register {full_module_name}: {e}")
     
-    bpy.app.handlers.load_post.append(aether_check_installs_on_startup)
+    #bpy.app.handlers.load_post.append(aether_check_installs_on_startup)
     bpy.app.timers.register(run_check_installs_later, first_interval=0.5)
 
 def unregister():
