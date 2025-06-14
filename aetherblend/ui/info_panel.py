@@ -25,13 +25,6 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-<<<<<<< HEAD
-        prefs = get_preferences()
-
-        layout.label(text="Active Branch:")
-        layout.label(text=f"testing")
-
-=======
         
         layout.operator("wm.url_open", text="Support & Links", icon="HEART").url = "https://mektools.carrd.co/"
         
@@ -40,7 +33,6 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         row.operator("wm.url_open", text="Issues", icon="BOOKMARKS").url = f"https://github.com/{GITHUB_USER}/{GITHUB_REPO}/issues"
         row.operator("aether.check_installs", text="", icon="FILE_REFRESH")
         
->>>>>>> dev
         layout.separator()
 
         # --- VERSION CONTROL ---

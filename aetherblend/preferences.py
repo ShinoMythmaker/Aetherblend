@@ -61,7 +61,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             ('testing', "Testing", "Experimental features"),
             ('dev', "Developement", "Active dev branch")
         ],
-        default='testing',
+        default='dev',
         update=branch_changed 
     ) # type: ignore
 
