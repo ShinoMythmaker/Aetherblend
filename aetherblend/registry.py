@@ -1,9 +1,26 @@
-import bpy
 import importlib
 import os
+import bpy
 from . import preferences
+from bpy.app.handlers import persistent
 
 MODULE_FOLDERS = ["operators", "ui"]
+
+
+@persistent
+def aether_check_installs_on_startup(dummy):
+    """Check installations on Blender startup."""
+    prefs = preferences.get_preferences()
+    if getattr(prefs, "run_check_on_startup", True):
+        bpy.ops.aether.check_installs('EXEC_DEFAULT')
+
+def run_check_installs_later():
+    """Run the check installs operator after a short delay."""
+    try:
+        bpy.ops.aether.check_installs('EXEC_DEFAULT')
+    except Exception as e:
+        print(f"[AetherBlend] Could not run check_installs after enable: {e}")
+    return None  # Only run once
 
 def register():
     """Automatically registers all operators and UI panels."""
@@ -35,10 +52,16 @@ def register():
                             mod.register()
                     except Exception as e:
                         print(f"[AetherBlend] Failed to register {full_module_name}: {e}")
+    
+    bpy.app.handlers.load_post.append(aether_check_installs_on_startup)
+    bpy.app.timers.register(run_check_installs_later, first_interval=0.5)
 
 def unregister():
     """Automatically unregisters all operators and UI panels."""
     package = __package__
+
+    if aether_check_installs_on_startup in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(aether_check_installs_on_startup)
 
     for folder in MODULE_FOLDERS:
         path = os.path.join(os.path.dirname(__file__), folder)
