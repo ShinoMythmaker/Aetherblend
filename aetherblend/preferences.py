@@ -1,67 +1,57 @@
 import bpy
+import os
 
-BRANCH_MATCH_RESULT = True 
-VERSION_MATCH_RESULT = True 
-MEDDLE_INSTALLED = False
-MEDDLE_VERSION_MATCH_RESULT = True 
-PROMPT_USER_AETHER = False
-PROMPT_USER_MEDDLE = False
+# Aetherblend GitHub repository information
+GITHUB_USER = "ShinoMythmaker"
+GITHUB_REPO = "Aetherblend"
 
-def set_prompt_user_meddle():
-    """Prompt the user to restart Blender."""
-    global PROMPT_USER_MEDDLE
-    PROMPT_USER_MEDDLE = True
+# Meddle Github repository information
+GITHUB_MEDDLE_USER = "PassiveModding"
+GITHUB_MEDDLE_REPO = "MeddleTools"
 
-def set_prompt_user_aether():
-    """Prompt the user to restart Blender."""
-    global PROMPT_USER_AETHER
-    PROMPT_USER_AETHER = True
+# Extension and manifest paths
+EXTENSIONS_PATH = bpy.utils.user_resource('EXTENSIONS', path="user_default")
+AETHERBLEND_FOLDER = os.path.join(EXTENSIONS_PATH, "aetherblend")
+MEDDLE_FOLDER = os.path.join(EXTENSIONS_PATH, "meddle_tools")
 
-def set_meddle_installed(result: bool):
-    """Set the global branch match result."""
-    global MEDDLE_INSTALLED
-    MEDDLE_INSTALLED = result
 
-def set_meddle_version_match_result(result: bool):
-    """Set the global branch match result."""
-    global MEDDLE_VERSION_MATCH_RESULT
-    MEDDLE_VERSION_MATCH_RESULT = result
+class AetherBlendStatus:
+    """Class to hold the status of AetherBlend and Meddle installations."""
+    BRANCH_MATCH_RESULT = True
+    VERSION_MATCH_RESULT = True
+    MEDDLE_INSTALLED = False
+    MEDDLE_VERSION_MATCH_RESULT = True
+    PROMPT_USER_AETHER = False
+    PROMPT_USER_MEDDLE = False
 
-def set_version_match_result(result: bool):
-    """Set the global branch match result."""
-    global VERSION_MATCH_RESULT
-    VERSION_MATCH_RESULT = result
+    @classmethod
+    def set(cls, **kwargs):
+        for k, v in kwargs.items():
+            if hasattr(cls, k):
+                setattr(cls, k, v)
+            else:
+                # Handle name-mangled private attributes
+                mangled = f"_{cls.__name__}__{k}" if k.startswith("__") and not k.endswith("__") else None
+                if mangled and hasattr(cls, mangled):
+                    setattr(cls, mangled, v)
 
-def set_branch_match_result(result: bool):
-    """Set the global branch match result."""
-    global BRANCH_MATCH_RESULT
-    BRANCH_MATCH_RESULT = result
-
-def get_meddle_installed():
-    """Get the current branch match result."""
-    return MEDDLE_INSTALLED
-
-def get_meddle_version_match_result():
-    """Get the current branch match result."""
-    return MEDDLE_VERSION_MATCH_RESULT
-
-def get_version_match_result():
-    """Get the current branch match result."""
-    return VERSION_MATCH_RESULT
-
-def get_branch_match_result():
-    """Get the current branch match result."""
-    return BRANCH_MATCH_RESULT
+    @classmethod
+    def get(cls, name):
+        return getattr(cls, name, None)
+    
+status = AetherBlendStatus  #Alias for convenience
 
 def get_preferences():
     """Retrieve addon preferences."""
     return bpy.context.preferences.addons[__package__].preferences
 
 def branch_changed(self, context):
+    """Callback for when the branch preference changes."""
     # Call the branch check operator when the branch changes
-    bpy.ops.aether.check_branch_match('INVOKE_DEFAULT')
+    bpy.ops.aether.check_installs('EXEC_DEFAULT')
 
 class AetherBlendPreferences(bpy.types.AddonPreferences):
+    """Addon preferences for AetherBlend."""
     bl_idname = __package__
 
     branch: bpy.props.EnumProperty(
@@ -72,16 +62,31 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             ('dev', "Developement", "Active dev branch")
         ],
         default='dev',
-        update= branch_changed 
+        update=branch_changed 
+    ) # type: ignore
+
+    run_check_on_startup: bpy.props.BoolProperty(
+        name="Check for updates on startup",
+        description="Automatically check for AetherBlend and Meddle updates when Blender starts",
+        default=True
     ) # type: ignore
 
     def draw(self, context):
         layout = self.layout
         indent = 0.2  
+
+        col = layout.column()
+        split = col.split(factor=indent)
+        col1 = split.column()
+        col1.alignment = 'RIGHT'
+        col1.label(text="Version Checks:")
+        col2 = split.column()
+        right = col2.row(align=True)
+        right.prop(self, "run_check_on_startup")
+        right.operator("aether.check_installs", text="Check for Updates", icon='RECOVER_LAST')
     
-        # --- Main Status Box ---
-        box = layout.box()
-        col = box.column(align=False)
+
+        col = layout.column(align=False)
 
         split = col.split(factor=indent)
         col1 = split.column(align=True)
@@ -90,7 +95,6 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col1.label(text="AetherBlend Branch:")
         right = col2.row(align=False)
         right.prop(self, "branch", text="")
-        right.operator("aether.check_installs", text="Check for Updates", icon='RECOVER_LAST')
 
         col.separator() 
     
@@ -102,17 +106,17 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col1.label(text="AetherBlend")
         status_text = "Up to date"
         status_icon = 'CHECKMARK'
-        if not BRANCH_MATCH_RESULT:
+        if not status.BRANCH_MATCH_RESULT:
             status_text = "Branch mismatch!"
             status_icon = 'ERROR'
-        elif not VERSION_MATCH_RESULT:
+        elif not status.VERSION_MATCH_RESULT:
             status_text = "Old version!"
             status_icon = 'ERROR'
         right = col2.row(align=True) 
         right.label(text=status_text, icon=status_icon)
-        if PROMPT_USER_AETHER:
+        if status.PROMPT_USER_AETHER:
             right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
-        elif not VERSION_MATCH_RESULT or not BRANCH_MATCH_RESULT:
+        elif not status.VERSION_MATCH_RESULT or not status.BRANCH_MATCH_RESULT:
             right.operator("aether.update", text="Update", icon='IMPORT')  
 
         col.separator() 
@@ -124,21 +128,21 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col2 = split.column(align=False)
         col1.label(text="Meddle Tools")
         right = col2.row(align=True)
-        if not MEDDLE_INSTALLED: 
+        if not status.MEDDLE_INSTALLED: 
             right.label(text="Not installed", icon='CANCEL')
-            if PROMPT_USER_MEDDLE:
+            if status.PROMPT_USER_MEDDLE:
                 right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
             else:
-                right.operator("wm.url_open", text="Download", icon="HELP").url = "https://github.com/PassiveModding/MeddleTools/releases/latest"
-        elif not MEDDLE_VERSION_MATCH_RESULT:
+                right.operator("wm.url_open", text="Github", icon="URL").url = "https://github.com/PassiveModding/MeddleTools/releases/latest"
+        elif not status.MEDDLE_VERSION_MATCH_RESULT:
             right.label(text="Old version!", icon='ERROR')
-            if PROMPT_USER_MEDDLE:
+            if status.PROMPT_USER_MEDDLE:
                 right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
             else:
                 right.operator("aether.meddle_update", text="Update", icon='IMPORT')
         else:
             right.label(text="Up to date", icon='CHECKMARK')
-            if PROMPT_USER_MEDDLE:
+            if status.PROMPT_USER_MEDDLE:
                 right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
     
 def register():

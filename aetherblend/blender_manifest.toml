@@ -1,9 +1,9 @@
 schema_version = "0.0.2"
 
 id = "AetherBlend"
-version = "0.0.2"
+version = "0.0.3"
 name = "AetherBlend"
-tagline = "This is another extension"
+tagline = "AetherBlend: Effortless FFXIV Workflows in Blender"
 maintainer = "Shino Mythmaker"
 type = "add-on"
 branch = "dev"
@@ -14,7 +14,7 @@ license = [
   "SPDX:AGPL-3.0-or-later",
 ]
 
-blender_version_min = "4.4.0"
+blender_version_min = "4.4.3"
 
 [permissions]
 files = "Import files for most Aetherblends functions"
