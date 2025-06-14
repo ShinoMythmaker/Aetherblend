@@ -136,9 +136,9 @@ class AETHER_OT_Meddle_Update(bpy.types.Operator):
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
             self.report({'INFO'}, f"[AetherBlend][Meddle] Installed {GITHUB_REPO} on branch {branch}.")
-            self.report({'INFO'}, "[AetherBlend][Meddle] updated. Please restart Blender.")
-            status.set(PROMPT_USER_MEDDLE=True)  # Set prompt flag for Meddle
-            bpy.ops.aether.restart_blender('INVOKE_DEFAULT')
+            #self.report({'INFO'}, "[AetherBlend][Meddle] updated. Please restart Blender.")
+            #status.set(PROMPT_USER_MEDDLE=True)  # Set prompt flag for Meddle
+            #bpy.ops.aether.restart_blender('INVOKE_DEFAULT')
         except Exception as e:
             self.report({'ERROR'}, f"[AetherBlend] Failed to install {GITHUB_MEDDLE_REPO}. Error: {e}")
             return {'CANCELLED'}
@@ -164,9 +164,9 @@ class AETHER_OT_Update(bpy.types.Operator):
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
             self.report({'INFO'}, f"[AetherBlend] Installed {GITHUB_REPO} on branch {branch}.")
-            self.report({'INFO'}, "[AetherBlend] updated. Please restart Blender.")
-            status.set(PROMPT_USER_AETHER=True)  # Set prompt flag for AetherBlend
-            bpy.ops.aether.restart_blender('INVOKE_DEFAULT')
+            #self.report({'INFO'}, "[AetherBlend] updated. Please restart Blender.")
+            #status.set(PROMPT_USER_AETHER=True)  # Set prompt flag for AetherBlend
+            #bpy.ops.aether.restart_blender('INVOKE_DEFAULT')
         except Exception as e:
             self.report({'ERROR'}, f"[AetherBlend] Failed to install {GITHUB_REPO} on branch {branch}")
             return {'CANCELLED'}
