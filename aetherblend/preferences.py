@@ -19,7 +19,7 @@ class AetherBlendStatus:
     """Class to hold the status of AetherBlend and Meddle installations."""
     BRANCH_MATCH_RESULT = True
     VERSION_MATCH_RESULT = True
-    MEDDLE_INSTALLED = False
+    MEDDLE_INSTALLED = True
     MEDDLE_VERSION_MATCH_RESULT = True
     PROMPT_USER_AETHER = False
     PROMPT_USER_MEDDLE = False
