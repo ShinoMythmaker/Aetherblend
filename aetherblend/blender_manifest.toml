@@ -6,7 +6,7 @@ name = "AetherBlend"
 tagline = "AetherBlend: Effortless FFXIV Workflows in Blender"
 maintainer = "Shino Mythmaker"
 type = "add-on"
-branch = "dev"
+branch = "main"
 
 website = "https://github.com/ShinoMythmaker/Aetherblend"
 
