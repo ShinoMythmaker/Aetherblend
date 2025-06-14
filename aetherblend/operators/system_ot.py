@@ -1,6 +1,7 @@
 import bpy
 import os
 import subprocess
+from bpy.app.handlers import persistent
 from ..utils import system
 from ..preferences import (
     get_preferences, AetherBlendStatus as status,
@@ -9,7 +10,7 @@ from ..preferences import (
     EXTENSIONS_PATH, AETHERBLEND_FOLDER, MEDDLE_FOLDER
 )
 
-    
+
 def check_branch_match(self, context):
     """Check if the installed branch matches the selected branch in preferences"""
     prefs = get_preferences()
@@ -117,7 +118,7 @@ def check_meddle_version_match(self, context):
         status.set(MEDDLE_VERSION_MATCH_RESULT=False)
 
     return {'FINISHED'}
-    
+
 class AETHER_OT_Meddle_Update(bpy.types.Operator):
     """Installs the latest Meddle Tools from GitHub"""
     bl_idname = "aether.meddle_update"
@@ -134,8 +135,10 @@ class AETHER_OT_Meddle_Update(bpy.types.Operator):
         
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
-            self.report({'INFO'}, f"[AetherBlend] Installed {GITHUB_MEDDLE_REPO}.")
-            bpy.ops.aether.check_installs('EXEC_DEFAULT')
+            self.report({'INFO'}, f"[AetherBlend][Meddle] Installed {GITHUB_REPO} on branch {branch}.")
+            self.report({'INFO'}, "[AetherBlend][Meddle] updated. Please restart Blender.")
+            status.set(PROMPT_USER_MEDDLE=True)  # Set prompt flag for Meddle
+            bpy.ops.aether.restart_blender('INVOKE_DEFAULT')
         except Exception as e:
             self.report({'ERROR'}, f"[AetherBlend] Failed to install {GITHUB_MEDDLE_REPO}. Error: {e}")
             return {'CANCELLED'}
@@ -161,7 +164,9 @@ class AETHER_OT_Update(bpy.types.Operator):
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
             self.report({'INFO'}, f"[AetherBlend] Installed {GITHUB_REPO} on branch {branch}.")
-            bpy.ops.aether.check_installs('EXEC_DEFAULT')
+            self.report({'INFO'}, "[AetherBlend] updated. Please restart Blender.")
+            status.set(PROMPT_USER_AETHER=True)  # Set prompt flag for AetherBlend
+            bpy.ops.aether.restart_blender('INVOKE_DEFAULT')
         except Exception as e:
             self.report({'ERROR'}, f"[AetherBlend] Failed to install {GITHUB_REPO} on branch {branch}")
             return {'CANCELLED'}
@@ -173,7 +178,7 @@ class AETHER_OT_Update(bpy.types.Operator):
 class AETHER_OT_RestartBlender(bpy.types.Operator):
     """Prompt user to save and restart Blender"""
     bl_idname = "aether.restart_blender"
-    bl_label = "Restart Blender"
+    bl_label = "Restart Required"
     bl_options = {'REGISTER'}
 
     def execute(self, context):
@@ -186,7 +191,7 @@ class AETHER_OT_RestartBlender(bpy.types.Operator):
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(
             self, event,
-            message="Are you sure you want to restart Blender? Unsaved work will be lost."
+            message="Restart now? Unsaved work will be lost."
         )
     
 class AETHER_OT_CheckInstalls(bpy.types.Operator):
