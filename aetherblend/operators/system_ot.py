@@ -22,11 +22,15 @@ class AETHER_OT_Meddle_Update(bpy.types.Operator):
         
         url = system.get_github_download_url(GITHUB_MEDDLE_USER, GITHUB_MEDDLE_REPO, branch)
         zip = system.download_zip(url, GITHUB_MEDDLE_REPO)
+
+        if zip is None:
+            self.report({'ERROR'}, "[AetherBlend] Failed to download Meddle Tools.")
+            return {'CANCELLED'}
         
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
             status.prompt_user_meddle = True
-            self.report({'INFO'}, f"[AetherBlend] New Meddle installed.")
+            self.report({'INFO'}, f"[AetherBlend] New Meddle Version installed.")
             return {'FINISHED'}
         except Exception as e:
             self.report({'ERROR'}, f"Failed to install: {e}")
@@ -48,11 +52,15 @@ class AETHER_OT_Update(bpy.types.Operator):
 
         url = system.get_github_download_url(GITHUB_USER, GITHUB_REPO, branch=branch)
         zip = system.download_zip(url, GITHUB_REPO)
+
+        if zip is None:
+            self.report({'ERROR'}, "[AetherBlend] Failed to download Meddle Tools.")
+            return {'CANCELLED'}
     
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
             status.prompt_user_aether = True
-            self.report({'INFO'}, f"[AetherBlend] New Installed")
+            self.report({'INFO'}, f"[AetherBlend] New Version Installed")
             return {'FINISHED'}
         except Exception as e:
             self.report({'ERROR'}, f"Failed to install: {e}")
