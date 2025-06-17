@@ -12,7 +12,7 @@ def download_zip(url: str, name: str = "download") -> str:
     try:
         response = requests.get(url, stream=True)
         if response.status_code != 200:
-            print(f"[AetherBlend] Failed to download {url}.")
+            print(f"[AetherBlend] Failed to download {url}")
             return None
 
         with open(zip_path, 'wb') as zip_file:

@@ -50,33 +50,49 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         )
 
         if show_status and status.restarted_check:
-            status_box = layout.box()
-            status_col = status_box.column(align=False)
-            status_col.label(text="Version Error")
+            if status.prompt_user_aether or status.prompt_user_meddle:
+                status_box = layout.box()
+                status_col = status_box.column(align=False)
+                status_col.label(text="Version Update Required")
 
-            status_col.separator()
+                status_col.separator()
 
-            if not status.is_branch:
-                row = status_col.row()
-                row.label(text="AetherBlend", icon="ERROR")
-                row.operator("aether.update", text="Update",  icon="IMPORT")
-            elif not status.is_latest:
-                row = status_col.row()
-                row.label(text="AetherBlend", icon="ERROR")
-                row.operator("aether.update", text="Update",  icon="IMPORT")
+                if status.prompt_user_aether:
+                    row = status_col.row()
+                    row.label(text="AetherBlend", icon="ERROR")
+                    row.operator("aether.restart_blender", text="Restart Blender!", icon="FILE_REFRESH")
+                if status.prompt_user_meddle:
+                    row = status_col.row()
+                    row.label(text="Meddle", icon="ERROR")
+                    row.operator("aether.restart_blender", text="Restart Blender!", icon="FILE_REFRESH")
+            else:
+                status_box = layout.box()
+                status_col = status_box.column(align=False)
+                status_col.label(text="Version Error")
 
-            if not status.meddle_installed:
-                row = status_col.row()
-                row.label(text="Meddle", icon="CANCEL")
-                row.operator("wm.url_open", text="Github", icon="URL").url = f"https://github.com/{GITHUB_MEDDLE_USER}/{GITHUB_MEDDLE_REPO}/releases/latest"
-            elif not status.meddle_is_latest:
-                row = status_col.row()
-                row.label(text="Meddle", icon="ERROR")
-                row.operator("aether.meddle_update", text="Update",  icon="IMPORT")
-            elif not status.meddle_enabled:
-                row = status_col.row()
-                row.label(text="Meddle", icon="CHECKBOX_DEHLT")
-                row.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
+                status_col.separator()
+
+                if not status.is_branch:
+                    row = status_col.row()
+                    row.label(text="AetherBlend", icon="ERROR")
+                    row.operator("aether.update", text="Update",  icon="IMPORT")
+                elif not status.is_latest:
+                    row = status_col.row()
+                    row.label(text="AetherBlend", icon="ERROR")
+                    row.operator("aether.update", text="Update",  icon="IMPORT")
+
+                if not status.meddle_installed:
+                    row = status_col.row()
+                    row.label(text="Meddle", icon="CANCEL")
+                    row.operator("wm.url_open", text="Github", icon="URL").url = f"https://github.com/{GITHUB_MEDDLE_USER}/{GITHUB_MEDDLE_REPO}/releases/latest"
+                elif not status.meddle_is_latest:
+                    row = status_col.row()
+                    row.label(text="Meddle", icon="ERROR")
+                    row.operator("aether.meddle_update", text="Update",  icon="IMPORT")
+                elif not status.meddle_enabled:
+                    row = status_col.row()
+                    row.label(text="Meddle", icon="CHECKBOX_DEHLT")
+                    row.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
 
 def register():
     bpy.utils.register_class(AETHER_PT_InfoPanel)
