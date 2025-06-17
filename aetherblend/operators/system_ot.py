@@ -1,5 +1,6 @@
 import bpy
 from ..utils import system
+import subprocess
 import addon_utils
 from ..preferences import get_preferences
 from ..status import AetherBlendStatus as status, GITHUB_USER, GITHUB_REPO, GITHUB_MEDDLE_USER, GITHUB_MEDDLE_REPO, EXTENSIONS_PATH 
@@ -15,11 +16,16 @@ class AETHER_OT_Meddle_Update(bpy.types.Operator):
         bpy.context.window.cursor_set('WAIT')  
         branch = "main"
 
+        if status.prompt_user_meddle:
+            self.report({'ERROR'}, "[AetherBlend] Previous update is not fully initialized, please restart Blender first.")
+            return {'CANCELLED'}
+        
         url = system.get_github_download_url(GITHUB_MEDDLE_USER, GITHUB_MEDDLE_REPO, branch)
         zip = system.download_zip(url, GITHUB_MEDDLE_REPO)
         
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
+            status.prompt_user_meddle = True
             self.report({'INFO'}, f"[AetherBlend] New Meddle installed.")
             return {'FINISHED'}
         except Exception as e:
@@ -36,11 +42,16 @@ class AETHER_OT_Update(bpy.types.Operator):
         prefs = get_preferences()
         branch = prefs.branch
 
+        if status.prompt_user_aether:
+            self.report({'ERROR'}, "[AetherBlend] Previous update is not fully initialized, please restart Blender first.")
+            return {'CANCELLED'}
+
         url = system.get_github_download_url(GITHUB_USER, GITHUB_REPO, branch=branch)
         zip = system.download_zip(url, GITHUB_REPO)
     
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
+            status.prompt_user_aether = True
             self.report({'INFO'}, f"[AetherBlend] New Installed")
             return {'FINISHED'}
         except Exception as e:
@@ -83,6 +94,25 @@ class AETHER_OT_EnableMeddle(bpy.types.Operator):
         system.update_window()
 
         return {'FINISHED'}
+    
+class AETHER_OT_RestartBlender(bpy.types.Operator):
+    """Prompt user to save and restart Blender"""
+    bl_idname = "aether.restart_blender"
+    bl_label = "Restart Required"
+    bl_options = {'REGISTER'}
+
+    def execute(self, context):
+        # Restart Blender
+        blender_path = bpy.app.binary_path
+        subprocess.Popen([blender_path])  # Start new instance
+        bpy.ops.wm.quit_blender()  # Close current instance
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(
+            self, event,
+            message="Restart now? Unsaved work will be lost."
+        )
 
 
 def register():
@@ -90,9 +120,11 @@ def register():
     bpy.utils.register_class(AETHER_OT_Meddle_Update)
     bpy.utils.register_class(AETHER_OT_CheckInstalls)
     bpy.utils.register_class(AETHER_OT_EnableMeddle)
+    bpy.utils.register_class(AETHER_OT_RestartBlender)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_EnableMeddle)
     bpy.utils.unregister_class(AETHER_OT_CheckInstalls)
     bpy.utils.unregister_class(AETHER_OT_Update)
     bpy.utils.unregister_class(AETHER_OT_Meddle_Update)
+    bpy.utils.unregister_class(AETHER_OT_RestartBlender)
