@@ -20,14 +20,11 @@ class AETHER_OT_Meddle_Update(bpy.types.Operator):
         
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
-            self.report({'INFO'}, f"[AetherBlend] Meddle installed {GITHUB_REPO} on branch {branch}.")
+            self.report({'INFO'}, f"[AetherBlend] New Meddle installed.")
+            return {'FINISHED'}
         except Exception as e:
-            self.report({'ERROR'}, f"[AetherBlend] Meddle failed to install {GITHUB_MEDDLE_REPO}. Error: {e}")
+            self.report({'ERROR'}, f"Failed to install: {e}")
             return {'CANCELLED'}
-        
-        bpy.context.window.cursor_set('DEFAULT')  
-        
-        return {'FINISHED'}
 
 class AETHER_OT_Update(bpy.types.Operator):
     """Installs the latest version of AetherBlend from GitHub"""
@@ -36,7 +33,6 @@ class AETHER_OT_Update(bpy.types.Operator):
     bl_options = {'REGISTER'}
 
     def execute(self, context): 
-        bpy.context.window.cursor_set('WAIT')  
         prefs = get_preferences()
         branch = prefs.branch
 
@@ -45,14 +41,11 @@ class AETHER_OT_Update(bpy.types.Operator):
     
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
-            self.report({'INFO'}, f"[AetherBlend] Installed {GITHUB_REPO} on branch {branch}.")
+            self.report({'INFO'}, f"[AetherBlend] New Installed")
+            return {'FINISHED'}
         except Exception as e:
-            self.report({'ERROR'}, f"[AetherBlend] Failed to install {GITHUB_REPO} on branch {branch}")
+            self.report({'ERROR'}, f"Failed to install: {e}")
             return {'CANCELLED'}
-    
-        bpy.context.window.cursor_set('DEFAULT')  
-
-        return {'FINISHED'}
     
 class AETHER_OT_CheckInstalls(bpy.types.Operator):
     """Check if AetherBlend and Meddle are installed and up-to-date"""
@@ -95,11 +88,11 @@ class AETHER_OT_EnableMeddle(bpy.types.Operator):
 def register():
     bpy.utils.register_class(AETHER_OT_Update)
     bpy.utils.register_class(AETHER_OT_Meddle_Update)
-    #bpy.utils.register_class(AETHER_OT_CheckInstalls)
+    bpy.utils.register_class(AETHER_OT_CheckInstalls)
     bpy.utils.register_class(AETHER_OT_EnableMeddle)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_EnableMeddle)
-    #bpy.utils.unregister_class(AETHER_OT_CheckInstalls)
+    bpy.utils.unregister_class(AETHER_OT_CheckInstalls)
     bpy.utils.unregister_class(AETHER_OT_Update)
     bpy.utils.unregister_class(AETHER_OT_Meddle_Update)
