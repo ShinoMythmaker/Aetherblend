@@ -1,45 +1,6 @@
 import bpy
-import os
+from .status import AetherBlendStatus as status
 
-# Aetherblend GitHub repository information
-GITHUB_USER = "ShinoMythmaker"
-GITHUB_REPO = "Aetherblend"
-
-# Meddle Github repository information
-GITHUB_MEDDLE_USER = "PassiveModding"
-GITHUB_MEDDLE_REPO = "MeddleTools"
-
-# Extension and manifest paths
-EXTENSIONS_PATH = bpy.utils.user_resource('EXTENSIONS', path="user_default")
-AETHERBLEND_FOLDER = os.path.join(EXTENSIONS_PATH, "aetherblend")
-MEDDLE_FOLDER = os.path.join(EXTENSIONS_PATH, "meddle_tools")
-
-
-class AetherBlendStatus:
-    """Class to hold the status of AetherBlend and Meddle installations."""
-    BRANCH_MATCH_RESULT = True
-    VERSION_MATCH_RESULT = True
-    MEDDLE_INSTALLED = True
-    MEDDLE_VERSION_MATCH_RESULT = True
-    PROMPT_USER_AETHER = False
-    PROMPT_USER_MEDDLE = False
-
-    @classmethod
-    def set(cls, **kwargs):
-        for k, v in kwargs.items():
-            if hasattr(cls, k):
-                setattr(cls, k, v)
-            else:
-                # Handle name-mangled private attributes
-                mangled = f"_{cls.__name__}__{k}" if k.startswith("__") and not k.endswith("__") else None
-                if mangled and hasattr(cls, mangled):
-                    setattr(cls, mangled, v)
-
-    @classmethod
-    def get(cls, name):
-        return getattr(cls, name, None)
-    
-status = AetherBlendStatus  #Alias for convenience
 
 def get_preferences():
     """Retrieve addon preferences."""
@@ -83,7 +44,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col2 = split.column()
         right = col2.row(align=True)
         right.prop(self, "run_check_on_startup")
-        right.operator("aether.check_installs", text="Check for Updates", icon='RECOVER_LAST')
+        right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
     
 
         col = layout.column(align=False)
@@ -106,18 +67,27 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col1.label(text="AetherBlend")
         status_text = "Up to date"
         status_icon = 'CHECKMARK'
-        if not status.BRANCH_MATCH_RESULT:
+
+        if not status.is_branch:
             status_text = "Branch mismatch!"
             status_icon = 'ERROR'
-        elif not status.VERSION_MATCH_RESULT:
+        elif not status.is_latest:
             status_text = "Old version!"
             status_icon = 'ERROR'
         right = col2.row(align=True) 
-        right.label(text=status_text, icon=status_icon)
-        if status.PROMPT_USER_AETHER:
+        
+        if not status.restarted_check:
+            right.label(text="Status Unkown", icon='QUESTION')
+            right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
+        elif status.prompt_user_aether:
+            right.label(text=status_text, icon=status_icon)
             right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
-        elif not status.VERSION_MATCH_RESULT or not status.BRANCH_MATCH_RESULT:
-            right.operator("aether.update", text="Update", icon='IMPORT')  
+        elif not status.is_latest or not status.is_branch:
+            right.label(text=status_text, icon=status_icon)
+            right.operator("aether.update", text="Update", icon='IMPORT')
+        else: 
+            right = col2.row(align=True) 
+            right.label(text=status_text, icon=status_icon)  
 
         col.separator() 
     
@@ -128,21 +98,29 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col2 = split.column(align=False)
         col1.label(text="Meddle Tools")
         right = col2.row(align=True)
-        if not status.MEDDLE_INSTALLED: 
+        if not status.restarted_check:
+            right.label(text="Status Unkown", icon='QUESTION')
+            right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
+        elif not status.meddle_installed: 
             right.label(text="Not installed", icon='CANCEL')
-            if status.PROMPT_USER_MEDDLE:
+            if status.prompt_user_meddle:
                 right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
             else:
                 right.operator("wm.url_open", text="Github", icon="URL").url = "https://github.com/PassiveModding/MeddleTools/releases/latest"
-        elif not status.MEDDLE_VERSION_MATCH_RESULT:
+        elif not status.meddle_is_latest:
             right.label(text="Old version!", icon='ERROR')
-            if status.PROMPT_USER_MEDDLE:
+            if status.prompt_user_meddle:
                 right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
             else:
                 right.operator("aether.meddle_update", text="Update", icon='IMPORT')
+        elif not status.meddle_enabled:
+            right.label(text="Disabled.", icon='CHECKBOX_DEHLT')
+            right.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
+            if status.prompt_user_meddle:
+                right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
         else:
             right.label(text="Up to date", icon='CHECKMARK')
-            if status.PROMPT_USER_MEDDLE:
+            if status.prompt_user_meddle:
                 right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
     
 def register():

@@ -1,12 +1,14 @@
 schema_version = "0.0.2"
 
 id = "AetherBlend"
-version = "0.0.3"
+version = "0.0.4"
 name = "AetherBlend"
 tagline = "AetherBlend: Effortless FFXIV Workflows in Blender"
 maintainer = "Shino Mythmaker"
 type = "add-on"
 branch = "dev"
+
+tags = ["Animation", "Rigging", "Import-Export", "3D-View"]
 
 website = "https://github.com/ShinoMythmaker/Aetherblend"
 
