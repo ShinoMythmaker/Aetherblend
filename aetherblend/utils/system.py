@@ -2,6 +2,7 @@ import os
 import requests
 import tempfile
 import addon_utils
+import bpy
 
 def download_zip(url: str, name: str = "download") -> str:
     """Download a ZIP file from a URL and return the path to the downloaded file."""
@@ -68,11 +69,43 @@ def get_github_download_url(username: str, repo: str, branch: str = "main") -> s
     """Construct the GitHub download URL for the specified repository and branch."""
     return f"https://github.com/{username}/{repo}/archive/refs/heads/{branch}.zip"
 
-def is_addon_installed(addon_name):
+def get_addon_info(addon_name, manifest_path=None):
+    """Get information about a Blender addon."""
     for mod in addon_utils.modules():
-        if mod.bl_info['name'] == addon_name:  
-            return True
-    return False
+        if mod.bl_info.get("name") == addon_name:
+            version = mod.bl_info.get("version")
+            branch = mod.bl_info.get("branch")
+            module_name = mod.__name__
+            # Try to find manifest_path dynamically if not provided
+            if not manifest_path and hasattr(mod, "__file__"):
+                possible_manifest = os.path.join(os.path.dirname(mod.__file__), "blender_manifest.toml")
+                if os.path.exists(possible_manifest):
+                    manifest_path = possible_manifest
+            if not branch:
+                branch = parse_key_from_manifest(manifest_path, "branch")
+            version_str = ".".join(str(v) for v in version) if version else None
+            loaded_default, loaded_state = addon_utils.check(module_name)
+            return {
+                "installed": True,
+                "enabled": loaded_state,
+                "version": version_str,
+                "branch": branch,
+                "name": module_name
+            }
+    return {
+        "installed": False,
+        "enabled": False,
+        "version": None,
+        "branch": None,
+        "name": None
+    }
+
+def update_window(areaType: str = "VIEW_3D"):
+    """Update the specified area type in Blender."""
+    for window in bpy.context.window_manager.windows:
+            for area in window.screen.areas:
+                if area.type == 'VIEW_3D': 
+                    area.tag_redraw()
 
 
 
