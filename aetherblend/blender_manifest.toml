@@ -6,7 +6,7 @@ name = "AetherBlend"
 tagline = "AetherBlend: Effortless FFXIV Workflows in Blender"
 maintainer = "Shino Mythmaker"
 type = "add-on"
-branch = "main"
+branch = "dev"
 
 tags = ["Animation", "Rigging", "Import-Export", "3D-View"]
 
