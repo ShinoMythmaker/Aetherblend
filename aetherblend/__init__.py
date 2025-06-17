@@ -44,7 +44,7 @@ def register():
                     except Exception as e:
                         print(f"[AetherBlend] Failed to register {full_module_name}: {e}")
 
-    bpy.app.timers.register(run_status_check_later, first_interval=0.8)
+    bpy.app.timers.register(run_status_check_later, first_interval=2)
                 
 def unregister():
     """Automatically unregisters all operators and UI panels."""
