@@ -99,7 +99,7 @@ def register():
     bpy.utils.register_class(AETHER_OT_EnableMeddle)
 
 def unregister():
+    bpy.utils.unregister_class(AETHER_OT_CheckInstalls)
+    bpy.utils.unregister_class(AETHER_OT_EnableMeddle)
     bpy.utils.unregister_class(AETHER_OT_Update)
     bpy.utils.unregister_class(AETHER_OT_Meddle_Update)
-    bpy.utils.unregister_class(AETHER_OT_CheckInstalls)
-    bpy.utils.register_class(AETHER_OT_EnableMeddle)
