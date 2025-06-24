@@ -41,30 +41,23 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         layout.separator()
 
         # --- VERSION CONTROL ---
-        show_status = (
-            not status.is_branch or
-            not status.is_latest or
-            not status.meddle_installed or
-            not status.meddle_is_latest or
-            not status.meddle_enabled
-        )
 
-        if show_status and status.restarted_check:
-            if status.prompt_user_aether or status.prompt_user_meddle:
+        if status.get_status():
+            if status.get_prompt_user_meddle() or status.get_prompt_user_aether():
                 status_box = layout.box()
                 status_col = status_box.column(align=False)
                 status_col.label(text="Version Update Required")
 
                 status_col.separator()
 
-                if status.prompt_user_aether:
+                if status.get_prompt_user_aether():
                     row = status_col.row()
                     row.label(text="AetherBlend", icon="ERROR")
-                    row.operator("aether.restart_blender", text="Restart Blender!", icon="FILE_REFRESH")
-                if status.prompt_user_meddle:
+                    row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
+                if status.get_prompt_user_meddle():
                     row = status_col.row()
                     row.label(text="Meddle", icon="ERROR")
-                    row.operator("aether.restart_blender", text="Restart Blender!", icon="FILE_REFRESH")
+                    row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
             else:
                 status_box = layout.box()
                 status_col = status_box.column(align=False)

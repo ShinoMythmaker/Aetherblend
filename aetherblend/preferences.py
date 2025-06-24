@@ -43,7 +43,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col2 = split.column()
         right = col2.row(align=True)
         right.prop(self, "run_check_on_startup")
-        if status.prompt_user_meddle or status.prompt_user_aether:
+        if status.get_prompt_user_meddle() or status.get_prompt_user_aether():
             right.operator("aether.restart_blender", text="Restart Blender", icon='FILE_REFRESH')
         else:
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
@@ -81,7 +81,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         if not status.restarted_check:
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
-        elif status.prompt_user_aether:
+        elif status.get_prompt_user_aether():
             right.label(text=status_text, icon=status_icon)
             right.operator("aether.restart_blender", text="Requires Restart!", icon='FILE_REFRESH')
         elif not status.is_latest or not status.is_branch:
@@ -103,7 +103,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         if not status.restarted_check:
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
-        elif status.prompt_user_meddle:
+        elif status.get_prompt_user_meddle():
             right.label(text="Update Required", icon='ERROR')
             right.operator("aether.restart_blender", text="Requires Restart!", icon='FILE_REFRESH')
         elif not status.meddle_installed: 
@@ -117,7 +117,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             right.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
         else:
             right.label(text="Up to date", icon='CHECKMARK')
-            if status.prompt_user_meddle:
+            if status.get_prompt_user_meddle():
                 right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
     
 def register():
