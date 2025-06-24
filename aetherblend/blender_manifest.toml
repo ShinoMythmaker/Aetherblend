@@ -16,7 +16,7 @@ license = [
   "SPDX:AGPL-3.0-or-later",
 ]
 
-blender_version_min = "4.4.3"
+blender_version_min = "4.3.0"
 
 [permissions]
 files = "Import files for most Aetherblends functions"

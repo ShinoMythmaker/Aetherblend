@@ -23,8 +23,8 @@ class AetherBlendStatus:
     meddle_installed = False
     meddle_enabled = False
     meddle_is_latest = False
-    prompt_user_aether = False
-    prompt_user_meddle = False
+    prompt_user_aether = bpy.app.driver_namespace.get("aetherblend_prompt_user", False)
+    prompt_user_meddle = bpy.app.driver_namespace.get("meddle_prompt_user", False)
 
 
 

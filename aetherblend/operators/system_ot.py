@@ -29,7 +29,7 @@ class AETHER_OT_Meddle_Update(bpy.types.Operator):
         
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
-            status.prompt_user_meddle = True
+            bpy.app.driver_namespace["meddle_prompt_user"] = True
             self.report({'INFO'}, f"[AetherBlend] New Meddle Version installed.")
             return {'FINISHED'}
         except Exception as e:
@@ -59,7 +59,7 @@ class AETHER_OT_Update(bpy.types.Operator):
     
         try:
             bpy.ops.extensions.package_install_files(directory=EXTENSIONS_PATH, filepath=zip, repo='user_default', url=url)
-            status.prompt_user_aether = True
+            bpy.app.driver_namespace["aetherblend_prompt_user"] = True
             self.report({'INFO'}, f"[AetherBlend] New Version Installed")
             return {'FINISHED'}
         except Exception as e:
