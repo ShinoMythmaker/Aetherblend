@@ -72,6 +72,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
 
                 status_col.separator()
 
+                # Check AetherBlend status
                 if not status.is_branch:
                     row = status_col.row()
                     row.label(text="AetherBlend", icon="ERROR")
@@ -80,7 +81,8 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
                     row = status_col.row()
                     row.label(text="AetherBlend", icon="ERROR")
                     row.operator("aether.update", text="Update",  icon="IMPORT")
-
+                
+                # Check Meddle status
                 if not status.meddle_installed:
                     row = status_col.row()
                     row.label(text="Meddle", icon="CANCEL")
@@ -93,6 +95,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
                     row = status_col.row()
                     row.label(text="Meddle", icon="CHECKBOX_DEHLT")
                     row.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
+
 
 def register():
     bpy.utils.register_class(AETHER_PT_InfoPanel)
