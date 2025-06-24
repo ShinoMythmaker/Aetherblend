@@ -32,7 +32,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         row.operator("wm.url_open", text="Wiki", icon="HELP").url = f"https://github.com/{GITHUB_USER}/{GITHUB_REPO}/wiki"
         row.operator("wm.url_open", text="Issues", icon="BOOKMARKS").url = f"https://github.com/{GITHUB_USER}/{GITHUB_REPO}/issues"
 
-        if not status.restarted_check:
+        if not status.startup_check:
             row = layout.row()
             row.operator("aether.check_installs", text="Run Version Control", icon="FILE_REFRESH")
         else:
@@ -42,7 +42,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
 
         # --- VERSION CONTROL ---
 
-        if status.get_status():
+        if not status.get_status():
             if status.get_prompt_user_meddle() or status.get_prompt_user_aether():
                 status_box = layout.box()
                 status_col = status_box.column(align=False)

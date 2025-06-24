@@ -78,7 +78,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             status_icon = 'ERROR'
         right = col2.row(align=True) 
         
-        if not status.restarted_check:
+        if not status.startup_check:
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
         elif status.get_prompt_user_aether():
@@ -100,7 +100,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         col2 = split.column(align=False)
         col1.label(text="Meddle Tools")
         right = col2.row(align=True)
-        if not status.restarted_check:
+        if not status.startup_check:
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
         elif status.get_prompt_user_meddle():

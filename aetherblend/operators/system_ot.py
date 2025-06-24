@@ -16,7 +16,7 @@ class AETHER_OT_Meddle_Update(bpy.types.Operator):
         bpy.context.window.cursor_set('WAIT')  
         branch = "main"
 
-        if status.prompt_user_meddle:
+        if status.get_prompt_user_meddle():
             self.report({'ERROR'}, "[AetherBlend] Previous update is not fully initialized, please restart Blender first.")
             return {'CANCELLED'}
         
@@ -46,7 +46,7 @@ class AETHER_OT_Update(bpy.types.Operator):
         prefs = get_preferences()
         branch = prefs.branch
 
-        if status.prompt_user_aether:
+        if status.get_prompt_user_aether():
             self.report({'ERROR'}, "[AetherBlend] Previous update is not fully initialized, please restart Blender first.")
             return {'CANCELLED'}
 

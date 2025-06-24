@@ -17,7 +17,7 @@ MEDDLE_FOLDER = os.path.join(EXTENSIONS_PATH, "meddle_tools")
 
 class AetherBlendStatus:
     """Class to hold the status of AetherBlend and Meddle installations."""
-    restarted_check = False
+    startup_check = False
     is_branch = False
     is_latest = False
     meddle_installed = False
@@ -47,12 +47,12 @@ class AetherBlendStatus:
     @staticmethod
     def get_meddle_status():
         """Reads if Meddle is installed and up-to-date."""
-        return (AetherBlendStatus.meddle_installed and AetherBlendStatus.meddle_is_latest and AetherBlendStatus.meddle_enabled and AetherBlendStatus.restarted_check)
+        return (AetherBlendStatus.meddle_installed and AetherBlendStatus.meddle_is_latest and AetherBlendStatus.meddle_enabled and AetherBlendStatus.startup_check)
 
     @staticmethod
     def get_aetherblend_status():
         """Reads if AetherBlend is installed and up-to-date."""
-        return (AetherBlendStatus.is_branch and AetherBlendStatus.is_latest and AetherBlendStatus.restarted_check)
+        return (AetherBlendStatus.is_branch and AetherBlendStatus.is_latest and AetherBlendStatus.startup_check)
     
     @staticmethod
     def get_status():
@@ -67,7 +67,7 @@ class AetherBlendStatus:
 
         AetherBlendStatus.check_aetherblend_status(branch)
         AetherBlendStatus.check_meddle_status()
-        AetherBlendStatus.restarted_check = True
+        AetherBlendStatus.startup_check = True
         system.update_window()
 
         print("[AetherBlend] All checks completed successfully.")
