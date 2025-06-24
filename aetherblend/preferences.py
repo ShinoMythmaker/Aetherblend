@@ -44,7 +44,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         right = col2.row(align=True)
         right.prop(self, "run_check_on_startup")
         if status.get_prompt_user_meddle() or status.get_prompt_user_aether():
-            right.operator("aether.restart_blender", text="Restart Blender", icon='FILE_REFRESH')
+            right.operator("aether.restart_blender", text="Restart Blender!", icon='FILE_REFRESH')
         else:
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
     
@@ -82,8 +82,8 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
         elif status.get_prompt_user_aether():
-            right.label(text=status_text, icon=status_icon)
-            right.operator("aether.restart_blender", text="Requires Restart!", icon='FILE_REFRESH')
+            right.label(text="Requires Restart", icon="ERROR")
+            right.operator("aether.restart_blender", text="Restart Blender!", icon='FILE_REFRESH')
         elif not status.is_latest or not status.is_branch:
             right.label(text=status_text, icon=status_icon)
             right.operator("aether.update", text="Update", icon='IMPORT')
@@ -104,8 +104,8 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
         elif status.get_prompt_user_meddle():
-            right.label(text="Update Required", icon='ERROR')
-            right.operator("aether.restart_blender", text="Requires Restart!", icon='FILE_REFRESH')
+            right.label(text="Requires Restart", icon="ERROR")
+            right.operator("aether.restart_blender", text="Restart Blender!", icon='FILE_REFRESH')
         elif not status.meddle_installed: 
             right.label(text="Not installed", icon='CANCEL')
             right.operator("wm.url_open", text="Github", icon="URL").url = "https://github.com/PassiveModding/MeddleTools/releases/latest"
@@ -118,7 +118,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         else:
             right.label(text="Up to date", icon='CHECKMARK')
             if status.get_prompt_user_meddle():
-                right.operator("aether.restart_blender", text="Requires Restart", icon='FILE_REFRESH') 
+                right.operator("aether.restart_blender", text="Restart Blender!", icon='FILE_REFRESH') 
     
 def register():
     bpy.utils.register_class(AetherBlendPreferences)

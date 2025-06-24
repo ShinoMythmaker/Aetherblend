@@ -43,51 +43,43 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         # --- VERSION CONTROL ---
 
         if not status.get_status():
-            if status.get_prompt_user_meddle() or status.get_prompt_user_aether():
-                status_box = layout.box()
-                status_col = status_box.column(align=False)
-                status_col.label(text="Version Update Required")
+            status_box = layout.box()
+            status_col = status_box.column(align=False)
+            status_col.label(text="Install Status")
 
-                status_col.separator()
+            status_col.separator()
 
-                if status.get_prompt_user_aether():
-                    row = status_col.row()
-                    row.label(text="AetherBlend", icon="ERROR")
-                    row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
-                if status.get_prompt_user_meddle():
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="ERROR")
-                    row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
-            else:
-                status_box = layout.box()
-                status_col = status_box.column(align=False)
-                status_col.label(text="Version Error")
-
-                status_col.separator()
-
-                # Check AetherBlend status
-                if not status.is_branch:
-                    row = status_col.row()
-                    row.label(text="AetherBlend", icon="ERROR")
-                    row.operator("aether.update", text="Update",  icon="IMPORT")
-                elif not status.is_latest:
-                    row = status_col.row()
-                    row.label(text="AetherBlend", icon="ERROR")
-                    row.operator("aether.update", text="Update",  icon="IMPORT")
-                
-                # Check Meddle status
-                if not status.meddle_installed:
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="CANCEL")
-                    row.operator("wm.url_open", text="Github", icon="URL").url = f"https://github.com/{GITHUB_MEDDLE_USER}/{GITHUB_MEDDLE_REPO}/releases/latest"
-                elif not status.meddle_is_latest:
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="ERROR")
-                    row.operator("aether.meddle_update", text="Update",  icon="IMPORT")
-                elif not status.meddle_enabled:
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="CHECKBOX_DEHLT")
-                    row.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
+            # Check AetherBlend status
+            if status.get_prompt_user_aether():
+                row = status_col.row()
+                row.label(text="AetherBlend", icon="ERROR")
+                row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
+            elif not status.is_branch:
+                row = status_col.row()
+                row.label(text="AetherBlend", icon="ERROR")
+                row.operator("aether.update", text="Update",  icon="IMPORT")
+            elif not status.is_latest:
+                row = status_col.row()
+                row.label(text="AetherBlend", icon="ERROR")
+                row.operator("aether.update", text="Update",  icon="IMPORT")
+            
+            # Check Meddle status
+            if status.get_prompt_user_meddle():
+                row = status_col.row()
+                row.label(text="Meddle", icon="ERROR")
+                row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
+            elif not status.meddle_installed:
+                row = status_col.row()
+                row.label(text="Meddle", icon="CANCEL")
+                row.operator("wm.url_open", text="Github", icon="URL").url = f"https://github.com/{GITHUB_MEDDLE_USER}/{GITHUB_MEDDLE_REPO}/releases/latest"
+            elif not status.meddle_is_latest:
+                row = status_col.row()
+                row.label(text="Meddle", icon="ERROR")
+                row.operator("aether.meddle_update", text="Update",  icon="IMPORT")
+            elif not status.meddle_enabled:
+                row = status_col.row()
+                row.label(text="Meddle", icon="CHECKBOX_DEHLT")
+                row.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
 
 
 def register():
