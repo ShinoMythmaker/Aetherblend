@@ -47,17 +47,17 @@ class AetherBlendStatus:
     @staticmethod
     def get_meddle_status():
         """Reads if Meddle is installed and up-to-date."""
-        return (AetherBlendStatus.meddle_installed and AetherBlendStatus.meddle_is_latest and AetherBlendStatus.meddle_enabled and AetherBlendStatus.startup_check)
+        return (AetherBlendStatus.meddle_installed and AetherBlendStatus.meddle_is_latest and AetherBlendStatus.meddle_enabled and AetherBlendStatus.get_prompt_user_meddle())
 
     @staticmethod
     def get_aetherblend_status():
         """Reads if AetherBlend is installed and up-to-date."""
-        return (AetherBlendStatus.is_branch and AetherBlendStatus.is_latest and AetherBlendStatus.startup_check)
+        return (AetherBlendStatus.is_branch and AetherBlendStatus.is_latest and AetherBlendStatus.get_prompt_user_aether())
     
     @staticmethod
     def get_status():
         """Returns the overall status of AetherBlend and Meddle installations."""
-        return (AetherBlendStatus.get_aetherblend_status() and AetherBlendStatus.get_meddle_status())
+        return (AetherBlendStatus.get_aetherblend_status() and AetherBlendStatus.get_meddle_status() and  AetherBlendStatus.startup_check)
 
 
     @staticmethod
