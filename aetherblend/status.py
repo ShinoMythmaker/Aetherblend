@@ -23,9 +23,41 @@ class AetherBlendStatus:
     meddle_installed = False
     meddle_enabled = False
     meddle_is_latest = False
-    prompt_user_aether = bpy.app.driver_namespace.get("aetherblend_prompt_user", False)
-    prompt_user_meddle = bpy.app.driver_namespace.get("meddle_prompt_user", False)
+    
+    @staticmethod
+    def get_prompt_user_aether():
+        """Returns whether the user has been prompted to restart Blender for AetherBlend."""
+        return bpy.app.driver_namespace.get("aetherblend_prompt_user", False)
 
+    @staticmethod
+    def set_prompt_user_aether(value: bool):
+        """Sets whether the user has been prompted to restart Blender for AetherBlend."""
+        bpy.app.driver_namespace["aetherblend_prompt_user"] = value
+
+    @staticmethod
+    def get_prompt_user_meddle():
+        """Returns whether the user has been prompted to restart Blender for Meddle."""
+        return bpy.app.driver_namespace.get("meddle_prompt_user", False)
+
+    @staticmethod
+    def set_prompt_user_meddle(value: bool):
+        """Sets whether the user has been prompted to restart Blender for Meddle."""
+        bpy.app.driver_namespace["meddle_prompt_user"] = value
+
+    @staticmethod
+    def get_meddle_status():
+        """Reads if Meddle is installed and up-to-date."""
+        return (AetherBlendStatus.meddle_installed and AetherBlendStatus.meddle_is_latest and AetherBlendStatus.meddle_enabled and AetherBlendStatus.restarted_check)
+
+    @staticmethod
+    def get_aetherblend_status():
+        """Reads if AetherBlend is installed and up-to-date."""
+        return (AetherBlendStatus.is_branch and AetherBlendStatus.is_latest and AetherBlendStatus.restarted_check)
+    
+    @staticmethod
+    def get_status():
+        """Returns the overall status of AetherBlend and Meddle installations."""
+        return (AetherBlendStatus.get_aetherblend_status() and AetherBlendStatus.get_meddle_status())
 
 
     @staticmethod
