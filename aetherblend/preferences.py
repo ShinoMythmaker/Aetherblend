@@ -82,7 +82,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
         elif status.get_prompt_user_aether():
-            right.label(text=status_text, icon=status_icon)
+            right.label(text="Requires Restart", icon="ERROR")
             right.operator("aether.restart_blender", text="Restart Blender!", icon='FILE_REFRESH')
         elif not status.is_latest or not status.is_branch:
             right.label(text=status_text, icon=status_icon)
@@ -104,7 +104,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             right.label(text="Status Unkown", icon='QUESTION')
             right.operator("aether.check_installs", text="Run Version Control", icon='RECOVER_LAST')
         elif status.get_prompt_user_meddle():
-            right.label(text="Update Required", icon='ERROR')
+            right.label(text="Requires Restart", icon="ERROR")
             right.operator("aether.restart_blender", text="Restart Blender!", icon='FILE_REFRESH')
         elif not status.meddle_installed: 
             right.label(text="Not installed", icon='CANCEL')
