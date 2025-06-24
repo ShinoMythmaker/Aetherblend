@@ -15,6 +15,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "AetherBlend"
+    bl_order = 0 
 
     def draw_header(self, context):
         self.local_manifest_path = os.path.join(AETHERBLEND_FOLDER, "blender_manifest.toml")
