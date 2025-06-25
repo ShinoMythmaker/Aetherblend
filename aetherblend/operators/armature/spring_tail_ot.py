@@ -12,6 +12,7 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.context.window.cursor_set('WAIT')  
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
@@ -27,6 +28,8 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
             rig_utils.bone.delete_bone_collection_and_bones(armature, sb_tail_collection)
 
         # reset xiv_tail_bones
+        original_visibility = rig_utils.bone.get_bone_visibility(armature, xiv_tail_bones)
+
         rig_utils.bone.delete_keyframes(armature, xiv_tail_bones)
         rig_utils.bone.reset_bone_transforms(armature, xiv_tail_bones)
  
@@ -77,8 +80,12 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
                 pb.ab_sb_gravity = 0.20
                 pb.ab_sb_global_influence = 0.8 
 
-        bpy.ops.object.mode_set(mode='POSE')   
 
+        # Restore original bone visibility
+        rig_utils.bone.restore_visibility(armature, original_visibility)
+
+        bpy.ops.object.mode_set(mode='POSE')   
+        bpy.context.window.cursor_set('DEFAULT')  
         self.report({'INFO'}, "[AetherBlend] Spring tail generated and constraints set.")
         return {'FINISHED'}
 
@@ -127,6 +134,8 @@ class AETHER_OT_Bake_Spring_Tail(bpy.types.Operator):
 
         start_frame, end_frame = rig_utils.armature.get_frame_range(armature)
 
+        original_visibility = rig_utils.bone.get_bone_visibility(armature, xiv_tail_bones)
+
         # Select only the tail bones before baking
         rig_utils.bone.select_bones(armature, xiv_tail_bones)
 
@@ -147,6 +156,9 @@ class AETHER_OT_Bake_Spring_Tail(bpy.types.Operator):
             bake_types={'POSE'},
             step=1,
         )
+
+        # Restore original bone visibility
+        rig_utils.bone.restore_visibility(armature, original_visibility)
 
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, f"[AetherBlend] Spring tail baked from frame {start_frame} to {end_frame}.")
