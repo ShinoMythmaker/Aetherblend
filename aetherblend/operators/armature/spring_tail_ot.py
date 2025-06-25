@@ -1,6 +1,6 @@
 import bpy
 from ...utils import rig as rig_utils
-from ...data.constants import xiv_tail_bones, sb_tail_collection, spring_prefix
+from ...data.constants import xiv_tail_bones, sb_tail_collection, spring_prefix, spring_bone_collection, sb_tail_parent_bone
 from ..spring_bones_ot import end_spring_bone
 
 
@@ -16,20 +16,29 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
+        
+        context.scene.ab_sb_global_spring_frame = False 
+        context.scene.ab_sb_global_spring = False 
 
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Delete existing spring bones collection if it exists
-        rig_utils.bone.delete_bone_collection_and_bones(armature, "SB_Tail")
+        if rig_utils.bone.collection_exists(armature, sb_tail_collection):
+            rig_utils.bone.delete_bone_collection_and_bones(armature, sb_tail_collection)
 
         # reset xiv_tail_bones
         rig_utils.bone.delete_keyframes(armature, xiv_tail_bones)
         rig_utils.bone.reset_bone_transforms(armature, xiv_tail_bones)
  
         # Create spring bones
-        spring_bones = rig_utils.generate.bone_chain(armature, xiv_tail_bones, prefix=spring_prefix, parent_bone="j_kosi")
+        spring_bones = rig_utils.generate.bone_chain(armature, xiv_tail_bones, prefix=spring_prefix, parent_bone=sb_tail_parent_bone)
 
-        rig_utils.bone.assign_bones_to_collection(armature, spring_bones, "Spring Bones/SB_Tail")
+        # Check if spring bones is an empty array
+        if not spring_bones:
+            self.report({'ERROR'}, "[AetherBlend] No spring bones generated. Missing reference bones.")
+            return {'CANCELLED'}
+
+        rig_utils.bone.assign_bones_to_collection(armature, spring_bones, f"{spring_bone_collection}/{sb_tail_collection}")
 
         # Apply Copy Rotation constraints to each reference bone except the last
         rig_utils.bone.add_constraint_copy_rotation(xiv_tail_bones[:-1], armature, spring_bones, overwrite=True)
@@ -43,30 +52,30 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
             pb.ab_sb_lock_axis = 'NONE'           
             
             if index == 0:
-                pb.ab_sb_stiffness = 0.20             
-                pb.ab_sb_damp = 0.40                  
-                pb.ab_sb_gravity = 0.25               
-                pb.ab_sb_global_influence = 0.8       
+                pb.ab_sb_stiffness = 0.20
+                pb.ab_sb_damp = 0.40
+                pb.ab_sb_gravity = 0.25
+                pb.ab_sb_global_influence = 0.8
             elif index == 1:
-                pb.ab_sb_stiffness = 0.20             
-                pb.ab_sb_damp = 0.40                  
-                pb.ab_sb_gravity = 0.15               
-                pb.ab_sb_global_influence = 0.8       
+                pb.ab_sb_stiffness = 0.20
+                pb.ab_sb_damp = 0.40
+                pb.ab_sb_gravity = 0.15
+                pb.ab_sb_global_influence = 0.8
             elif index == 2:
-                pb.ab_sb_stiffness = 0.20             
-                pb.ab_sb_damp = 0.40                  
-                pb.ab_sb_gravity = (-0.15)            
-                pb.ab_sb_global_influence = 0.8       
+                pb.ab_sb_stiffness = 0.20
+                pb.ab_sb_damp = 0.40
+                pb.ab_sb_gravity = (-0.15)
+                pb.ab_sb_global_influence = 0.8
             elif index == 3:
-                pb.ab_sb_stiffness = 0.20             
-                pb.ab_sb_damp = 0.40                  
-                pb.ab_sb_gravity = (-0.20)            
-                pb.ab_sb_global_influence = 0.80      
+                pb.ab_sb_stiffness = 0.20
+                pb.ab_sb_damp = 0.40
+                pb.ab_sb_gravity = (-0.20)
+                pb.ab_sb_global_influence = 0.80
             else :
-                pb.ab_sb_stiffness = 0.20             
-                pb.ab_sb_damp = 0.40                  
-                pb.ab_sb_gravity = 0.20               
-                pb.ab_sb_global_influence = 0.8    
+                pb.ab_sb_stiffness = 0.20
+                pb.ab_sb_damp = 0.40
+                pb.ab_sb_gravity = 0.20
+                pb.ab_sb_global_influence = 0.8 
 
         bpy.ops.object.mode_set(mode='POSE')   
 
@@ -86,6 +95,8 @@ class AETHER_OT_Delete_Spring_Tail(bpy.types.Operator):
             return {'CANCELLED'}
         
         # Disable Spring Bones
+        context.scene.ab_sb_global_spring_frame = False 
+        context.scene.ab_sb_global_spring = False 
         end_spring_bone(context, self)
 
         bpy.ops.object.mode_set(mode='POSE')

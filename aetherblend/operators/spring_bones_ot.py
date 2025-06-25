@@ -24,7 +24,7 @@ def spring_bone_frame_mode(foo):
         try:
             spring_bone(foo)
         except Exception as e:
-            print(f"[AetherBlend] Error in spring_bone_frame_mode: {e}")
+            print(f"[AetherBlend][SB] Error in spring_bone_frame_mode: {e}")
             bpy.context.scene.ab_sb_global_spring_frame = False
  
 def lerp_vec(vec_a, vec_b, t):                        
@@ -366,7 +366,7 @@ def project_point_onto_tri(TRI, P):
     
                     
 def update_bone(self, context):
-    print("Updating data...")
+    print("[AetherBlend][SB] Updating sb_bone data...")
     time_start = time.time()
     scene = bpy.context.scene    
     armature = bpy.context.active_object  
@@ -421,7 +421,7 @@ def update_bone(self, context):
         if is_spring_bone or is_collider_bone:
             item = bpy.context.scene.ab_sb_spring_bones.add()
             item.name = pbone.name    
-            print("registering", pbone.name)
+            print("[AetherBlend][SB] registering", pbone.name)
             bone_tail = armature.matrix_world @ pbone.tail 
             bone_head = armature.matrix_world @ pbone.head 
             item.last_loc = bone_head
@@ -527,7 +527,7 @@ def update_bone(self, context):
     #set_active_object(armature.name)
     #bpy.ops.object.mode_set(mode='POSE')
     
-    print("Updated in", round(time.time()-time_start, 1), "seconds.")    
+    print("[AetherBlend][SB] Updated in", round(time.time()-time_start, 1), "seconds.")    
   
 def end_spring_bone(context, self):
     if context.scene.ab_sb_global_spring:
@@ -555,7 +555,7 @@ def end_spring_bone(context, self):
         if emp2:        
             bpy.data.objects.remove(emp2)
     
-    print("--End--")
+    print("[AetherBlend][SB] --End--")
     
 class AETHER_OT_Spring_Modal(bpy.types.Operator):
     """Spring Bones, interactive mode"""
@@ -563,8 +563,7 @@ class AETHER_OT_Spring_Modal(bpy.types.Operator):
     bl_idname = "aether.spring_bone"
     bl_label = "spring_bone" 
     
-    def __init__(self):
-        self.timer_handler = None
+    timer_handler: object = None
      
     def modal(self, context, event):  
         #print("self.timer_handler =", self.timer_handler)
@@ -588,7 +587,7 @@ class AETHER_OT_Spring_Modal(bpy.types.Operator):
             wm = context.window_manager
             self.timer_handler = wm.event_timer_add(0.02, window=context.window)            
             wm.modal_handler_add(self)
-            print("--Start modal--")
+            print("[AetherBlend][SB] --Start modal--")
             
             context.scene.ab_sb_global_spring = True
             update_bone(self, context)
@@ -598,7 +597,7 @@ class AETHER_OT_Spring_Modal(bpy.types.Operator):
         # disable spring selection
         
         else:
-            print("--End modal--")
+            print("[AetherBlend][SB] --End modal--")
             #self.cancel(context)
             context.scene.ab_sb_global_spring = False
             return {'FINISHED'}  
@@ -630,7 +629,7 @@ class AETHER_OT_Spring_Modal(bpy.types.Operator):
             if emp2:        
                 bpy.data.objects.remove(emp2)
         
-        print("--End--")
+        print("[AetherBlend][SB] --End--")
                      
 class AETHER_OT_Spring(bpy.types.Operator):
     """Spring Bones, animation mode. Support baking."""
@@ -678,7 +677,7 @@ class AETHER_PT_ui(bpy.types.Panel):
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = 'bone'
-    bl_label = "Spring Bones"    
+    bl_label = "AetherBlend Spring Bones"    
     
     @classmethod
     
@@ -697,10 +696,10 @@ class AETHER_PT_ui(bpy.types.Panel):
             #col.label(text='Scene Parameters:')
             col = layout.column(align=True)
             #col.prop(scene, 'ab_sb_global_spring', text="Enable spring")
-            #if context.scene.ab_sb_global_spring == False:
-                #col.operator("aether.spring_bone", text="Start - Interactive Mode", icon='PLAY')           
-            #if context.scene.ab_sb_global_spring == True:
-                #col.operator("aether.spring_bone", text="Stop", icon='PAUSE')          
+            if context.scene.ab_sb_global_spring == False:
+                col.operator("aether.spring_bone", text="Start - Interactive Mode", icon='PLAY')           
+            if context.scene.ab_sb_global_spring == True:
+                col.operator("aether.spring_bone", text="Stop", icon='PAUSE')          
           
             col.enabled = not context.scene.ab_sb_global_spring_frame
           
@@ -751,7 +750,7 @@ class AETHER_PT_Object_Ui(bpy.types.Panel):
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = 'object'
-    bl_label = "Spring Bones"    
+    bl_label = "AetherBlend Spring Bones"    
     
     @classmethod
     
