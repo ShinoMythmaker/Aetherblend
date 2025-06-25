@@ -1,7 +1,17 @@
 import bpy
+from .bone import bones_exist
 
 def bone_chain(armature, reference_bone_names, prefix="gen_", suffix="", parent_bone=None):
     """Generates a chain of bones based on reference bone names."""
+
+    if not armature or armature.type != 'ARMATURE':
+        print(f"[AetherBlend] Object '{armature.name}' is not an armature.")
+        return []
+    
+    if not bones_exist(armature, reference_bone_names):
+        print(f"[AetherBlend] One or more reference bones do not exist in armature '{armature.name}'.")
+        return []
+
     bpy.ops.object.mode_set(mode='EDIT')
     edit_bones = armature.data.edit_bones
     bone_chain = []

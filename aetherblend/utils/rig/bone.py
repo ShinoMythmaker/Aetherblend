@@ -55,6 +55,17 @@ def assign_bones_to_collection(armature, bone_names, collection_path):
             print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'")
 
 
+def collection_exists(armature, collection_name):
+    """Checks if a specified collection exists in the armature's data."""
+    if armature.type != 'ARMATURE':
+        print(f"[AetherBlend] Object '{armature.name}' is not an armature.")
+        return False
+
+    for coll in armature.data.collections_all:
+        if coll.name == collection_name:
+            return True
+    return False
+
 def delete_bone_collection_and_bones(armature, collection_name):
     """Deletes a specified collection and all bones within it from the armature."""
     if armature.type != 'ARMATURE':
@@ -73,7 +84,7 @@ def delete_bone_collection_and_bones(armature, collection_name):
             break
 
     if not target_coll:
-        print(f"Collection '{collection_name}' not found.")
+        print(f"[AetherBlend] Collection '{collection_name}' not found.")
         return
 
     # Gather all bones recursively
@@ -166,3 +177,11 @@ def reset_bone_transforms(armature, bone_names):
     # Deselect all again (optional)
     for pb in armature.pose.bones:
         pb.bone.select = False
+
+def bone_exists(armature, bone_name):
+    """Checks if a bone exists in the armature."""
+    return bone_name in armature.data.bones
+
+def bones_exist(armature, bone_names):
+    """Checks if all specified bones exist in the armature."""
+    return all(bone_exists(armature, bone_name) for bone_name in bone_names)

@@ -17,7 +17,7 @@ MEDDLE_FOLDER = os.path.join(EXTENSIONS_PATH, "meddle_tools")
 
 class AetherBlendStatus:
     """Class to hold the status of AetherBlend and Meddle installations."""
-    startup_check = False
+    startup_check = False  #turns true after the first check
     is_branch = False
     is_latest = False
     meddle_installed = False
@@ -62,7 +62,7 @@ class AetherBlendStatus:
     @staticmethod
     def get_prompt_user():
         """Returns whether the user has been prompted to restart Blender for both AetherBlend and Meddle."""
-        return (AetherBlendStatus.get_prompt_user_aether() and AetherBlendStatus.get_prompt_user_meddle())
+        return (AetherBlendStatus.get_prompt_user_aether() or AetherBlendStatus.get_prompt_user_meddle())
 
 
     @staticmethod

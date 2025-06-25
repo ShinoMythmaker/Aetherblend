@@ -1,7 +1,7 @@
 schema_version = "0.0.2"
 
 id = "AetherBlend"
-version = "0.0.6"
+version = "0.0.7"
 name = "AetherBlend"
 tagline = "AetherBlend: Effortless FFXIV Workflows in Blender"
 maintainer = "Shino Mythmaker"

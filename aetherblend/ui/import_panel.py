@@ -11,7 +11,7 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return not status.get_prompt_user()
+        return not status.get_prompt_user() and status.startup_check
     
     def draw(self, context):
         layout = self.layout
