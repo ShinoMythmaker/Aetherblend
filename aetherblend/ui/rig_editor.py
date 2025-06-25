@@ -11,10 +11,11 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
     bl_category = 'AetherBlend'
     bl_order = 2 
 
-    def draw(self, context):
-        if status.get_prompt_user():
-            return
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None and context.active_object.type == 'ARMATURE' and not status.get_prompt_user()
     
+    def draw(self, context):
         layout = self.layout
 
         row = layout.row(align=True)
