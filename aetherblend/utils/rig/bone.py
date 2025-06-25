@@ -15,13 +15,13 @@ def add_constraint_copy_rotation(bone_names, armature, target_bone_names, euler_
             copy_rot = ref_bone.constraints.new('COPY_ROTATION')
             copy_rot.target = armature
             copy_rot.subtarget = spring_bone_name
-            copy_rot.euler_order = 'ZXY'
-            copy_rot.use_x = True
-            copy_rot.use_y = True
-            copy_rot.use_z = True
-            copy_rot.mix_mode = 'AFTER'
-            copy_rot.target_space = 'LOCAL_OWNER_ORIENT'
-            copy_rot.owner_space = 'LOCAL_WITH_PARENT'
+            copy_rot.euler_order = euler_order
+            copy_rot.use_x = use_x
+            copy_rot.use_y = use_y
+            copy_rot.use_z = use_z
+            copy_rot.mix_mode = mix_mode
+            copy_rot.target_space = target_space
+            copy_rot.owner_space = owner_space
 
 
 def assign_bones_to_collection(armature, bone_names, collection_path):
@@ -125,6 +125,10 @@ def remove_copy_rotation_constraints(armature, bone_names):
 def select_bones(armature, bone_names):
     """Selects the specified bones in the armature."""
     bpy.ops.object.mode_set(mode='POSE')
+    # Deselect all bones first
+    for pb in armature.pose.bones:
+        pb.bone.select = False
+    # Select only the specified bones
     for bone_name in bone_names:
         pb = armature.pose.bones.get(bone_name)
         if pb:
@@ -174,7 +178,7 @@ def reset_bone_transforms(armature, bone_names):
             pb.bone.select = True
     # Call the operator
     bpy.ops.pose.transforms_clear()
-    # Deselect all again (optional)
+    # Deselect all again 
     for pb in armature.pose.bones:
         pb.bone.select = False
 
@@ -184,4 +188,28 @@ def bone_exists(armature, bone_name):
 
 def bones_exist(armature, bone_names):
     """Checks if all specified bones exist in the armature."""
+    if bone_names is None or not isinstance(bone_names, list):
+        print("[AetherBlend] Invalid bone names provided. Expected a list of bone names.")
+        return False
     return all(bone_exists(armature, bone_name) for bone_name in bone_names)
+
+def get_bone_visibility(armature, bone_list):
+    """Returns a dictionary of bone names and their visibility status."""
+    bpy.ops.object.mode_set(mode='POSE')
+    pbones = armature.pose.bones
+    original_visibility = {}
+    for bone_name in bone_list:
+        pb = pbones.get(bone_name)
+        if pb:
+            original_visibility[bone_name] = pb.bone.hide
+            pb.bone.hide = False
+    return original_visibility
+
+def restore_visibility(armature, original_visibility):
+    """Restores the visibility of bones based on the provided dictionary."""
+    bpy.ops.object.mode_set(mode='POSE')
+    pbones = armature.pose.bones
+    for bone_name, was_hidden in original_visibility.items():
+        pb = pbones.get(bone_name)
+        if pb:
+            pb.bone.hide = was_hidden
