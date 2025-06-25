@@ -9,10 +9,11 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
     bl_category = 'AetherBlend'
     bl_order = 1 
 
-    def draw(self, context):
-        if status.get_prompt_user():
-            return
+    @classmethod
+    def poll(cls, context):
+        return not status.get_prompt_user()
     
+    def draw(self, context):
         layout = self.layout
 
         if status.meddle_installed and status.meddle_enabled:
