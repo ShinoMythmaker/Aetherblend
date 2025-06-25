@@ -1,7 +1,7 @@
 import bpy
 from ..status import AetherBlendStatus as status
 from ..utils import rig as rig_utils
-from ..data.constants import sb_tail_collection
+from ..data.constants import sb_tail_collection, sb_ears_collection, sb_breast_collection
 
 class AETHER_PT_RigEditor(bpy.types.Panel):
     bl_label = "Rig Editor"
@@ -34,9 +34,13 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
         
 
         # Spring Modal button (disabled if spring frame is active)
-        col2= row.column(align=True)
-        col2.enabled = not spring_frame_active
-        col2.operator("aether.spring_bone", text="Active", icon='PLAY' if not spring_active else 'PAUSE')
+        if spring_frame_active:
+            col2 = row.column(align=False)
+            col2.operator("aether.bake_all_spring_bones", text="Bake All", icon='LIGHT_SUN')
+        else:
+            col2= row.column(align=True)
+            col2.enabled = not spring_frame_active
+            col2.operator("aether.spring_bone", text="Active", icon='PLAY' if not spring_active else 'PAUSE')
         
 
         row = box.row(align=True)
@@ -44,9 +48,10 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
         split = col.split(factor=0.5)
         col_label = split.column(align=True)
         col_ops = split.column(align=True)
+        
         col_ops_row = col_ops.row(align=False)
-
-        col_label.label(text="Tail Bones", icon='BONE_DATA')
+        col_label_row = col_label.row(align=True)
+        col_label_row.label(text="Tail", icon='BONE_DATA')
         if rig_utils.bone.get_collectiion(context.active_object, sb_tail_collection):
             delete_string = "Delete"
             if context.scene.ab_sb_global_spring_frame == True:           
@@ -56,6 +61,33 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
             
         else:
             col_ops_row.operator("aether.generate_spring_tail", text="Generate", icon="PIVOT_MEDIAN")
+
+        col_ops_row = col_ops.row(align=False)
+        col_label_row = col_label.row(align=True)
+        col_label_row.label(text="Ears", icon='BONE_DATA')
+        if rig_utils.bone.get_collectiion(context.active_object, sb_ears_collection):
+            delete_string = "Delete"
+            if context.scene.ab_sb_global_spring_frame == True:           
+                col_ops_row.operator("aether.bake_spring_ears", text="Bake", icon="LIGHT_SUN")
+                delete_string = ""
+            col_ops_row.operator("aether.delete_spring_ears", text=delete_string, icon="TRASH")
+            
+        else:
+            col_ops_row.operator("aether.generate_spring_ears", text="Generate", icon="PIVOT_MEDIAN")
+
+        col_ops_row = col_ops.row(align=False)
+        col_label_row = col_label.row(align=True)
+        col_label_row.label(text="Breasts", icon='BONE_DATA')
+        if rig_utils.bone.get_collectiion(context.active_object, sb_breast_collection):
+            delete_string = "Delete"
+            if context.scene.ab_sb_global_spring_frame == True:           
+                col_ops_row.operator("aether.bake_spring_breasts", text="Bake", icon="LIGHT_SUN")
+                delete_string = ""
+            col_ops_row.operator("aether.delete_spring_breasts", text=delete_string, icon="TRASH")
+            
+        else:
+            col_ops_row.operator("aether.generate_spring_breasts", text="Generate", icon="PIVOT_MEDIAN")
+        
 
 
 def register():
