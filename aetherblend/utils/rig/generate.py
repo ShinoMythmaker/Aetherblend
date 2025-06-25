@@ -8,6 +8,11 @@ def bone_chain(armature, reference_bone_names, prefix="gen_", suffix="", parent_
 
     for index, bone_name in enumerate(reference_bone_names[:-1]):
         new_bone_name = f"{prefix}{bone_name}{suffix}"
+
+        # Delete existing bone if it exists
+        if new_bone_name in edit_bones:
+            edit_bones.remove(edit_bones[new_bone_name])
+            
         new_bone = edit_bones.new(new_bone_name)
         new_bone.head = edit_bones[bone_name].head
         if index < len(reference_bone_names) - 2:  # Prevent out of range index for the last bone
