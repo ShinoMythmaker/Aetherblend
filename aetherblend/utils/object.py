@@ -107,6 +107,7 @@ def import_meddle_shader(filepath, imported_objects):
     meddle_cache_directory = os.path.join(character_directory, "cache","")
 
     try:
-        bpy.ops.meddle.use_shaders_selected_objects('EXEC_DEFAULT', directory=meddle_cache_directory)  
+        bpy.ops.meddle.import_shaders('EXEC_DEFAULT')  
+        bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)  
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")

@@ -17,3 +17,26 @@ sb_breast_collection = "SB_Breast"
 spring_prefix = "sb_"
 spring_bone_collection = "Spring Bones"
 
+
+
+# Meta Rig Constants
+meta_rig_arm_l_bones = ["j_sako_l", "j_ude_a_l", "j_ude_b_l", "j_te_l"]
+meta_rig_arm_r_bones = ["j_sako_r", "j_ude_a_r", "j_ude_b_r", "j_te_r"]
+meta_rig_leg_l_bones = ["j_kosi", "j_asi_a_l", "j_asi_b_l", "j_asi_c_l", "j_asi_d_l"]
+meta_rig_leg_r_bones = ["j_kosi", "j_asi_a_r", "j_asi_b_r", "j_asi_c_r", "j_asi_d_r"]
+
+# Meta rig bone chains for generation (without shoulder/hip bones)
+meta_rig_arm_l_chain = ["j_ude_a_l", "j_ude_b_l", "j_te_l"]
+meta_rig_arm_r_chain = ["j_ude_a_r", "j_ude_b_r", "j_te_r"]
+meta_rig_leg_l_chain = ["j_asi_a_l", "j_asi_b_l", "j_asi_c_l", "j_asi_d_l"]
+meta_rig_leg_r_chain = ["j_asi_a_r", "j_asi_b_r", "j_asi_c_r", "j_asi_d_r"]
+
+# Meta rig bone name mappings
+meta_rig_arm_l_names = ["upper_arm.L", "forearm.L", "hand.L"]
+meta_rig_arm_r_names = ["upper_arm.R", "forearm.R", "hand.R"]
+meta_rig_leg_l_names = ["thigh.L", "shin.L", "foot.L", "toe.L"]
+meta_rig_leg_r_names = ["thigh.R", "shin.R", "foot.R", "toe.R"]
+
+meta_rig_prefix = "META_"
+meta_rig_collection = "Meta Rig"
+
