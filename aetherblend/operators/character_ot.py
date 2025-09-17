@@ -99,6 +99,11 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         # Import the model
         imported_objects = utils.import_export.import_model(self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices)
 
+        # Mark any imported armatures as FFXIV rigs
+        for obj in imported_objects:
+            if obj.type == 'ARMATURE':
+                obj.aether_is_ffxiv_rig = True
+
         # Process the imported objects with settings in mind
         if self.s_import_collection:
             import_collection = utils.collection.create_collection("Model_Import")
@@ -125,7 +130,16 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         return {'FINISHED'}
 
 def register():
+    # Add custom property to mark FFXIV rigs
+    bpy.types.Object.aether_is_ffxiv_rig = bpy.props.BoolProperty(
+        name="Is FFXIV Rig",
+        description="Marks this armature as an imported FFXIV rig",
+        default=False
+    )
     bpy.utils.register_class(AETHER_OT_Character_Import)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Character_Import)
+    if hasattr(bpy.types.Object, 'aether_is_ffxiv_rig'):
+        del bpy.types.Object.aether_is_ffxiv_rig
+
