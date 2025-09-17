@@ -8,7 +8,6 @@ def get_preferences():
 
 def branch_changed(self, context):
     """Callback for when the branch preference changes."""
-    # Call the branch check operator when the branch changes
     status.check_installs(self.branch)
 
 class AetherBlendPreferences(bpy.types.AddonPreferences):
