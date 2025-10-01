@@ -1,0 +1,37 @@
+name: Create draft release and attach ZIP
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get repo name and tag
+        id: vars
+        run: |
+          echo "repo_name=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create ZIP archive
+        run: |
+          set -e
+          zipfile="${{ steps.vars.outputs.repo_name }}-${{ steps.vars.outputs.tag }}.zip"
+          # Exclude repo.json, .gitignore, .git and .github
+          zip -r "$zipfile" . -x 'repo.json' '.gitignore' '.git/*' '.github/*'
+          echo "ZIP file created: $zipfile"
+
+      - name: Create draft release and upload ZIP
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          zipfile="${{ steps.vars.outputs.repo_name }}-${{ steps.vars.outputs.tag }}.zip"
+          gh release create "${{ steps.vars.outputs.tag }}" "$zipfile" --draft --title "${{ steps.vars.outputs.tag }}"
