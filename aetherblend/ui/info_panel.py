@@ -1,12 +1,6 @@
 import bpy
-import os
-from ..utils import system
-from ..status import (
-    AetherBlendStatus as status,
-    GITHUB_USER, GITHUB_REPO,
-    GITHUB_MEDDLE_USER, GITHUB_MEDDLE_REPO,
-    AETHERBLEND_FOLDER
-)
+
+GITHUB_URL = "https://github.com/ShinoMythmaker/Aetherblend"
 
 class AETHER_PT_InfoPanel(bpy.types.Panel):
     """Addon Info Panel"""
@@ -18,10 +12,8 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
     bl_order = 0 
 
     def draw_header(self, context):
-        self.local_manifest_path = os.path.join(AETHERBLEND_FOLDER, "blender_manifest.toml")
-        self.local_manifest_path = os.path.abspath(self.local_manifest_path)
 
-        self.layout.label(text=f"AetherBlend {system.parse_key_from_manifest(self.local_manifest_path, 'version')} - {system.parse_key_from_manifest(self.local_manifest_path, 'branch')}")
+        self.layout.label(text=f"AetherBlend")
 
 
     def draw(self, context):
@@ -30,57 +22,8 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         layout.operator("wm.url_open", text="Support & Links", icon="HEART").url = "https://mektools.carrd.co/"
         
         row = layout.row()
-        row.operator("wm.url_open", text="Wiki", icon="HELP").url = f"https://github.com/{GITHUB_USER}/{GITHUB_REPO}/wiki"
-        row.operator("wm.url_open", text="Issues", icon="BOOKMARKS").url = f"https://github.com/{GITHUB_USER}/{GITHUB_REPO}/issues"
-
-        if not status.startup_check:
-            row = layout.row()
-            row.operator("aether.check_installs", text="Run Version Control", icon="FILE_REFRESH")
-        else:
-            row.operator("aether.check_installs", text="", icon="FILE_REFRESH")
-        
-        layout.separator()
-
-        # --- VERSION CONTROL ---
-        if status.startup_check:
-            if not status.get_status():
-                status_box = layout.box()
-                status_col = status_box.column(align=False)
-                status_col.label(text="Install Status")
-
-                status_col.separator()
-
-                # Check AetherBlend status
-                if status.get_prompt_user_aether():
-                    row = status_col.row()
-                    row.label(text="AetherBlend", icon="ERROR")
-                    row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
-                elif not status.is_branch:
-                    row = status_col.row()
-                    row.label(text="AetherBlend", icon="ERROR")
-                    row.operator("aether.update", text="Update",  icon="IMPORT")
-                elif not status.is_latest:
-                    row = status_col.row()
-                    row.label(text="AetherBlend", icon="ERROR")
-                    row.operator("aether.update", text="Update",  icon="IMPORT")
-                
-                # Check Meddle status
-                if status.get_prompt_user_meddle():
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="ERROR")
-                    row.operator("aether.restart_blender", text="Restart!", icon="FILE_REFRESH")
-                elif not status.meddle_installed:
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="CANCEL")
-                    row.operator("wm.url_open", text="Github", icon="URL").url = f"https://github.com/{GITHUB_MEDDLE_USER}/{GITHUB_MEDDLE_REPO}/releases/latest"
-                elif not status.meddle_is_latest:
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="ERROR")
-                    row.operator("aether.meddle_update", text="Update",  icon="IMPORT")
-                elif not status.meddle_enabled:
-                    row = status_col.row()
-                    row.label(text="Meddle", icon="CHECKBOX_DEHLT")
-                    row.operator("aether.enable_meddle", text="Enable", icon="CHECKBOX_HLT")
+        row.operator("wm.url_open", text="Wiki", icon="HELP").url = f"{GITHUB_URL}/wiki"
+        row.operator("wm.url_open", text="Issues", icon="BOOKMARKS").url = f"{GITHUB_URL}/issues"
 
 
 def register():

@@ -1,5 +1,4 @@
 import bpy
-from ..status import AetherBlendStatus as status
 
 class AETHER_PT_ImportPanel(bpy.types.Panel):
     bl_label = "Import"
@@ -8,17 +7,13 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
     bl_region_type = 'UI'  
     bl_category = 'AetherBlend'
     bl_order = 1 
-
-    @classmethod
-    def poll(cls, context):
-        return not status.get_prompt_user() and status.startup_check
     
     def draw(self, context):
         layout = self.layout
 
-        if status.meddle_installed and status.meddle_enabled:
-            row = layout.row(align=True)
-            row.operator("aether.character_import", text="Import Character", icon = "IMPORT")
+        #check here if meddle operators are available otherwise display it. too lazye rn will do later
+        row = layout.row(align=True)
+        row.operator("aether.character_import", text="Import Character", icon = "IMPORT")
 
 def register():
     bpy.utils.register_class(AETHER_PT_ImportPanel)

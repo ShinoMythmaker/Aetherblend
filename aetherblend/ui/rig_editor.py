@@ -1,5 +1,4 @@
 import bpy
-from ..status import AetherBlendStatus as status
 from ..utils import rig as rig_utils
 from ..data.constants import sb_tail_collection, sb_ears_collection, sb_breast_collection
 
@@ -13,7 +12,7 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None and context.active_object.type == 'ARMATURE' and not status.get_prompt_user() and status.startup_check
+        return context.active_object is not None and context.active_object.type == 'ARMATURE'
     
     def draw(self, context):
         layout = self.layout

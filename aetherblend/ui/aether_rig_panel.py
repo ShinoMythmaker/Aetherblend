@@ -1,5 +1,4 @@
 import bpy
-from ..status import AetherBlendStatus as status
 
 
 class AETHER_PT_MetaRigPanel(bpy.types.Panel):
@@ -16,8 +15,6 @@ class AETHER_PT_MetaRigPanel(bpy.types.Panel):
         return (
             armature is not None 
             and armature.type == 'ARMATURE' 
-            and not status.get_prompt_user()
-            and status.startup_check
             and getattr(armature, 'aether_is_ffxiv_rig', False)  # FFXIV rig check
         )
 

@@ -2,16 +2,8 @@ import importlib
 import os
 import bpy
 from . import preferences
-from .status import AetherBlendStatus as status
 
 MODULE_FOLDERS = ["operators", "ui"]
-
-
-def run_status_check_later():
-    prefs = preferences.get_preferences()
-    if prefs and getattr(prefs, "run_check_on_startup", False):
-        status.check_installs(prefs.branch)
-    return None  # Only run once
 
 def register():
     """Automatically registers all operators and UI panels."""
@@ -43,8 +35,6 @@ def register():
                             mod.register()
                     except Exception as e:
                         print(f"[AetherBlend] Failed to register {full_module_name}: {e}")
-
-    bpy.app.timers.register(run_status_check_later, first_interval=2)
                 
 def unregister():
     """Automatically unregisters all operators and UI panels."""
