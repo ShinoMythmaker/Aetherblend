@@ -11,7 +11,7 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        #check here if meddle operators are available otherwise display it. too lazye rn will do later
+        #check here if meddle operators are available otherwise display it. too lazy rn will do later
         row = layout.row(align=True)
         row.operator("aether.character_import", text="Import Character", icon = "IMPORT")
 

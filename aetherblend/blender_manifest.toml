@@ -1,24 +1,19 @@
 schema_version = "0.0.2"
 
 id = "AetherBlend"
-version = "0.0.10"
 name = "AetherBlend"
 tagline = "AetherBlend: Effortless FFXIV Workflows in Blender"
-maintainer = "Shino Mythmaker"
+version = "0.0.10"
 type = "add-on"
-branch = "main"
-
-tags = ["Animation", "Rigging", "Import-Export", "3D-View"]
-
+maintainer = "Shino Mythmaker"
+license = ["SPDX:GPL-3.0-or-later"]
+blender_version_min = "4.2.0"
+blender_version_max = "4.6.0"
 website = "https://github.com/ShinoMythmaker/Aetherblend"
-
-license = [
-  "SPDX:AGPL-3.0-or-later",
-]
-
-blender_version_min = "4.3.2"
+tags = ["Animation", "Rigging", "Import-Export", "3D-View"]
 
 [permissions]
 files = "Import files for most Aetherblends functions"
 network = "For updating"
+
 

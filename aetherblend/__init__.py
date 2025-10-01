@@ -1,6 +1,5 @@
 import importlib
 import os
-import bpy
 from . import preferences
 
 MODULE_FOLDERS = ["operators", "ui"]
@@ -17,17 +16,14 @@ def register():
         for root, _, files in os.walk(path):
             for file in files:
                 if file.endswith(".py") and not file.startswith("__"):
-                    # Convert file path into an importable module path
                     relative_path = os.path.relpath(root, path).replace(os.sep, ".")
                     
-                    # Remove unnecessary dots
                     module_path = relative_path.strip(".")
                     
-                    # Ensure proper module formatting
                     full_module_name = f"{package}.{folder}"
                     if module_path:
                         full_module_name += f".{module_path}"
-                    full_module_name += f".{file[:-3]}"  # Add filename without `.py`
+                    full_module_name += f".{file[:-3]}"  
 
                     try:
                         mod = importlib.import_module(full_module_name)
