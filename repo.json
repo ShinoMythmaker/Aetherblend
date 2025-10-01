@@ -26,9 +26,9 @@
         "Import-Export",
         "3D-View"
       ],
-      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.0.9/AetherBlend.zip",
-      "archive_size": 746075,
-      "archive_hash": "sha256:1948ce14f3b743a316bf15329b59ca6c550a0e235501a439e5378adc0554fb2f"
+      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.0.1/Aetherblend-v0.0.1.zip",
+      "archive_size": 42240,
+      "archive_hash": "sha256:e11ea950a62b50ffd2b4a720248efbbf48a1a2e274154a7a514333bea8040c9f"
     }
   ]
 }
