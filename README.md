@@ -1,6 +1,7 @@
 <div align="center">
   <h1> Aetherblend – FFXIV Animation & Posing Toolkit </h1>
   <p>
+    <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/Mythmaker-Sponsor-pink?style=flat"></a>
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Aetherblend&color=blue">
     <img src="https://img.shields.io/badge/Blender-4.4-orange">
     <img src="https://img.shields.io/badge/Meddle-0.1.1-blue">
