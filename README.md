@@ -2,8 +2,8 @@
   <h1> Aetherblend – FFXIV Animation & Posing Toolkit </h1>
   <p>
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Aetherblend&color=blue">
-    <img src="https://img.shields.io/badge/Blender-4.4%2B-orange">
-    <img src="https://img.shields.io/badge/Meddle-0.1.1%2B-blue">
+    <img src="https://img.shields.io/badge/Blender-4.4-orange">
+    <img src="https://img.shields.io/badge/Meddle-0.1.1-blue">
   </p>
   <p>Aetherblend is a small, simple Blender plugin to help with various FFXIV workflows—primarily animation-related tasks.</p>
 </div>
