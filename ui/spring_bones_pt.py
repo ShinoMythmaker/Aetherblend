@@ -1,24 +1,21 @@
 import bpy
-from ..utils import rig as rig_utils
 from ..data.constants import sb_tail_collection, sb_ears_collection, sb_breast_collection
 
-class AETHER_PT_RigEditor(bpy.types.Panel):
-    bl_label = "Rig Editor"
-    bl_idname = "AETHER_PT_rig_editor"
+class AETHER_PT_SpringBones(bpy.types.Panel):
+    bl_label = "Spring Bones"
+    bl_idname = "AETHER_PT_spring_bones"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'  
     bl_category = 'AetherBlend'
-    bl_order = 2 
+    bl_order = 4 
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None and context.active_object.type == 'ARMATURE'
+        return context.active_object is not None and context.active_object.type == 'ARMATURE' and False
     
     def draw(self, context):
+        armature = context.active_object
         layout = self.layout
-
-        row = layout.row(align=True)
-        row.label(text="Spring Bones", icon='CONSTRAINT_BONE')
 
         box = layout.box()
         row = box.row(align=True)
@@ -51,12 +48,11 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
         col_ops_row = col_ops.row(align=False)
         col_label_row = col_label.row(align=True)
         col_label_row.label(text="Tail", icon='BONE_DATA')
-        if rig_utils.bone.get_collectiion(context.active_object, sb_tail_collection):
-            delete_string = "Delete"
+        if armature.data.collections.get(sb_tail_collection):
             if context.scene.ab_sb_global_spring_frame == True:           
                 col_ops_row.operator("aether.bake_spring_tail", text="Bake", icon="LIGHT_SUN")
                 delete_string = ""
-            col_ops_row.operator("aether.delete_spring_tail", text=delete_string, icon="TRASH")
+            col_ops_row.operator("aether.delete_spring_tail", text="Delete", icon="TRASH")
             
         else:
             col_ops_row.operator("aether.generate_spring_tail", text="Generate", icon="PIVOT_MEDIAN")
@@ -64,12 +60,11 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
         col_ops_row = col_ops.row(align=False)
         col_label_row = col_label.row(align=True)
         col_label_row.label(text="Ears", icon='BONE_DATA')
-        if rig_utils.bone.get_collectiion(context.active_object, sb_ears_collection):
-            delete_string = "Delete"
+        if armature.data.collections.get(sb_ears_collection):
             if context.scene.ab_sb_global_spring_frame == True:           
                 col_ops_row.operator("aether.bake_spring_ears", text="Bake", icon="LIGHT_SUN")
                 delete_string = ""
-            col_ops_row.operator("aether.delete_spring_ears", text=delete_string, icon="TRASH")
+            col_ops_row.operator("aether.delete_spring_ears", text="Delete", icon="TRASH")
             
         else:
             col_ops_row.operator("aether.generate_spring_ears", text="Generate", icon="PIVOT_MEDIAN")
@@ -77,12 +72,10 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
         col_ops_row = col_ops.row(align=False)
         col_label_row = col_label.row(align=True)
         col_label_row.label(text="Breasts", icon='BONE_DATA')
-        if rig_utils.bone.get_collectiion(context.active_object, sb_breast_collection):
-            delete_string = "Delete"
+        if armature.data.collections.get(sb_breast_collection):
             if context.scene.ab_sb_global_spring_frame == True:           
                 col_ops_row.operator("aether.bake_spring_breasts", text="Bake", icon="LIGHT_SUN")
-                delete_string = ""
-            col_ops_row.operator("aether.delete_spring_breasts", text=delete_string, icon="TRASH")
+            col_ops_row.operator("aether.delete_spring_breasts", text="Delete", icon="TRASH")
             
         else:
             col_ops_row.operator("aether.generate_spring_breasts", text="Generate", icon="PIVOT_MEDIAN")
@@ -90,7 +83,7 @@ class AETHER_PT_RigEditor(bpy.types.Panel):
 
 
 def register():
-    bpy.utils.register_class(AETHER_PT_RigEditor)
+    bpy.utils.register_class(AETHER_PT_SpringBones)
 
 def unregister():  
-    bpy.utils.unregister_class(AETHER_PT_RigEditor)
+    bpy.utils.unregister_class(AETHER_PT_SpringBones)

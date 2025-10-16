@@ -2,7 +2,7 @@ import importlib
 import os
 from . import preferences
 
-MODULE_FOLDERS = ["operators", "ui"]
+MODULE_FOLDERS = ["properties", "operators", "ui"]
 
 def register():
     """Automatically registers all operators and UI panels."""

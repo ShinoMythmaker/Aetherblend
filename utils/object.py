@@ -67,7 +67,7 @@ def merge_by_name(objects, name_filter):
 
     return list(updated_objects)  
   
-def get_object_icon(obj):
+def get_icon(obj):
     """Returns the icon for the given object type."""
     return bpy.types.Object.bl_rna.properties['type'].enum_items[obj.type].icon
 
@@ -111,3 +111,29 @@ def import_meddle_shader(filepath, imported_objects):
         bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)  
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")
+
+def add_armature_modifier(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object) -> None:
+    """
+    Adds a new armature modifier to the mesh object for the given armature.
+    """
+    original_mode = mesh_obj.mode
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action='DESELECT')
+    mesh_obj.select_set(True)
+    bpy.context.view_layer.objects.active = mesh_obj
+    mod = mesh_obj.modifiers.new(name="Armature", type="ARMATURE")
+    mod.object = armature_obj
+    bpy.ops.object.mode_set(mode=original_mode)
+
+
+def remove_shapekey(obj: bpy.types.Object, shapekey_name: str) -> None:
+    """
+    Removes the specified shapekey from the object if it exists.
+    """
+    if obj.type != 'MESH' or not obj.data.shape_keys:
+        return
+
+    if obj.data.shape_keys:
+        sk = obj.data.shape_keys.key_blocks.get(shapekey_name)
+        if sk:
+            obj.shape_key_remove(sk)

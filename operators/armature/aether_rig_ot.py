@@ -1,13 +1,14 @@
 import bpy
-from ...utils import rig as rig_utils
-from ...utils.rig.meta_rig import create_limb_arm, create_meta_rig_collections, setup_rigify_standard_colors, setup_rigify_color_sets, assign_color_sets_to_collections, setup_meta_rig_viewport_display, setup_meta_rig_collection_ui, get_ffxiv_to_control_bone_mapping, setup_ffxiv_control_constraints, cleanup_ffxiv_control_constraints
-from ...utils.rig.bone import bones_exist, collection_exists, delete_bone_collection_and_bones
+from ... import utils
+from ...utils.armature.meta_rig import create_limb_arm, create_meta_rig_collections, setup_rigify_standard_colors, setup_rigify_color_sets, assign_color_sets_to_collections, setup_meta_rig_viewport_display, setup_meta_rig_collection_ui, get_ffxiv_to_control_bone_mapping, setup_ffxiv_control_constraints, cleanup_ffxiv_control_constraints
+from ...utils.armature.bone import exist
 from ...data.constants import (
     meta_rig_arm_l_bones, meta_rig_arm_r_bones,
     meta_rig_leg_l_bones, meta_rig_leg_r_bones,
     meta_rig_arm_l_names, meta_rig_arm_r_names,
     meta_rig_prefix, meta_rig_collection
 )
+## This code is highly experiemental and subject to change as we refine the meta rig generation process ##
 
 class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     """Generate a meta rig based on available bones"""
@@ -25,7 +26,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             return {'CANCELLED'}
 
         # Check if we're regenerating an existing meta rig
-        existing_meta_rig = armature.aether_meta_rig
+        existing_meta_rig = armature.aether_rig.meta_rig
         
         if existing_meta_rig:
             # For regeneration, check what limbs currently exist in the meta rig
@@ -35,8 +36,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             print(f"[AetherBlend] Regenerating meta rig - detected existing limbs: Arm.L={self.include_arm_l}, Arm.R={self.include_arm_r}")
         else:
             # For new generation, check which bone sets are available in source armature using utility function
-            self.include_arm_l = bones_exist(armature, meta_rig_arm_l_bones)
-            self.include_arm_r = bones_exist(armature, meta_rig_arm_r_bones)
+            self.include_arm_l = exist(armature, meta_rig_arm_l_bones)
+            self.include_arm_r = exist(armature, meta_rig_arm_r_bones)
             print(f"[AetherBlend] Creating new meta rig - available limbs: Arm.L={self.include_arm_l}, Arm.R={self.include_arm_r}")
 
         return context.window_manager.invoke_props_dialog(self)
@@ -44,7 +45,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         armature = context.active_object
-        existing_meta_rig = armature.aether_meta_rig if armature else None
+        existing_meta_rig = armature.aether_rig.meta_rig if armature else None
         
         if existing_meta_rig:
             layout.label(text="Regenerate Meta Rig:", icon="FILE_REFRESH")
@@ -77,7 +78,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 print(f"[AetherBlend] Temporarily showing FFXIV rig for meta rig creation")
 
             # Check if meta rig already exists
-            existing_meta_rig = armature.aether_meta_rig
+            existing_meta_rig = armature.aether_rig.meta_rig
             is_regeneration = bool(existing_meta_rig)
             
             if is_regeneration:
@@ -103,7 +104,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                     
             # Step 5: Store reference and setup parenting/visibility (only for new meta rigs)
             if not is_regeneration:
-                armature.aether_meta_rig = meta_rig
+                armature.aether_rig.meta_rig = meta_rig
                 
                 # Parent meta rig to FFXIV rig and hide it
                 meta_rig.parent = armature
@@ -215,10 +216,10 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         return created_limbs
 
 
-class AETHER_OT_Generate_Control_Rig(bpy.types.Operator):
-    """Generate a control rig from the meta rig using Rigify"""
-    bl_idname = "aether.generate_control_rig"
-    bl_label = "Generate Control Rig"
+class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
+    """Generate a rigify rig from the meta rig using Rigify"""
+    bl_idname = "aether.generate_rigify_rig"
+    bl_label = "Generate Rigify Rig"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -234,11 +235,11 @@ class AETHER_OT_Generate_Control_Rig(bpy.types.Operator):
             print(f"[AetherBlend] Switched from {original_mode} to Object mode for control rig generation")
 
         try:
-            if not armature.aether_meta_rig:
+            if not armature.aether_rig.meta_rig:
                 self.report({'ERROR'}, "No meta rig found. Generate a meta rig first.")
                 return {'CANCELLED'}
 
-            meta_rig = armature.aether_meta_rig
+            meta_rig = armature.aether_rig.meta_rig
             
             # Store meta rig visibility state and ensure it's visible for operations
             meta_rig_was_hidden = meta_rig.hide_get()
@@ -272,7 +273,7 @@ class AETHER_OT_Generate_Control_Rig(bpy.types.Operator):
                 
                 if control_rig:
                     # Store reference to control rig in original FFXIV armature
-                    armature.aether_control_rig = control_rig
+                    armature.aether_rig.rigify_rig = control_rig
                     
                     # Parent control rig to FFXIV rig and hide it
                     control_rig.parent = armature
@@ -351,10 +352,10 @@ class AETHER_OT_Generate_Control_Rig(bpy.types.Operator):
     
 
 
-class AETHER_OT_Link_Control_Rig(bpy.types.Operator):
-    """Link the control rig to the FFXIV rig by merging control bones"""
-    bl_idname = "aether.link_control_rig"
-    bl_label = "Link Control Rig"
+class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
+    """Link the rigify rig to the FFXIV rig by merging rigify bones"""
+    bl_idname = "aether.link_rigify_rig"
+    bl_label = "Link Rigify Rig"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -370,11 +371,11 @@ class AETHER_OT_Link_Control_Rig(bpy.types.Operator):
             print(f"[AetherBlend] Switched from {original_mode} to Object mode for control rig linking")
 
         try:
-            if not armature.aether_control_rig:
+            if not armature.aether_rig.rigify_rig:
                 self.report({'ERROR'}, "No control rig found. Generate a control rig first.")
                 return {'CANCELLED'}
 
-            control_rig = armature.aether_control_rig
+            control_rig = armature.aether_rig.rigify_rig
             
             # Store control rig visibility state and ensure it's visible for operations
             control_rig_was_hidden = control_rig.hide_get()
@@ -383,7 +384,7 @@ class AETHER_OT_Link_Control_Rig(bpy.types.Operator):
                 print(f"[AetherBlend] Temporarily showing control rig for linking")
 
             # Check if already linked and clean up old control bones if needed
-            if getattr(armature, 'aether_control_linked', False):
+            if getattr(armature, 'aether_rig.rigify_linked', False):
                 print(f"[AetherBlend] Control rig already linked, cleaning up old control bones...")
                 self.cleanup_old_control_bones(armature)
 
@@ -392,7 +393,7 @@ class AETHER_OT_Link_Control_Rig(bpy.types.Operator):
             
             if success:
                 # Mark as linked
-                armature.aether_control_linked = True
+                armature.aether_rig.rigify_linked = True
                 
                 # Restore control rig visibility state
                 if control_rig_was_hidden:
@@ -432,7 +433,7 @@ class AETHER_OT_Link_Control_Rig(bpy.types.Operator):
         cleanup_ffxiv_control_constraints(ffxiv_armature)
         
         # Get all control rig collections from the reference control rig
-        control_rig = ffxiv_armature.aether_control_rig
+        control_rig = ffxiv_armature.aether_rig.rigify_rig
         if not control_rig:
             print(f"[AetherBlend] No control rig reference found for cleanup")
             return
@@ -443,8 +444,8 @@ class AETHER_OT_Link_Control_Rig(bpy.types.Operator):
         # Delete each control collection and all its bones from FFXIV armature
         collections_removed = 0
         for collection_name in control_collection_names:
-            if collection_exists(ffxiv_armature, collection_name):
-                delete_bone_collection_and_bones(ffxiv_armature, collection_name)
+            if ffxiv_armature.data.collections.get(collection_name):
+                utils.armature.b_collection.delete_with_bones(ffxiv_armature, collection_name)
                 collections_removed += 1
         
         print(f"[AetherBlend] Cleaned up {collections_removed} control collections and their bones")
@@ -529,10 +530,10 @@ class AETHER_OT_Link_Control_Rig(bpy.types.Operator):
         return constraint_count
 
 
-class AETHER_OT_Unlink_Control_Rig(bpy.types.Operator):
-    """Unlink the control rig from the FFXIV rig by removing control bones and constraints"""
-    bl_idname = "aether.unlink_control_rig"
-    bl_label = "Unlink Control Rig"
+class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
+    """Unlink the rigify rig from the FFXIV rig by removing control bones and constraints"""
+    bl_idname = "aether.unlink_rigify_rig"
+    bl_label = "Unlink Rigify Rig"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -548,7 +549,7 @@ class AETHER_OT_Unlink_Control_Rig(bpy.types.Operator):
             print(f"[AetherBlend] Switched from {original_mode} to Object mode for control rig unlinking")
 
         try:
-            if not getattr(armature, 'aether_control_linked', False):
+            if not getattr(armature.aether_rig, 'rigify_linked', False):
                 self.report({'ERROR'}, "No control rig is currently linked.")
                 return {'CANCELLED'}
 
@@ -561,7 +562,7 @@ class AETHER_OT_Unlink_Control_Rig(bpy.types.Operator):
                 print(f"[AetherBlend] Removed rig_id from armature data")
             
             # Mark as unlinked
-            armature.aether_control_linked = False
+            armature.aether_rig.rigify_linked = False
             
             self.report({'INFO'}, f"Control rig unlinked from {armature.name}")
             return {'FINISHED'}
@@ -587,7 +588,7 @@ class AETHER_OT_Unlink_Control_Rig(bpy.types.Operator):
         constraint_count = cleanup_ffxiv_control_constraints(ffxiv_armature)
         
         # Get control rig reference to identify collections to remove
-        control_rig = ffxiv_armature.aether_control_rig
+        control_rig = ffxiv_armature.aether_rig.rigify_rig
         if not control_rig:
             print(f"[AetherBlend] No control rig reference found for cleanup")
             return
@@ -598,8 +599,8 @@ class AETHER_OT_Unlink_Control_Rig(bpy.types.Operator):
         # Delete each control collection and all its bones from FFXIV armature
         collections_removed = 0
         for collection_name in control_collection_names:
-            if collection_exists(ffxiv_armature, collection_name):
-                delete_bone_collection_and_bones(ffxiv_armature, collection_name)
+            if ffxiv_armature.data.collections.get(collection_name):
+                utils.armature.b_collection.delete_with_bones(ffxiv_armature, collection_name)
                 collections_removed += 1
         
         print(f"[AetherBlend] Unlink completed: removed {collections_removed} control collections and their bones, {constraint_count} constraints")
@@ -607,12 +608,12 @@ class AETHER_OT_Unlink_Control_Rig(bpy.types.Operator):
 
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
-    bpy.utils.register_class(AETHER_OT_Generate_Control_Rig)
-    bpy.utils.register_class(AETHER_OT_Link_Control_Rig)
-    bpy.utils.register_class(AETHER_OT_Unlink_Control_Rig)
+    bpy.utils.register_class(AETHER_OT_Generate_Rigify_Rig)
+    bpy.utils.register_class(AETHER_OT_Link_Rigify_Rig)
+    bpy.utils.register_class(AETHER_OT_Unlink_Rigify_Rig)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Generate_Meta_Rig)
-    bpy.utils.unregister_class(AETHER_OT_Generate_Control_Rig)
-    bpy.utils.unregister_class(AETHER_OT_Link_Control_Rig)
-    bpy.utils.unregister_class(AETHER_OT_Unlink_Control_Rig)
+    bpy.utils.unregister_class(AETHER_OT_Generate_Rigify_Rig)
+    bpy.utils.unregister_class(AETHER_OT_Link_Rigify_Rig)
+    bpy.utils.unregister_class(AETHER_OT_Unlink_Rigify_Rig)

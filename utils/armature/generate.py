@@ -1,5 +1,5 @@
 import bpy
-from .bone import bones_exist
+from . import bone
 
 def bone_chain(armature, reference_bone_names, prefix="gen_", suffix="", parent_bone=None):
     """Generates a chain of bones based on reference bone names."""
@@ -8,7 +8,7 @@ def bone_chain(armature, reference_bone_names, prefix="gen_", suffix="", parent_
         print(f"[AetherBlend] Object '{armature.name}' is not an armature.")
         return []
     
-    if not bones_exist(armature, reference_bone_names):
+    if not bone.exist(armature, reference_bone_names):
         print(f"[AetherBlend] One or more reference bones do not exist in armature '{armature.name}'.")
         return []
 
@@ -108,7 +108,7 @@ def meta_rig_bone_chain(source_armature, target_armature, reference_bones, meta_
         print(f"[AetherBlend] Target object '{target_armature.name}' is not an armature.")
         return []
     
-    if not bones_exist(source_armature, reference_bones):
+    if not bone.exist(source_armature, reference_bones):
         print(f"[AetherBlend] One or more reference bones do not exist in source armature '{source_armature.name}'.")
         return []
 

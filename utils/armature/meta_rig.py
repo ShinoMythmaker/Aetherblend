@@ -1,5 +1,7 @@
 import bpy
-from .bone import bones_exist, assign_bones_to_collection, add_constraint_copy_rotation, remove_copy_rotation_constraints, collection_exists
+from . import bone
+from .bone import add_constraint_copy_rotation
+from .b_collection import assign_bones
 from .generate import meta_rig_bone_chain
 from ...data.constants import (
     meta_rig_arm_l_bones, meta_rig_arm_r_bones, 
@@ -34,7 +36,7 @@ def create_meta_rig_collections(armature):
     
     for collection_name in collections_to_create:
         # Use utility function to check if collection already exists
-        if not collection_exists(armature, collection_name):
+        if not armature.data.collections.get(collection_name):
             armature.data.collections.new(collection_name)
             print(f"[AetherBlend] Created bone collection: {collection_name}")
         else:
@@ -343,7 +345,7 @@ def create_limb_arm(source_armature, target_armature, side="L", prefix=None, col
         return []
     
     # Check if required bones exist in source armature
-    if not bones_exist(source_armature, chain_bones):
+    if not bone.exist(source_armature, chain_bones):
         print(f"[AetherBlend] One or more required arm {side} bones do not exist in source armature '{source_armature.name}'.")
         return []
 
@@ -361,7 +363,7 @@ def create_limb_arm(source_armature, target_armature, side="L", prefix=None, col
     # Assign bones to IK collection
     if created_bones:
         ik_collection_name = f"Arm.{side} (IK)"
-        assign_bones_to_collection(target_armature, created_bones, ik_collection_name)
+        assign_bones(target_armature, created_bones, ik_collection_name)
         
         # Set up rigify properties on the upper arm bone (first bone in the chain)
         if len(created_bones) > 0:

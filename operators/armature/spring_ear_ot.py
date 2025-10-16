@@ -1,5 +1,5 @@
 import bpy
-from ...utils import rig as rig_utils
+from ...utils import armature as rig_utils
 from ...data.constants import xiv_ear_bone_l, xiv_ear_bone_r, sb_ear_target_bone_l, sb_ear_target_bone_r, sb_ear_parent_bone, sb_ears_collection, spring_prefix, spring_bone_collection
 from ..spring_bones_ot import end_spring_bone
 
@@ -29,16 +29,16 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
         original_visibility = rig_utils.bone.get_bone_visibility(armature, referenece_bones_l + referenece_bones_r)
 
         # Delete existing spring bones collection if it exists
-        if rig_utils.bone.collection_exists(armature, sb_ears_collection):
-            rig_utils.bone.delete_bone_collection_and_bones(armature, sb_ears_collection)
+        if armature.data.collections.get(sb_ears_collection):
+            rig_utils.b_collection.delete_with_bones(armature, sb_ears_collection)
 
         # reset xiv_ear_bones
         rig_utils.bone.delete_keyframes(armature, xiv_ear_bone_l)
-        rig_utils.bone.reset_bone_transforms(armature, xiv_ear_bone_l)
+        rig_utils.bone.reset_transforms(armature, xiv_ear_bone_l)
 
         rig_utils.bone.delete_keyframes(armature, xiv_ear_bone_r)
-        rig_utils.bone.reset_bone_transforms(armature, xiv_ear_bone_r)
- 
+        rig_utils.bone.reset_transforms(armature, xiv_ear_bone_r)
+
         # Create spring bones
         print(f"[AetherBlend] Generating spring ears for {referenece_bones_l}...")
         spring_bones_l = rig_utils.generate.bone_chain(armature, referenece_bones_l, prefix=spring_prefix, parent_bone=sb_ear_parent_bone)
@@ -49,8 +49,8 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] No spring bones generated. Missing reference bones.")
             return {'CANCELLED'}
 
-        rig_utils.bone.assign_bones_to_collection(armature, spring_bones_l, f"{spring_bone_collection}/{sb_ears_collection}")
-        rig_utils.bone.assign_bones_to_collection(armature, spring_bones_r, f"{spring_bone_collection}/{sb_ears_collection}")
+        rig_utils.b_collection.assign_bones(armature, spring_bones_l, f"{spring_bone_collection}/{sb_ears_collection}")
+        rig_utils.b_collection.assign_bones(armature, spring_bones_r, f"{spring_bone_collection}/{sb_ears_collection}")
 
         # Apply Copy Rotation constraints to each reference bone except the last
         rig_utils.bone.add_constraint_copy_rotation(xiv_ear_bone_l, armature, spring_bones_l, overwrite=True)
@@ -93,14 +93,14 @@ class AETHER_OT_Bake_Spring_Ears(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
 
-        start_frame, end_frame = rig_utils.armature.get_frame_range(armature)
+        start_frame, end_frame = rig_utils.get_frame_range(armature)
 
         reference_bones = xiv_ear_bone_r + xiv_ear_bone_l
 
         original_visibility = rig_utils.bone.get_bone_visibility(armature, reference_bones)
 
         # Select only the reference bones before baking
-        rig_utils.bone.select_bones(armature, reference_bones)
+        rig_utils.bone.select(armature, reference_bones)
 
         pre_roll = 50
         pre_roll_start = start_frame - pre_roll
@@ -156,7 +156,7 @@ class AETHER_OT_Delete_Spring_Ears(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Delete the spring bone collection and all bones within
-        rig_utils.bone.delete_bone_collection_and_bones(armature, sb_ears_collection)
+        rig_utils.b_collection.delete_with_bones(armature, sb_ears_collection)
 
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, "[AetherBlend] Spring ears deleted.")

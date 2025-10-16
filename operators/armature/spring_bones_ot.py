@@ -1,5 +1,4 @@
 import bpy
-from ...utils import rig as rig_utils
 from ...data.constants import sb_breast_collection, sb_ears_collection, sb_tail_collection
 
 class AETHER_OT_Bake_All_Spring_Bones(bpy.types.Operator):
@@ -20,11 +19,11 @@ class AETHER_OT_Bake_All_Spring_Bones(bpy.types.Operator):
         
         # Bake each type of spring bone
 
-        if rig_utils.bone.get_collectiion(context.active_object, sb_breast_collection):
+        if armature.data.collections.get(sb_breast_collection):
             bpy.ops.aether.bake_spring_breasts()
-        if rig_utils.bone.get_collectiion(context.active_object, sb_ears_collection):
+        if armature.data.collections.get(sb_ears_collection):
             bpy.ops.aether.bake_spring_ears()
-        if rig_utils.bone.get_collectiion(context.active_object, sb_tail_collection):
+        if armature.data.collections.get(sb_tail_collection):
             bpy.ops.aether.bake_spring_tail()
 
         self.report({'INFO'}, f"[AetherBlend] All spring bones baked for {armature.name}.")

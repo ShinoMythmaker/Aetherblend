@@ -1,5 +1,5 @@
 import bpy
-from ...utils import rig as rig_utils
+from ...utils import armature as rig_utils
 from ...data.constants import xiv_tail_bones, sb_tail_collection, spring_prefix, spring_bone_collection, sb_tail_parent_bone
 from ..spring_bones_ot import end_spring_bone
 
@@ -24,14 +24,14 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Delete existing spring bones collection if it exists
-        if rig_utils.bone.collection_exists(armature, sb_tail_collection):
-            rig_utils.bone.delete_bone_collection_and_bones(armature, sb_tail_collection)
+        if armature.data.collections.get(sb_tail_collection):
+            rig_utils.b_collection.delete_with_bones(armature, sb_tail_collection)
 
         # reset xiv_tail_bones
         original_visibility = rig_utils.bone.get_bone_visibility(armature, xiv_tail_bones)
 
         rig_utils.bone.delete_keyframes(armature, xiv_tail_bones)
-        rig_utils.bone.reset_bone_transforms(armature, xiv_tail_bones)
+        rig_utils.bone.reset_transforms(armature, xiv_tail_bones)
  
         # Create spring bones
         spring_bones = rig_utils.generate.bone_chain(armature, xiv_tail_bones, prefix=spring_prefix, parent_bone=sb_tail_parent_bone)
@@ -41,7 +41,7 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] No spring bones generated. Missing reference bones.")
             return {'CANCELLED'}
 
-        rig_utils.bone.assign_bones_to_collection(armature, spring_bones, f"{spring_bone_collection}/{sb_tail_collection}")
+        rig_utils.b_collection.assign_bones(armature, spring_bones, f"{spring_bone_collection}/{sb_tail_collection}")
 
         # Apply Copy Rotation constraints to each reference bone except the last
         rig_utils.bone.add_constraint_copy_rotation(xiv_tail_bones[:-1], armature, spring_bones, overwrite=True)
@@ -114,7 +114,7 @@ class AETHER_OT_Delete_Spring_Tail(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Delete the spring bone collection and all bones within
-        rig_utils.bone.delete_bone_collection_and_bones(armature, sb_tail_collection)
+        rig_utils.b_collection.delete_with_bones(armature, sb_tail_collection)
 
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, "[AetherBlend] Spring tail deleted.")
@@ -132,12 +132,12 @@ class AETHER_OT_Bake_Spring_Tail(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
 
-        start_frame, end_frame = rig_utils.armature.get_frame_range(armature)
+        start_frame, end_frame = rig_utils.get_frame_range(armature)
 
         original_visibility = rig_utils.bone.get_bone_visibility(armature, xiv_tail_bones)
 
         # Select only the tail bones before baking
-        rig_utils.bone.select_bones(armature, xiv_tail_bones)
+        rig_utils.bone.select(armature, xiv_tail_bones)
 
         pre_roll = 50
         pre_roll_start = start_frame - pre_roll

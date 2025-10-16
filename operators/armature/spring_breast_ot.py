@@ -1,6 +1,6 @@
 import bpy
 import mathutils
-from ...utils import rig as rig_utils
+from ...utils import armature as rig_utils
 from ...data.constants import xiv_breast_bone_r, xiv_breast_bone_l, sb_breast_collection, sb_breast_parent_bone, spring_prefix, spring_bone_collection
 from ..spring_bones_ot import end_spring_bone
 
@@ -23,18 +23,18 @@ class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
 
 
         # Delete existing spring breast collection if it exists
-        if rig_utils.bone.collection_exists(armature, sb_breast_collection):
-            rig_utils.bone.delete_bone_collection_and_bones(armature, sb_breast_collection)
+        if armature.data.collections.get(sb_breast_collection):
+            rig_utils.b_collection.delete_with_bones(armature, sb_breast_collection)
 
         # reset xiv_breast_bones
         rig_utils.bone.delete_keyframes(armature, xiv_breast_bone_r)
-        rig_utils.bone.reset_bone_transforms(armature, xiv_breast_bone_r)
+        rig_utils.bone.reset_transforms(armature, xiv_breast_bone_r)
 
         rig_utils.bone.delete_keyframes(armature, xiv_breast_bone_l)
-        rig_utils.bone.reset_bone_transforms(armature, xiv_breast_bone_l)
+        rig_utils.bone.reset_transforms(armature, xiv_breast_bone_l)
 
         # check if xiv_breast_bones exist
-        if not rig_utils.bone.bones_exist(armature, xiv_breast_bone_r + xiv_breast_bone_l):
+        if not rig_utils.bone.exist(armature, xiv_breast_bone_r + xiv_breast_bone_l):
             self.report({'ERROR'}, "[AetherBlend] Missing reference bones for spring breasts.")
             return {'CANCELLED'}
 
@@ -46,7 +46,7 @@ class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
 
 
         # Assign to collection
-        rig_utils.bone.assign_bones_to_collection(armature, [spring_bone_r, spring_bone_l], f"{spring_bone_collection}/{sb_breast_collection}")
+        rig_utils.b_collection.assign_bones(armature, [spring_bone_r, spring_bone_l], f"{spring_bone_collection}/{sb_breast_collection}")
 
         bpy.ops.object.mode_set(mode='POSE')
 
@@ -90,13 +90,13 @@ class AETHER_OT_Bake_Spring_Breasts(bpy.types.Operator):
         context.scene.ab_sb_global_spring_frame = False 
         context.scene.ab_sb_global_spring = False 
 
-        start_frame, end_frame = rig_utils.armature.get_frame_range(armature)
+        start_frame, end_frame = rig_utils.get_frame_range(armature)
         reference_bones = xiv_breast_bone_r + xiv_breast_bone_l
 
         original_visibility = rig_utils.bone.get_bone_visibility(armature, reference_bones)
 
         # Select only the reference bones before baking
-        rig_utils.bone.select_bones(armature, reference_bones)
+        rig_utils.bone.select(armature, reference_bones)
 
         pre_roll = 50
         pre_roll_start = start_frame - pre_roll
@@ -154,7 +154,7 @@ class AETHER_OT_Delete_Spring_Breasts(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Delete the spring bone collection and all bones within
-        rig_utils.bone.delete_bone_collection_and_bones(armature, sb_breast_collection)
+        rig_utils.b_collection.delete_with_bones(armature, sb_breast_collection)
 
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, "[AetherBlend] Spring breasts deleted.")
