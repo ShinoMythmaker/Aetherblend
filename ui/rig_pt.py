@@ -15,7 +15,6 @@ class AETHER_PT_RigPanel(bpy.types.Panel):
             armature is not None 
             and armature.type == 'ARMATURE' 
             and getattr(armature, 'aether_rig', None)
-            and False
         )
 
     def draw(self, context):

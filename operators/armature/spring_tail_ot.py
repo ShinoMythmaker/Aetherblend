@@ -137,7 +137,7 @@ class AETHER_OT_Bake_Spring_Tail(bpy.types.Operator):
         original_visibility = rig_utils.bone.get_bone_visibility(armature, xiv_tail_bones)
 
         # Select only the tail bones before baking
-        rig_utils.bone.select(armature, xiv_tail_bones)
+        rig_utils.bone.select_edit(armature, xiv_tail_bones)
 
         pre_roll = 50
         pre_roll_start = start_frame - pre_roll

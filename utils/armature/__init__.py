@@ -1,8 +1,6 @@
 from . import generate
-from . import bone
 from . import b_collection
-from . import meta_rig
-
+from . import bone
 
 import bpy
 
@@ -162,3 +160,19 @@ def restore_bone_parenting(armature: bpy.types.Object, parent_map: dict) -> None
             bone.parent = edit_bones.get(parent_name) if parent_name else None
     bpy.ops.object.mode_set(mode=original_mode)
 
+def create(location: tuple, armature_name: str) -> bpy.types.Armature:
+    """Create the base meta rig armature."""
+    original_mode = bpy.context.object.mode if bpy.context.object else 'OBJECT'
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.armature_add(enter_editmode=False, location=location)
+    armature = bpy.context.active_object
+    armature.name = armature_name
+
+    bpy.ops.object.mode_set(mode='EDIT')
+    edit_bones = armature.data.edit_bones
+    if "Bone" in edit_bones:
+        edit_bones.remove(edit_bones["Bone"])
+
+    bpy.ops.object.mode_set(mode=original_mode)
+    return armature

@@ -84,7 +84,7 @@ class AETHER_OT_CreateREFCollection(bpy.types.Operator):
         ref_col = bone_collections.new('FFXIV-REF')
 
         bpy.ops.object.mode_set(mode='POSE')
-        utils.armature.bone.select(armature, [b.name for b in ffxiv_col.bones])
+        utils.armature.bone.select_edit(armature, [b.name for b in ffxiv_col.bones])
 
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.duplicate()

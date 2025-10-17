@@ -96,7 +96,7 @@ class AETHER_OT_Bake_Spring_Breasts(bpy.types.Operator):
         original_visibility = rig_utils.bone.get_bone_visibility(armature, reference_bones)
 
         # Select only the reference bones before baking
-        rig_utils.bone.select(armature, reference_bones)
+        rig_utils.bone.select_edit(armature, reference_bones)
 
         pre_roll = 50
         pre_roll_start = start_frame - pre_roll

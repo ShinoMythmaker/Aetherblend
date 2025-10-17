@@ -38,9 +38,6 @@ def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
         new_bones[key] = values
     return new_bones
 
-
-
-#i want to implement an opotion to also give a collection name to only apply to bones in that collection
 def apply_transforms(armature: bpy.types.Object, scale_dict: dict, rot_dict: dict, pos_dict: dict, bones: dict[str, bpy.types.PoseBone] = None) -> None:
     """
     Applies C+ scale, rotation, and translation transforms to the pose bones of the given armature.
