@@ -140,3 +140,27 @@ def restore_visibility(armature, original_visibility):
         if pb:
             pb.bone.hide = was_hidden
 
+def copy_to(src_armature: bpy.types.Armature, target_armature: bpy.types.Armature, bone_name: str, new_bone_name: str) -> str | None:
+    """Copy a bone from src_armature to target_armature."""
+    
+    src_bones = src_armature.data.bones
+    target_edit_bones = target_armature.data.edit_bones
+        
+    ref_bone = src_bones.get(bone_name)
+    if not ref_bone:
+        print(f"[AetherBlend] Reference bone '{bone_name}' not found in armature '{src_armature.name}'.")
+        return None
+    
+    bone_copy = target_edit_bones.new(new_bone_name)
+    bone_copy.head = ref_bone.head_local.copy()
+    bone_copy.tail = ref_bone.tail_local.copy()
+    bone_copy.roll = get_roll(ref_bone)
+
+    return bone_copy.name
+
+
+
+def get_roll(bone: bpy.types.Bone) -> float:
+    """Gets the roll of a data Bone"""
+    axis, roll = bone.AxisRollFromMatrix(bone.matrix, axis=bone.y_axis)
+    return roll

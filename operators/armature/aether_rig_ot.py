@@ -59,7 +59,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 coll.rigify_ui_row = collection.row_index
                 coll.rigify_ui_title = collection.title
 
-        self.generate_limbs(source_armature=armature, meta_rig=meta_rig)
+        self.generate_arms(source_armature=armature, meta_rig=meta_rig)
+        self.generate_tail(source_armature=armature, meta_rig=meta_rig)
                 
         armature.aether_rig.meta_rig = meta_rig
         
@@ -73,21 +74,21 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         return {'FINISHED'}
 
-    def generate_limbs(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
+    def generate_arms(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
         """Generate the individual limbs"""
 
         original_mode = bpy.context.object.mode
         bpy.ops.object.mode_set(mode='POSE')
         created_limbs = []
-        for limb_coll, limb_info in constants.LIMBS_INFO.items():
+        for limb_coll, chain_info in constants.ARMS_INFO.items():
             bones = utils.armature.generate.bone_chain(
                 src=source_armature,
                 target=meta_rig,
-                chain_info=limb_info
+                chain_info=chain_info
             )
             if bones and meta_rig.data.collections.get(limb_coll):
                 utils.armature.b_collection.assign_bones(meta_rig, bones, limb_coll)
-                for bone_name, rigify_settings in limb_info.gen_bones.items():
+                for bone_name, rigify_settings in chain_info.gen_bones.items():
                     self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
                 created_limbs.extend(bones)
 
@@ -95,6 +96,28 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         return created_limbs
     
+    def generate_tail(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
+        """Generate the individual tail bones"""
+
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='POSE')
+        created_limbs = []
+        for tail_coll, chain_info in constants.TAILS_INFO.items():
+            bones = utils.armature.generate.bone_chain(
+                src=source_armature,
+                target=meta_rig,
+                chain_info=chain_info
+            )
+            if bones and meta_rig.data.collections.get(tail_coll):
+                utils.armature.b_collection.assign_bones(meta_rig, bones, tail_coll)
+                for bone_name, rigify_settings in chain_info.gen_bones.items():
+                    self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
+                created_limbs.extend(bones)
+
+        bpy.ops.object.mode_set(mode=original_mode)
+
+        return created_limbs
+
     def rigify_set_tweak_collection(self, armature: bpy.types.Armature, bone_name: str, collection_name: str) -> None:
         """Sets the rigify tweak collection for a given bone."""
         
@@ -159,6 +182,30 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         bpy.ops.object.mode_set(mode='OBJECT')
 
+
+    def rigify_set_copy_rotation_axes(self, armature: bpy.types.Armature, bone_name: str, use_x: bool, use_y: bool, use_z: bool) -> None:
+        """sets rigify copy rotation axes parameter for a given bone."""
+
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='POSE')
+        
+        pose_bone = armature.pose.bones.get(bone_name)
+        
+        bpy.ops.pose.select_all(action='DESELECT')
+        pose_bone.bone.select = True
+        armature.data.bones.active = pose_bone.bone
+        
+        try:
+            rigify_params = pose_bone.rigify_parameters
+            
+            rigify_params.copy_rotation_axes[0] = use_x
+            rigify_params.copy_rotation_axes[1] = use_y
+            rigify_params.copy_rotation_axes[2] = use_z
+        except Exception as e:
+            print(f"[AetherBlend] Error setting rigify copy rotation axes: {e}")
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
+
     def set_rigify_properties(self, armature: bpy.types.Armature, bone_name: str, settings: constants.RigifySettings) -> None:
         """Sets up rigify properties for a pose bone"""
         original_mode = armature.mode
@@ -175,6 +222,15 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         if settings.tweak_coll:
             self.rigify_set_tweak_collection(armature, pose_bone.name, settings.tweak_coll)
+
+        if settings.copy_rot_axes:
+            self.rigify_set_copy_rotation_axes(
+                armature,
+                pose_bone.name,
+                use_x=settings.copy_rot_axes.get('use_x'),
+                use_y=settings.copy_rot_axes.get('use_y'),
+                use_z=settings.copy_rot_axes.get('use_z')
+            )
 
         bpy.ops.object.mode_set(mode=original_mode)
 
@@ -293,12 +349,33 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         bpy.context.view_layer.objects.active = ffxiv_armature 
         
         bpy.ops.object.join()
+
+        bpy.ops.object.mode_set(mode='EDIT')
+        self.set_org_bone_parents(bpy.context.active_object)
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
         
         self.copy_rigify_properties(ffxiv_armature, rigify_rig)
         
         constraints = utils.armature.bone.add_constraint_copy_rotation(ffxiv_armature, constants.CONSTRAINT_BONE_MAP, overwrite=True)
         for con in constraints:
             con.name = f"AetherBlend_CopyRot_{con.name}"
+
+        bpy.ops.object.mode_set(mode=original_mode)
+        return True
+    
+    def set_org_bone_parents(self, armature: bpy.types.Armature) -> bool:
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        edit_bones = armature.data.edit_bones
+        for edit_bone in edit_bones:
+            if edit_bone.name.startswith("ORG-"):
+                ref_bone_name = edit_bone.name[4:]
+                ref_bone = edit_bones.get(ref_bone_name)
+                if ref_bone:
+                    edit_bone.parent = ref_bone
+                    edit_bone.use_connect = False
 
         bpy.ops.object.mode_set(mode=original_mode)
         return True

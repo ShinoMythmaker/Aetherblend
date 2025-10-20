@@ -1,5 +1,5 @@
 import bpy
-
+from . import bone as bone_utils
 from ...data import constants
 
 def bone_on_local_axis_x(armature, bone_name, parent_bone=None, prefix="gen_", suffix=""):
@@ -94,11 +94,16 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
                 new_bone.parent = target_edit_bones[parent_bone]
                 new_bone.use_connect = False
             else:
-                print(f"[AetherBlend] Parent bone '{parent_bone}' not found in target armature '{target.name}'.")
+                new_parent = bone_utils.copy_to(src, target, parent_bone, parent_bone)
+
+                new_bone.parent = target_edit_bones[new_parent]
+                new_bone.use_connect = False
+                print(f"New parent bone created: {new_parent}")
         elif index > 0:
             new_bone.parent = target_edit_bones[created_bones[index - 1]]
             new_bone.use_connect = True
 
+        print(f"Created new bone: {new_bone.name}")
         created_bones.append(new_bone.name)
 
     bpy.ops.object.mode_set(mode=original_mode)

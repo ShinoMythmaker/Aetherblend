@@ -10,9 +10,10 @@ class MetaRigCollectionInfo:
 
 @dataclass(frozen=True)
 class RigifySettings:
-    rigify_type: str | None
-    fk_coll: str | None
-    tweak_coll: str | None
+    rigify_type: str | None  = None
+    fk_coll: str | None  = None
+    tweak_coll: str | None  = None
+    copy_rot_axes: Dict[str, bool] | None = None
 
 @dataclass(frozen=True)
 class BoneChainInfo:
@@ -50,15 +51,18 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
     MetaRigCollectionInfo(name="Arm.R (FK)", color_type="FK", row_index=2, title="FK.R"),
     MetaRigCollectionInfo(name="Arm.R (Tweak)", color_type="Tweak", row_index=3, title="Tweak.R"),
 
-    MetaRigCollectionInfo(name="Leg.L (IK)", color_type="IK", row_index=4, title="IK.L"),
-    MetaRigCollectionInfo(name="Leg.L (FK)", color_type="FK", row_index=5, title="FK.L"),
-    MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=6, title="Tweak.L"),
-    MetaRigCollectionInfo(name="Leg.R (IK)", color_type="IK", row_index=4, title="IK.R"),
-    MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=5, title="FK.R"),
-    MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=6, title="Tweak.R"),
+    MetaRigCollectionInfo(name="Leg.L (IK)", color_type="IK", row_index=5, title="IK.L"),
+    MetaRigCollectionInfo(name="Leg.L (FK)", color_type="FK", row_index=6, title="FK.L"),
+    MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=7, title="Tweak.L"),
+    MetaRigCollectionInfo(name="Leg.R (IK)", color_type="IK", row_index=5, title="IK.R"),
+    MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=6, title="FK.R"),
+    MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=7, title="Tweak.R"),
+
+    MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=9, title="Tail"),
+    MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=9, title="Tweaks"),
 ]
 
-LIMBS_INFO: Dict[str, BoneChainInfo] = {
+ARMS_INFO: Dict[str, BoneChainInfo] = {
     "Arm.L (IK)": BoneChainInfo(
         ffxiv_bones=["j_ude_a_l", "j_ude_b_l", "j_te_l"],
         gen_bones= {
@@ -68,7 +72,7 @@ LIMBS_INFO: Dict[str, BoneChainInfo] = {
         },
         parent_bone="j_sako_l",
         extend_last=True,
-        extension_factor=0.4
+        extension_factor=0.6
     ),
     "Arm.R (IK)": BoneChainInfo(
         ffxiv_bones=["j_ude_a_r", "j_ude_b_r", "j_te_r"],
@@ -79,7 +83,7 @@ LIMBS_INFO: Dict[str, BoneChainInfo] = {
         },
         parent_bone="j_sako_r",
         extend_last=True,
-        extension_factor=0.4
+        extension_factor=0.6
     )
     # "Leg.L (IK)": BoneChainInfo(
     #     ffxiv_bones=["j_asi_a_l", "j_asi_c_l", "j_asi_d_l", "j_asi_e_l"],
@@ -107,6 +111,21 @@ LIMBS_INFO: Dict[str, BoneChainInfo] = {
     # ),
 }
 
+TAILS_INFO: Dict[str, BoneChainInfo] = {
+    "Tail": BoneChainInfo(
+        ffxiv_bones=["n_sippo_a", "n_sippo_b", "n_sippo_c", "n_sippo_d", "n_sippo_e"],
+        gen_bones= {
+            "tail.A": RigifySettings(rigify_type="spines.basic_tail", copy_rot_axes={"use_x": True, "use_y": True, "use_z": True}, tweak_coll="Tail (Tweak)"),
+            "tail.B": None,
+            "tail.C": None,
+            "tail.D": None,
+        },
+        parent_bone="j_kosi",
+        extend_last=False,
+        extension_factor=0.4
+    )
+}
+
 CONSTRAINT_BONE_MAP: Dict[str, str] = {
         # Left Arm
         "j_ude_a_l": "ORG-upper_arm.L",
@@ -117,4 +136,11 @@ CONSTRAINT_BONE_MAP: Dict[str, str] = {
         "j_ude_a_r": "ORG-upper_arm.R",
         "j_ude_b_r": "ORG-forearm.R",
         "j_te_r": "ORG-hand.R",
+
+        # Tail 
+        "n_sippo_a": "tail.A",
+        "n_sippo_b": "tail.B",
+        "n_sippo_c": "tail.C",
+        "n_sippo_d": "tail.D",
+        "n_sippo_e": "Tail.A_master"
     }
