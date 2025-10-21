@@ -62,6 +62,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         self.generate_arms(source_armature=armature, meta_rig=meta_rig)
         self.generate_tail(source_armature=armature, meta_rig=meta_rig)
         self.generate_legs(source_armature=armature, meta_rig=meta_rig)
+        self.generate_fingers(source_armature=armature, meta_rig=meta_rig)
                 
         armature.aether_rig.meta_rig = meta_rig
         
@@ -140,6 +141,29 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             
             if bones and meta_rig.data.collections.get(leg_coll):
                 utils.armature.b_collection.assign_bones(meta_rig, bones, leg_coll)
+                for bone_name, rigify_settings in chain_info.gen_bones.items():
+                    self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
+                created_limbs.extend(bones)
+
+        bpy.ops.object.mode_set(mode=original_mode)
+
+        return created_limbs
+    
+
+    def generate_fingers(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
+        """Generate the individual limbs"""
+
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='POSE')
+        created_limbs = []
+        for (fingers_coll, finger_name), chain_info in constants.FINGERS_INFO.items():
+            bones = utils.armature.generate.bone_chain(
+                src=source_armature,
+                target=meta_rig,
+                chain_info=chain_info
+            )
+            if bones and meta_rig.data.collections.get(fingers_coll):
+                utils.armature.b_collection.assign_bones(meta_rig, bones, fingers_coll)
                 for bone_name, rigify_settings in chain_info.gen_bones.items():
                     self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
                 created_limbs.extend(bones)
@@ -235,6 +259,27 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         bpy.ops.object.mode_set(mode='OBJECT')
 
+    def rigify_make_extra_ik_control(self, armature: bpy.types.Armature, bone_name: str, make_extra_ik_control: bool) -> None:
+        """sets rigify make_extra_ik_control parameter for a given bone."""
+
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='POSE')
+        
+        pose_bone = armature.pose.bones.get(bone_name)
+
+        bpy.ops.pose.select_all(action='DESELECT')
+        pose_bone.bone.select = True
+        armature.data.bones.active = pose_bone.bone
+
+        try:
+            rigify_params = pose_bone.rigify_parameters
+
+            rigify_params.make_extra_ik_control = make_extra_ik_control
+        except Exception as e:
+            print(f"[AetherBlend] Error setting rigify make_extra_ik_control: {e}")
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
     def set_rigify_properties(self, armature: bpy.types.Armature, bone_name: str, settings: constants.RigifySettings) -> None:
         """Sets up rigify properties for a pose bone"""
         original_mode = armature.mode
@@ -259,6 +304,13 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 use_x=settings.copy_rot_axes.get('use_x'),
                 use_y=settings.copy_rot_axes.get('use_y'),
                 use_z=settings.copy_rot_axes.get('use_z')
+            )
+
+        if settings.make_extra_ik_control:
+            self.rigify_make_extra_ik_control(
+                armature,
+                pose_bone.name,
+                make_extra_ik_control=settings.make_extra_ik_control
             )
 
         bpy.ops.object.mode_set(mode=original_mode)
@@ -402,7 +454,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
             if edit_bone.name.startswith("ORG-"):
                 ref_bone_name = edit_bone.name[4:]
                 ref_bone = edit_bones.get(ref_bone_name)
-                if ref_bone:
+                if ref_bone and ref_bone.collections.get("FFXIV"):
                     edit_bone.parent = ref_bone
                     edit_bone.use_connect = False
 

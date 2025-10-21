@@ -1,6 +1,8 @@
 import bpy
+import math
 from . import bone as bone_utils
 from ...data import constants
+
 
 def bone_on_local_axis_x(armature, bone_name, parent_bone=None, prefix="gen_", suffix=""):
     """Generates a new bone on the local +X axis of a reference bone."""
@@ -57,7 +59,16 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
     target_edit_bones = target.data.edit_bones
     created_bones = []
 
-    for index, (ref_bone, meta_name) in enumerate(zip(reference_bones, meta_bone_names)):
+    valid_reference_bones = []
+    valid_meta_bone_names = []
+    for ref_bone, meta_name in zip(reference_bones, meta_bone_names):
+        if ref_bone in source_bones:
+            valid_reference_bones.append(ref_bone)
+            valid_meta_bone_names.append(meta_name)
+        else:
+            print(f"[AetherBlend] Reference bone '{ref_bone}' not found in source armature '{src.name}'. Skipping this bone.")
+
+    for index, (ref_bone, meta_name) in enumerate(zip(valid_reference_bones, valid_meta_bone_names)):
         new_bone_name = meta_name
 
         if new_bone_name in target_edit_bones:
@@ -88,7 +99,7 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
                 new_bone.tail = source_bone.head_local + chain_direction * extension_length
             else:
                 new_bone.tail = source_bone.tail_local.copy()
-
+                
         if parent_bone and index == 0:
             if parent_bone in target_edit_bones:
                 new_bone.parent = target_edit_bones[parent_bone]
@@ -102,6 +113,9 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
         elif index > 0:
             new_bone.parent = target_edit_bones[created_bones[index - 1]]
             new_bone.use_connect = True
+
+        if chain_info.roll:
+            new_bone.roll = math.radians(chain_info.roll)
 
         print(f"Created new bone: {new_bone.name}")
         created_bones.append(new_bone.name)

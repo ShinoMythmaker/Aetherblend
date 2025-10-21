@@ -158,8 +158,6 @@ def copy_to(src_armature: bpy.types.Armature, target_armature: bpy.types.Armatur
 
     return bone_copy.name
 
-
-
 def get_roll(bone: bpy.types.Bone) -> float:
     """Gets the roll of a data Bone"""
     axis, roll = bone.AxisRollFromMatrix(bone.matrix, axis=bone.y_axis)

@@ -60,6 +60,6 @@ def get_pose_bones(armature, collection_name) -> dict[str, bpy.types.PoseBone]:
     if not target_coll:
         print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
         return {}
-
+    
     pose_bones = {b.name: armature.pose.bones.get(b.name) for b in target_coll.bones if b.name in armature.pose.bones}
     return pose_bones

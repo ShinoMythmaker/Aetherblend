@@ -14,6 +14,7 @@ class RigifySettings:
     fk_coll: str | None  = None
     tweak_coll: str | None  = None
     copy_rot_axes: Dict[str, bool] | None = None
+    make_extra_ik_control: bool | None = False
 
 @dataclass(frozen=True)
 class BoneExtensionInfo:
@@ -31,6 +32,7 @@ class BoneChainInfo:
     gen_bones: dict[str, RigifySettings | None]
     parent_bone: str | None
     bone_extensions: BoneExtensionInfo | None = None
+    roll: float | None = 0.0
     extend_last: bool = False
     extension_factor: float = 0.0
 
@@ -55,23 +57,65 @@ spring_bone_collection = "Spring Bones"
 
 
 META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
-    MetaRigCollectionInfo(name="Arm.L (IK)", color_type="IK", row_index=1, title="IK.L"),
-    MetaRigCollectionInfo(name="Arm.L (FK)", color_type="FK", row_index=2, title="FK.L"),
-    MetaRigCollectionInfo(name="Arm.L (Tweak)", color_type="Tweak", row_index=3, title="Tweak.L"),
-    MetaRigCollectionInfo(name="Arm.R (IK)", color_type="IK", row_index=1, title="IK.R"),
-    MetaRigCollectionInfo(name="Arm.R (FK)", color_type="FK", row_index=2, title="FK.R"),
-    MetaRigCollectionInfo(name="Arm.R (Tweak)", color_type="Tweak", row_index=3, title="Tweak.R"),
+    MetaRigCollectionInfo(name="Fingers", color_type="Extra", row_index=1, title="Fingers"),
+    MetaRigCollectionInfo(name="Fingers (Details)", color_type="FK", row_index=2, title="(Details)"),
 
-    MetaRigCollectionInfo(name="Leg.L (IK)", color_type="IK", row_index=5, title="IK.L"),
-    MetaRigCollectionInfo(name="Leg.L (FK)", color_type="FK", row_index=6, title="FK.L"),
-    MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=7, title="Tweak.L"),
-    MetaRigCollectionInfo(name="Leg.R (IK)", color_type="IK", row_index=5, title="IK.R"),
-    MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=6, title="FK.R"),
-    MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=7, title="Tweak.R"),
+    MetaRigCollectionInfo(name="Arm.L (IK)", color_type="IK", row_index=4, title="IK.L"),
+    MetaRigCollectionInfo(name="Arm.L (FK)", color_type="FK", row_index=5, title="FK.L"),
+    MetaRigCollectionInfo(name="Arm.L (Tweak)", color_type="Tweak", row_index=6, title="Tweak.L"),
+    MetaRigCollectionInfo(name="Arm.R (IK)", color_type="IK", row_index=4, title="IK.R"),
+    MetaRigCollectionInfo(name="Arm.R (FK)", color_type="FK", row_index=5, title="FK.R"),
+    MetaRigCollectionInfo(name="Arm.R (Tweak)", color_type="Tweak", row_index=6, title="Tweak.R"),
 
-    MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=9, title="Tail"),
-    MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=10, title="Tweaks"),
+    MetaRigCollectionInfo(name="Leg.L (IK)", color_type="IK", row_index=8, title="IK.L"),
+    MetaRigCollectionInfo(name="Leg.L (FK)", color_type="FK", row_index=9, title="FK.L"),
+    MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=10, title="Tweak.L"),
+    MetaRigCollectionInfo(name="Leg.R (IK)", color_type="IK", row_index=8, title="IK.R"),
+    MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=9, title="FK.R"),
+    MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=10, title="Tweak.R"),
+
+    MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=12, title="Tail"),
+    MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=13, title="Tweaks"),
 ]
+
+FINGERS_INFO: Dict[[str, str], BoneChainInfo] = {
+    ("Fingers", "Thumb.L"): BoneChainInfo(
+        ffxiv_bones=["j_oya_a_l", "j_oya_b_l"],
+        gen_bones= {
+            "f_thumb.L01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_thumb.L02": None,
+            "f_thumb.L03": None
+        },
+        parent_bone="j_te_l",
+        extend_last=True,
+        extension_factor=0.6
+        ),
+    ("Fingers", "Pointer.L"): BoneChainInfo(
+        ffxiv_bones=["j_hito_a_l", "j_hito_b_l", "iv_hito_c_l"],
+        gen_bones= {
+            "f_pointer.L01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_pointer.L02": None,
+            "f_pointer.L03": None
+        },
+        roll=(-135.0),
+        parent_bone="j_te_l",
+        extend_last=True,
+        extension_factor=1
+    ),
+    ("Fingers", "Middle.L"): BoneChainInfo(
+        ffxiv_bones=["j_naka_a_l", "j_naka_b_l", "iv_naka_c_l"],
+        gen_bones= {
+            "f_middle.L01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_middle.L02": None,
+            "f_middle.L03": None
+        },
+        roll=(-135.0),
+        parent_bone="j_te_l",
+        extend_last=True,
+        extension_factor=1
+    )
+}
+
 
 ARMS_INFO: Dict[str, BoneChainInfo] = {
     "Arm.L (IK)": BoneChainInfo(
@@ -180,7 +224,20 @@ TAILS_INFO: Dict[str, BoneChainInfo] = {
     )
 }
 
+
+
 CONSTRAINT_BONE_MAP: Dict[str, str] = {
+        # Left Fingers 
+        "j_oya_a_l": "ORG-f_thumb.L01",
+        "j_oya_b_l": "ORG-f_thumb.L02",
+        "j_hito_a_l": "ORG-f_pointer.L01",
+        "j_hito_b_l": "ORG-f_pointer.L02",
+        "iv_hito_c_l": "ORG-f_pointer.L03",
+        "j_naka_a_l": "ORG-f_middle.L01",
+        "j_naka_b_l": "ORG-f_middle.L02",
+        "iv_naka_c_l": "ORG-f_middle.L03",
+
+
         # Left Arm
         "j_ude_a_l": "ORG-upper_arm.L",
         "j_ude_b_l": "ORG-forearm.L", 
