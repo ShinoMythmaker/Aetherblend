@@ -16,12 +16,23 @@ class RigifySettings:
     copy_rot_axes: Dict[str, bool] | None = None
 
 @dataclass(frozen=True)
+class BoneExtensionInfo:
+    org_bone: str
+    name: str
+    extension_factors: float
+    axis_type: str # e.g., "global", "local", "armature"
+    axis: str # e.g., "X", "Y", "Z"
+    start: str = "tail" # e.g., "head", "tail"
+    is_connected: bool = False
+
+@dataclass(frozen=True)
 class BoneChainInfo:
     ffxiv_bones: list[str]
     gen_bones: dict[str, RigifySettings | None]
     parent_bone: str | None
-    extend_last: bool
-    extension_factor: float
+    bone_extensions: BoneExtensionInfo | None = None
+    extend_last: bool = False
+    extension_factor: float = 0.0
 
 xiv_tail_bones = ["n_sippo_a", "n_sippo_b", "n_sippo_c", "n_sippo_d", "n_sippo_e"]
 sb_tail_parent_bone = "j_kosi"
@@ -59,7 +70,7 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
     MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=7, title="Tweak.R"),
 
     MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=9, title="Tail"),
-    MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=9, title="Tweaks"),
+    MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=10, title="Tweaks"),
 ]
 
 ARMS_INFO: Dict[str, BoneChainInfo] = {
@@ -85,30 +96,73 @@ ARMS_INFO: Dict[str, BoneChainInfo] = {
         extend_last=True,
         extension_factor=0.6
     )
-    # "Leg.L (IK)": BoneChainInfo(
-    #     ffxiv_bones=["j_asi_a_l", "j_asi_c_l", "j_asi_d_l", "j_asi_e_l"],
-    #     gen_bones= {
-    #         "thigh.L": RigifySettings(rigify_type="limbs.leg", fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)"),
-    #         "shin.L": None,
-    #         "foot.L": None,
-    #         "toe.L": None
-    #     },
-    #     parent_bone="j_kosi",
-    #     extend_last=True,
-    #     extension_factor=0.2
-    # ),
-    # "Leg.R (IK)": BoneChainInfo(
-    #     ffxiv_bones=["j_asi_a_r","j_asi_c_r", "j_asi_d_r", "j_asi_e_r"],
-    #     gen_bones= {
-    #         "thigh.R": RigifySettings(rigify_type="limbs.leg", fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)"),
-    #         "shin.R": None,
-    #         "foot.R": None,
-    #         "toe.R": None
-    #     },
-    #     parent_bone="j_kosi",
-    #     extend_last=True,
-    #     extension_factor=0.2
-    # ),
+}
+
+LEGS_INFO: Dict[str, BoneChainInfo] = {
+    "Leg.L (IK)": BoneChainInfo(
+        ffxiv_bones=["j_asi_a_l", "j_asi_c_l", "j_asi_d_l", "j_asi_e_l"],
+        gen_bones= {
+            "thigh.L": RigifySettings(rigify_type="limbs.leg", fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)"),
+            "shin.L": None,
+            "foot.L": None,
+            "toe.L": None
+        },
+        parent_bone="j_kosi",
+        bone_extensions= [
+        BoneExtensionInfo(
+            org_bone="foot.L",
+            name="toe.L",
+            extension_factors= (-0.05),
+            axis_type="armature",
+            axis="Y", 
+            start="tail",
+            is_connected=True
+        ),
+        BoneExtensionInfo(
+            org_bone="foot.L",
+            name="heel.L",
+            extension_factors=0.1,
+            axis_type="armature",
+            axis="Y", 
+            start="tail",
+            is_connected=False
+        ), 
+        ],
+        extend_last=False,
+        extension_factor=0.3
+    ),
+    "Leg.R (IK)": BoneChainInfo(
+        ffxiv_bones=["j_asi_a_r","j_asi_c_r", "j_asi_d_r", "j_asi_e_r"],
+        gen_bones= {
+            "thigh.R": RigifySettings(rigify_type="limbs.leg", fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)"),
+            "shin.R": None,
+            "foot.R": None,
+            "toe.R": None
+        },
+        parent_bone="j_kosi",
+        bone_extensions= [
+        BoneExtensionInfo(
+            org_bone="foot.R",
+            name="toe.R",
+            extension_factors= (-0.05),
+            axis_type="armature",
+            axis="Y", 
+            start="tail",
+            is_connected=True
+        ),
+        BoneExtensionInfo(
+            org_bone="foot.R",
+            name="heel.R",
+            extension_factors=0.1,
+            axis_type="armature",
+            axis="Y",
+            start="tail",
+            is_connected=False
+        ),
+        ],
+        extend_last=False,
+        extension_factor=0.3
+    ),
 }
 
 TAILS_INFO: Dict[str, BoneChainInfo] = {
@@ -136,6 +190,21 @@ CONSTRAINT_BONE_MAP: Dict[str, str] = {
         "j_ude_a_r": "ORG-upper_arm.R",
         "j_ude_b_r": "ORG-forearm.R",
         "j_te_r": "ORG-hand.R",
+
+        # DEF-toe because the ORG bone here stays still in local space. 
+        # This issue is a mystery to me because it works when manually merging the rigify rig with the ffxiv rig. 
+        # So i assume this happens in the parent clean up step.
+        # Left Leg
+        "j_asi_a_l": "ORG-thigh.L",
+        "j_asi_c_l": "ORG-shin.L",
+        "j_asi_d_l": "ORG-foot.L",
+        "j_asi_e_l": "DEF-toe.L",
+
+        # Right Leg
+        "j_asi_a_r": "ORG-thigh.R",
+        "j_asi_c_r": "ORG-shin.R",
+        "j_asi_d_r": "ORG-foot.R",
+        "j_asi_e_r": "DEF-toe.R", 
 
         # Tail 
         "n_sippo_a": "tail.A",

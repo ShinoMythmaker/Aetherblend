@@ -108,3 +108,63 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
 
     bpy.ops.object.mode_set(mode=original_mode)
     return created_bones
+
+
+def create_extensions(target: bpy.types.Armature, extension_info: list[constants.BoneExtensionInfo]) -> list[str]:
+    """Generate bone extension in target armature based on extension_info"""
+    original_mode = bpy.context.object.mode
+    source_bones = target.data.bones
+
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.context.view_layer.objects.active = target
+    target_edit_bones = target.data.edit_bones
+    created_bones = []
+
+    for ext_info in extension_info:
+        ref_bone_name = ext_info.org_bone
+        new_bone_name = ext_info.name
+
+        if new_bone_name in target_edit_bones:
+            target_edit_bones.remove(target_edit_bones[new_bone_name])
+            
+        new_bone = target_edit_bones.new(new_bone_name)
+        source_bone = source_bones[ref_bone_name]
+        
+        start = source_bone.tail_local.copy() if ext_info.start == "tail" else source_bone.head_local.copy()
+
+        new_bone.head = start
+
+        direction_vector = None
+        if ext_info.axis_type == "local":
+            if ext_info.axis == "X":
+                direction_vector = source_bone.x_axis
+            elif ext_info.axis == "Y":
+                direction_vector = source_bone.y_axis
+            elif ext_info.axis == "Z":
+                direction_vector = source_bone.z_axis
+        elif ext_info.axis_type == "armature":
+            armature_matrix = target.matrix_world.to_3x3().inverted()
+            if ext_info.axis == "X":
+                direction_vector = armature_matrix[0]
+            elif ext_info.axis == "Y":
+                direction_vector = armature_matrix[1]
+            elif ext_info.axis == "Z":
+                direction_vector = armature_matrix[2]
+
+        if direction_vector:
+            new_bone.tail = new_bone.head + direction_vector.normalized() * ext_info.extension_factors
+        else:
+            new_bone.tail = source_bone.tail_local.copy()
+
+        if ext_info.is_connected:
+            new_bone.parent = target_edit_bones[ref_bone_name]
+            new_bone.use_connect = True
+        else:
+            new_bone.parent = target_edit_bones[ref_bone_name]
+            new_bone.use_connect = False
+
+        print(f"Created extension bone: {new_bone.name}")
+        created_bones.append(new_bone.name)
+
+    bpy.ops.object.mode_set(mode=original_mode)
+    return created_bones

@@ -61,6 +61,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         self.generate_arms(source_armature=armature, meta_rig=meta_rig)
         self.generate_tail(source_armature=armature, meta_rig=meta_rig)
+        self.generate_legs(source_armature=armature, meta_rig=meta_rig)
                 
         armature.aether_rig.meta_rig = meta_rig
         
@@ -110,6 +111,35 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             )
             if bones and meta_rig.data.collections.get(tail_coll):
                 utils.armature.b_collection.assign_bones(meta_rig, bones, tail_coll)
+                for bone_name, rigify_settings in chain_info.gen_bones.items():
+                    self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
+                created_limbs.extend(bones)
+
+        bpy.ops.object.mode_set(mode=original_mode)
+
+        return created_limbs
+    
+    def generate_legs(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
+        """Generate the individual leg bones"""
+
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='POSE')
+        created_limbs = []
+        for leg_coll, chain_info in constants.LEGS_INFO.items():
+            bones = utils.armature.generate.bone_chain(
+                src=source_armature,
+                target=meta_rig,
+                chain_info=chain_info
+            )
+            extension_bones = utils.armature.generate.create_extensions(
+                target=meta_rig,
+                extension_info=chain_info.bone_extensions
+            )
+            if extension_bones:
+                bones.extend(extension_bones)
+            
+            if bones and meta_rig.data.collections.get(leg_coll):
+                utils.armature.b_collection.assign_bones(meta_rig, bones, leg_coll)
                 for bone_name, rigify_settings in chain_info.gen_bones.items():
                     self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
                 created_limbs.extend(bones)
@@ -181,7 +211,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             print(f"[AetherBlend] Error setting rigify FK collection: {e}")
         
         bpy.ops.object.mode_set(mode='OBJECT')
-
 
     def rigify_set_copy_rotation_axes(self, armature: bpy.types.Armature, bone_name: str, use_x: bool, use_y: bool, use_z: bool) -> None:
         """sets rigify copy rotation axes parameter for a given bone."""
