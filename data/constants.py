@@ -86,7 +86,7 @@ FINGERS_INFO: Dict[[str, str], BoneChainInfo] = {
             "f_thumb.L02": None,
             "f_thumb.L03": None
         },
-        parent_bone="j_te_l",
+        parent_bone="hand.L",
         extend_last=True,
         extension_factor=0.6
         ),
@@ -98,7 +98,7 @@ FINGERS_INFO: Dict[[str, str], BoneChainInfo] = {
             "f_pointer.L03": None
         },
         roll=(-135.0),
-        parent_bone="j_te_l",
+        parent_bone="hand.L",
         extend_last=True,
         extension_factor=1
     ),
@@ -110,7 +110,90 @@ FINGERS_INFO: Dict[[str, str], BoneChainInfo] = {
             "f_middle.L03": None
         },
         roll=(-135.0),
-        parent_bone="j_te_l",
+        parent_bone="hand.L",
+        extend_last=True,
+        extension_factor=1
+    ),
+    ("Fingers", "Ring.L"): BoneChainInfo(
+        ffxiv_bones=["j_kusu_a_l", "j_kusu_b_l", "iv_kusu_c_l"],
+        gen_bones= {
+            "f_ring.L01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_ring.L02": None,
+            "f_ring.L03": None
+        },
+        roll=(-135.0),
+        parent_bone="hand.L",
+        extend_last=True,
+        extension_factor=1
+    ),
+    ("Fingers", "Pinky.L"): BoneChainInfo(
+        ffxiv_bones=["j_ko_a_l", "j_ko_b_l", "iv_ko_c_l"],
+        gen_bones= {
+            "f_pinky.L01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_pinky.L02": None,
+            "f_pinky.L03": None
+        },
+        roll=(-135.0),
+        parent_bone="hand.L",
+        extend_last=True,
+        extension_factor=1
+    ),
+    ("Fingers", "Thumb.R"): BoneChainInfo(
+        ffxiv_bones=["j_oya_a_r", "j_oya_b_r"],
+        gen_bones= {
+            "f_thumb.R01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_thumb.R02": None,
+            "f_thumb.R03": None
+        },
+        parent_bone="hand.R",
+        extend_last=True,
+        extension_factor=0.6
+        ),
+    ("Fingers", "Pointer.R"): BoneChainInfo(
+        ffxiv_bones=["j_hito_a_r", "j_hito_b_r", "iv_hito_c_r"],
+        gen_bones= {
+            "f_pointer.R01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_pointer.R02": None,
+            "f_pointer.R03": None
+        },
+        roll=135.0,
+        parent_bone="hand.R",
+        extend_last=True,
+        extension_factor=1
+    ),
+    ("Fingers", "Middle.R"): BoneChainInfo(
+        ffxiv_bones=["j_naka_a_r", "j_naka_b_r", "iv_naka_c_r"],
+        gen_bones= {
+            "f_middle.R01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_middle.R02": None,
+            "f_middle.R03": None
+        },
+        roll=135.0,
+        parent_bone="hand.R",
+        extend_last=True,
+        extension_factor=1
+    ),
+    ("Fingers", "Ring.R"): BoneChainInfo(
+        ffxiv_bones=["j_kusu_a_r", "j_kusu_b_r", "iv_kusu_c_r"],
+        gen_bones= {
+            "f_ring.R01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_ring.R02": None,
+            "f_ring.R03": None
+        },
+        roll=135.0,
+        parent_bone="hand.R",
+        extend_last=True,
+        extension_factor=1
+    ),
+    ("Fingers", "Pinky.R"): BoneChainInfo(
+        ffxiv_bones=["j_ko_a_r", "j_ko_b_r", "iv_ko_c_r"],
+        gen_bones= {
+            "f_pinky.R01": RigifySettings(rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
+            "f_pinky.R02": None,
+            "f_pinky.R03": None
+        },
+        roll=135.0,
+        parent_bone="hand.R",
         extend_last=True,
         extension_factor=1
     )
@@ -225,7 +308,6 @@ TAILS_INFO: Dict[str, BoneChainInfo] = {
 }
 
 
-
 CONSTRAINT_BONE_MAP: Dict[str, str] = {
         # Left Fingers 
         "j_oya_a_l": "ORG-f_thumb.L01",
@@ -236,6 +318,28 @@ CONSTRAINT_BONE_MAP: Dict[str, str] = {
         "j_naka_a_l": "ORG-f_middle.L01",
         "j_naka_b_l": "ORG-f_middle.L02",
         "iv_naka_c_l": "ORG-f_middle.L03",
+        "j_kusu_a_l": "ORG-f_ring.L01",
+        "j_kusu_b_l": "ORG-f_ring.L02",
+        "iv_kusu_c_l": "ORG-f_ring.L03",
+        "j_ko_a_l": "ORG-f_pinky.L01",
+        "j_ko_b_l": "ORG-f_pinky.L02",
+        "iv_ko_c_l": "ORG-f_pinky.L03",
+
+        # Right Fingers
+        "j_oya_a_r": "ORG-f_thumb.R01",
+        "j_oya_b_r": "ORG-f_thumb.R02",
+        "j_hito_a_r": "ORG-f_pointer.R01",
+        "j_hito_b_r": "ORG-f_pointer.R02",
+        "iv_hito_c_r": "ORG-f_pointer.R03",
+        "j_naka_a_r": "ORG-f_middle.R01",
+        "j_naka_b_r": "ORG-f_middle.R02",
+        "iv_naka_c_r": "ORG-f_middle.R03",
+        "j_kusu_a_r": "ORG-f_ring.R01",
+        "j_kusu_b_r": "ORG-f_ring.R02",
+        "iv_kusu_c_r": "ORG-f_ring.R03",
+        "j_ko_a_r": "ORG-f_pinky.R01",
+        "j_ko_b_r": "ORG-f_pinky.R02",
+        "iv_ko_c_r": "ORG-f_pinky.R03",
 
 
         # Left Arm
