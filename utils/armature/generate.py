@@ -126,6 +126,9 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
 
 def create_extensions(target: bpy.types.Armature, extension_info: list[constants.BoneExtensionInfo]) -> list[str]:
     """Generate bone extension in target armature based on extension_info"""
+    if extension_info is None or len(extension_info) == 0:
+        return []
+
     original_mode = bpy.context.object.mode
     source_bones = target.data.bones
 

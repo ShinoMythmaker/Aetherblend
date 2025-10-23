@@ -59,6 +59,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 coll.rigify_ui_row = collection.row_index
                 coll.rigify_ui_title = collection.title
 
+        self.generate_torso(source_armature=armature, meta_rig=meta_rig)
         self.generate_arms(source_armature=armature, meta_rig=meta_rig)
         self.generate_tail(source_armature=armature, meta_rig=meta_rig)
         self.generate_legs(source_armature=armature, meta_rig=meta_rig)
@@ -75,6 +76,37 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         armature.select_set(True)
         
         return {'FINISHED'}
+
+
+    def generate_torso(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
+        """Generate the individual torso bones"""
+
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='POSE')
+        created_limbs = []
+        for (torso_coll, chain_name), chain_info in constants.SPINE_INFO.items():
+            bones = utils.armature.generate.bone_chain(
+                src=source_armature,
+                target=meta_rig,
+                chain_info=chain_info
+            )
+            extension_bones = utils.armature.generate.create_extensions(
+                target=meta_rig,
+                extension_info=chain_info.bone_extensions
+            )
+            if extension_bones:
+                bones.extend(extension_bones)
+            
+            if bones and meta_rig.data.collections.get(torso_coll):
+                utils.armature.b_collection.assign_bones(meta_rig, bones, torso_coll)
+                for bone_name, rigify_settings in chain_info.gen_bones.items():
+                    self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
+                created_limbs.extend(bones)
+
+        bpy.ops.object.mode_set(mode=original_mode)
+
+        return created_limbs
+
 
     def generate_arms(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
         """Generate the individual limbs"""
@@ -280,6 +312,48 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         bpy.ops.object.mode_set(mode='OBJECT')
 
+    def rigify_set_super_copy_widget_type(self, armature: bpy.types.Armature, bone_name: str, super_copy_widget_type: str) -> None:
+        """sets rigify super_copy_widget_type parameter for a given bone."""
+
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='POSE')
+        
+        pose_bone = armature.pose.bones.get(bone_name)
+
+        bpy.ops.pose.select_all(action='DESELECT')
+        pose_bone.bone.select = True
+        armature.data.bones.active = pose_bone.bone
+
+        try:
+            rigify_params = pose_bone.rigify_parameters
+
+            rigify_params.super_copy_widget_type = super_copy_widget_type
+        except Exception as e:
+            print(f"[AetherBlend] Error setting rigify super_copy_widget_type: {e}")
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+    def rigify_set_pivot_pos(self, armature: bpy.types.Armature, bone_name: str, pivot_pos: int) -> None:
+        """sets rigify pivot_pos parameter for a given bone."""
+
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='POSE')
+        
+        pose_bone = armature.pose.bones.get(bone_name)
+
+        bpy.ops.pose.select_all(action='DESELECT')
+        pose_bone.bone.select = True
+        armature.data.bones.active = pose_bone.bone
+
+        try:
+            rigify_params = pose_bone.rigify_parameters
+
+            rigify_params.pivot_pos = pivot_pos
+        except Exception as e:
+            print(f"[AetherBlend] Error setting rigify pivot_pos: {e}")
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
     def set_rigify_properties(self, armature: bpy.types.Armature, bone_name: str, settings: constants.RigifySettings) -> None:
         """Sets up rigify properties for a pose bone"""
         original_mode = armature.mode
@@ -311,6 +385,20 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 armature,
                 pose_bone.name,
                 make_extra_ik_control=settings.make_extra_ik_control
+            )
+
+        if settings.super_copy_widget_type:
+            self.rigify_set_super_copy_widget_type(
+                armature,
+                pose_bone.name,
+                super_copy_widget_type=settings.super_copy_widget_type
+            )
+
+        if settings.pivot_pos:
+            self.rigify_set_pivot_pos(
+                armature,
+                pose_bone.name,
+                pivot_pos=settings.pivot_pos
             )
 
         bpy.ops.object.mode_set(mode=original_mode)
@@ -438,9 +526,9 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         
         self.copy_rigify_properties(ffxiv_armature, rigify_rig)
         
-        constraints = utils.armature.bone.add_constraint_copy_rotation(ffxiv_armature, constants.CONSTRAINT_BONE_MAP, overwrite=True)
-        for con in constraints:
-            con.name = f"AetherBlend_CopyRot_{con.name}"
+        constraints_copy_rot = utils.armature.bone.add_constraint_copy_rotation(ffxiv_armature, constants.CONSTRAINTS_COPY_ROT, overwrite=False)
+        constraints_copy_loc = utils.armature.bone.add_constraint_copy_location(ffxiv_armature, constants.CONSTRAINTS_COPY_LOC, overwrite=False)
+        constraints_child_of = utils.armature.bone.add_constraint_child_of(ffxiv_armature, constants.CONSTRAINTS_CHILD_OF, overwrite=False)
 
         bpy.ops.object.mode_set(mode=original_mode)
         return True

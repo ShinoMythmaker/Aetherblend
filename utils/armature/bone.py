@@ -1,32 +1,91 @@
 import bpy
 
-def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[str, str], overwrite: bool = False) -> list[bpy.types.Constraint]:
+def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
     """Adds Copy Rotation constraints to specified bones in an armature."""
     original_mode = armature.mode
 
     bpy.ops.object.mode_set(mode='POSE')
     constraints = []
 
-    for bone_name, target_bone_name in bone_map.items():
-        bone = armature.pose.bones[bone_name]
+    for bone_name, target_bone_names in bone_map.items():
+        for target_bone_name in target_bone_names:
+            bone = armature.pose.bones[bone_name]
 
-        # Remove all existing constraints
-        if overwrite:
-            for con in list(bone.constraints):
-                bone.constraints.remove(con)
+            # Remove all existing constraints
+            if overwrite:
+                for con in list(bone.constraints):
+                    bone.constraints.remove(con)
 
-        copy_rot = bone.constraints.new('COPY_ROTATION')
-        copy_rot.target = armature
-        copy_rot.subtarget = target_bone_name
-        copy_rot.euler_order = 'ZXY'
-        copy_rot.use_x = True
-        copy_rot.use_y = True
-        copy_rot.use_z = True
-        copy_rot.mix_mode = 'AFTER'
-        copy_rot.target_space = 'LOCAL_OWNER_ORIENT'
-        copy_rot.owner_space = 'LOCAL_WITH_PARENT'
+            copy_rot = bone.constraints.new('COPY_ROTATION')
+            copy_rot.target = armature
+            copy_rot.subtarget = target_bone_name
+            copy_rot.euler_order = 'ZXY'
+            copy_rot.use_x = True
+            copy_rot.use_y = True
+            copy_rot.use_z = True
+            copy_rot.mix_mode = 'AFTER'
+            copy_rot.target_space = 'LOCAL_OWNER_ORIENT'
+            copy_rot.owner_space = 'LOCAL_WITH_PARENT'
 
-        constraints.append(copy_rot)
+            copy_rot.name = f"AetherBlend_{copy_rot.name}"
+            constraints.append(copy_rot)
+
+    bpy.ops.object.mode_set(mode=original_mode)
+    return constraints
+
+def add_constraint_copy_location(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
+    """Adds Copy Location constraints to specified bones in an armature."""
+    original_mode = armature.mode
+
+    bpy.ops.object.mode_set(mode='POSE')
+    constraints = []
+
+    for bone_name, target_bone_names in bone_map.items():
+        for target_bone_name in target_bone_names:
+            bone = armature.pose.bones[bone_name]
+
+            # Remove all existing constraints
+            if overwrite:
+                for con in list(bone.constraints):
+                    bone.constraints.remove(con)
+
+            copy_loc = bone.constraints.new('COPY_LOCATION')
+            copy_loc.target = armature
+            copy_loc.subtarget = target_bone_name
+            copy_loc.use_x = True
+            copy_loc.use_y = True
+            copy_loc.use_z = True
+            copy_loc.target_space = 'POSE'
+            copy_loc.owner_space = 'POSE'
+
+            copy_loc.name = f"AetherBlend_{copy_loc.name}"
+            constraints.append(copy_loc)
+
+    bpy.ops.object.mode_set(mode=original_mode)
+    return constraints
+
+def add_constraint_child_of(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
+    """Adds Child Of constraints to specified bones in an armature."""
+    original_mode = armature.mode
+
+    bpy.ops.object.mode_set(mode='POSE')
+    constraints = []
+
+    for bone_name, target_bone_names in bone_map.items():
+        for target_bone_name in target_bone_names:
+            bone = armature.pose.bones[bone_name]
+
+            # Remove all existing constraints
+            if overwrite:
+                for con in list(bone.constraints):
+                    bone.constraints.remove(con)
+
+            child_of = bone.constraints.new('CHILD_OF')
+            child_of.target = armature
+            child_of.subtarget = target_bone_name
+
+            child_of.name = f"AetherBlend_{child_of.name}"
+            constraints.append(child_of)
 
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
