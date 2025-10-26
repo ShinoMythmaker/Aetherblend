@@ -22,49 +22,81 @@ Here is a list of all 1.0 features i would like to have in Aetherblend.
   - [ ] Face
   - [ ] Head
   - [x] Arms
+  ## Project progress
+
+  Here are the planned 1.0 features grouped into compact, collapsible sections to keep the README tidy.
+
+  Progress: **8 / 31** — **26%**
+
+  Progress bar: ▰▰▰▱▱▱▱▱▱▱ (26%)
+
+  <details>
+  <summary><strong>Core</strong></summary>
+
+  - [x] Repository installer integration
+  - [ ] Master Repository for FFXIV Blender plugins (e.g. meddle, bustomize, yet another blender plugin ....)
+  - [x] Character Import
+  - [ ] Quick setup
+  - [ ] Guides
+  - [ ] Full user documentation
+
+  </details>
+
+  <details>
+  <summary><strong>Rigify Compatibility</strong></summary>
+
+  - [ ] Face
+  - [ ] Head
+  - [x] Arms
   - [x] Fingers
-  - [x] Legs 
+  - [x] Legs
   - [x] Torso
   - [x] Tail
-- [ ] Rig Options 
+
+  </details>
+
+  <details>
+  <summary><strong>Rig Options</strong></summary>
+
   - [ ] Tentacle Tail
   - [ ] Knee Bone Adjustment
-- [ ] Quick setup
-- [ ] C+
-  - [x] C+ Application 
+
+  </details>
+
+  <details>
+  <summary><strong>C+</strong></summary>
+
+  - [x] C+ Application
   - [ ] C+ Editing
   - [ ] C+ Export
-- [ ] Gpose 
+
+  </details>
+
+  <details>
+  <summary><strong>Gpose</strong></summary>
+
   - [ ] Pose Export
-  - [ ] Pose Import without IK 
+  - [ ] Pose Import without IK
   - [ ] Pose Import with IK
-- [ ] Spring Bones 
+
+  </details>
+
+  <details>
+  <summary><strong>Spring Bones</strong></summary>
+
   - [ ] Breast
   - [ ] Tail
   - [ ] Ears
-- [ ] Animation Export
-- [ ] Workflow to remove the FFXIV bones and continue work with newly created Meta Rig for precise in Blender animation. ( Removes Modding Compatibility )
 
-- [ ] Guides
-- [ ] Full user documentation
+  </details>
 
-Progress: 8/31 (26%)
+  <details>
+  <summary><strong>Animation & Workflow</strong></summary>
 
-<div style="background:#e6e6e6;border-radius:6px;width:360px;max-width:100%;height:14px">
-  <div style="background:#46a049;width:26%;height:14px;border-radius:6px"></div>
-</div>
+  - [ ] Animation Export
+  - [ ] Workflow to remove the FFXIV bones and continue work with newly created Meta Rig for precise in Blender animation. (Removes Modding Compatibility)
 
-
-
-## Installation (Recommended: Repository Method)
-
-You can install Aetherblend using Blender's new Repository feature for easy updates.
-
-1. In Blender, go to **Edit > Preferences > Get Extensions**
-2. Select the **Repositories** Drop-down-menu (top right)
-3. Click "**Add Remote Repository**"
-4. Paste the following URL for the repo:
-   ```
+  </details>
    https://raw.githubusercontent.com/ShinoMythmaker/Aetherblend/main/repo.json
    ```
 6. Click **Check for Updates on Startup**.
