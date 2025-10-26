@@ -11,6 +11,51 @@
 
 !! Aetherblend is currently not production ready and very early on in developement !!
 
+## Project progress
+
+Here is a list of all 1.0 features i would like to have in Aetherblend. 
+
+- [x] Repository installer integration
+- [ ] Master Repository for FFXIV Blender plugins (e.g. meddle, bustomize, yet another blender plugin ....)
+- [x] Character Import
+- [ ] Rigify Compatibility
+  - [ ] Face
+  - [ ] Head
+  - [x] Arms
+  - [x] Fingers
+  - [x] Legs 
+  - [x] Torso
+  - [x] Tail
+- [ ] Rig Options 
+  - [ ] Tentacle Tail
+  - [ ] Knee Bone Adjustment
+- [ ] Quick setup
+- [ ] C+
+  - [x] C+ Application 
+  - [ ] C+ Editing
+  - [ ] C+ Export
+- [ ] Gpose 
+  - [ ] Pose Export
+  - [ ] Pose Import without IK 
+  - [ ] Pose Import with IK
+- [ ] Spring Bones 
+  - [ ] Breast
+  - [ ] Tail
+  - [ ] Ears
+- [ ] Animation Export
+- [ ] Workflow to remove the FFXIV bones and continue work with newly created Meta Rig for precise in Blender animation. ( Removes Modding Compatibility )
+
+- [ ] Guides
+- [ ] Full user documentation
+
+Progress: 8/31 (26%)
+
+<div style="background:#e6e6e6;border-radius:6px;width:360px;max-width:100%;height:14px">
+  <div style="background:#46a049;width:26%;height:14px;border-radius:6px"></div>
+</div>
+
+
+
 ## Installation (Recommended: Repository Method)
 
 You can install Aetherblend using Blender's new Repository feature for easy updates.
