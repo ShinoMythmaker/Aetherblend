@@ -26,7 +26,8 @@ Here is a list of all 1.0 features i would like to have in Aetherblend.
 - [ ] Guides
 - [ ] Full user documentation
 <details>
-  <summary><strong>- [ ] Rigify Compatibility</strong></summary>
+  <summary><strong>Rigify Compatibility</strong></summary>
+
   - [ ] Face
   - [ ] Head
   - [x] Arms
@@ -36,25 +37,29 @@ Here is a list of all 1.0 features i would like to have in Aetherblend.
   - [x] Tail
 </details>
 <details>
-  <summary><strong>- [ ] Rig Options</strong></summary>
+  <summary><strong>Rig Options</strong></summary>
+
   - [ ] Tentacle Tail
   - [ ] Knee Bone Adjustment
 </details>
 
 <details>
-  <summary><strong>- [ ] C+</strong></summary>
+  <summary><strong>C+</strong></summary>
+
   - [x] C+ Application 
   - [ ] C+ Editing
   - [ ] C+ Export
 </details>
 <details>
-  <summary><strong>- [ ] Gpose</strong></summary>
+  <summary><strong>Gpose</strong></summary>
+
   - [ ] Pose Export
   - [ ] Pose Import without IK 
   - [ ] Pose Import with IK
 </details>
 <details>
-  <summary><strong>- [ ] Spring Bones</strong></summary>
+  <summary><strong>Spring Bones</strong></summary>
+
   - [ ] Breast
   - [ ] Tail
   - [ ] Ears
