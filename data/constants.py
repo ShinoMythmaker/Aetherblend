@@ -116,6 +116,13 @@ SPINE_INFO: dict[list[str, str], BoneChainInfo] = {
         },
         parent_bone="spine.03",
     ),
+    ("Torso", "Neck"): BoneChainInfo(
+        ffxiv_bones=["j_kubi", "j_kao"],
+        gen_bones= {
+            "neck": RigifySettings(rigify_type="basic.super_copy", super_copy_widget_type="circle")
+        },
+        parent_bone="spine.03",
+    ),
 }
 
 
@@ -358,6 +365,7 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
 
         "j_sako_l": ["shoulder.L"],
         "j_sako_r": ["shoulder.R"],
+        "j_kubi": ["neck"],
 
 
         # Left Fingers 
