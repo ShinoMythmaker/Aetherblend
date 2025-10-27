@@ -10,6 +10,7 @@
 </div>
 
 !! Aetherblend is currently not production ready and very early on in developement !!
+You can already use Aetherblend to generate a rig without head bones and use it to animate and mod in FFXIV.
 
 ## Project progress
 
@@ -53,7 +54,7 @@ Here is a list of all 1.0 features i would like to have in Aetherblend.
 <details>
   <summary><strong>Gpose</strong></summary>
 
-  - [ ] Pose Export
+  - [x] Pose Export
   - [ ] Pose Import without IK 
   - [ ] Pose Import with IK
 </details>
