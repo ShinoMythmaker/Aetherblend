@@ -6,7 +6,7 @@ class AETHER_PT_ExportPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'  
     bl_category = 'AetherBlend'
-    bl_order = 1 
+    bl_order = 3 
     
     def draw(self, context):
         layout = self.layout
