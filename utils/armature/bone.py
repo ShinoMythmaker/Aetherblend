@@ -8,8 +8,16 @@ def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[st
     constraints = []
 
     for bone_name, target_bone_names in bone_map.items():
+        bone = armature.pose.bones.get(bone_name)
+        if not bone:
+            print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
+            continue
+            
         for target_bone_name in target_bone_names:
-            bone = armature.pose.bones[bone_name]
+            # Check if target bone exists
+            if target_bone_name not in armature.pose.bones:
+                print(f"[AetherBlend] Target bone '{target_bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
+                continue
 
             # Remove all existing constraints
             if overwrite:
@@ -41,8 +49,16 @@ def add_constraint_copy_location(armature: bpy.types.Armature, bone_map: dict[st
     constraints = []
 
     for bone_name, target_bone_names in bone_map.items():
+        bone = armature.pose.bones.get(bone_name)
+        if not bone:
+            print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
+            continue
+            
         for target_bone_name in target_bone_names:
-            bone = armature.pose.bones[bone_name]
+            # Check if target bone exists
+            if target_bone_name not in armature.pose.bones:
+                print(f"[AetherBlend] Target bone '{target_bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
+                continue
 
             # Remove all existing constraints
             if overwrite:
@@ -72,8 +88,16 @@ def add_constraint_child_of(armature: bpy.types.Armature, bone_map: dict[str, li
     constraints = []
 
     for bone_name, target_bone_names in bone_map.items():
+        bone = armature.pose.bones.get(bone_name)
+        if not bone:
+            print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
+            continue
+            
         for target_bone_name in target_bone_names:
-            bone = armature.pose.bones[bone_name]
+            # Check if target bone exists
+            if target_bone_name not in armature.pose.bones:
+                print(f"[AetherBlend] Target bone '{target_bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
+                continue
 
             # Remove all existing constraints
             if overwrite:
@@ -123,7 +147,7 @@ def select_edit(armature, bone_names):
     bpy.ops.armature.select_all(action='DESELECT')
 
     for bone_name in bone_names:
-        b = armature.data.edit_bones[bone_name]
+        b = armature.data.edit_bones.get(bone_name)
         if b:
             b.select = True
             b.select_head = True
