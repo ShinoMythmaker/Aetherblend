@@ -1,5 +1,7 @@
 import bpy
 import math
+import mathutils
+
 from . import bone as bone_utils
 from ...data import constants
 
@@ -123,8 +125,7 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
     bpy.ops.object.mode_set(mode=original_mode)
     return created_bones
 
-
-def create_extensions(target: bpy.types.Armature, extension_info: list[constants.BoneExtensionInfo]) -> list[str]:
+def bone_extensions(target: bpy.types.Armature, extension_info: list[constants.BoneExtensionInfo]) -> list[str]:
     """Generate bone extension in target armature based on extension_info"""
     if extension_info is None or len(extension_info) == 0:
         return []
@@ -185,3 +186,127 @@ def create_extensions(target: bpy.types.Armature, extension_info: list[constants
 
     bpy.ops.object.mode_set(mode=original_mode)
     return created_bones
+
+
+def skin_bone(src: bpy.types.Armature, target: bpy.types.Armature, skin_bone_info: constants.SkinBoneInfo) -> list[str]:
+    """Generate skin bones in target armature based on skin_bone_info.
+    
+    Finds the vertex with the highest weight for the specified bone and creates 
+    a new bone at that position with the given size factor.
+    """
+    original_mode = bpy.context.object.mode
+    created_bones = []
+    
+    try:
+        # Find the highest weighted vertex position for the target bone
+        world_co, weight = _find_highest_weight_vertex_world_pos(skin_bone_info.org_bone, src)
+        
+        if world_co is None:
+            print(f"[AetherBlend] No vertices found with weights for bone '{skin_bone_info.org_bone}'. Skipping skin bone creation.")
+            return created_bones
+        
+        # Switch to edit mode and create the skin bone
+        bpy.context.view_layer.objects.active = target
+        bpy.ops.object.mode_set(mode='EDIT')
+        target_edit_bones = target.data.edit_bones
+        
+        # Remove existing bone if it exists
+        if skin_bone_info.name in target_edit_bones:
+            target_edit_bones.remove(target_edit_bones[skin_bone_info.name])
+        
+        # Create new bone at the highest weighted vertex position
+        new_bone = target_edit_bones.new(skin_bone_info.name)
+        
+        # Convert world position to armature local space
+        local_co = target.matrix_world.inverted() @ world_co
+        new_bone.head = local_co
+        
+        # Get original bone length from source armature and calculate size based on factor
+        org_bone = src.data.bones.get(skin_bone_info.org_bone)
+        if org_bone:
+            org_bone_length = org_bone.length
+        else:
+            org_bone_length = 0.3  # Fallback if original bone not found
+        
+        # Set tail based on size factor relative to original bone length
+        bone_length = org_bone_length * skin_bone_info.size_factor
+        direction = mathutils.Vector((0, 0, bone_length))
+        new_bone.tail = local_co + direction
+        
+        # # Set parent if specified
+        # if skin_bone_info.parent_bone and skin_bone_info.parent_bone in target_edit_bones:
+        #     new_bone.parent = target_edit_bones[skin_bone_info.parent_bone]
+        #     new_bone.use_connect = False
+        
+        print(f"[AetherBlend] Created skin bone '{new_bone.name}' at vertex position (weight: {weight:.6f})")
+        created_bones.append(new_bone.name)
+        
+    finally:
+        bpy.ops.object.mode_set(mode=original_mode)
+    
+    return created_bones
+
+
+def _find_highest_weight_vertex_world_pos(bone_name: str, src_armature: bpy.types.Armature) -> tuple:
+    """Find the vertex with the highest weight for the given bone name across meshes with armature modifiers.
+    
+    Only checks meshes that have an armature modifier targeting the source armature.
+    Returns (world_location, weight) or (None, 0.0) if no vertices found.
+    """
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    
+    best_weight = 0.0
+    best_world_co = None
+    
+    for obj in bpy.data.objects:
+        if obj.type != 'MESH':
+            continue
+        
+        # Check if this mesh has an armature modifier targeting our source armature
+        has_armature_modifier = False
+        for modifier in obj.modifiers:
+            if modifier.type == 'ARMATURE' and modifier.object == src_armature:
+                has_armature_modifier = True
+                break
+        
+        if not has_armature_modifier:
+            continue
+            
+        vg = obj.vertex_groups.get(bone_name)
+        if vg is None:
+            continue
+        
+        # Get evaluated mesh to account for modifiers
+        eval_obj = obj.evaluated_get(depsgraph)
+        try:
+            mesh_eval = eval_obj.to_mesh()
+        except Exception:
+            mesh_eval = None
+        
+        # Use original mesh vertices to read vertex group weights
+        orig_verts = obj.data.vertices
+        
+        if mesh_eval is None or len(mesh_eval.vertices) != len(orig_verts):
+            if mesh_eval is not None:
+                eval_obj.to_mesh_clear()
+            continue
+        
+        for v_idx, v in enumerate(orig_verts):
+            # Find weight for this vertex in the target group
+            weight = 0.0
+            for g in v.groups:
+                if g.group == vg.index:
+                    weight = g.weight
+                    break
+            
+            if weight > best_weight:
+                # Get world location of evaluated vertex
+                ev_co = mesh_eval.vertices[v_idx].co
+                world_co = eval_obj.matrix_world @ ev_co
+                best_weight = weight
+                best_world_co = world_co.copy()
+        
+        # Clean up evaluated mesh
+        eval_obj.to_mesh_clear()
+    
+    return (best_world_co, best_weight)

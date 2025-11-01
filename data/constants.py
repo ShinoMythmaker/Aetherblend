@@ -28,14 +28,30 @@ class BoneExtensionInfo:
     is_connected: bool = False
 
 @dataclass(frozen=True)
+class SkinBoneInfo:
+    org_bone: str
+    name: str
+    size_factor: float = 1.0
+    lead_bone: bool = False
+
+@dataclass(frozen=True)
+class BridgeBoneInfo:
+    org_bone: str
+    target_bone: str
+    segments: int = 1
+    offset_factor: tuple[float, float, float] = (0.0, 0.0, 0.0)
+
+@dataclass(frozen=True)
 class BoneChainInfo:
-    ffxiv_bones: list[str]
-    gen_bones: dict[str, RigifySettings | None]
+    ffxiv_bones: list[str] | None = None
+    gen_bones: dict[str, RigifySettings | None] | None = None
     parent_bone: str | None = None
     bone_extensions: BoneExtensionInfo | None = None
     roll: float | None = 0.0
     extend_last: bool = False
     extension_factor: float = 0.0
+    skin_bones: list[SkinBoneInfo] | None = None
+    bridge_bones: list[BridgeBoneInfo] | None = None
 
 xiv_tail_bones = ["n_sippo_a", "n_sippo_b", "n_sippo_c", "n_sippo_d", "n_sippo_e"]
 sb_tail_parent_bone = "j_kosi"
@@ -124,7 +140,6 @@ SPINE_INFO: dict[list[str, str], BoneChainInfo] = {
         parent_bone="spine.03",
     ),
 }
-
 
 ARMS_INFO: dict[str, BoneChainInfo] = {
     "Arm.L (IK)": BoneChainInfo(
@@ -354,6 +369,26 @@ TAILS_INFO: dict[str, BoneChainInfo] = {
     )
 }
 
+EYES_INFO: dict[str, BoneChainInfo] = {
+    "Eye.L": BoneChainInfo(
+        skin_bones=[
+            SkinBoneInfo(org_bone="j_f_mabup_02out_l", name="eye_outer_corner.L"),
+            SkinBoneInfo(org_bone="j_f_mabup_01_l", name="eye_upper_lid.L"),
+            SkinBoneInfo(org_bone="j_f_mabdn_03in_l", name="eye_inner_corner.L"),
+            SkinBoneInfo(org_bone="j_f_mabdn_01_l", name="eye_bottom_lid.L"),
+        ],
+        bridge_bones=[
+            BridgeBoneInfo(org_bone="eye_outer_corner.L", target_bone="eye_upper_lid.L", segments=1, offset_factor=(0.0, 0.0, 0.0)),
+            BridgeBoneInfo(org_bone="eye_upper_lid.L", target_bone="eye_inner_corner.L", segments=1, offset_factor=(0.0, 0.0, 0.0)),
+            BridgeBoneInfo(org_bone="eye_inner_corner.L", target_bone="eye_bottom_lid.L", segments=1, offset_factor=(0.0, 0.0, 0.0)),
+            BridgeBoneInfo(org_bone="eye_bottom_lid.L", target_bone="eye_outer_corner.L", segments=1, offset_factor=(0.0, 0.0, 0.0)),
+        ],
+        gen_bones={
+            "eye_inner_corner.L": RigifySettings(rigify_type="skin.stretchy_chain"),
+            "eye_outer_corner.L": RigifySettings(rigify_type="skin.stretchy_chain"),
+        },
+    ),
+}
 
 CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         # Spine 

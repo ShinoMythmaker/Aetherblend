@@ -59,11 +59,14 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 coll.rigify_ui_row = collection.row_index
                 coll.rigify_ui_title = collection.title
 
-        self.generate_torso(source_armature=armature, meta_rig=meta_rig)
-        self.generate_arms(source_armature=armature, meta_rig=meta_rig)
-        self.generate_tail(source_armature=armature, meta_rig=meta_rig)
-        self.generate_legs(source_armature=armature, meta_rig=meta_rig)
-        self.generate_fingers(source_armature=armature, meta_rig=meta_rig)
+        #self.generate_torso(source_armature=armature, meta_rig=meta_rig)
+        #self.generate_arms(source_armature=armature, meta_rig=meta_rig)
+        #self.generate_tail(source_armature=armature, meta_rig=meta_rig)
+        #self.generate_legs(source_armature=armature, meta_rig=meta_rig)
+        #self.generate_fingers(source_armature=armature, meta_rig=meta_rig)
+
+        self.generate_eyes(source_armature=armature, meta_rig=meta_rig)
+
                 
         armature.aether_rig.meta_rig = meta_rig
         
@@ -76,6 +79,26 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         armature.select_set(True)
         
         return {'FINISHED'}
+
+    
+    def generate_eyes(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
+        """Generate the individual eye bones"""
+
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='POSE')
+        created_limbs = []
+        for limb_coll, chain_info in constants.EYES_INFO.items():
+            for skin_bone in chain_info.skin_bones:
+                bones = utils.armature.generate.skin_bone(
+                    src=source_armature,
+                    target=meta_rig,
+                    skin_bone_info=skin_bone
+                )
+                created_limbs.extend(bones)
+
+        bpy.ops.object.mode_set(mode=original_mode)
+
+        return created_limbs
 
 
     def generate_torso(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
@@ -90,7 +113,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 target=meta_rig,
                 chain_info=chain_info
             )
-            extension_bones = utils.armature.generate.create_extensions(
+            extension_bones = utils.armature.generate.bone_extensions(
                 target=meta_rig,
                 extension_info=chain_info.bone_extensions
             )
@@ -164,7 +187,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 target=meta_rig,
                 chain_info=chain_info
             )
-            extension_bones = utils.armature.generate.create_extensions(
+            extension_bones = utils.armature.generate.bone_extensions(
                 target=meta_rig,
                 extension_info=chain_info.bone_extensions
             )
