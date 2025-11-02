@@ -1,5 +1,84 @@
 import bpy
 
+def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_map: dict[str, str]) -> list[bpy.types.Constraint]:
+    """Adds a track to constraint to a bone in an armature, applied after the original rotation."""
+    original_mode = armature.mode
+    constraints = []
+    for bone_name, target_bone_name in bone_map.items():
+        bpy.ops.object.mode_set(mode='EDIT')
+        edit_bones = armature.data.edit_bones
+
+
+        base_bone = edit_bones.get(bone_name)
+        base_bone_parent = edit_bones.get(base_bone.parent.name)
+        target_bone = edit_bones.get(target_bone_name)
+
+        if not base_bone or not target_bone:
+            print(f"[AetherBlend] Bone '{bone_name}' or target bone '{target_bone_name}' not found in armature '{armature.name}'.")
+            bpy.ops.object.mode_set(mode=original_mode)
+            return
+
+        new_bone_name = f"ORG_{bone_name}_to_{target_bone_name}"
+        new_bone = edit_bones.new(new_bone_name)
+        new_bone.head = base_bone.head.copy()
+        new_bone.tail = target_bone.head.copy()
+        new_bone.roll = 0.0
+        new_bone.parent = base_bone_parent
+
+        org_collection = armature.data.collections.get("ORG")
+        if org_collection:
+            org_collection.assign(new_bone)
+
+        bpy.ops.object.mode_set(mode='POSE')
+        pb = armature.pose.bones.get(bone_name)
+        new_pb = armature.pose.bones.get(new_bone_name)
+
+        if pb and new_pb:
+            track_to = add_constraint_track_to(
+                armature, {new_bone_name: [target_bone_name]}, overwrite=False)
+            child_of = add_constraint_child_of(
+                armature, {bone_name: [new_bone_name]}, overwrite=False, inverse=True, location=False, rotation=True, scale=False)
+        else:
+            print(f"[AetherBlend] Pose bone '{bone_name}' or new pose bone '{new_bone_name}' not found in armature '{armature.name}'.")
+
+        constraints.append(track_to)
+        constraints.append(child_of)
+
+    bpy.ops.object.mode_set(mode=original_mode)
+    return constraints
+
+
+def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
+    """Adds Track To constraints to specified bones in an armature."""
+    original_mode = armature.mode
+
+    bpy.ops.object.mode_set(mode='POSE')
+    constraints = []
+
+    for bone_name, target_bone_names in bone_map.items():
+        for target_bone_name in target_bone_names:
+            bone = armature.pose.bones[bone_name]
+
+            # Remove all existing constraints
+            if overwrite:
+                for con in list(bone.constraints):
+                    bone.constraints.remove(con)
+
+            track_to = bone.constraints.new('TRACK_TO')
+            track_to.target = armature
+            track_to.subtarget = target_bone_name
+            track_to.track_axis = "TRACK_Y"
+            track_to.up_axis = "UP_X"
+            track_to.target_space = 'POSE'
+            track_to.owner_space = 'POSE'
+            track_to.name = f"AetherBlend_{track_to.name}"
+            constraints.append(track_to)
+
+    bpy.ops.object.mode_set(mode=original_mode)
+    return constraints
+
+
+
 def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
     """Adds Copy Rotation constraints to specified bones in an armature."""
     original_mode = armature.mode
@@ -64,7 +143,7 @@ def add_constraint_copy_location(armature: bpy.types.Armature, bone_map: dict[st
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
 
-def add_constraint_child_of(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
+def add_constraint_child_of(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False, inverse: bool = False, location: bool = True, rotation: bool = True, scale: bool = True) -> list[bpy.types.Constraint]:
     """Adds Child Of constraints to specified bones in an armature."""
     original_mode = armature.mode
 
@@ -83,8 +162,29 @@ def add_constraint_child_of(armature: bpy.types.Armature, bone_map: dict[str, li
             child_of = bone.constraints.new('CHILD_OF')
             child_of.target = armature
             child_of.subtarget = target_bone_name
-
             child_of.name = f"AetherBlend_{child_of.name}"
+
+            if not location:
+                child_of.use_location_x = False
+                child_of.use_location_y = False
+                child_of.use_location_z = False
+            
+            if not rotation:
+                child_of.use_rotation_x = False
+                child_of.use_rotation_y = False
+                child_of.use_rotation_z = False
+            
+            if not scale:
+                child_of.use_scale_x = False
+                child_of.use_scale_y = False
+                child_of.use_scale_z = False
+
+
+            if inverse:
+                bpy.context.active_object.data.bones.active = bone.bone
+
+                bpy.ops.constraint.childof_set_inverse(constraint=child_of.name, owner='BONE')
+
             constraints.append(child_of)
 
     bpy.ops.object.mode_set(mode=original_mode)
@@ -221,3 +321,17 @@ def get_roll(bone: bpy.types.Bone) -> float:
     """Gets the roll of a data Bone"""
     axis, roll = bone.AxisRollFromMatrix(bone.matrix, axis=bone.y_axis)
     return roll
+
+def set_parent(armature: bpy.types.Armature, bone_name: str, parent_bone_name: str) -> None:
+    """Sets the parent of a bone in the armature."""
+    bpy.ops.object.mode_set(mode='EDIT')
+    edit_bones = armature.data.edit_bones
+    bone = edit_bones.get(bone_name)
+    parent_bone = edit_bones.get(parent_bone_name)
+    if bone and parent_bone:
+        bone.parent = parent_bone
+    else:
+        if not bone:
+            print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'.")
+        if not parent_bone:
+            print(f"[AetherBlend] Parent bone '{parent_bone_name}' not found in armature '{armature.name}'.")
