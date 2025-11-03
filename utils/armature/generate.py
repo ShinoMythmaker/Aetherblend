@@ -81,13 +81,13 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
         
         new_bone.head = source_bone.head_local.copy()
 
-        if index < len(reference_bones) - 1:
-            next_ref_bone = reference_bones[index + 1]
+        if index < len(valid_reference_bones) - 1:
+            next_ref_bone = valid_reference_bones[index + 1]
             next_source_bone = source_bones[next_ref_bone]
             new_bone.tail = next_source_bone.head_local.copy()
         else:
-            if extend_last and len(reference_bones) >= 2:
-                prev_ref_bone = reference_bones[index - 1]
+            if extend_last and len(valid_reference_bones) >= 2:
+                prev_ref_bone = valid_reference_bones[index - 1]
                 prev_source_bone = source_bones[prev_ref_bone]
                 
                 chain_direction = (source_bone.head_local - prev_source_bone.head_local).normalized()
