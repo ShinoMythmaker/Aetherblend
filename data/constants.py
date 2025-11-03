@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import mathutils
 
 @dataclass(frozen=True)
 class MetaRigCollectionInfo:
@@ -16,6 +17,10 @@ class RigifySettings:
     make_extra_ik_control: bool | None = None
     super_copy_widget_type: str | None = None
     pivot_pos: int | None = None
+    secondary_layer_extra: str | None  = None
+    skin_chain_pivot_pos: int | None  = None
+    skin_chain_falloff_spherical: list[bool] | None  = None
+    skin_control_orientation_bone: str | None  = None
 
 @dataclass(frozen=True)
 class BoneExtensionInfo:
@@ -28,14 +33,48 @@ class BoneExtensionInfo:
     is_connected: bool = False
 
 @dataclass(frozen=True)
+class SkinBone:
+    org_bone: str
+    name: str
+    size_factor: float = 1.0
+    lead_bone: bool = False
+
+@dataclass(frozen=True)
+class BridgeBone:
+    bone_a: str
+    bone_b: str
+    segments: int = 1
+    offset_factor: mathutils.Vector = mathutils.Vector((0.0, 0.0, 0.0))
+    connected: bool = True
+
+@dataclass(frozen=True)
+class TrackToBone:
+    origin_name: str 
+    target_name: str
+    custom_space: str
+    parent_name: str | None
+
+@dataclass(frozen=True)
 class BoneChainInfo:
-    ffxiv_bones: list[str]
-    gen_bones: dict[str, RigifySettings | None]
+    ffxiv_bones: list[str] | None = None
+    gen_bones: dict[str, RigifySettings | None] | None = None
     parent_bone: str | None = None
     bone_extensions: BoneExtensionInfo | None = None
     roll: float | None = 0.0
     extend_last: bool = False
     extension_factor: float = 0.0
+    skin_bones: list[SkinBone] | None = None
+    bridge_bones: list[BridgeBone] | None = None
+
+
+@dataclass(frozen=True)
+class EyeBone:
+    outer_bones: list[SkinBone]
+    bridges: list[BridgeBone]
+    eye_name: str
+    eye_collection: str
+    parent_bone: str | None = None
+    bone_settings: dict[str, RigifySettings | None] | None = None
 
 xiv_tail_bones = ["n_sippo_a", "n_sippo_b", "n_sippo_c", "n_sippo_d", "n_sippo_e"]
 sb_tail_parent_bone = "j_kosi"
@@ -58,28 +97,32 @@ spring_bone_collection = "Spring Bones"
 
 
 META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
-    MetaRigCollectionInfo(name="Torso", color_type="Special", row_index=1, title="Torso"),
-    MetaRigCollectionInfo(name="Torso (Tweak)", color_type="Tweak", row_index=2, title="(Tweak)"),
+    MetaRigCollectionInfo(name="Face", color_type="FK", row_index=1, title="Face"),
+    MetaRigCollectionInfo(name="Face (Primary)", color_type="IK", row_index=2, title="(Primary)"),
+    MetaRigCollectionInfo(name="Face (Secondary)", color_type="Special", row_index=2, title="(Secondary)"),
 
-    MetaRigCollectionInfo(name="Fingers", color_type="Extra", row_index=4, title="Fingers"),
-    MetaRigCollectionInfo(name="Fingers (Details)", color_type="FK", row_index=5, title="(Details)"),
+    MetaRigCollectionInfo(name="Torso", color_type="Special", row_index=4, title="Torso"),
+    MetaRigCollectionInfo(name="Torso (Tweak)", color_type="Tweak", row_index=5, title="(Tweak)"),
 
-    MetaRigCollectionInfo(name="Arm.L (IK)", color_type="IK", row_index=7, title="IK.L"),
-    MetaRigCollectionInfo(name="Arm.L (FK)", color_type="FK", row_index=8, title="FK.L"),
-    MetaRigCollectionInfo(name="Arm.L (Tweak)", color_type="Tweak", row_index=9, title="Tweak.L"),
-    MetaRigCollectionInfo(name="Arm.R (IK)", color_type="IK", row_index=7, title="IK.R"),
-    MetaRigCollectionInfo(name="Arm.R (FK)", color_type="FK", row_index=8, title="FK.R"),
-    MetaRigCollectionInfo(name="Arm.R (Tweak)", color_type="Tweak", row_index=9, title="Tweak.R"),
+    MetaRigCollectionInfo(name="Fingers", color_type="Extra", row_index=7, title="Fingers"),
+    MetaRigCollectionInfo(name="Fingers (Details)", color_type="FK", row_index=8, title="(Details)"),
 
-    MetaRigCollectionInfo(name="Leg.L (IK)", color_type="IK", row_index=11, title="IK.L"),
-    MetaRigCollectionInfo(name="Leg.L (FK)", color_type="FK", row_index=12, title="FK.L"),
-    MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=13, title="Tweak.L"),
-    MetaRigCollectionInfo(name="Leg.R (IK)", color_type="IK", row_index=11, title="IK.R"),
-    MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=12, title="FK.R"),
-    MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=13, title="Tweak.R"),
+    MetaRigCollectionInfo(name="Arm.L (IK)", color_type="IK", row_index=10, title="IK.L"),
+    MetaRigCollectionInfo(name="Arm.L (FK)", color_type="FK", row_index=11, title="FK.L"),
+    MetaRigCollectionInfo(name="Arm.L (Tweak)", color_type="Tweak", row_index=12, title="Tweak.L"),
+    MetaRigCollectionInfo(name="Arm.R (IK)", color_type="IK", row_index=10, title="IK.R"),
+    MetaRigCollectionInfo(name="Arm.R (FK)", color_type="FK", row_index=11, title="FK.R"),
+    MetaRigCollectionInfo(name="Arm.R (Tweak)", color_type="Tweak", row_index=12, title="Tweak.R"),
 
-    MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=15, title="Tail"),
-    MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=16, title="Tweaks"),
+    MetaRigCollectionInfo(name="Leg.L (IK)", color_type="IK", row_index=14, title="IK.L"),
+    MetaRigCollectionInfo(name="Leg.L (FK)", color_type="FK", row_index=15, title="FK.L"),
+    MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=16, title="Tweak.L"),
+    MetaRigCollectionInfo(name="Leg.R (IK)", color_type="IK", row_index=14, title="IK.R"),
+    MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=15, title="FK.R"),
+    MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=16, title="Tweak.R"),
+
+    MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=18, title="Tail"),
+    MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=19, title="Tweaks"),
 ]
 
 SPINE_INFO: dict[list[str, str], BoneChainInfo] = {
@@ -124,7 +167,6 @@ SPINE_INFO: dict[list[str, str], BoneChainInfo] = {
         parent_bone="spine.03",
     ),
 }
-
 
 ARMS_INFO: dict[str, BoneChainInfo] = {
     "Arm.L (IK)": BoneChainInfo(
@@ -354,8 +396,81 @@ TAILS_INFO: dict[str, BoneChainInfo] = {
     )
 }
 
+EYES_GEN_INFO: dict[list[str, str], EyeBone] = {
+    ("Face (Secondary)", "Eye.L"): EyeBone(
+        outer_bones=[
+            SkinBone(org_bone="j_f_mabup_02out_l", name="lid.T.L"),
+            SkinBone(org_bone="j_f_mabup_01_l", name="lid.T.L.002"),
+            SkinBone(org_bone="j_f_mabdn_03in_l", name="lid.B.L"),
+            SkinBone(org_bone="j_f_mabdn_01_l", name="lid.B.L.002"),
+        ],
+        bridges=[
+            BridgeBone(bone_a="lid.T.L", bone_b="lid.T.L.002", segments=1, offset_factor=mathutils.Vector((0.0, -0.001, 0.001)), connected=True),
+            BridgeBone(bone_a="lid.T.L.002", bone_b="lid.B.L", segments=1, offset_factor=mathutils.Vector((0.0, 0.0, 0.003)), connected=False),
+            BridgeBone(bone_a="lid.B.L", bone_b="lid.B.L.002", segments=1, offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)), connected=True),
+            BridgeBone(bone_a="lid.B.L.002", bone_b="lid.T.L", segments=1, offset_factor=mathutils.Vector((0.003, -0.001, -0.003)), connected=False),
+        ],
+        eye_name="eye.L",
+        eye_collection="Face",
+        parent_bone="neck",
+        bone_settings={
+            "eye.L": RigifySettings(rigify_type="face.skin_eye"),
+            "lid.B.L": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck"),
+            "lid.T.L": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck", skin_chain_falloff_spherical=[False, True, False]),
+        },
+    ),
+    ("Face (Secondary)", "Eye.R"): EyeBone(
+        outer_bones=[
+            SkinBone(org_bone="j_f_mabup_02out_r", name="lid.T.R"),
+            SkinBone(org_bone="j_f_mabup_01_r", name="lid.T.R.002"),
+            SkinBone(org_bone="j_f_mabdn_03in_r", name="lid.B.R"),
+            SkinBone(org_bone="j_f_mabdn_01_r", name="lid.B.R.002"),
+        ],
+        bridges=[
+            BridgeBone(bone_a="lid.T.R", bone_b="lid.T.R.002", segments=1, offset_factor=mathutils.Vector((0.0, -0.001, 0.001)), connected=True),
+            BridgeBone(bone_a="lid.T.R.002", bone_b="lid.B.R", segments=1, offset_factor=mathutils.Vector((0.0, 0.0, 0.003)), connected=False),
+            BridgeBone(bone_a="lid.B.R", bone_b="lid.B.R.002", segments=1, offset_factor=mathutils.Vector((0.002, 0.0, 0.001)), connected=True),
+            BridgeBone(bone_a="lid.B.R.002", bone_b="lid.T.R", segments=1, offset_factor=mathutils.Vector((-0.003, -0.001, -0.003)), connected=False),
+        ],
+        eye_name="eye.R",
+        eye_collection="Face",
+        parent_bone="neck",
+        bone_settings={
+            "eye.R": RigifySettings(rigify_type="face.skin_eye"),
+            "lid.B.R": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck"),
+            "lid.T.R": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck", skin_chain_falloff_spherical=[False, True, False]),
+        },
+    ),
+}
+
+CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
+    #Eyes
+    # Left Eye
+    TrackToBone(origin_name="j_f_mabdn_03in_l", target_name="lid.B.L.001", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabdn_01_l", target_name="lid.B.L.002", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabdn_02out_l", target_name="lid.B.L.003", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+
+    TrackToBone(origin_name="j_f_mabup_03in_l", target_name="lid.T.L.003", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabup_01_l", target_name="lid.T.L.002", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabup_02out_l", target_name="lid.T.L.001", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+
+    # Right Eye
+    TrackToBone(origin_name="j_f_mabdn_03in_r", target_name="lid.B.R.001", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabdn_01_r", target_name="lid.B.R.002", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabdn_02out_r", target_name="lid.B.R.003", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+
+    TrackToBone(origin_name="j_f_mabup_03in_r", target_name="lid.T.R.003", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabup_01_r", target_name="lid.T.R.002", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabup_02out_r", target_name="lid.T.R.001", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+]
 
 CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
+        # Eyes
+        "j_f_eye_l": ["MCH-eye.L"],
+        "j_f_mab_l": ["eye_master.L"],
+        "j_f_eye_r": ["MCH-eye.R"],
+        "j_f_mab_r": ["eye_master.R"],
+
         # Spine 
         "j_kosi": ["j_sebo_a", "hips.001"],
 

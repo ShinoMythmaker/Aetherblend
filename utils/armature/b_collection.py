@@ -31,6 +31,7 @@ def assign_bones(armature, bone_names, collection_name) -> None:
     bpy.ops.object.mode_set(mode='POSE')
 
     for bone_name in bone_names:
+        print(bone_name)
         bone = armature.data.bones.get(bone_name)
         if bone:
             target_coll.assign(bone)

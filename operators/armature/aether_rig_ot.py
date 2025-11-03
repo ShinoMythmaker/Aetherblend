@@ -64,6 +64,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         self.generate_tail(source_armature=armature, meta_rig=meta_rig)
         self.generate_legs(source_armature=armature, meta_rig=meta_rig)
         self.generate_fingers(source_armature=armature, meta_rig=meta_rig)
+        self.generate_eyes(source_armature=armature, meta_rig=meta_rig)
+
                 
         armature.aether_rig.meta_rig = meta_rig
         
@@ -77,6 +79,63 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         return {'FINISHED'}
 
+    
+    def generate_eyes(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
+        """Generate the individual eye bones"""
+
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='POSE')
+        all_created_bones = []
+        for (collection_name, segment_name), gen_info in constants.EYES_GEN_INFO.items():
+            created_bones = []
+            for skin_bone in gen_info.outer_bones:
+                bones = utils.armature.generate.skin_bone(
+                    src=source_armature,
+                    target=meta_rig,
+                    skin_bone_info=skin_bone
+                )
+                created_bones.extend(bones)
+
+            eye_bone = utils.armature.generate.eye_bone(
+                armature=meta_rig,
+                outer_bones=created_bones,
+                name=gen_info.eye_name,
+                length=float(0.010)
+            )
+            if eye_bone and meta_rig.data.collections.get(gen_info.eye_collection):
+                utils.armature.b_collection.assign_bones(meta_rig, eye_bone, gen_info.eye_collection)
+                if eye_bone and gen_info.parent_bone: 
+                    utils.armature.bone.set_parent(
+                        armature=meta_rig,
+                        bone_name=gen_info.eye_name,
+                        parent_bone_name=gen_info.parent_bone
+                    )
+
+            for bone in created_bones:
+                utils.armature.bone.set_parent(
+                    armature=meta_rig,
+                    bone_name=bone,
+                    parent_bone_name=gen_info.eye_name
+                )
+
+            for bridge in gen_info.bridges:
+                bones = utils.armature.generate.bridge_bones(
+                    armature=meta_rig,
+                    bridge_info=bridge
+                )
+                created_bones.extend(bones)
+
+            if created_bones and meta_rig.data.collections.get(collection_name):
+                utils.armature.b_collection.assign_bones(meta_rig, created_bones, collection_name)
+                for bone_name, rigify_settings in gen_info.bone_settings.items():
+                    self.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
+                created_bones.extend(bones)
+
+            all_created_bones.extend(created_bones)
+
+        bpy.ops.object.mode_set(mode=original_mode)
+
+        return all_created_bones
 
     def generate_torso(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
         """Generate the individual torso bones"""
@@ -90,7 +149,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 target=meta_rig,
                 chain_info=chain_info
             )
-            extension_bones = utils.armature.generate.create_extensions(
+            extension_bones = utils.armature.generate.bone_extensions(
                 target=meta_rig,
                 extension_info=chain_info.bone_extensions
             )
@@ -106,7 +165,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         bpy.ops.object.mode_set(mode=original_mode)
 
         return created_limbs
-
 
     def generate_arms(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
         """Generate the individual limbs"""
@@ -164,7 +222,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 target=meta_rig,
                 chain_info=chain_info
             )
-            extension_bones = utils.armature.generate.create_extensions(
+            extension_bones = utils.armature.generate.bone_extensions(
                 target=meta_rig,
                 extension_info=chain_info.bone_extensions
             )
@@ -180,7 +238,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         bpy.ops.object.mode_set(mode=original_mode)
 
         return created_limbs
-    
 
     def generate_fingers(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
         """Generate the individual limbs"""
@@ -354,6 +411,47 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         bpy.ops.object.mode_set(mode='OBJECT')
 
+    def rigify_set_skin_stretchy_chain_properties(self, armature: bpy.types.Armature, bone_name: str, settings: constants.RigifySettings) -> None:
+        """Sets up rigify skin stretchy chain properties for a pose bone"""
+
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='POSE')
+
+        pose_bone = armature.pose.bones.get(bone_name)
+
+        bpy.ops.pose.select_all(action='DESELECT')
+        pose_bone.bone.select = True
+        armature.data.bones.active = pose_bone.bone
+
+        try:
+            rigify_params = pose_bone.rigify_parameters
+
+
+            if settings.skin_chain_pivot_pos is not None:
+                rigify_params.skin_chain_pivot_pos = settings.skin_chain_pivot_pos
+            if settings.skin_control_orientation_bone is not None:
+                rigify_params.skin_control_orientation_bone = settings.skin_control_orientation_bone
+            if settings.skin_chain_falloff_spherical is not None:
+                rigify_params.skin_chain_falloff_spherical = settings.skin_chain_falloff_spherical
+
+            if settings.secondary_layer_extra is not None:
+                rigify_params.skin_secondary_layers_extra = True
+                rigify_params.skin_secondary_coll_refs.clear()
+                if settings.secondary_layer_extra in armature.data.collections:
+                    bpy.ops.pose.rigify_collection_ref_add(prop_name="skin_secondary_coll_refs")
+
+                    if len(rigify_params.skin_secondary_coll_refs) > 0:
+                        skin_ref = rigify_params.skin_secondary_coll_refs[-1]
+                        skin_ref.name = settings.secondary_layer_extra
+                        print(f"[AetherBlend] Set Skin Secondary collection reference to '{settings.secondary_layer_extra}' for bone '{bone_name}'")
+                    else:
+                        print(f"[AetherBlend] Collection '{settings.secondary_layer_extra}' not found in armature '{armature.name}'")
+
+        except Exception as e:
+            print(f"[AetherBlend] Error setting rigify skin stretchy chain properties: {e}")
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
     def set_rigify_properties(self, armature: bpy.types.Armature, bone_name: str, settings: constants.RigifySettings) -> None:
         """Sets up rigify properties for a pose bone"""
         original_mode = armature.mode
@@ -399,6 +497,13 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 armature,
                 pose_bone.name,
                 pivot_pos=settings.pivot_pos
+            )
+
+        if settings.rigify_type == "skin.stretchy_chain":
+            self.rigify_set_skin_stretchy_chain_properties(
+                armature,
+                pose_bone.name,
+                settings=settings
             )
 
         bpy.ops.object.mode_set(mode=original_mode)
@@ -525,7 +630,9 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         
         self.copy_rigify_properties(ffxiv_armature, rigify_rig)
-        
+
+
+        constraints_track_to_after = utils.armature.bone.add_constraint_track_to_after_original(ffxiv_armature, constants.CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL)
         constraints_copy_rot = utils.armature.bone.add_constraint_copy_rotation(ffxiv_armature, constants.CONSTRAINTS_COPY_ROT, overwrite=False)
         constraints_copy_loc = utils.armature.bone.add_constraint_copy_location(ffxiv_armature, constants.CONSTRAINTS_COPY_LOC, overwrite=False)
         constraints_child_of = utils.armature.bone.add_constraint_child_of(ffxiv_armature, constants.CONSTRAINTS_CHILD_OF, overwrite=False)
