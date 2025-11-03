@@ -48,6 +48,13 @@ class BridgeBone:
     connected: bool = True
 
 @dataclass(frozen=True)
+class TrackToBone:
+    origin_name: str 
+    target_name: str
+    custom_space: str
+    parent_name: str | None
+
+@dataclass(frozen=True)
 class BoneChainInfo:
     ffxiv_bones: list[str] | None = None
     gen_bones: dict[str, RigifySettings | None] | None = None
@@ -436,34 +443,33 @@ EYES_GEN_INFO: dict[list[str, str], EyeBone] = {
     ),
 }
 
+CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
+    #Eyes
+    # Left Eye
+    TrackToBone(origin_name="j_f_mabdn_03in_l", target_name="lid.B.L.001", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabdn_01_l", target_name="lid.B.L.002", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabdn_02out_l", target_name="lid.B.L.003", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
 
-
-CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: dict[str, str] = {
-    #Eyes 
-    # Left Eye  
-    "j_f_mabdn_03in_l": "lid.B.L.001",
-    "j_f_mabdn_01_l": "lid.B.L.002",
-    "j_f_mabdn_02out_l": "lid.B.L.003",
-
-    "j_f_mabup_03in_l": "lid.T.L.003",
-    "j_f_mabup_01_l": "lid.T.L.002",
-    "j_f_mabup_02out_l": "lid.T.L.001",
+    TrackToBone(origin_name="j_f_mabup_03in_l", target_name="lid.T.L.003", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabup_01_l", target_name="lid.T.L.002", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+    TrackToBone(origin_name="j_f_mabup_02out_l", target_name="lid.T.L.001", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
 
     # Right Eye
-    "j_f_mabdn_03in_r": "lid.B.R.001",
-    "j_f_mabdn_01_r": "lid.B.R.002",
-    "j_f_mabdn_02out_r": "lid.B.R.003",
+    TrackToBone(origin_name="j_f_mabdn_03in_r", target_name="lid.B.R.001", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabdn_01_r", target_name="lid.B.R.002", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabdn_02out_r", target_name="lid.B.R.003", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
 
-    "j_f_mabup_03in_r": "lid.T.R.003",
-    "j_f_mabup_01_r": "lid.T.R.002",
-    "j_f_mabup_02out_r": "lid.T.R.001",
-}
-
+    TrackToBone(origin_name="j_f_mabup_03in_r", target_name="lid.T.R.003", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabup_01_r", target_name="lid.T.R.002", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    TrackToBone(origin_name="j_f_mabup_02out_r", target_name="lid.T.R.001", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+]
 
 CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         # Eyes
         "j_f_eye_l": ["MCH-eye.L"],
+        "j_f_mab_l": ["eye_master.L"],
         "j_f_eye_r": ["MCH-eye.R"],
+        "j_f_mab_r": ["eye_master.R"],
 
         # Spine 
         "j_kosi": ["j_sebo_a", "hips.001"],

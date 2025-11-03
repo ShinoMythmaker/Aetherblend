@@ -1,54 +1,52 @@
 import bpy
+from ...data import constants
 
-def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_map: dict[str, str]) -> list[bpy.types.Constraint]:
+def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_map: list[constants.TrackToBone]) -> list[bpy.types.Constraint]:
     """Adds a track to constraint to a bone in an armature, applied after the original rotation."""
     original_mode = armature.mode
     constraints = []
-    for bone_name, target_bone_name in bone_map.items():
+    for track in bone_map:
         bpy.ops.object.mode_set(mode='EDIT')
         edit_bones = armature.data.edit_bones
 
+        origin_bone = edit_bones.get(track.origin_name)
+        parent_bone = edit_bones.get(track.parent_name)
+        target_bone = edit_bones.get(track.target_name)
 
-        base_bone = edit_bones.get(bone_name)
-        base_bone_parent = edit_bones.get(base_bone.parent.name)
-        target_bone = edit_bones.get(target_bone_name)
-
-        if not base_bone or not target_bone:
-            print(f"[AetherBlend] Bone '{bone_name}' or target bone '{target_bone_name}' not found in armature '{armature.name}'.")
+        if not origin_bone or not parent_bone or not target_bone:
+            print(f"[AetherBlend] Bone '{origin_bone.name}' or parent bone '{parent_bone.name}' or target bone '{target_bone.name}' not found in armature '{armature.name}'.")
             bpy.ops.object.mode_set(mode=original_mode)
             return
 
-        new_bone_name = f"ORG_{bone_name}_to_{target_bone_name}"
-        new_bone = edit_bones.new(new_bone_name)
-        new_bone.head = base_bone.head.copy()
-        new_bone.tail = target_bone.head.copy()
-        new_bone.roll = 0.0
-        new_bone.parent = base_bone_parent
+        track_bone_name = "TRACK_" + track.origin_name
+
+        track_bone = edit_bones.new(track_bone_name)
+        track_bone.name = track_bone_name
+        track_bone.head = origin_bone.head.copy()
+        track_bone.tail = target_bone.head.copy()
+        track_bone.roll = 0.0
+        track_bone.parent = parent_bone
 
         org_collection = armature.data.collections.get("ORG")
-        if org_collection:
-            org_collection.assign(new_bone)
+        org_collection.assign(track_bone)
+        org_collection.is_visible = True    
 
-        bpy.ops.object.mode_set(mode='POSE')
-        pb = armature.pose.bones.get(bone_name)
-        new_pb = armature.pose.bones.get(new_bone_name)
-
-        if pb and new_pb:
-            track_to = add_constraint_track_to(
-                armature, {new_bone_name: [target_bone_name]}, overwrite=False)
-            child_of = add_constraint_child_of(
-                armature, {bone_name: [new_bone_name]}, overwrite=False, inverse=True, location=False, rotation=True, scale=False)
-        else:
-            print(f"[AetherBlend] Pose bone '{bone_name}' or new pose bone '{new_bone_name}' not found in armature '{armature.name}'.")
+        target_bone_name = target_bone.name
+        origin_bone_name = origin_bone.name
+        track_bone_name = track_bone.name
+        track_to = add_constraint_track_to(armature, {track_bone_name: [target_bone_name]}, overwrite=False, custom_space=track.custom_space)
+        copy_rot = add_constraint_copy_rotation(armature, {origin_bone_name: [track_bone_name]}, overwrite=False)
 
         constraints.append(track_to)
-        constraints.append(child_of)
+        constraints.append(copy_rot)
+
+        org_collection.is_visible = False
 
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
 
 
-def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
+def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False, custom_space: str | None = None) -> list[bpy.types.Constraint]:
     """Adds Track To constraints to specified bones in an armature."""
     original_mode = armature.mode
 
@@ -57,21 +55,40 @@ def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, li
 
     for bone_name, target_bone_names in bone_map.items():
         for target_bone_name in target_bone_names:
-            bone = armature.pose.bones[bone_name]
+            pb = armature.pose.bones.get(bone_name)
+            if not pb:
+                print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'.")
+                continue
 
             # Remove all existing constraints
             if overwrite:
-                for con in list(bone.constraints):
-                    bone.constraints.remove(con)
+                for con in list(pb.constraints):
+                    pb.constraints.remove(con)
 
-            track_to = bone.constraints.new('TRACK_TO')
+            track_to = pb.constraints.new('TRACK_TO')
             track_to.target = armature
             track_to.subtarget = target_bone_name
             track_to.track_axis = "TRACK_Y"
             track_to.up_axis = "UP_X"
-            track_to.target_space = 'POSE'
-            track_to.owner_space = 'POSE'
+
+            if custom_space:
+                c_bone = armature.pose.bones.get(custom_space)
+                if not c_bone:
+                    print(f"[AetherBlend] Custom bone '{custom_space}' not found in armature '{armature.name}'.")
+                    continue
+                track_to.target_space = 'CUSTOM'
+                track_to.owner_space = 'CUSTOM'
+                track_to.space_object = armature
+                track_to.space_subtarget = c_bone.name
+            else:
+                track_to.target_space = 'POSE'
+                track_to.owner_space = 'POSE'
             track_to.name = f"AetherBlend_{track_to.name}"
+
+            pb.bone.select = True
+            bpy.ops.pose.armature_apply(selected=True)
+            pb.bone.select = False
+
             constraints.append(track_to)
 
     bpy.ops.object.mode_set(mode=original_mode)
@@ -88,7 +105,10 @@ def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[st
 
     for bone_name, target_bone_names in bone_map.items():
         for target_bone_name in target_bone_names:
-            bone = armature.pose.bones[bone_name]
+            bone = armature.pose.bones.get(bone_name)
+            if not bone:
+                print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'.")
+                continue
 
             # Remove all existing constraints
             if overwrite:
