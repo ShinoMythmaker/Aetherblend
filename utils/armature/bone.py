@@ -1,7 +1,7 @@
 import bpy
-from ...data import constants
+from ...data import *
 
-def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_map: list[constants.TrackToBone]) -> list[bpy.types.Constraint]:
+def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_map: list[TrackToBone]) -> list[bpy.types.Constraint]:
     """Adds a track to constraint to a bone in an armature, applied after the original rotation."""
     original_mode = armature.mode
     constraints = []
@@ -14,7 +14,7 @@ def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_ma
         target_bone = edit_bones.get(track.target_name)
 
         if not origin_bone or not parent_bone or not target_bone:
-            print(f"[AetherBlend] Bone '{origin_bone.name}' or parent bone '{parent_bone.name}' or target bone '{target_bone.name}' not found in armature '{armature.name}'.")
+            print(f"[AetherBlend] Required Bones not found in armature '{armature.name}'.")
             bpy.ops.object.mode_set(mode=original_mode)
             return
 
@@ -44,7 +44,6 @@ def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_ma
 
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
-
 
 def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False, custom_space: str | None = None) -> list[bpy.types.Constraint]:
     """Adds Track To constraints to specified bones in an armature."""
@@ -94,8 +93,6 @@ def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, li
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
 
-
-
 def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
     """Adds Copy Rotation constraints to specified bones in an armature."""
     original_mode = armature.mode
@@ -104,11 +101,6 @@ def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[st
     constraints = []
 
     for bone_name, target_bone_names in bone_map.items():
-        bone = armature.pose.bones.get(bone_name)
-        if not bone:
-            print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
-            continue
-            
         for target_bone_name in target_bone_names:
             bone = armature.pose.bones.get(bone_name)
             if not bone:
@@ -145,16 +137,8 @@ def add_constraint_copy_location(armature: bpy.types.Armature, bone_map: dict[st
     constraints = []
 
     for bone_name, target_bone_names in bone_map.items():
-        bone = armature.pose.bones.get(bone_name)
-        if not bone:
-            print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
-            continue
-            
         for target_bone_name in target_bone_names:
-            # Check if target bone exists
-            if target_bone_name not in armature.pose.bones:
-                print(f"[AetherBlend] Target bone '{target_bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
-                continue
+            bone = armature.pose.bones[bone_name]
 
             # Remove all existing constraints
             if overwrite:
@@ -184,16 +168,8 @@ def add_constraint_child_of(armature: bpy.types.Armature, bone_map: dict[str, li
     constraints = []
 
     for bone_name, target_bone_names in bone_map.items():
-        bone = armature.pose.bones.get(bone_name)
-        if not bone:
-            print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
-            continue
-            
         for target_bone_name in target_bone_names:
-            # Check if target bone exists
-            if target_bone_name not in armature.pose.bones:
-                print(f"[AetherBlend] Target bone '{target_bone_name}' not found in armature '{armature.name}'. Skipping constraint assignment.")
-                continue
+            bone = armature.pose.bones[bone_name]
 
             # Remove all existing constraints
             if overwrite:
@@ -264,7 +240,7 @@ def select_edit(armature, bone_names):
     bpy.ops.armature.select_all(action='DESELECT')
 
     for bone_name in bone_names:
-        b = armature.data.edit_bones.get(bone_name)
+        b = armature.data.edit_bones[bone_name]
         if b:
             b.select = True
             b.select_head = True

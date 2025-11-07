@@ -3,7 +3,7 @@ import math
 import mathutils
 
 from . import bone as bone_utils
-from ...data import constants
+from ...data import *
 
 
 def bone_on_local_axis_x(armature, bone_name, parent_bone=None, prefix="gen_", suffix=""):
@@ -45,7 +45,7 @@ def bone_on_local_axis_x(armature, bone_name, parent_bone=None, prefix="gen_", s
     
     return created_bone_name
 
-def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: constants.BoneChainInfo) -> list[str]:
+def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: BoneChainInfo) -> list[str]:
     """Generate a bone chain based on info from chain_info"""
     original_mode = bpy.context.object.mode
 
@@ -125,7 +125,7 @@ def bone_chain(src: bpy.types.Armature, target: bpy.types.Armature, chain_info: 
     bpy.ops.object.mode_set(mode=original_mode)
     return created_bones
 
-def bone_extensions(target: bpy.types.Armature, extension_info: list[constants.BoneExtensionInfo]) -> list[str]:
+def bone_extensions(target: bpy.types.Armature, extension_info: list[ExtensionBone]) -> list[str]:
     """Generate bone extension in target armature based on extension_info"""
     if extension_info is None or len(extension_info) == 0:
         return []
@@ -139,7 +139,7 @@ def bone_extensions(target: bpy.types.Armature, extension_info: list[constants.B
     created_bones = []
 
     for ext_info in extension_info:
-        ref_bone_name = ext_info.org_bone
+        ref_bone_name = ext_info.bone_a
         new_bone_name = ext_info.name
 
         if new_bone_name in target_edit_bones:
@@ -170,7 +170,7 @@ def bone_extensions(target: bpy.types.Armature, extension_info: list[constants.B
                 direction_vector = armature_matrix[2]
 
         if direction_vector:
-            new_bone.tail = new_bone.head + direction_vector.normalized() * ext_info.extension_factors
+            new_bone.tail = new_bone.head + direction_vector.normalized() * ext_info.size_factor
         else:
             new_bone.tail = source_bone.tail_local.copy()
 
@@ -187,16 +187,16 @@ def bone_extensions(target: bpy.types.Armature, extension_info: list[constants.B
     bpy.ops.object.mode_set(mode=original_mode)
     return created_bones
 
-def skin_bone(src: bpy.types.Armature, target: bpy.types.Armature, skin_bone_info: constants.SkinBone) -> list[str]:
+def skin_bone(src: bpy.types.Armature, target: bpy.types.Armature, skin_bone_info: SkinBone) -> list[str]:
     """Generate skin bones in target armature based on skin_bone_info."""
     original_mode = bpy.context.object.mode
     created_bones = []
     
     try:
-        world_co, weight = _find_highest_weight_vertex_world_pos(skin_bone_info.org_bone, src)
+        world_co, weight = _find_highest_weight_vertex_world_pos(skin_bone_info.bone_a, src)
         
         if world_co is None:
-            print(f"[AetherBlend] No vertices found with weights for bone '{skin_bone_info.org_bone}'. Skipping skin bone creation.")
+            print(f"[AetherBlend] No vertices found with weights for bone '{skin_bone_info.bone_a}'. Skipping skin bone creation.")
             return created_bones
         
         bpy.context.view_layer.objects.active = target
@@ -211,7 +211,7 @@ def skin_bone(src: bpy.types.Armature, target: bpy.types.Armature, skin_bone_inf
         local_co = target.matrix_world.inverted() @ world_co
         new_bone.head = local_co
         
-        org_bone = src.data.bones.get(skin_bone_info.org_bone)
+        org_bone = src.data.bones.get(skin_bone_info.bone_a)
         if org_bone:
             org_bone_length = org_bone.length
         else:
@@ -283,7 +283,7 @@ def _find_highest_weight_vertex_world_pos(bone_name: str, src_armature: bpy.type
     
     return (best_world_co, best_weight)
 
-def bridge_bones(armature: bpy.types.Armature, bridge_info: constants.BridgeBone) -> list[str]:
+def bridge_bones(armature: bpy.types.Armature, bridge_info: BridgeBone) -> list[str]:
     """Creates a chain of bones bridging from bone_a to bone_b with curved path."""
     original_mode = bpy.context.object.mode
     created_bones = []
@@ -359,14 +359,14 @@ def bridge_bones(armature: bpy.types.Armature, bridge_info: constants.BridgeBone
         if bridge_info.segments > 0:
             bone_a.tail = positions[1].copy()
             
-            if bridge_info.connected:
+            if bridge_info.is_connected:
                 bone_b.parent = current_parent
                 bone_b.use_connect = True
             
         else:
             bone_a.tail = original_bone_b_head.copy()
             
-            if bridge_info.connected:
+            if bridge_info.is_connected:
                 bone_b.parent = bone_a
                 bone_b.use_connect = True
 

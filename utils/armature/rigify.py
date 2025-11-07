@@ -1,0 +1,254 @@
+import bpy
+from ...data import *
+
+
+def rigify_set_tweak_collection(armature: bpy.types.Armature, bone_name: str, collection_name: str) -> None:
+    """Sets the rigify tweak collection for a given bone."""
+    
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    pose_bone = armature.pose.bones.get(bone_name)
+    
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+    
+    try:
+        rigify_params = pose_bone.rigify_parameters
+        
+        rigify_params.tweak_coll_refs.clear()
+        
+        if collection_name in armature.data.collections:
+            bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
+            
+            if len(rigify_params.tweak_coll_refs) > 0:
+                tweak_ref = rigify_params.tweak_coll_refs[-1]
+                tweak_ref.name = collection_name
+                print(f"[AetherBlend] Set tweak collection reference to '{collection_name}' for bone '{bone_name}'")
+        else:
+            print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
+            
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify tweak collection: {e}")
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def rigify_set_fk_collection(armature: bpy.types.Armature, bone_name: str, collection_name: str) -> None:
+    """Sets the rigify FK collection for a given bone."""
+    
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    pose_bone = armature.pose.bones.get(bone_name)
+    
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+    
+    try:
+        rigify_params = pose_bone.rigify_parameters
+        
+        rigify_params.tweak_coll_refs.clear()
+        
+        if collection_name in armature.data.collections:
+            bpy.ops.pose.rigify_collection_ref_add(prop_name="fk_coll_refs")
+
+            if len(rigify_params.fk_coll_refs) > 0:
+                fk_ref = rigify_params.fk_coll_refs[-1]
+                fk_ref.name = collection_name
+                print(f"[AetherBlend] Set FK collection reference to '{collection_name}' for bone '{bone_name}'")
+        else:
+            print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
+            
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify FK collection: {e}")
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def rigify_set_copy_rotation_axes(armature: bpy.types.Armature, bone_name: str, use_x: bool, use_y: bool, use_z: bool) -> None:
+    """sets rigify copy rotation axes parameter for a given bone."""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    pose_bone = armature.pose.bones.get(bone_name)
+    
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+    
+    try:
+        rigify_params = pose_bone.rigify_parameters
+        
+        rigify_params.copy_rotation_axes[0] = use_x
+        rigify_params.copy_rotation_axes[1] = use_y
+        rigify_params.copy_rotation_axes[2] = use_z
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify copy rotation axes: {e}")
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def rigify_make_extra_ik_control(armature: bpy.types.Armature, bone_name: str, make_extra_ik_control: bool) -> None:
+    """sets rigify make_extra_ik_control parameter for a given bone."""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+
+    try:
+        rigify_params = pose_bone.rigify_parameters
+
+        rigify_params.make_extra_ik_control = make_extra_ik_control
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify make_extra_ik_control: {e}")
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def rigify_set_super_copy_widget_type(armature: bpy.types.Armature, bone_name: str, super_copy_widget_type: str) -> None:
+    """sets rigify super_copy_widget_type parameter for a given bone."""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+
+    try:
+        rigify_params = pose_bone.rigify_parameters
+
+        rigify_params.super_copy_widget_type = super_copy_widget_type
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify super_copy_widget_type: {e}")
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def rigify_set_pivot_pos(armature: bpy.types.Armature, bone_name: str, pivot_pos: int) -> None:
+    """sets rigify pivot_pos parameter for a given bone."""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+
+    try:
+        rigify_params = pose_bone.rigify_parameters
+
+        rigify_params.pivot_pos = pivot_pos
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify pivot_pos: {e}")
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
+    """Sets up rigify skin stretchy chain properties for a pose bone"""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+
+    try:
+        rigify_params = pose_bone.rigify_parameters
+
+
+        if settings.skin_chain_pivot_pos is not None:
+            rigify_params.skin_chain_pivot_pos = settings.skin_chain_pivot_pos
+        if settings.skin_control_orientation_bone is not None:
+            rigify_params.skin_control_orientation_bone = settings.skin_control_orientation_bone
+        if settings.skin_chain_falloff_spherical is not None:
+            rigify_params.skin_chain_falloff_spherical = settings.skin_chain_falloff_spherical
+
+        if settings.secondary_layer_extra is not None:
+            rigify_params.skin_secondary_layers_extra = True
+            rigify_params.skin_secondary_coll_refs.clear()
+            if settings.secondary_layer_extra in armature.data.collections:
+                bpy.ops.pose.rigify_collection_ref_add(prop_name="skin_secondary_coll_refs")
+
+                if len(rigify_params.skin_secondary_coll_refs) > 0:
+                    skin_ref = rigify_params.skin_secondary_coll_refs[-1]
+                    skin_ref.name = settings.secondary_layer_extra
+                    print(f"[AetherBlend] Set Skin Secondary collection reference to '{settings.secondary_layer_extra}' for bone '{bone_name}'")
+                else:
+                    print(f"[AetherBlend] Collection '{settings.secondary_layer_extra}' not found in armature '{armature.name}'")
+
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify skin stretchy chain properties: {e}")
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings, bone_name: str = None) -> None:
+    """Sets up rigify properties for a pose bone"""
+    original_mode = armature.mode
+    if bone_name is None:
+        if settings.bone_name is not None:
+            bone_name = settings.bone_name
+        
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    if settings is None:
+        return
+    
+    if settings.rigify_type:
+        pose_bone.rigify_type = settings.rigify_type
+
+    if settings.fk_coll:
+        rigify_set_fk_collection(armature, pose_bone.name, settings.fk_coll)
+
+    if settings.tweak_coll:
+        rigify_set_tweak_collection(armature, pose_bone.name, settings.tweak_coll)
+
+    if settings.copy_rot_axes:
+        rigify_set_copy_rotation_axes(
+            armature,
+            pose_bone.name,
+            use_x=settings.copy_rot_axes.get('use_x'),
+            use_y=settings.copy_rot_axes.get('use_y'),
+            use_z=settings.copy_rot_axes.get('use_z')
+        )
+
+    if settings.make_extra_ik_control:
+        rigify_make_extra_ik_control(
+            armature,
+            pose_bone.name,
+            make_extra_ik_control=settings.make_extra_ik_control
+        )
+
+    if settings.super_copy_widget_type:
+        rigify_set_super_copy_widget_type(
+            armature,
+            pose_bone.name,
+            super_copy_widget_type=settings.super_copy_widget_type
+        )
+
+    if settings.pivot_pos:
+        rigify_set_pivot_pos(
+            armature,
+            pose_bone.name,
+            pivot_pos=settings.pivot_pos
+        )
+
+    if settings.rigify_type == "skin.stretchy_chain":
+        rigify_set_skin_stretchy_chain_properties(
+            armature,
+            pose_bone.name,
+            settings=settings
+        )
+
+    bpy.ops.object.mode_set(mode=original_mode)
