@@ -1,4 +1,3 @@
-from . import generate
 from . import b_collection
 from . import bone
 from . import rigify

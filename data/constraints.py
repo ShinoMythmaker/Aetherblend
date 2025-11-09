@@ -28,6 +28,14 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         "j_f_eye_r": ["MCH-eye.R"],
         "j_f_mab_r": ["eye_master.R"],
 
+        #Head
+        "j_kubi": ["ORG-neck"],
+        "j_kao": ["ORG-head"],
+        "j_f_ago": ["ORG-jaw"],
+
+        "j_mimi_l": ["ORG-ear.L"],
+        "j_mimi_r": ["ORG-ear.R"],
+
         # Spine 
         "j_kosi": ["j_sebo_a", "hips.001"],
 
@@ -37,7 +45,6 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
 
         "j_sako_l": ["shoulder.L"],
         "j_sako_r": ["shoulder.R"],
-        "j_kubi": ["neck"],
 
 
         # Left Fingers 

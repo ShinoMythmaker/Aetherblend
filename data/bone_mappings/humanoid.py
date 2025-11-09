@@ -2,215 +2,6 @@ import mathutils
 
 from .. schemas import GenerativeBone, ConnectBone, ExtensionBone, RigifySettings, EyeBone, SkinBone, BridgeBone
 
-LEFT_HAND: list[GenerativeBone] = [
-    #Thumb L
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_thumb.L01", bone_a="j_oya_a_l", bone_b="j_oya_b_l", parent="hand.L"),
-        req_bones=["j_oya_a_l", "j_oya_b_l"],
-        settings=RigifySettings(bone_name="f_thumb.L01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name="f_thumb.L02", bone_a="f_thumb.L01", parent="f_thumb.L01", is_connected=True),
-        req_bones=["f_thumb.L01"],
-        b_collection="Fingers"
-    ),
-
-    #Pointer L
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pointer.L01", bone_a="j_hito_a_l", bone_b="j_hito_b_l", parent="hand.L", roll=(-135.0)),
-        req_bones=["j_hito_a_l", "j_hito_b_l"],
-        settings=RigifySettings(bone_name="f_pointer.L01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pointer.L02", bone_a="j_hito_b_l", bone_b="iv_hito_c_l", parent="f_pointer.L01", roll=(-135.0), is_connected=True),
-        req_bones=["j_hito_b_l", "iv_hito_c_l"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_pointer.L03", "f_pointer.L02"], bone_a=["f_pointer.L02", "f_pointer.L01"], parent=["f_pointer.L02", "f_pointer.L01"], roll=(-135.0), is_connected=True),
-        req_bones=["f_pointer.L01"],
-        b_collection="Fingers"
-    ),
-
-    #Middle L
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_middle.L01", bone_a="j_naka_a_l", bone_b="j_naka_b_l", parent="hand.L", roll=(-135.0)),
-        req_bones=["j_naka_a_l", "j_naka_b_l"],
-        settings=RigifySettings(bone_name="f_middle.L01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_middle.L02", bone_a="j_naka_b_l", bone_b="iv_naka_c_l", parent="f_middle.L01", roll=(-135.0), is_connected=True),
-        req_bones=["j_naka_b_l", "iv_naka_c_l"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_middle.L03", "f_middle.L02"], bone_a=["f_middle.L02", "f_middle.L01"], parent=["f_middle.L02", "f_middle.L01"], roll=(-135.0), is_connected=True),
-        req_bones=["f_middle.L01"],
-        b_collection="Fingers"
-    ),
-
-    #Ring L
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_ring.L01", bone_a="j_kusu_a_l", bone_b="j_kusu_b_l", parent="hand.L", roll=(-135.0)),
-        req_bones=["j_kusu_a_l", "j_kusu_b_l"],
-        settings=RigifySettings(bone_name="f_ring.L01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_ring.L02", bone_a="j_kusu_b_l", bone_b="iv_kusu_c_l", parent="f_ring.L01", roll=(-135.0), is_connected=True),
-        req_bones=["j_kusu_b_l", "iv_kusu_c_l"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_ring.L03", "f_ring.L02"], bone_a=["f_ring.L02", "f_ring.L01"], parent=["f_ring.L02", "f_ring.L01"], roll=(-135.0), is_connected=True),
-        req_bones=["f_ring.L01"],
-        b_collection="Fingers"
-    ),
-
-    #Pinky L
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pinky.L01", bone_a="j_ko_a_l", bone_b="j_ko_b_l", parent="hand.L", roll=(-135.0)),
-        req_bones=["j_ko_a_l", "j_ko_b_l"],
-        settings=RigifySettings(bone_name="f_pinky.L01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pinky.L02", bone_a="j_ko_b_l", bone_b="iv_ko_c_l", parent="f_pinky.L01", roll=(-135.0), is_connected=True),
-        req_bones=["j_ko_b_l", "iv_ko_c_l"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_pinky.L03", "f_pinky.L02"], bone_a=["f_pinky.L02", "f_pinky.L01"], parent=["f_pinky.L02", "f_pinky.L01"], roll=(-135.0), is_connected=True),
-        req_bones=["f_pinky.L01"],
-        b_collection="Fingers"
-    ),
-]
-
-RIGHT_HAND: list[GenerativeBone] = [
-    #Thumb R
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_thumb.R01", bone_a="j_oya_a_r", bone_b="j_oya_b_r", parent="hand.R"),
-        req_bones=["j_oya_a_r", "j_oya_b_r"],
-        settings=RigifySettings(bone_name="f_thumb.R01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name="f_thumb.R02", bone_a="f_thumb.R01", parent="f_thumb.R01", is_connected=True),
-        req_bones=["f_thumb.R01"],
-        b_collection="Fingers"
-    ),
-
-    #Pointer R
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pointer.R01", bone_a="j_hito_a_r", bone_b="j_hito_b_r", parent="hand.R", roll=(135.0)),
-        req_bones=["j_hito_a_r", "j_hito_b_r"],
-        settings=RigifySettings(bone_name="f_pointer.R01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pointer.R02", bone_a="j_hito_b_r", bone_b="iv_hito_c_r", parent="f_pointer.R01", roll=(135.0), is_connected=True),
-        req_bones=["j_hito_b_r", "iv_hito_c_r"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_pointer.R03", "f_pointer.R02"], bone_a=["f_pointer.R02", "f_pointer.R01"], parent=["f_pointer.R02", "f_pointer.R01"], roll=(135.0), is_connected=True),
-        req_bones=["f_pointer.R01"],
-        b_collection="Fingers"
-    ),
-
-    #Middle R
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_middle.R01", bone_a="j_naka_a_r", bone_b="j_naka_b_r", parent="hand.R", roll=(135.0)),
-        req_bones=["j_naka_a_r", "j_naka_b_r"],
-        settings=RigifySettings(bone_name="f_middle.R01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_middle.R02", bone_a="j_naka_b_r", bone_b="iv_naka_c_r", parent="f_middle.R01", roll=(135.0), is_connected=True),
-        req_bones=["j_naka_b_r", "iv_naka_c_r"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_middle.R03", "f_middle.R02"], bone_a=["f_middle.R02", "f_middle.R01"], parent=["f_middle.R02", "f_middle.R01"], roll=(135.0), is_connected=True),
-        req_bones=["f_middle.R01"],
-        b_collection="Fingers"
-    ),
-
-    #Ring R
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_ring.R01", bone_a="j_kusu_a_r", bone_b="j_kusu_b_r", parent="hand.R", roll=(135.0)),
-        req_bones=["j_kusu_a_r", "j_kusu_b_r"],
-        settings=RigifySettings(bone_name="f_ring.R01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_ring.R02", bone_a="j_kusu_b_r", bone_b="iv_kusu_c_r", parent="f_ring.R01", roll=(135.0), is_connected=True),
-        req_bones=["j_kusu_b_r", "iv_kusu_c_r"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_ring.R03", "f_ring.R02"], bone_a=["f_ring.R02", "f_ring.R01"], parent=["f_ring.R02", "f_ring.R01"], roll=(135.0), is_connected=True),
-        req_bones=["f_ring.R01"],
-        b_collection="Fingers"
-    ),
-
-    #Pinky R
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pinky.R01", bone_a="j_ko_a_r", bone_b="j_ko_b_r", parent="hand.R", roll=(135.0)),
-        req_bones=["j_ko_a_r", "j_ko_b_r"],
-        settings=RigifySettings(bone_name="f_pinky.R01", rigify_type="limbs.super_finger", tweak_coll="Fingers (Details)", make_extra_ik_control=True),
-        b_collection="Fingers"
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="f_pinky.R02", bone_a="j_ko_b_r", bone_b="iv_ko_c_r", parent="f_pinky.R01", roll=(135.0), is_connected=True),
-        req_bones=["j_ko_b_r", "iv_ko_c_r"],
-        b_collection="Fingers",
-        is_optional=True
-    ),
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name=["f_pinky.R03", "f_pinky.R02"], bone_a=["f_pinky.R02", "f_pinky.R01"], parent=["f_pinky.R02", "f_pinky.R01"], roll=(135.0), is_connected=True),
-        req_bones=["f_pinky.R01"],
-        b_collection="Fingers"
-    ),
-]
 
 LEG_L: list[GenerativeBone] = [
     GenerativeBone(
@@ -299,13 +90,6 @@ SPINE: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="spine.03", bone_a="j_sebo_c", bone_b="j_kubi", parent="spine.02", is_connected=True),
         req_bones=["j_sebo_c", "j_kubi"],
-        b_collection="Torso",
-    ),
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="neck", bone_a="j_kubi", bone_b="j_kao", parent="spine.03", is_connected=False),
-        req_bones=["j_kubi", "j_kao"],
-        settings=RigifySettings(bone_name="neck", rigify_type="basic.super_copy", super_copy_widget_type="circle"),
         b_collection="Torso",
     ),
 
@@ -410,51 +194,175 @@ TAIL: list[GenerativeBone] = [
     ),
 ]
 
-EYES_GEN_INFO: dict[list[str, str], EyeBone] = {
-    ("Face (Secondary)", "Eye.L"): EyeBone(
-        outer_bones=[
-            SkinBone(bone_a="j_f_mabup_02out_l", name="lid.T.L"),
-            SkinBone(bone_a="j_f_mabup_01_l", name="lid.T.L.002"),
-            SkinBone(bone_a="j_f_mabdn_03in_l", name="lid.B.L"),
-            SkinBone(bone_a="j_f_mabdn_01_l", name="lid.B.L.002"),
-        ],
-        bridges=[
-            BridgeBone(bone_a="lid.T.L", bone_b="lid.T.L.002", segments=1, offset_factor=mathutils.Vector((0.0, -0.001, 0.001)), is_connected=True),
-            BridgeBone(bone_a="lid.T.L.002", bone_b="lid.B.L", segments=1, offset_factor=mathutils.Vector((0.0, 0.0, 0.003)), is_connected=False),
-            BridgeBone(bone_a="lid.B.L", bone_b="lid.B.L.002", segments=1, offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)), is_connected=True),
-            BridgeBone(bone_a="lid.B.L.002", bone_b="lid.T.L", segments=1, offset_factor=mathutils.Vector((0.003, -0.001, -0.003)), is_connected=False),
-        ],
-        eye_name="eye.L",
-        eye_collection="Face",
-        parent_bone="neck",
-        bone_settings={
-            "eye.L": RigifySettings(rigify_type="face.skin_eye"),
-            "lid.B.L": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck"),
-            "lid.T.L": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck", skin_chain_falloff_spherical=[False, True, False]),
-        },
+EYE_L: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.T.L", bone_a="j_f_mabup_02out_l"),
+        req_bones=["j_f_mabup_02out_l"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="lid.T.L", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False])
     ),
-    ("Face (Secondary)", "Eye.R"): EyeBone(
-        outer_bones=[
-            SkinBone(bone_a="j_f_mabup_02out_r", name="lid.T.R"),
-            SkinBone(bone_a="j_f_mabup_01_r", name="lid.T.R.002"),
-            SkinBone(bone_a="j_f_mabdn_03in_r", name="lid.B.R"),
-            SkinBone(bone_a="j_f_mabdn_01_r", name="lid.B.R.002"),
-        ],
-        bridges=[
-            BridgeBone(bone_a="lid.T.R", bone_b="lid.T.R.002", segments=1, offset_factor=mathutils.Vector((0.0, -0.001, 0.001)), is_connected=True),
-            BridgeBone(bone_a="lid.T.R.002", bone_b="lid.B.R", segments=1, offset_factor=mathutils.Vector((0.0, 0.0, 0.003)), is_connected=False),
-            BridgeBone(bone_a="lid.B.R", bone_b="lid.B.R.002", segments=1, offset_factor=mathutils.Vector((0.002, 0.0, 0.001)), is_connected=True),
-            BridgeBone(bone_a="lid.B.R.002", bone_b="lid.T.R", segments=1, offset_factor=mathutils.Vector((-0.003, -0.001, -0.003)), is_connected=False),
-        ],
-        eye_name="eye.R",
-        eye_collection="Face",
-        parent_bone="neck",
-        bone_settings={
-            "eye.R": RigifySettings(rigify_type="face.skin_eye"),
-            "lid.B.R": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck"),
-            "lid.T.R": RigifySettings(rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="neck", skin_chain_falloff_spherical=[False, True, False]),
-        },
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.T.L.002", bone_a="j_f_mabup_01_l"),
+        req_bones=["j_f_mabup_01_l"],
+        b_collection="Face (Secondary)"
     ),
-}
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.B.L", bone_a="j_f_mabdn_03in_l"),
+        req_bones=["j_f_mabdn_03in_l"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="lid.B.L", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.B.L.002", bone_a="j_f_mabdn_01_l"),
+        req_bones=["j_f_mabdn_01_l"],
+        b_collection="Face (Secondary)"
+    ),
 
+    GenerativeBone(
+        ref="tgt",
+        data=EyeBone(name="eye.L", ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"], parent="head"),
+        req_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="eye.L", rigify_type="face.skin_eye")
+    ),
 
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.T.L.001", bone_a="lid.T.L", bone_b="lid.T.L.002", offset_factor=mathutils.Vector((0.0, -0.001, 0.001)), is_connected=True, parent="eye.L"),
+        req_bones=["lid.T.L", "lid.T.L.002"],
+        b_collection="Face (Secondary)",
+        
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.T.L.003", bone_a="lid.T.L.002", bone_b="lid.B.L", offset_factor=mathutils.Vector((0.0, 0.0, 0.003)), is_connected=False),
+        req_bones=["lid.T.L.002", "lid.B.L"],
+        b_collection="Face (Secondary)"
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.B.L.001", bone_a="lid.B.L", bone_b="lid.B.L.002", offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)), is_connected=True, parent="eye.L"),
+        req_bones=["lid.B.L", "lid.B.L.002"],
+        b_collection="Face (Secondary)",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.B.L.003", bone_a="lid.B.L.002", bone_b="lid.T.L", offset_factor=mathutils.Vector((0.003, -0.001, -0.003)), is_connected=False),
+        req_bones=["lid.B.L.002", "lid.T.L"],
+        b_collection="Face (Secondary)"
+    ),
+]
+
+EYE_R: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.T.R", bone_a="j_f_mabup_02out_r"),
+        req_bones=["j_f_mabup_02out_r"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="lid.T.R", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False])
+    ),
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.T.R.002", bone_a="j_f_mabup_01_r"),
+        req_bones=["j_f_mabup_01_r"],
+        b_collection="Face (Secondary)"
+    ),
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.B.R", bone_a="j_f_mabdn_03in_r"),
+        req_bones=["j_f_mabdn_03in_r"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="lid.B.R", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=SkinBone(name="lid.B.R.002", bone_a="j_f_mabdn_01_r"),
+        req_bones=["j_f_mabdn_01_r"],
+        b_collection="Face (Secondary)"
+    ),
+
+    GenerativeBone(
+        ref="tgt",
+        data=EyeBone(name="eye.R", ref_bones=["lid.T.R", "lid.T.R.002", "lid.B.R", "lid.B.R.002"], parent="head"),
+        req_bones=["lid.T.R", "lid.T.R.002", "lid.B.R", "lid.B.R.002"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="eye.R", rigify_type="face.skin_eye")
+    ),
+
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.T.R.001", bone_a="lid.T.R", bone_b="lid.T.R.002", offset_factor=mathutils.Vector((0.0, -0.001, 0.001)), is_connected=True, parent="eye.R"),
+        req_bones=["lid.T.R", "lid.T.R.002"],
+        b_collection="Face (Secondary)",
+        
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.T.R.003", bone_a="lid.T.R.002", bone_b="lid.B.R", offset_factor=mathutils.Vector((0.0, 0.0, 0.003)), is_connected=False),
+        req_bones=["lid.T.R.002", "lid.B.R"],
+        b_collection="Face (Secondary)"
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.B.R.001", bone_a="lid.B.R", bone_b="lid.B.R.002", offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)), is_connected=True, parent="eye.R"),
+        req_bones=["lid.B.R", "lid.B.R.002"],
+        b_collection="Face (Secondary)",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=BridgeBone(name="lid.B.R.003", bone_a="lid.B.R.002", bone_b="lid.T.R", offset_factor=mathutils.Vector((0.003, -0.001, -0.003)), is_connected=False),
+        req_bones=["lid.B.R.002", "lid.T.R"],
+        b_collection="Face (Secondary)"
+    ),
+]
+
+HEAD: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="neck", bone_a="j_kubi", bone_b="j_kao", parent="spine.03", is_connected=False),
+        req_bones=["j_kubi", "j_kao"],
+        settings=RigifySettings(bone_name="neck", rigify_type="spines.super_head", tweak_coll="Torso (Tweak)"),
+        b_collection="Torso",
+    ),
+
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="head", bone_a="neck", parent="neck", is_connected=True, axis_type="armature", axis="Z"),
+        req_bones=["neck"],
+        b_collection="Torso",
+    ),
+]
+
+JAW: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="jaw", bone_a="j_f_ago", bone_b="j_f_hagukidn", parent="head", is_connected=False),
+        req_bones=["j_f_ago", "j_f_hagukidn"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="jaw", rigify_type="basic.super_copy", super_copy_widget_type="jaw")
+    )
+]
+
+EAR_L: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear.L", bone_a="j_mimi_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head"),
+        req_bones=["j_mimi_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="ear.L", rigify_type="basic.super_copy", super_copy_widget_type="bone")
+    )
+]
+
+EAR_R: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear.R", bone_a="j_mimi_r", parent="head", is_connected=False, axis_type="local", axis="X", start="head"),
+        req_bones=["j_mimi_r"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="ear.R", rigify_type="basic.super_copy", super_copy_widget_type="bone")
+    )
+]

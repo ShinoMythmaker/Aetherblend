@@ -30,14 +30,14 @@ class RigifySettings:
 
 @dataclass(frozen=True)
 class ExtensionBone:
-    name: str | list[str]
-    bone_a: str | list[str]
+    name: str 
+    bone_a: str 
     size_factor: float = 1.0
     axis_type: str = "local"# e.g., "global", "local", "armature"
     axis: str  = "Y" # e.g., "X", "Y", "Z"
     start: str = "tail" # e.g., "head", "tail"
     is_connected: bool = False
-    parent: str | list[str] | None = None
+    parent: str | None = None
     roll: float = 0.0
 
     def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
@@ -47,26 +47,10 @@ class ExtensionBone:
             return None
         
         ref_bones = ref.data.bones
-        bone_a_ref = None
-        bone_name_to_create = self.name
-        
-        if isinstance(self.bone_a, list):
-            for i, ref_bone_name in enumerate(self.bone_a):
-                bone_a_ref = ref_bones.get(ref_bone_name)
-                if bone_a_ref:
-                    if isinstance(self.name, list):
-                        if i < len(self.name):
-                            bone_name_to_create = self.name[i]
-                        else:
-                            bone_name_to_create = self.name[-1]  
-                    break
-        else:
-            bone_a_ref = ref_bones.get(self.bone_a)
-            if isinstance(self.name, list):
-                bone_name_to_create = self.name[0]
+        bone_a_ref = ref_bones.get(self.bone_a)
 
         if not bone_a_ref:
-            print(f"[AetherBlend] Reference bone '{self.bone_a}' not found in either armature for ExtensionBone '{bone_name_to_create}'.")
+            print(f"[AetherBlend] Reference bone '{self.bone_a}' not found in either armature for ExtensionBone '{self.name}'.")
             return None
         
         if self.start == "tail":
@@ -100,7 +84,7 @@ class ExtensionBone:
                 direction_vector = mathutils.Vector((0.0, 0.0, 1.0))
         
         if not direction_vector:
-            print(f"[AetherBlend] Invalid axis configuration for ExtensionBone '{bone_name_to_create}': axis_type='{self.axis_type}', axis='{self.axis}'.")
+            print(f"[AetherBlend] Invalid axis configuration for ExtensionBone '{self.name}': axis_type='{self.axis_type}', axis='{self.axis}'.")
             return None
         
         ref_bone_length = bone_a_ref.length if bone_a_ref.length > 0 else 1.0
@@ -114,10 +98,10 @@ class ExtensionBone:
         try:
             target_edit_bones = target.data.edit_bones
             
-            if bone_name_to_create in target_edit_bones:
-                target_edit_bones.remove(target_edit_bones[bone_name_to_create])
+            if self.name in target_edit_bones:
+                target_edit_bones.remove(target_edit_bones[self.name])
 
-            new_bone = target_edit_bones.new(bone_name_to_create)
+            new_bone = target_edit_bones.new(self.name)
             new_bone.head = start_pos
             new_bone.tail = tail_pos
             new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
@@ -135,7 +119,7 @@ class ExtensionBone:
                     new_bone.parent = parent_bone
                     new_bone.use_connect = self.is_connected
                 else:
-                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ExtensionBone '{bone_name_to_create}'.")
+                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ExtensionBone '{self.name}'.")
             
             created_name = new_bone.name  
             return [created_name]
@@ -149,14 +133,121 @@ class SkinBone:
     bone_a: str
     parent: str | None = None
     size_factor: float = 1.0
-    lead_bone: bool = False
+
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+        """Generates the SkinBone at the highest weighted vertex position for bone_a."""
+        if not ref or not target:
+            print(f"[AetherBlend] Invalid armatures provided for SkinBone '{self.name}'.")
+            return None
+        
+        ref_bones = ref.data.bones
+        bone_a_ref = ref_bones.get(self.bone_a)
+
+        if not bone_a_ref:
+            print(f"[AetherBlend] Reference bone '{self.bone_a}' not found in source armature for SkinBone '{self.name}'.")
+            return None
+        
+        world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, ref)
+        
+        if world_co is None:
+            print(f"[AetherBlend] No vertices found with weights for bone '{self.bone_a}'. Skipping SkinBone '{self.name}'.")
+            return None     
+        
+        ref_bone_length = bone_a_ref.length if bone_a_ref.length > 0 else 0.3
+    
+        bone_length = ref_bone_length * self.size_factor
+        
+        original_mode = bpy.context.object.mode
+        bpy.context.view_layer.objects.active = target
+        bpy.ops.object.mode_set(mode='EDIT')
+        
+        try:
+            target_edit_bones = target.data.edit_bones
+            
+            if self.name in target_edit_bones:
+                target_edit_bones.remove(target_edit_bones[self.name])
+            
+            new_bone = target_edit_bones.new(self.name)
+            
+            local_co = target.matrix_world.inverted() @ world_co
+            new_bone.head = local_co
+            
+            direction = mathutils.Vector((0.0, 0.0, bone_length))
+            new_bone.tail = local_co + direction
+            
+            if self.parent:
+                parent_bone = target_edit_bones.get(self.parent)
+                if parent_bone:
+                    new_bone.parent = parent_bone
+                    new_bone.use_connect = False
+                else:
+                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for SkinBone '{self.name}'.")
+            
+            created_name = new_bone.name
+            print(f"[AetherBlend] Created skin bone '{created_name}' at vertex position (weight: {weight:.6f})")
+            return [created_name]
+            
+        finally:
+            bpy.ops.object.mode_set(mode=original_mode)
+    
+    def _find_highest_weight_vertex_world_pos(self, bone_name: str, src_armature: bpy.types.Armature) -> tuple:
+        """Optimized function to find the vertex with highest weight for given bone."""
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        
+        best_weight = 0.0
+        best_world_co = None
+        
+        candidate_objects = []
+        for obj in bpy.data.objects:
+            if obj.type != 'MESH':
+                continue
+            
+            for modifier in obj.modifiers:
+                if modifier.type == 'ARMATURE' and modifier.object == src_armature:
+                    vg = obj.vertex_groups.get(bone_name)
+                    if vg is not None:
+                        candidate_objects.append((obj, vg))
+                    break
+        
+        if not candidate_objects:
+            return (None, 0.0)
+        
+        for obj, vertex_group in candidate_objects:
+            eval_obj = obj.evaluated_get(depsgraph)
+            try:
+                mesh_eval = eval_obj.to_mesh()
+            except Exception:
+                continue
+            
+            if mesh_eval is None:
+                continue
+            
+            orig_verts = obj.data.vertices
+            
+            if len(mesh_eval.vertices) != len(orig_verts):
+                eval_obj.to_mesh_clear()
+                continue
+            
+            vg_index = vertex_group.index
+            for v_idx, vertex in enumerate(orig_verts):
+                for group in vertex.groups:
+                    if group.group == vg_index and group.weight > best_weight:
+                        ev_co = mesh_eval.vertices[v_idx].co
+                        world_co = eval_obj.matrix_world @ ev_co
+                        best_weight = group.weight
+                        best_world_co = world_co.copy()
+                        break
+            
+            eval_obj.to_mesh_clear()
+        
+        return (best_world_co, best_weight)
 
 @dataclass(frozen=True)
 class ConnectBone:
-    name: str | list[str]
-    bone_a: str | list[str]
-    bone_b: str | list[str]
-    parent: str | list[str] | None = None
+    name: str
+    bone_a: str
+    bone_b: str 
+    parent: str | None = None
     is_connected: bool = False
     roll: float = 0.0
 
@@ -167,35 +258,11 @@ class ConnectBone:
             return None
             
         ref_bones = ref.data.bones
-        bone_a_ref = None
-        bone_name_to_create = self.name
-        
-        if isinstance(self.bone_a, list):
-            for i, ref_bone_name in enumerate(self.bone_a):
-                bone_a_ref = ref_bones.get(ref_bone_name)
-                if bone_a_ref:
-                    if isinstance(self.name, list):
-                        if i < len(self.name):
-                            bone_name_to_create = self.name[i]
-                        else:
-                            bone_name_to_create = self.name[-1]  
-                    break
-        else:
-            bone_a_ref = ref_bones.get(self.bone_a)
-            if isinstance(self.name, list):
-                bone_name_to_create = self.name[0]
-
-
-        if isinstance(self.bone_b, list):
-            for ref_bone_name in self.bone_b:
-                bone_b_ref = ref_bones.get(ref_bone_name)
-                if bone_b_ref:
-                    break
-        else:
-            bone_b_ref = ref_bones.get(self.bone_b)
+        bone_a_ref = ref_bones.get(self.bone_a)
+        bone_b_ref = ref_bones.get(self.bone_b)
 
         if not bone_a_ref or not bone_b_ref:
-            print(f"[AetherBlend] Cannot create ConnectBone '{bone_name_to_create}': reference bones '{self.bone_a}' or '{self.bone_b}' not found in source armature.")
+            print(f"[AetherBlend] Cannot create ConnectBone '{self.name}': reference bones '{self.bone_a}' or '{self.bone_b}' not found in source armature.")
             return None
         
         head_pos = bone_a_ref.head_local.copy()
@@ -208,27 +275,21 @@ class ConnectBone:
         try:
             target_edit_bones = target.data.edit_bones
             
-            if bone_name_to_create in target_edit_bones:
-                target_edit_bones.remove(target_edit_bones[bone_name_to_create])
+            if self.name in target_edit_bones:
+                target_edit_bones.remove(target_edit_bones[self.name])
 
-            new_bone = target_edit_bones.new(bone_name_to_create)
+            new_bone = target_edit_bones.new(self.name)
             new_bone.head = head_pos
             new_bone.tail = tail_pos
             new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
             
             if self.parent:
-                if isinstance(self.parent, list):
-                    for bone_name in self.parent:
-                        parent_bone = target_edit_bones.get(bone_name)
-                        if parent_bone  and parent_bone != new_bone:    
-                            break
-                else :
-                    parent_bone = target_edit_bones.get(self.parent)
+                parent_bone = target_edit_bones.get(self.parent)
                 if parent_bone:
                     new_bone.parent = parent_bone
                     new_bone.use_connect = self.is_connected
                 else:
-                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ConnectBone '{bone_name_to_create}'.")
+                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ConnectBone '{self.name}'.")
             
             created_name = new_bone.name  
             return [created_name]
@@ -238,11 +299,78 @@ class ConnectBone:
 
 @dataclass(frozen=True)
 class BridgeBone:
+    name: str
     bone_a: str
     bone_b: str
-    segments: int = 1
     offset_factor: mathutils.Vector = mathutils.Vector((0.0, 0.0, 0.0))
-    is_connected: bool = True
+    is_connected: bool = True #Unlike ExtensionBone and SkinBone, BridgeBones is_connect defines weither the last bone is connected to bone_b
+    parent : str | None = None
+
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+        """Generates the BridgeBone from bone_a to bone_b with curved offset in target armature."""
+        if not ref or not target:
+            print(f"[AetherBlend] Invalid armatures provided for BridgeBone '{self.name}'.")
+            return None
+            
+        ref_bones = ref.data.bones
+        bone_a_ref = ref_bones.get(self.bone_a)
+        bone_b_ref = ref_bones.get(self.bone_b)
+
+        if not bone_a_ref or not bone_b_ref:
+            print(f"[AetherBlend] Cannot create BridgeBone '{self.name}': reference bones '{self.bone_a}' or '{self.bone_b}' not found in source armature.")
+            return None
+        
+        start_pos = bone_a_ref.head_local.copy()
+        end_pos = bone_b_ref.head_local.copy()
+        
+        midpoint = (start_pos + end_pos) / 2.0
+        curve_factor = math.sin(math.pi * 0.5)  # Maximum curve at t=0.5
+        bridge_head = midpoint + (self.offset_factor * curve_factor)
+        
+        original_mode = bpy.context.object.mode
+        bpy.context.view_layer.objects.active = target
+        bpy.ops.object.mode_set(mode='EDIT')
+        
+        try:
+            target_edit_bones = target.data.edit_bones
+            
+            if self.name in target_edit_bones:
+                target_edit_bones.remove(target_edit_bones[self.name])
+
+            new_bone = target_edit_bones.new(self.name)
+            new_bone.head = bridge_head
+            new_bone.tail = end_pos
+            
+            bone_a_target = target_edit_bones.get(self.bone_a)
+            if bone_a_target:
+                bone_a_target.tail = bridge_head
+                new_bone.parent = bone_a_target
+                new_bone.use_connect = True
+                
+                # Set bone_a's parent if parent parameter is provided
+                if self.parent:
+                    parent_bone = target_edit_bones.get(self.parent)
+                    if parent_bone:
+                        bone_a_target.parent = parent_bone
+                        bone_a_target.use_connect = False
+                    else:
+                        print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for bone_a '{self.bone_a}' in BridgeBone '{self.name}'.")
+            else:
+                print(f"[AetherBlend] Warning: Parent bone '{self.bone_a}' not found in target armature for BridgeBone '{self.name}'.")
+            
+            if self.is_connected:
+                bone_b_target = target_edit_bones.get(self.bone_b)
+                if bone_b_target:
+                    bone_b_target.parent = new_bone
+                    bone_b_target.use_connect = True
+                else:
+                    print(f"[AetherBlend] Warning: Target bone '{self.bone_b}' not found for connection in BridgeBone '{self.name}'.")
+            
+            created_name = new_bone.name  
+            return [created_name]
+            
+        finally:
+            bpy.ops.object.mode_set(mode=original_mode)
 
 @dataclass(frozen=True)
 class TrackToBone:
@@ -252,25 +380,72 @@ class TrackToBone:
     parent_name: str | None
 
 @dataclass(frozen=True)
-class BoneChainInfo:
-    ffxiv_bones: list[str] | None = None
-    gen_bones: dict[str, RigifySettings | None] | None = None
-    parent_bone: str | None = None
-    bone_extensions: ExtensionBone | None = None
-    roll: float | None = 0.0
-    extend_last: bool = False
-    extension_factor: float = 0.0
-    skin_bones: list[SkinBone] | None = None
-    bridge_bones: list[BridgeBone] | None = None
-
-@dataclass(frozen=True)
 class EyeBone:
-    outer_bones: list[SkinBone]
-    bridges: list[BridgeBone]
-    eye_name: str
-    eye_collection: str
-    parent_bone: str | None = None
-    bone_settings: dict[str, RigifySettings | None] | None = None
+    name: str
+    ref_bones: list[str]
+    size_factor: float = 1.0
+    parent: str | None = None
+
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+        """Generates the EyeBone at the center position of reference bones in target armature."""
+        if not ref or not target:
+            print(f"[AetherBlend] Invalid armatures provided for EyeBone '{self.name}'.")
+            return None
+        
+        ref_bones_data = ref.data.bones
+        valid_ref_bones = []
+        
+        for bone_name in self.ref_bones:
+            bone_ref = ref_bones_data.get(bone_name)
+            if bone_ref:
+                valid_ref_bones.append(bone_ref)
+            else:
+                print(f"[AetherBlend] Warning: Reference bone '{bone_name}' not found in source armature for EyeBone '{self.name}'.")
+        
+        if not valid_ref_bones:
+            print(f"[AetherBlend] Error: No valid reference bones found for EyeBone '{self.name}'. Cannot create eye bone.")
+            return None
+        
+        total_position = mathutils.Vector((0.0, 0.0, 0.0))
+        total_length = 0.0
+        for bone_ref in valid_ref_bones:
+            total_position += bone_ref.head_local
+            total_length += bone_ref.length
+        
+        center_position = total_position / len(valid_ref_bones)
+        avg_length = total_length / len(valid_ref_bones) if total_length > 0 else 0.3
+        eye_bone_length = avg_length * self.size_factor
+        
+        original_mode = bpy.context.object.mode
+        bpy.context.view_layer.objects.active = target
+        bpy.ops.object.mode_set(mode='EDIT')
+        
+        try:
+            target_edit_bones = target.data.edit_bones
+            
+            if self.name in target_edit_bones:
+                target_edit_bones.remove(target_edit_bones[self.name])
+            
+            new_bone = target_edit_bones.new(self.name)
+            
+            new_bone.tail = center_position.copy()
+            new_bone.head = center_position + mathutils.Vector((0.0, eye_bone_length, 0.0))
+            
+            if self.parent:
+                parent_bone = target_edit_bones.get(self.parent)
+                if parent_bone:
+                    new_bone.parent = parent_bone
+                    new_bone.use_connect = False
+                else:
+                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for EyeBone '{self.name}'.")
+            
+            created_name = new_bone.name
+            print(f"[AetherBlend] Created eye bone '{created_name}' from {len(valid_ref_bones)} reference bones, center at {center_position}, length {eye_bone_length:.3f}")
+            return [created_name]
+            
+        finally:
+            bpy.ops.object.mode_set(mode=original_mode)
+        
 
 @dataclass(frozen=True)
 class GenerativeBone:

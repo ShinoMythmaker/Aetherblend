@@ -1,7 +1,6 @@
 import bpy
 from .. import utils
 from ..data import *
-from ..data.bone_mappings.humanoid import EYES_GEN_INFO
 ## This code is highly experiemental and subject to change as we refine the meta rig generation process ##
 
 def cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> None:
@@ -21,7 +20,6 @@ def cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: 
         utils.armature.bone.remove_constraint_by_name_contains(armature=ffxiv_armature, bone_name=bone.name, substring='AetherBlend')
     
     bpy.ops.object.mode_set(mode=original_mode)
-
 
 class GenerativeMetaBoneGroup():
     src_armature: bpy.types.Armature
@@ -49,7 +47,7 @@ class GenerativeMetaBoneGroup():
                                 continue
                             print(f"[AetherBlend] Required bone '{req_bone}' not found in armature '{armature_to_check.name}', Skipping MetaBoneGroup generation.")
                             return False
-                        
+        print(future_bones)
         return True
     
     def generateBones(self) -> list[str]:
@@ -122,12 +120,14 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 coll.rigify_ui_title = collection.title
 
         for bone_group in HUMAN:
-            gen_group = GenerativeMetaBoneGroup(src_armature=armature, target_armature=meta_rig, generative_bones=bone_group)
-            bones = gen_group.execute()
-            print(bones)
-
-        self.generate_eyes(source_armature=armature, meta_rig=meta_rig)
-
+            for sub_group in bone_group:
+                gen_group = GenerativeMetaBoneGroup(src_armature=armature, target_armature=meta_rig, generative_bones=sub_group)
+                if gen_group.check() is False:
+                    continue
+                else:
+                    bones = gen_group.execute()
+                    print(bones)
+                    break
                 
         armature.aether_rig.meta_rig = meta_rig
         
@@ -140,63 +140,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         armature.select_set(True)
         
         return {'FINISHED'}
-    
-    def generate_eyes(self, source_armature: bpy.types.Armature, meta_rig: bpy.types.Armature) -> list[str]:
-        """Generate the individual eye bones"""
-
-        original_mode = bpy.context.object.mode
-        bpy.ops.object.mode_set(mode='POSE')
-        all_created_bones = []
-        for (collection_name, segment_name), gen_info in EYES_GEN_INFO.items():
-            created_bones = []
-            for skin_bone in gen_info.outer_bones:
-                bones = utils.armature.generate.skin_bone(
-                    src=source_armature,
-                    target=meta_rig,
-                    skin_bone_info=skin_bone
-                )
-                created_bones.extend(bones)
-
-            eye_bone = utils.armature.generate.eye_bone(
-                armature=meta_rig,
-                outer_bones=created_bones,
-                name=gen_info.eye_name,
-                length=float(0.010)
-            )
-            if eye_bone and meta_rig.data.collections.get(gen_info.eye_collection):
-                utils.armature.b_collection.assign_bones(meta_rig, eye_bone, gen_info.eye_collection)
-                if eye_bone and gen_info.parent_bone: 
-                    utils.armature.bone.set_parent(
-                        armature=meta_rig,
-                        bone_name=gen_info.eye_name,
-                        parent_bone_name=gen_info.parent_bone
-                    )
-
-            for bone in created_bones:
-                utils.armature.bone.set_parent(
-                    armature=meta_rig,
-                    bone_name=bone,
-                    parent_bone_name=gen_info.eye_name
-                )
-
-            for bridge in gen_info.bridges:
-                bones = utils.armature.generate.bridge_bones(
-                    armature=meta_rig,
-                    bridge_info=bridge
-                )
-                created_bones.extend(bones)
-
-            if created_bones and meta_rig.data.collections.get(collection_name):
-                utils.armature.b_collection.assign_bones(meta_rig, created_bones, collection_name)
-                for bone_name, rigify_settings in gen_info.bone_settings.items():
-                    utils.armature.rigify.set_rigify_properties(armature=meta_rig, bone_name=bone_name, settings=rigify_settings)
-                created_bones.extend(bones)
-
-            all_created_bones.extend(created_bones)
-
-        bpy.ops.object.mode_set(mode=original_mode)
-
-        return all_created_bones
 
 class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
     bl_idname = "aether.generate_rigify_rig"
