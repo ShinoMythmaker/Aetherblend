@@ -34,14 +34,14 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 &nbsp;
 
 ## Setup and getting started. 
-- [Installation Guide](wiki/Installation)
+- [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
 &nbsp;
 
 &nbsp;
 
 ## Support & Feedback
 
-- Make sure to use [Issues & Suggestions](issues) directly on github
+- Make sure to use [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on github
 - If you want to stay up to date or have questions feel free to join our discord!
 <p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
 </p>
