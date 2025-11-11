@@ -1,6 +1,6 @@
 <br>
 <p align="center">
-<img height="90rem" alt="AetherBlend" src="https://github.com/user-attachments/assets/c94b0dd1-9c84-44dd-87fc-3c17754d16f2" />
+<img height="90rem" alt="AetherBlend" src="assets/brand/Aether Blend Logo-min.png" />
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
@@ -27,23 +27,23 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 - And much more...
 
 <p align="center">
-  <img width="50%" alt="Advanced Eye Controls" src="https://github.com/user-attachments/assets/eb672d24-e0c8-477d-b1db-dacd93fd59f0" /><img width="50%" alt="Head and Shoulder follow" src="https://github.com/user-attachments/assets/e4d2c997-b47e-4118-aaa1-2f66a37b7560" />
+  <img width="50%" alt="Advanced Eye Controls" src="assets/demo/eyescontrols-min.gif" /><img width="50%" alt="Head and Shoulder follow" src="assets/demo/headshouldercontrols-min.gif" />
 </p>
 &nbsp;
 
 &nbsp;
 
 ## Setup and getting started. 
-- [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
+- [Installation Guide](wiki/Installation)
 &nbsp;
 
 &nbsp;
 
 ## Support & Feedback
 
-- Make sure to use [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on github
+- Make sure to use [Issues & Suggestions](issues) directly on github
 - If you want to stay up to date or have questions feel free to join our discord!
-<p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="https://github.com/user-attachments/assets/91171618-b071-4832-84ce-c7bd985d3702" /></a>
+<p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
 </p>
 &nbsp;
 
