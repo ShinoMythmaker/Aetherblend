@@ -35,6 +35,7 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 
 ## Setup and getting started. 
 - [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
+- [Quick getting started guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
 &nbsp;
 
 &nbsp;
