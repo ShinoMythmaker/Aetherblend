@@ -9,6 +9,7 @@
 </p>
 
 Aetherblend is a Blender plugin designed to help you import characters and animate with ease. Aetherblend determines what bones are present in the vanilla armature and generates a rigify rig to the exact proportions of your character, including NPCs and monsters. 
+
 This add-on is multipurpose and can be used for gposing, modding or animating in Blender!
 
 <b> Aetherblend is currently in early development and not complete.</b>
