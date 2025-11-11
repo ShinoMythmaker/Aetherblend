@@ -8,20 +8,22 @@
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/Mythmaker-Sponsor-pink?style=flat"></a>
 </p>
 
-AetherBlend is a Blender-Plugin to help you animate with ease. It aims to generate a a Rigify Rig to the exact dimensions of your Character. It will determin what bones are present and generate the Rig accordingly, including Monsters and NPCS. 
-You can use it for Gposing, Modding or in Blender animations. 
-!! Aetherblend is currently not production ready and very early on in developement !!
+Aetherblend is a Blender plugin designed to help you import characters and animate with ease. Aetherblend determines what bones are present in the vanilla armature and generates a rigify rig to the exact proportions of your character, including NPCs and monsters. 
+This add-on is multipurpose and can be used for gposing, modding or animating in Blender!
+
+<b> Aetherblend is currently in early development and not complete.</b>
 &nbsp;
 
 &nbsp;
 
 ## Notable Features
-- Import and apply C+ directly on your armature.
-- Gpose Export
-- Advanced Eye controls.
-- Heel Controls
-- IK/FK functionality.
-- and much more...
+- Rigify compatibility
+- Customisation+ support
+- Gpose export
+- Advanced eye controls
+- Heel controls
+- IK/FK functionality
+- And much more...
 
 <p align="center">
   <img width="50%" alt="Advanced Eye Controls" src="https://github.com/user-attachments/assets/eb672d24-e0c8-477d-b1db-dacd93fd59f0" /><img width="50%" alt="Head and Shoulder follow" src="https://github.com/user-attachments/assets/e4d2c997-b47e-4118-aaa1-2f66a37b7560" />
@@ -47,9 +49,9 @@ You can use it for Gposing, Modding or in Blender animations.
 &nbsp;
 
 ## Acknowledgements
-💖 [Zed](https://x.com/RoseHikari24) and [CC](https://x.com/CC_VibesXIV), two of my very closest friends that let me yapp for countless hours about issues with this project and kept motivating me to go on. Really without them i think i wouldnt have finished it, thank you!
+💖 [Zed](https://x.com/RoseHikari24) and [CC](https://x.com/CC_VibesXIV), two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!
 
-💖 [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into blender and making me want to create a better Animation solution. 
+💖 [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. 
 
 💖 [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
 
