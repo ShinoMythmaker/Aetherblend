@@ -56,8 +56,11 @@ def delete_keyframes(armature):
 
 def reset_transforms(armature):
     """Resets the transforms of the armature."""
+    original_mode = armature.mode
     if not armature:
         return
+    
+    bpy.context.view_layer.objects.active = armature
 
     bpy.ops.object.mode_set(mode='POSE')
     for bone in armature.pose.bones:
@@ -65,7 +68,7 @@ def reset_transforms(armature):
         bone.rotation_euler = (0.0, 0.0, 0.0)
         bone.scale = (1.0, 1.0, 1.0)
 
-    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode=original_mode)
     print(f"[AetherBlend] Transforms of armature '{armature.name}' reset to default.")
 
 
@@ -97,18 +100,26 @@ def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object
     Applies the armature modifier as a shapekey to the mesh object and renames the shapekey.
     """
     original_mode = mesh_obj.mode
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
-    mesh_obj.select_set(True)
-    bpy.context.view_layer.objects.active = mesh_obj
+    object_state = mesh_obj.hide_get()
+    try:
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.select_all(action='DESELECT')
+                
+        mesh_obj.hide_set(False)
+        mesh_obj.select_set(True)
+        
+        bpy.context.view_layer.objects.active = mesh_obj
 
-    # Find armature modifiers for this armature (could be more than one, but usually just one)
-    armature_mods = [m for m in mesh_obj.modifiers if m.type == 'ARMATURE' and m.object == armature_obj]
-    for mod in armature_mods:
-        bpy.ops.object.modifier_apply_as_shapekey(modifier=mod.name)
-        mesh_obj.data.shape_keys.key_blocks[-1].name = shapekey_name
-        mesh_obj.data.shape_keys.key_blocks[-1].value = 1.0
-
+        
+        armature_mods = [m for m in mesh_obj.modifiers if m.type == 'ARMATURE' and m.object == armature_obj]
+        for mod in armature_mods:
+            bpy.ops.object.modifier_apply_as_shapekey(modifier=mod.name)
+            mesh_obj.data.shape_keys.key_blocks[-1].name = shapekey_name
+            mesh_obj.data.shape_keys.key_blocks[-1].value = 1.0
+    except Exception as e:
+        print(f"[AetherBlend] Failed to apply armature modifier as shapekey on '{mesh_obj.name}': {e}")
+    finally:
+        mesh_obj.hide_set(object_state)
     bpy.ops.object.mode_set(mode=original_mode)
 
 def apply_all_as_shapekey(armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey") -> list:

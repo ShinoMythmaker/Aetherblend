@@ -1,7 +1,3 @@
-"""
-AetherBlend: Operators for Customize Plus (C+) workflow.
-Contains operators and utility functions for applying and managing C+ bone transforms and reference collections.
-"""
 import bpy
 from .. import utils
 

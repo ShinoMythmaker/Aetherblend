@@ -13,7 +13,8 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
     def poll(cls, context):
         prefs = get_preferences()
         if prefs.customize_plus_panel:
-            return prefs.customize_plus_panel == 'ON'
+            if not prefs.customize_plus_panel == 'ON':
+                return False
 
         armature = context.active_object
         return (
@@ -24,6 +25,8 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
     
     def draw(self, context):
         armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return
         cplus = getattr(armature, 'aether_cplus', None)
         aether_rig = getattr(armature, 'aether_rig', None)
 

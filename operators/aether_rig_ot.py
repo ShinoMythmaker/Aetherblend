@@ -1,7 +1,6 @@
 import bpy
 from .. import utils
 from ..data import *
-## This code is highly experiemental and subject to change as we refine the meta rig generation process ##
 
 def cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> None:
     """Remove old control rig bones and data from FFXIV armature before linking new ones."""
@@ -88,6 +87,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.context.window.cursor_set('WAIT') 
+
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
@@ -138,7 +139,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         bpy.ops.object.select_all(action='DESELECT')
         bpy.context.view_layer.objects.active = armature
         armature.select_set(True)
-        
+
+        bpy.context.window.cursor_set('DEFAULT') 
         return {'FINISHED'}
 
 class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
@@ -148,6 +150,8 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.context.window.cursor_set('WAIT') 
+
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
@@ -168,6 +172,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
 
         result = bpy.ops.pose.rigify_generate()
         
+        bpy.context.window.cursor_set('DEFAULT') 
         if result == {'FINISHED'}:
             rigify_rig = getattr(meta_rig.data, 'rigify_target_rig', None)
             
@@ -199,6 +204,8 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.context.window.cursor_set('WAIT') 
+
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
@@ -235,6 +242,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
         armature.select_set(True)
 
+        bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
             
     def merge_control_rig_bones(self, ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> bool:
@@ -310,9 +318,11 @@ class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.context.window.cursor_set('WAIT') 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
+            bpy.context.window.cursor_set('DEFAULT')
             return {'CANCELLED'}
         
         rigify_rig = armature.aether_rig.rigify_rig
@@ -320,9 +330,11 @@ class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
             rigify_rig.hide_set(False)
             cleanup_linked_rigify_bones(armature, rigify_rig)
             armature.aether_rig.rigify_linked = False
+            bpy.context.window.cursor_set('DEFAULT')
             return {'FINISHED'}
         else:
             self.report({'ERROR'}, "No Rigify Rig found to unlink.")
+            bpy.context.window.cursor_set('DEFAULT')
             return {'CANCELLED'}
     
 def register():

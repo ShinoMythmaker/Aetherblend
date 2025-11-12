@@ -22,6 +22,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     s_import_with_shaders_setting: BoolProperty(name="Import with Meddle Shaders", description="Tries to also import all shaders from meddle shader cache", default=True)  # type: ignore
         
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
+    s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=True)  # type: ignore
     
     
     def invoke(self, context, event):
@@ -93,6 +94,10 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         split = col.split(factor=indent)  
         split.label(text=" ")
         split.prop(self, "s_disable_bone_shape")
+
+        split = col.split(factor=indent)  
+        split.label(text=" ")
+        split.prop(self, "s_apply_pose_track")
  
     def execute(self, context):  
         bpy.context.window.cursor_set('WAIT')   
@@ -121,12 +126,20 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
                 utils.object.import_meddle_shader(self.filepath, imported_objects)
             except Exception as e:
                 self.report({'ERROR'}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}")
+
+
+        if self.s_apply_pose_track:
+            armature = utils.armature.find_armature_in_objects(imported_objects)
+            if armature:
+                apply_pose_track_to_rest_pose(armature, pose_track_name="AetherPoseTrack")
               
         
         bpy.ops.object.select_all(action='DESELECT')
 
         armature = utils.armature.find_armature_in_objects(imported_objects)
         if armature:
+            if self.s_apply_pose_track:
+                apply_pose_track_to_rest_pose(armature, pose_track_name="pose")
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.armature.select_all(action='SELECT')
@@ -136,6 +149,53 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
+    
+def apply_pose_track_to_rest_pose(armature: bpy.types.Object, pose_track_name: str) -> None:
+    """Apply a pose track to rest pose, similar to C+ quick apply process."""
+    if not armature or armature.type != "ARMATURE":
+        print(f"[AetherBlend] Invalid armature provided.")
+        return
+    
+    if not armature.animation_data or not armature.animation_data.action:
+        print(f"[AetherBlend] No animation data found on armature.")
+        return
+    
+    action = bpy.data.actions.get(pose_track_name)
+    if not action:
+        print(f"[AetherBlend] Pose track '{pose_track_name}' not found.")
+        return
+    
+    armature.animation_data.action = action
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.context.view_layer.objects.active = armature
+    
+    parent_map = utils.armature.snapshot_parenting(armature)
+    
+    utils.armature.unparent_all_bones(armature)
+    
+    meshes = utils.armature.apply_all_as_shapekey(armature, shapekey_name=f"ImportedPose")
+    
+    utils.armature.new_rest_pose(armature)
+    
+    utils.armature.restore_bone_parenting(armature, parent_map)
+    
+    for mesh_obj in meshes:
+        utils.object.add_armature_modifier(mesh_obj, armature)
+    
+    try:
+        bpy.data.actions.remove(action)
+        print(f"[AetherBlend] Deleted pose track '{pose_track_name}'")
+    except Exception as e:
+        print(f"[AetherBlend] Warning: Could not delete pose track '{pose_track_name}': {e}")
+
+    utils.armature.reset_transforms(armature)
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = armature
+    
+    print(f"[AetherBlend] Applied pose track '{pose_track_name}' to rest pose successfully.")
 
 def register():
     bpy.utils.register_class(AETHER_OT_Character_Import)

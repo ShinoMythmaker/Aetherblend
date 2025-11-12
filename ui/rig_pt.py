@@ -14,17 +14,18 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
     def poll(cls, context):
         prefs = get_preferences()
         if prefs.create_rig_panel:
-            return prefs.create_rig_panel == 'ON'
+            if not prefs.create_rig_panel == 'ON':
+                return False
 
         armature = context.active_object
         return (
             armature is not None 
+            and armature.visible_get()
             and armature.type == 'ARMATURE' 
             and getattr(armature, 'aether_rig', None)
         )
 
     def draw(self, context):
-
         addon_enabled = addon_utils.check("rigify")[0]
         if not addon_enabled:
             layout = self.layout
@@ -35,6 +36,8 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         layout = self.layout
         armature = context.active_object
         aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            return
 
         col = layout.column(align=True)
         
@@ -107,7 +110,8 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
     def poll(cls, context):
         prefs = get_preferences()
         if prefs.rig_layers_panel:
-            return prefs.rig_layers_panel == 'ON'
+            if not prefs.rig_layers_panel == 'ON':
+                return False
 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
@@ -159,7 +163,8 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
     def poll(cls, context):
         prefs = get_preferences()
         if prefs.rig_ui_panel:
-            return prefs.rig_ui_panel == 'ON'
+            if not prefs.rig_ui_panel == 'ON':
+                return False
         
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
@@ -211,7 +216,8 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
     def poll(cls, context):
         prefs = get_preferences()
         if prefs.rig_bake_panel:
-            return prefs.rig_bake_panel == 'ON'
+            if not prefs.rig_bake_panel == 'ON':
+                return False
         
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
