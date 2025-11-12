@@ -1,4 +1,5 @@
 import bpy
+import addon_utils
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -18,6 +19,14 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         )
 
     def draw(self, context):
+
+        addon_enabled = addon_utils.check("rigify")[0]
+        if not addon_enabled:
+            layout = self.layout
+            box = layout.box()
+            box.label(text="Rigify addon is not enabled", icon='ERROR')
+            return None
+        
         layout = self.layout
         armature = context.active_object
         aether_rig = getattr(armature, 'aether_rig', None)

@@ -1,4 +1,6 @@
 import bpy
+import addon_utils
+import importlib.util
 
 class AETHER_PT_ImportPanel(bpy.types.Panel):
     bl_label = "Import"
@@ -10,8 +12,21 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
     
     def draw(self, context):
         layout = self.layout
+        addon_module = [m for m in addon_utils.modules() if m.bl_info.get('name') == "Meddle Tools"]
+        if not addon_module:
+            layout = self.layout
+            box = layout.box()
+            box.label(text="Meddle Tools addon is not installed", icon='ERROR')
+            return None
+        
+        addon_enabled = addon_utils.check(addon_module[0].__name__)[0]
+        if not addon_enabled:
+            layout = self.layout
+            box = layout.box()
+            box.label(text="Meddle Tools addon is not enabled", icon='ERROR')
+            return None
 
-        #check here if meddle operators are available otherwise display it. too lazy rn will do later
+
         row = layout.row(align=True)
         row.operator("aether.character_import", text="Import Character", icon = "IMPORT")
 
