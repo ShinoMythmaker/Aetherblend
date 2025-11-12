@@ -21,10 +21,10 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 - Rigify compatibility
 - Customisation+ support
 - Gpose export
-- Advanced eye controls
-- Heel controls
+- Modding compatibility
 - IK/FK functionality
-- And much more...
+  
+    And much more...
 
 <p align="center">
   <img width="50%" alt="Advanced Eye Controls" src="assets/demo/eyescontrols-min.gif" /><img width="50%" alt="Head and Shoulder follow" src="assets/demo/headshouldercontrols-min.gif" />
@@ -33,17 +33,17 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 
 &nbsp;
 
-## Setup and getting started. 
+## Setup and Getting Started 
 - [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
-- [Quick getting started guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
+- [Getting Started](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
 &nbsp;
 
 &nbsp;
 
 ## Support & Feedback
 
-- Make sure to use [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on github
-- If you want to stay up to date or have questions feel free to join our discord!
+- Make sure to submit [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on Github.
+- To stay up to date or find out more about development, join our [Discord](https://discord.gg/mythmaker)!
 <p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
 </p>
 &nbsp;
