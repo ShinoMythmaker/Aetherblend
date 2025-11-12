@@ -29,6 +29,7 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 <p align="center">
   <img width="50%" alt="Advanced Eye Controls" src="assets/demo/eyescontrols-min.gif" /><img width="50%" alt="Head and Shoulder follow" src="assets/demo/headshouldercontrols-min.gif" />
 </p>
+<p align="center"><b>Advanced Eye Controls & Head and Shoulder Stabilisation</b></p>
 &nbsp;
 
 &nbsp;
