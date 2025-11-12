@@ -1,5 +1,6 @@
 import bpy
 import addon_utils
+from ..preferences import get_preferences
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -11,6 +12,10 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
+        prefs = get_preferences()
+        if prefs.create_rig_panel:
+            return prefs.create_rig_panel == 'ON'
+
         armature = context.active_object
         return (
             armature is not None 
@@ -100,6 +105,10 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
+        prefs = get_preferences()
+        if prefs.rig_layers_panel:
+            return prefs.rig_layers_panel == 'ON'
+
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return False
@@ -148,6 +157,10 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
+        prefs = get_preferences()
+        if prefs.rig_ui_panel:
+            return prefs.rig_ui_panel == 'ON'
+        
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return False
@@ -196,6 +209,10 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
+        prefs = get_preferences()
+        if prefs.rig_bake_panel:
+            return prefs.rig_bake_panel == 'ON'
+        
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return False

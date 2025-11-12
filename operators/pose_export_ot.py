@@ -5,6 +5,7 @@ import re
 from bpy.types import Operator
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper  
+from ..preferences import get_preferences
 
 
 class AETHER_OT_PoseExport(Operator, ExportHelper):
@@ -19,14 +20,18 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
     
     
     def invoke(self, context, event):
+        prefs = get_preferences()  
         blend_filename = bpy.path.basename(bpy.data.filepath) 
         if blend_filename:
-            blend_filename = os.path.splitext(blend_filename)[0] + ".pose" 
+            blend_filename = os.path.splitext(blend_filename)[0] + ".pose"  
         else:
-            blend_filename = "untitled.pose" 
+            blend_filename = "untitled.pose"  
         
-        self.filepath = blend_filename
-
+        if prefs.default_pose_export_path:
+            self.filepath = os.path.join(prefs.default_pose_export_path, blend_filename)
+        else:
+            self.filepath = blend_filename
+        
         return super().invoke(context, event)
     
     

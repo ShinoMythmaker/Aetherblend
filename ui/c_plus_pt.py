@@ -1,4 +1,5 @@
 import bpy
+from ..preferences import get_preferences
 
 class AETHER_PT_CustomizePlus(bpy.types.Panel):
     bl_label = "Customize Plus"
@@ -10,6 +11,10 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
+        prefs = get_preferences()
+        if prefs.customize_plus_panel:
+            return prefs.customize_plus_panel == 'ON'
+
         armature = context.active_object
         return (
             armature is not None 

@@ -1,6 +1,7 @@
 import bpy
 from .. import utils
 from bpy.props import BoolProperty, StringProperty
+from ..preferences import get_preferences
 
 class AETHER_OT_Character_Import(bpy.types.Operator):
     """Import a character model into Blender with various options."""
@@ -24,7 +25,11 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     
     
     def invoke(self, context, event):
+        prefs = get_preferences()
+        if prefs.default_meddle_import_path:
+            self.filepath = prefs.default_meddle_import_path
         context.window_manager.fileselect_add(self)
+
         return {'RUNNING_MODAL'}
     
     def draw(self, context):
