@@ -12,7 +12,7 @@ Aetherblend is a Blender plugin designed to help you import characters and anima
 
 This add-on is multipurpose and can be used for gposing, modding or animating in Blender!
 
-<b> Aetherblend is currently in early development and not complete.</b>
+<b>Note: Aetherblend is currently in early development and not complete.</b>
 &nbsp;
 
 &nbsp;
@@ -20,7 +20,7 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 ## Notable Features
 - Rigify compatibility
 - Customisation+ support
-- Gpose export
+- Pose export
 - Modding compatibility
 - IK/FK functionality
   
@@ -50,6 +50,7 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 ## Support & Feedback
 
 - Make sure to submit [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on Github.
+- Check the [wiki](https://github.com/ShinoMythmaker/Aetherblend/wiki/Home) for useful information!
 - To stay up to date or find out more about development, join our [Discord](https://discord.gg/mythmaker)!
 <p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
 </p>
