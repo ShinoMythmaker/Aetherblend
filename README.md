@@ -32,6 +32,12 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 <p align="center"><b>Advanced Eye Controls & Head and Shoulder Stabilisation</b></p>
 &nbsp;
 
+## Limitations
+- Pose import is not supported
+- Animation import is not supported
+- Some NPCs may not generate rigs correctly
+- Monster rig generation is not yet supported
+
 &nbsp;
 
 ## Setup and Getting Started 
