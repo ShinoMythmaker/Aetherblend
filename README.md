@@ -38,6 +38,8 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 - Some NPCs may not generate rigs correctly
 - Monster rig generation is not yet supported
 
+<b>It is recommended you disable Customise+ when exporting your character. Instead, export with Reference Pose & Scale enabled and apply your C+ edits using Aetherblend's built in functions.</b>
+
 &nbsp;
 
 ## Setup and Getting Started 
