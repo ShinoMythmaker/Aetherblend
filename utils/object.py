@@ -116,15 +116,24 @@ def add_armature_modifier(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Ob
     """
     Adds a new armature modifier to the mesh object for the given armature.
     """
-    original_mode = mesh_obj.mode
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
-    mesh_obj.select_set(True)
-    bpy.context.view_layer.objects.active = mesh_obj
-    mod = mesh_obj.modifiers.new(name="Armature", type="ARMATURE")
-    mod.object = armature_obj
-    bpy.ops.object.mode_set(mode=original_mode)
+    if mesh_obj.type != 'MESH':
+        return
 
+    original_mode = mesh_obj.mode
+    object_state = mesh_obj.hide_get()
+    try:
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.select_all(action='DESELECT')
+        mesh_obj.hide_set(False)
+        mesh_obj.select_set(True)
+        bpy.context.view_layer.objects.active = mesh_obj
+        mod = mesh_obj.modifiers.new(name="Armature", type="ARMATURE")
+        mod.object = armature_obj
+    except Exception as e:
+        print(f"[AetherBlend] Failed to add armature modifier: {e}")
+    finally:
+        mesh_obj.hide_set(object_state)
+        bpy.ops.object.mode_set(mode=original_mode)
 
 def remove_shapekey(obj: bpy.types.Object, shapekey_name: str) -> None:
     """
