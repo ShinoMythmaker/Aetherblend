@@ -67,6 +67,8 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 
 💖 [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
 
+💖 [Oats](https://github.com/ExplosiveOats) for maintaining and building up the wiki as we go. Aswell as hearing me out yapping about issues :3
+
 💖 Ofcourse everyone that showed interest in not only AetherBlend but also [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!
 
 
