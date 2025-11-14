@@ -113,9 +113,21 @@ def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object
         
         armature_mods = [m for m in mesh_obj.modifiers if m.type == 'ARMATURE' and m.object == armature_obj]
         for mod in armature_mods:
-            bpy.ops.object.modifier_apply_as_shapekey(modifier=mod.name)
+
+            previous_values = {}
+            if mesh_obj.data.shape_keys:
+                for key_block in mesh_obj.data.shape_keys.key_blocks:
+                    previous_values[key_block.name] = key_block.value
+                    key_block.value = 0.0
+
+            bpy.ops.object.modifier_apply_as_shapekey(modifier=mod.name, keep_modifier=True)
             mesh_obj.data.shape_keys.key_blocks[-1].name = shapekey_name
             mesh_obj.data.shape_keys.key_blocks[-1].value = 1.0
+
+            for key_block in mesh_obj.data.shape_keys.key_blocks:
+                if key_block.name in previous_values:
+                    key_block.value = previous_values[key_block.name]
+
     except Exception as e:
         print(f"[AetherBlend] Failed to apply armature modifier as shapekey on '{mesh_obj.name}': {e}")
     finally:

@@ -37,14 +37,11 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         ffxiv_bones =utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
         utils.c_plus.apply_transforms(armature, scale_dict, rot_dict, pos_dict, ffxiv_bones)
 
-        meshes = utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
+        utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
 
         utils.armature.new_rest_pose(armature)
 
         utils.armature.restore_bone_parenting(armature, parent_map)
-
-        for mesh_obj in meshes:
-            utils.object.add_armature_modifier(mesh_obj, armature)
 
         settings.applied = True
 

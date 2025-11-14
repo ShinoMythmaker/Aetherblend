@@ -127,19 +127,13 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             except Exception as e:
                 self.report({'ERROR'}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}")
 
-
-        if self.s_apply_pose_track:
-            armature = utils.armature.find_armature_in_objects(imported_objects)
-            if armature:
-                apply_pose_track_to_rest_pose(armature, pose_track_name="AetherPoseTrack")
-              
-        
+    
         bpy.ops.object.select_all(action='DESELECT')
 
         armature = utils.armature.find_armature_in_objects(imported_objects)
         if armature:
             if self.s_apply_pose_track:
-                apply_pose_track_to_rest_pose(armature, pose_track_name="pose")
+                apply_pose_to_rest_pose(armature)
 
             remove_action(armature, action_name="pose")
             utils.armature.reset_transforms(armature)
@@ -154,7 +148,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
     
-def apply_pose_track_to_rest_pose(armature: bpy.types.Object, pose_track_name: str) -> None:
+def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
     """Apply a pose track to rest pose, similar to C+ quick apply process."""
     if not armature or armature.type != "ARMATURE":
         print(f"[AetherBlend] Invalid armature provided.")
@@ -171,20 +165,17 @@ def apply_pose_track_to_rest_pose(armature: bpy.types.Object, pose_track_name: s
     
     utils.armature.unparent_all_bones(armature)
     
-    meshes = utils.armature.apply_all_as_shapekey(armature, shapekey_name=f"ImportedPose")
+    utils.armature.apply_all_as_shapekey(armature, shapekey_name=f"ImportedPose")
     
     utils.armature.new_rest_pose(armature)
     
     utils.armature.restore_bone_parenting(armature, parent_map)
     
-    for mesh_obj in meshes:
-        utils.object.add_armature_modifier(mesh_obj, armature)
-    
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
     bpy.context.view_layer.objects.active = armature
     
-    print(f"[AetherBlend] Applied pose track '{pose_track_name}' to rest pose successfully.")
+    print(f"[AetherBlend] Applied pose to rest pose successfully.")
 
 def remove_action(armature: bpy.types.Object, action_name: str) -> None:
     action = bpy.data.actions.get(action_name)
