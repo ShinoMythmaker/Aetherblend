@@ -20,7 +20,7 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 ## Notable Features
 - Rigify compatibility
 - Customisation+ support
-- Pose export
+- Pose/Animation export
 - Modding compatibility
 - IK/FK functionality
   
