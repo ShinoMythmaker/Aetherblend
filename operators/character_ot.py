@@ -22,7 +22,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     s_import_with_shaders_setting: BoolProperty(name="Import with Meddle Shaders", description="Tries to also import all shaders from meddle shader cache", default=True)  # type: ignore
         
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
-    s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=True)  # type: ignore
+    s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
     
     
     def invoke(self, context, event):
@@ -140,6 +140,10 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         if armature:
             if self.s_apply_pose_track:
                 apply_pose_track_to_rest_pose(armature, pose_track_name="pose")
+
+            remove_action(armature, action_name="pose")
+            utils.armature.reset_transforms(armature)
+
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.armature.select_all(action='SELECT')
@@ -159,14 +163,7 @@ def apply_pose_track_to_rest_pose(armature: bpy.types.Object, pose_track_name: s
     if not armature.animation_data or not armature.animation_data.action:
         print(f"[AetherBlend] No animation data found on armature.")
         return
-    
-    action = bpy.data.actions.get(pose_track_name)
-    if not action:
-        print(f"[AetherBlend] Pose track '{pose_track_name}' not found.")
-        return
-    
-    armature.animation_data.action = action
-    
+        
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.view_layer.objects.active = armature
     
@@ -183,19 +180,23 @@ def apply_pose_track_to_rest_pose(armature: bpy.types.Object, pose_track_name: s
     for mesh_obj in meshes:
         utils.object.add_armature_modifier(mesh_obj, armature)
     
-    try:
-        bpy.data.actions.remove(action)
-        print(f"[AetherBlend] Deleted pose track '{pose_track_name}'")
-    except Exception as e:
-        print(f"[AetherBlend] Warning: Could not delete pose track '{pose_track_name}': {e}")
-
-    utils.armature.reset_transforms(armature)
-    
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
     bpy.context.view_layer.objects.active = armature
     
     print(f"[AetherBlend] Applied pose track '{pose_track_name}' to rest pose successfully.")
+
+def remove_action(armature: bpy.types.Object, action_name: str) -> None:
+    action = bpy.data.actions.get(action_name)
+    if not action:
+        print(f"[AetherBlend] Pose track '{action_name}' not found.")
+        return
+    
+    try:
+        bpy.data.actions.remove(action)
+        print(f"[AetherBlend] Deleted pose track '{action_name}'")
+    except Exception as e:
+        print(f"[AetherBlend] Warning: Could not delete pose track '{action_name}': {e}")
 
 def register():
     bpy.utils.register_class(AETHER_OT_Character_Import)
