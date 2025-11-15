@@ -40,6 +40,8 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 
 <b>It is recommended you disable Customise+ when exporting your character. Instead, export with Reference Pose & Scale enabled and apply your C+ edits using Aetherblend's built in functions. Make sure Apply Pose Track is checked on import to Blender.</b>
 
+List of all features:
+
 &nbsp;
 
 ## Setup and Getting Started 
