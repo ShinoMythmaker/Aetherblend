@@ -19,7 +19,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         
-        layout.operator("wm.url_open", text="Support & Links", icon="HEART").url = "https://mektools.carrd.co/"
+        layout.operator("wm.url_open", text="Support & Links", icon="HEART").url = "https://shinomythmaker.carrd.co/"
         
         row = layout.row()
         row.operator("wm.url_open", text="Wiki", icon="HELP").url = f"{GITHUB_URL}/wiki"
