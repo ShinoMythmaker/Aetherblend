@@ -10,7 +10,7 @@ THUMB_L: list[GenerativeBone] = [
     ),
     GenerativeBone(
         ref="tgt",
-        data=ExtensionBone(name="f_thumb.L02", bone_a="f_thumb.L01", parent="f_thumb.L01", is_connected=True),
+        data=ExtensionBone(name="f_thumb.L02", bone_a="f_thumb.L01", parent="f_thumb.L01", is_connected=True, size_factor=0.6),
         req_bones=["f_thumb.L01"],
         b_collection="Fingers"
     ),
@@ -181,7 +181,7 @@ THUMB_R: list[GenerativeBone] = [
     ),
     GenerativeBone(
         ref="tgt",
-        data=ExtensionBone(name="f_thumb.R02", bone_a="f_thumb.R01", parent="f_thumb.R01", is_connected=True),
+        data=ExtensionBone(name="f_thumb.R02", bone_a="f_thumb.R01", parent="f_thumb.R01", is_connected=True, size_factor=0.6),
         req_bones=["f_thumb.R01"],
         b_collection="Fingers"
     ),
