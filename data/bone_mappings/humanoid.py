@@ -347,6 +347,124 @@ JAW: list[GenerativeBone] = [
     )
 ]
 
+CHEEK_L: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="cheek.L", bone_a="j_f_hoho_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_hoho_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="cheek.L", rigify_type="basic.super_copy", super_copy_widget_type="circle" )
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="cheek.L.01", bone_a="j_f_shoho_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_shoho_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="cheek.L.01", rigify_type="basic.super_copy", super_copy_widget_type="circle")
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="cheek.L.02", bone_a="j_f_dhoho_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_dhoho_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="cheek.L.02", rigify_type="basic.super_copy", super_copy_widget_type="circle")
+    )
+
+]
+
+CHEEK_R: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="cheek.R", bone_a="j_f_hoho_r", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_hoho_r"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="cheek.R", rigify_type="basic.super_copy", super_copy_widget_type="circle" )
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="cheek.R.01", bone_a="j_f_shoho_r", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_shoho_r"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="cheek.R.01", rigify_type="basic.super_copy", super_copy_widget_type="circle" )
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="cheek.R.02", bone_a="j_f_dhoho_r", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_dhoho_r"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="cheek.R.02", rigify_type="basic.super_copy", super_copy_widget_type="circle" )
+    )
+]
+
+BROW_L: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="brow.L", bone_a="j_f_miken_02_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_miken_02_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="brow.L", rigify_type="basic.super_copy", super_copy_widget_type="circle")
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="brow.L.01", bone_a="j_f_miken_01_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_miken_01_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="brow.L.01", rigify_type="basic.super_copy", super_copy_widget_type="circle")
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="brow.L.02", bone_a="j_f_mmayu_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_mmayu_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="brow.L.02", rigify_type="basic.super_copy", super_copy_widget_type="circle")
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="brow.L.03", bone_a="j_f_mayu_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head", size_factor=0.6),
+        req_bones=["j_f_mayu_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="brow.L.03", rigify_type="basic.super_copy", super_copy_widget_type="circle")
+    )
+]
+
+BROW_R: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="brow.R", bone_a="j_f_mayu_r", bone_b= "j_f_mmayu_r", parent="head", is_connected=False),
+        req_bones=["j_f_mayu_r", "j_f_mmayu_r"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="brow.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", secondary_layer_extra="Face (Primary)")
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="brow.R.01", bone_a="j_f_mmayu_r", bone_b= "j_f_miken_01_r", parent="brow.R", is_connected=True),
+        req_bones=["j_f_mmayu_r", "j_f_miken_01_r", "brow.R"],
+        b_collection="Face",
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="brow.R.02", bone_a="j_f_miken_01_r", bone_b= "j_f_miken_02_r", parent="brow.R.01", is_connected=True),
+        req_bones=["j_f_miken_01_r", "j_f_miken_02_r", "brow.R.01"],
+        b_collection="Face",
+    ),
+
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="brow.R.03", bone_a="brow.R.02", parent="brow.R.02", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.6),
+        req_bones=["brow.R.02"],
+        b_collection="Face",
+    )
+]
+
 EAR_L: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",

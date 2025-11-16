@@ -36,6 +36,17 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         "j_mimi_l": ["ORG-ear.L"],
         "j_mimi_r": ["ORG-ear.R"],
 
+        #Cheeks
+        "j_f_hoho_l": ["ORG-cheek.L"],
+        "j_f_hoho_r": ["ORG-cheek.R"],
+        "j_f_shoho_l": ["ORG-cheek.L.01"],
+        "j_f_shoho_r": ["ORG-cheek.R.01"],
+        "j_f_dhoho_l": ["ORG-cheek.L.02"],
+        "j_f_dhoho_r": ["ORG-cheek.R.02"],
+
+        # Brows
+        
+
         # Spine 
         "j_kosi": ["j_sebo_a", "hips.001"],
 
@@ -121,5 +132,16 @@ CONSTRAINTS_CHILD_OF: dict[str, list[str]] = {
 CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
     # Spine
     "j_sebo_a": ["DEF-spine.01"],
-    "j_kosi": ["j_sebo_a"]
+    "j_kosi": ["j_sebo_a"],
+
+    # Cheeks
+    "j_f_hoho_l": ["ORG-cheek.L"],
+    "j_f_hoho_r": ["ORG-cheek.R"],
+    "j_f_shoho_l": ["ORG-cheek.L.01"],
+    "j_f_shoho_r": ["ORG-cheek.R.01"],
+    "j_f_dhoho_l": ["ORG-cheek.L.02"],
+    "j_f_dhoho_r": ["ORG-cheek.R.02"],
+
+    # Brows
+
     }
