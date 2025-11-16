@@ -134,11 +134,19 @@ class SkinBone:
     parent: str | None = None
     size_factor: float = 1.0
 
-    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data = None) -> list[str] | None:
         """Generates the SkinBone at the highest weighted vertex position for bone_a."""
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for SkinBone '{self.name}'.")
             return None
+        
+        skin = None
+        if data is not None:
+            try:
+                if data.type == 'MESH':
+                    skin = data
+            except Exception:
+                pass
         
         ref_bones = ref.data.bones
         bone_a_ref = ref_bones.get(self.bone_a)
@@ -147,7 +155,7 @@ class SkinBone:
             print(f"[AetherBlend] Reference bone '{self.bone_a}' not found in source armature for SkinBone '{self.name}'.")
             return None
         
-        world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, ref)
+        world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, ref, mesh=skin)
         
         if world_co is None:
             print(f"[AetherBlend] No vertices found with weights for bone '{self.bone_a}'. Skipping SkinBone '{self.name}'.")
@@ -190,15 +198,18 @@ class SkinBone:
         finally:
             bpy.ops.object.mode_set(mode=original_mode)
     
-    def _find_highest_weight_vertex_world_pos(self, bone_name: str, src_armature: bpy.types.Armature) -> tuple:
+    def _find_highest_weight_vertex_world_pos(self, bone_name: str, src_armature: bpy.types.Armature, mesh = None) -> tuple:
         """Optimized function to find the vertex with highest weight for given bone."""
         depsgraph = bpy.context.evaluated_depsgraph_get()
         
         best_weight = 0.0
         best_world_co = None
         
+
+        object_pool = [mesh] if mesh else bpy.data.objects
         candidate_objects = []
-        for obj in bpy.data.objects:
+        
+        for obj in object_pool:
             if obj.type != 'MESH':
                 continue
             
@@ -457,9 +468,9 @@ class GenerativeBone:
     is_optional: bool = False
 
 
-    def generate(self, ref: bpy.types.Armature, tgt: bpy.types.Armature) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, tgt: bpy.types.Armature, data = None) -> list[str] | None:
         """Generates the bone in the given armature and returns the new bone's name."""
-        generated_bones = self.data.generate(ref, tgt)
+        generated_bones = self.data.generate(ref, tgt, data=data)
 
         if generated_bones and self.b_collection:
            utils.armature.b_collection.assign_bones(tgt, generated_bones, self.b_collection)
