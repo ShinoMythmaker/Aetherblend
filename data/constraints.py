@@ -23,9 +23,9 @@ CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
 
 CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         # Eyes
-        "j_f_eye_l": ["MCH-eye.L"],
+        "j_f_eyepuru_l": ["MCH-eye.L"],
         "j_f_mab_l": ["eye_master.L"],
-        "j_f_eye_r": ["MCH-eye.R"],
+        "j_f_eyepuru_r": ["MCH-eye.R"],
         "j_f_mab_r": ["eye_master.R"],
 
         #Head
@@ -45,14 +45,14 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         "j_f_dhoho_r": ["ORG-cheek.R.02"],
 
         # Brows
-        "j_f_mayu_r": ["DEF-brow.T.R", "brow.T.R"],
-        "j_f_mayu_l": ["DEF-brow.T.L", "brow.T.L"],
-        "j_f_mmayu_r": ["DEF-brow.T.R.001", "brow.T.R.001"],
-        "j_f_mmayu_l": ["DEF-brow.T.L.001", "brow.T.L.001"],
-        "j_f_miken_01_r": ["DEF-brow.T.R.002", "brow.T.R.002"],
-        "j_f_miken_01_l": ["DEF-brow.T.L.002", "brow.T.L.002"],
-        "j_f_miken_02_r": ["DEF-brow.T.R.003", "brow.T.R.003"],
-        "j_f_miken_02_l": ["DEF-brow.T.L.003", "brow.T.L.003"],
+        "j_f_mayu_r": ["brow.T.R"],
+        "j_f_mayu_l": ["brow.T.L"],
+        "j_f_mmayu_r": ["brow.T.R.001"],
+        "j_f_mmayu_l": ["brow.T.L.001"],
+        "j_f_miken_01_r": ["brow.T.R.002"],
+        "j_f_miken_01_l": ["brow.T.L.002"],
+        "j_f_miken_02_r": ["brow.T.R.003"],
+        "j_f_miken_02_l": ["brow.T.L.003"],
 
 
         # Spine 

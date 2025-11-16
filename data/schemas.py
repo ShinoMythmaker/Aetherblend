@@ -40,7 +40,7 @@ class ExtensionBone:
     parent: str | None = None
     roll: float = 0.0
 
-    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the ExtensionBone extending from bone_a in the target armature."""
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for ExtensionBone '{self.name}'.")
@@ -133,8 +133,9 @@ class SkinBone:
     bone_a: str
     parent: str | None = None
     size_factor: float = 1.0
+    mesh_restriction: str | None = None
 
-    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data = None) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the SkinBone at the highest weighted vertex position for bone_a."""
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for SkinBone '{self.name}'.")
@@ -143,11 +144,13 @@ class SkinBone:
         skin = None
         if data is not None:
             try:
-                if data.type == 'MESH':
-                    skin = data
+                data_item = data.get(self.mesh_restriction)
+
+                if data_item.type == 'MESH':
+                    skin = data_item
             except Exception:
                 pass
-        
+                
         ref_bones = ref.data.bones
         bone_a_ref = ref_bones.get(self.bone_a)
 
@@ -192,59 +195,80 @@ class SkinBone:
                     print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for SkinBone '{self.name}'.")
             
             created_name = new_bone.name
-            print(f"[AetherBlend] Created skin bone '{created_name}' at vertex position (weight: {weight:.6f})")
             return [created_name]
             
         finally:
             bpy.ops.object.mode_set(mode=original_mode)
     
     def _find_highest_weight_vertex_world_pos(self, bone_name: str, src_armature: bpy.types.Armature, mesh = None) -> tuple:
-        """Optimized function to find the vertex with highest weight for given bone."""
+        """Optimized function to find the vertex with highest weight for given bone, accounting for modifiers and shapekeys."""
         depsgraph = bpy.context.evaluated_depsgraph_get()
         
         best_weight = 0.0
         best_world_co = None
-        
 
-        object_pool = [mesh] if mesh else bpy.data.objects
+        if mesh is not None:
+            object_pool = [mesh]
+        else:
+            object_pool = [obj for obj in bpy.data.objects if obj.type == 'MESH']
+            
         candidate_objects = []
         
         for obj in object_pool:
+            if obj is None:
+                continue
             if obj.type != 'MESH':
                 continue
             
+            has_armature_mod = False
             for modifier in obj.modifiers:
                 if modifier.type == 'ARMATURE' and modifier.object == src_armature:
-                    vg = obj.vertex_groups.get(bone_name)
-                    if vg is not None:
-                        candidate_objects.append((obj, vg))
+                    has_armature_mod = True
                     break
+            
+            if not has_armature_mod:
+                continue
+                
+            vg = obj.vertex_groups.get(bone_name)
+            if vg is not None:
+                candidate_objects.append((obj, vg))
         
         if not candidate_objects:
             return (None, 0.0)
         
         for obj, vertex_group in candidate_objects:
+            armature_mod = None
+            for mod in obj.modifiers:
+                if mod.type == 'ARMATURE' and mod.object == src_armature:
+                    armature_mod = mod
+                    break
+            
+            if not armature_mod:
+                continue
+            
             eval_obj = obj.evaluated_get(depsgraph)
+            
             try:
                 mesh_eval = eval_obj.to_mesh()
-            except Exception:
+            except Exception as e:
                 continue
             
             if mesh_eval is None:
                 continue
             
             orig_verts = obj.data.vertices
+            vg_index = vertex_group.index
             
             if len(mesh_eval.vertices) != len(orig_verts):
                 eval_obj.to_mesh_clear()
                 continue
             
-            vg_index = vertex_group.index
             for v_idx, vertex in enumerate(orig_verts):
                 for group in vertex.groups:
                     if group.group == vg_index and group.weight > best_weight:
-                        ev_co = mesh_eval.vertices[v_idx].co
-                        world_co = eval_obj.matrix_world @ ev_co
+                        eval_local_co = mesh_eval.vertices[v_idx].co.copy()
+                        world_co = obj.matrix_world @ eval_local_co
+                        
                         best_weight = group.weight
                         best_world_co = world_co.copy()
                         break
@@ -262,7 +286,7 @@ class ConnectBone:
     is_connected: bool = False
     roll: float = 0.0
 
-    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the ConnectBone from bone_a.head to bone_b.head in target armature."""
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for ConnectBone '{self.name}'.")
@@ -317,7 +341,7 @@ class BridgeBone:
     is_connected: bool = True #Unlike ExtensionBone and SkinBone, BridgeBones is_connect defines weither the last bone is connected to bone_b
     parent : str | None = None
 
-    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the BridgeBone from bone_a to bone_b with curved offset in target armature."""
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for BridgeBone '{self.name}'.")
@@ -397,7 +421,7 @@ class EyeBone:
     size_factor: float = 1.0
     parent: str | None = None
 
-    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the EyeBone at the center position of reference bones in target armature."""
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for EyeBone '{self.name}'.")
@@ -457,7 +481,6 @@ class EyeBone:
         finally:
             bpy.ops.object.mode_set(mode=original_mode)
         
-
 @dataclass(frozen=True)
 class GenerativeBone:
     ref: str # e.g. "src" or "tgt"
@@ -468,7 +491,7 @@ class GenerativeBone:
     is_optional: bool = False
 
 
-    def generate(self, ref: bpy.types.Armature, tgt: bpy.types.Armature, data = None) -> list[str] | None:
+    def generate(self, ref: bpy.types.Armature, tgt: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the bone in the given armature and returns the new bone's name."""
         generated_bones = self.data.generate(ref, tgt, data=data)
 

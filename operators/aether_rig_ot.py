@@ -20,6 +20,66 @@ def cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: 
     
     bpy.ops.object.mode_set(mode=original_mode)
 
+def find_objects_with_armature_and_material_property(armature: bpy.types.Armature, property_name: str, property_value=None) -> list[bpy.types.Object]:
+    """Find all objects that have the specified armature as a constraint target and have materials with a specific custom property.
+    
+    Args:
+        armature: The armature object to search for in constraints
+        property_name: The name of the custom property to look for in materials
+        property_value: Optional specific value the property should have. If None, just checks for property existence
+        
+    Returns:
+        List of objects that meet both criteria
+    """
+    matching_objects = []
+    
+    for obj in bpy.data.objects:
+        # Check if object has the armature as a constraint target
+        has_armature_constraint = False
+        
+        # Check object-level constraints
+        for constraint in obj.constraints:
+            if hasattr(constraint, 'target') and constraint.target == armature:
+                has_armature_constraint = True
+                break
+        
+        # If not found in object constraints, check modifiers (like Armature modifier)
+        if not has_armature_constraint:
+            for modifier in obj.modifiers:
+                if modifier.type == 'ARMATURE' and modifier.object == armature:
+                    has_armature_constraint = True
+                    break
+        
+        # If not found yet, check bone constraints (if object has pose bones)
+        if not has_armature_constraint and obj.type == 'ARMATURE' and obj.pose:
+            for pose_bone in obj.pose.bones:
+                for constraint in pose_bone.constraints:
+                    if hasattr(constraint, 'target') and constraint.target == armature:
+                        has_armature_constraint = True
+                        break
+                if has_armature_constraint:
+                    break
+        
+        # If object has armature constraint, check materials for custom property
+        if has_armature_constraint and obj.data and hasattr(obj.data, 'materials'):
+            for material_slot in obj.material_slots:
+                if material_slot.material:
+                    material = material_slot.material
+                    
+                    # Check if material has the custom property
+                    if property_name in material:
+                        # If specific value is required, check it matches
+                        if property_value is not None:
+                            if material[property_name] == property_value:
+                                matching_objects.append(obj)
+                                break
+                        else:
+                            # Just checking for property existence
+                            matching_objects.append(obj)
+                            break
+    
+    return matching_objects
+
 class GenerativeMetaBoneGroup():
     src_armature: bpy.types.Armature
     target_armature: bpy.types.Armature
@@ -49,13 +109,13 @@ class GenerativeMetaBoneGroup():
         print(future_bones)
         return True
     
-    def generateBones(self) -> list[str]:
+    def generateBones(self, data: dict | None = None) -> list[str]:
         """Generate the bones in the target armature based on the generative bones list."""
         generated_bones = []
         for gen_bone in self.generative_bones:
             ref = self.target_armature if gen_bone.ref == "tgt" else self.src_armature
             tgt = self.target_armature
-            new_bone = gen_bone.generate(ref, tgt)
+            new_bone = gen_bone.generate(ref, tgt, data=data)
             if new_bone:
                 generated_bones.append(new_bone)
 
@@ -70,13 +130,13 @@ class GenerativeMetaBoneGroup():
                     settings=gen_bone.settings
                 )
 
-    def execute(self) -> list[str]:
+    def execute(self, data: dict | None = None) -> list[str]:
         """Execute the full generation process for this bone group."""
         verified = self.check()
         if not verified:
             return []
         
-        generated_bones = self.generateBones()
+        generated_bones = self.generateBones(data=data)
         self.setRigifySettings()
         return generated_bones
 
@@ -120,13 +180,26 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 coll.rigify_ui_row = collection.row_index
                 coll.rigify_ui_title = collection.title
 
+
+        ## Propegate data 
+        eye_occlusion_object = find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
+
+        data = {}
+        if eye_occlusion_object:
+            data["eye_occlusion"] = eye_occlusion_object[0]
+            print(eye_occlusion_object[0])
+
+        if len(data) == 0:
+            data = None
+
+        ## Generate bones
         for bone_group in HUMAN:
             for sub_group in bone_group:
                 gen_group = GenerativeMetaBoneGroup(src_armature=armature, target_armature=meta_rig, generative_bones=sub_group)
                 if gen_group.check() is False:
                     continue
                 else:
-                    bones = gen_group.execute()
+                    bones = gen_group.execute(data=data)
                     print(bones)
                     break
                 

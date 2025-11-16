@@ -197,27 +197,27 @@ TAIL: list[GenerativeBone] = [
 EYE_L: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.T.L", bone_a="j_f_mabup_02out_l"),
+        data=SkinBone(name="lid.T.L", bone_a="j_f_mabup_02out_l", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabup_02out_l"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="lid.T.L", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False])
     ),
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.T.L.002", bone_a="j_f_mabup_01_l"),
+        data=SkinBone(name="lid.T.L.002", bone_a="j_f_mabup_01_l", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabup_01_l"],
         b_collection="Face (Secondary)"
     ),
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.B.L", bone_a="j_f_mabdn_03in_l"),
+        data=SkinBone(name="lid.B.L", bone_a="j_f_mabdn_03in_l", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabdn_03in_l"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="lid.B.L", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head")
     ),
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.B.L.002", bone_a="j_f_mabdn_01_l"),
+        data=SkinBone(name="lid.B.L.002", bone_a="j_f_mabdn_01_l", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabdn_01_l"],
         b_collection="Face (Secondary)"
     ),
@@ -260,27 +260,27 @@ EYE_L: list[GenerativeBone] = [
 EYE_R: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.T.R", bone_a="j_f_mabup_02out_r"),
+        data=SkinBone(name="lid.T.R", bone_a="j_f_mabup_02out_r", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabup_02out_r"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="lid.T.R", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False])
     ),
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.T.R.002", bone_a="j_f_mabup_01_r"),
+        data=SkinBone(name="lid.T.R.002", bone_a="j_f_mabup_01_r", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabup_01_r"],
         b_collection="Face (Secondary)"
     ),
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.B.R", bone_a="j_f_mabdn_03in_r"),
+        data=SkinBone(name="lid.B.R", bone_a="j_f_mabdn_03in_r", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabdn_03in_r"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="lid.B.R", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head")
     ),
     GenerativeBone(
         ref="src",
-        data=SkinBone(name="lid.B.R.002", bone_a="j_f_mabdn_01_r"),
+        data=SkinBone(name="lid.B.R.002", bone_a="j_f_mabdn_01_r", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabdn_01_r"],
         b_collection="Face (Secondary)"
     ),
@@ -295,7 +295,7 @@ EYE_R: list[GenerativeBone] = [
 
     GenerativeBone(
         ref="tgt",
-        data=BridgeBone(name="lid.T.R.001", bone_a="lid.T.R", bone_b="lid.T.R.002", offset_factor=mathutils.Vector((0.0, -0.001, 0.001)), is_connected=True, parent="eye.R"),
+        data=BridgeBone(name="lid.T.R.001", bone_a="lid.T.R", bone_b="lid.T.R.002", offset_factor=mathutils.Vector((0.0, 0.001, 0.001)), is_connected=True, parent="eye.R"),
         req_bones=["lid.T.R", "lid.T.R.002"],
         b_collection="Face (Secondary)",
         
@@ -308,13 +308,13 @@ EYE_R: list[GenerativeBone] = [
     ),
     GenerativeBone(
         ref="tgt",
-        data=BridgeBone(name="lid.B.R.001", bone_a="lid.B.R", bone_b="lid.B.R.002", offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)), is_connected=True, parent="eye.R"),
+        data=BridgeBone(name="lid.B.R.001", bone_a="lid.B.R", bone_b="lid.B.R.002", offset_factor=mathutils.Vector((0.002, 0.0, 0.001)), is_connected=True, parent="eye.R"),
         req_bones=["lid.B.R", "lid.B.R.002"],
         b_collection="Face (Secondary)",
     ),
     GenerativeBone(
         ref="tgt",
-        data=BridgeBone(name="lid.B.R.003", bone_a="lid.B.R.002", bone_b="lid.T.R", offset_factor=mathutils.Vector((0.003, -0.001, -0.003)), is_connected=False),
+        data=BridgeBone(name="lid.B.R.003", bone_a="lid.B.R.002", bone_b="lid.T.R", offset_factor=mathutils.Vector((-0.003, -0.001, -0.003)), is_connected=False),
         req_bones=["lid.B.R.002", "lid.T.R"],
         b_collection="Face (Secondary)"
     ),
