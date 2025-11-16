@@ -402,62 +402,62 @@ CHEEK_R: list[GenerativeBone] = [
 BROW_L: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="brow.L", bone_a="j_f_mayu_l", bone_b= "j_f_mmayu_l", parent="head", is_connected=False),
+        data=ConnectBone(name="brow.T.L", bone_a="j_f_mayu_l", bone_b= "j_f_mmayu_l", parent="head", is_connected=False),
         req_bones=["j_f_mayu_l", "j_f_mmayu_l"],
-        b_collection="Face",
-        settings=RigifySettings(bone_name="brow.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", secondary_layer_extra="Face (Primary)")
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="brow.T.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", secondary_layer_extra="Face (Primary)", skin_chain_pivot_pos=2)
     ),
 
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="brow.L.01", bone_a="j_f_mmayu_l", bone_b= "j_f_miken_01_l", parent="brow.L", is_connected=True),
-        req_bones=["j_f_mmayu_l", "j_f_miken_01_l", "brow.L"],
-        b_collection="Face",
+        data=ConnectBone(name="brow.T.L.001", bone_a="j_f_mmayu_l", bone_b= "j_f_miken_01_l", parent="brow.T.L", is_connected=True),
+        req_bones=["j_f_mmayu_l", "j_f_miken_01_l", "brow.T.L"],
+        b_collection="Face (Secondary)",
     ),
 
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="brow.L.02", bone_a="j_f_miken_01_l", bone_b= "j_f_miken_02_l", parent="brow.L.01", is_connected=True),
-        req_bones=["j_f_miken_01_l", "j_f_miken_02_l", "brow.L.01"],
-        b_collection="Face",
+        data=ConnectBone(name="brow.T.L.002", bone_a="j_f_miken_01_l", bone_b= "j_f_miken_02_l", parent="brow.T.L.001", is_connected=True),
+        req_bones=["j_f_miken_01_l", "j_f_miken_02_l", "brow.T.L.001"],
+        b_collection="Face (Secondary)",
     ),
 
     GenerativeBone(
         ref="tgt",
-        data=ExtensionBone(name="brow.L.03", bone_a="brow.L.02", parent="brow.L.02", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.6),
-        req_bones=["brow.L.02"],
-        b_collection="Face",
+        data=ExtensionBone(name="brow.T.L.003", bone_a="brow.T.L.002", parent="brow.T.L.002", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.6),
+        req_bones=["brow.T.L.002"],
+        b_collection="Face (Secondary)",
     )
 ]
 
 BROW_R: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="brow.R", bone_a="j_f_mayu_r", bone_b= "j_f_mmayu_r", parent="head", is_connected=False),
+        data=ConnectBone(name="brow.T.R", bone_a="j_f_mayu_r", bone_b= "j_f_mmayu_r", parent="head", is_connected=False),
         req_bones=["j_f_mayu_r", "j_f_mmayu_r"],
-        b_collection="Face",
-        settings=RigifySettings(bone_name="brow.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", secondary_layer_extra="Face (Primary)")
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="brow.T.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", secondary_layer_extra="Face (Primary)", skin_chain_pivot_pos=2)
     ),
 
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="brow.R.01", bone_a="j_f_mmayu_r", bone_b= "j_f_miken_01_r", parent="brow.R", is_connected=True),
-        req_bones=["j_f_mmayu_r", "j_f_miken_01_r", "brow.R"],
-        b_collection="Face",
+        data=ConnectBone(name="brow.T.R.001", bone_a="j_f_mmayu_r", bone_b= "j_f_miken_01_r", parent="brow.T.R", is_connected=True),
+        req_bones=["j_f_mmayu_r", "j_f_miken_01_r", "brow.T.R"],
+        b_collection="Face (Secondary)",
     ),
 
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="brow.R.02", bone_a="j_f_miken_01_r", bone_b= "j_f_miken_02_r", parent="brow.R.01", is_connected=True),
-        req_bones=["j_f_miken_01_r", "j_f_miken_02_r", "brow.R.01"],
-        b_collection="Face",
+        data=ConnectBone(name="brow.T.R.002", bone_a="j_f_miken_01_r", bone_b= "j_f_miken_02_r", parent="brow.T.R.001", is_connected=True),
+        req_bones=["j_f_miken_01_r", "j_f_miken_02_r", "brow.T.R.001"],
+        b_collection="Face (Secondary)",
     ),
 
     GenerativeBone(
         ref="tgt",
-        data=ExtensionBone(name="brow.R.03", bone_a="brow.R.02", parent="brow.R.02", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.6),
-        req_bones=["brow.R.02"],
-        b_collection="Face",
+        data=ExtensionBone(name="brow.T.R.003", bone_a="brow.T.R.002", parent="brow.T.R.002", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.6),
+        req_bones=["brow.T.R.002"],
+        b_collection="Face (Secondary)",
     )
 ]
 

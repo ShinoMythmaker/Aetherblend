@@ -45,7 +45,15 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         "j_f_dhoho_r": ["ORG-cheek.R.02"],
 
         # Brows
-        
+        "j_f_mayu_r": ["DEF-brow.T.R", "brow.T.R"],
+        "j_f_mayu_l": ["DEF-brow.T.L", "brow.T.L"],
+        "j_f_mmayu_r": ["DEF-brow.T.R.001", "brow.T.R.001"],
+        "j_f_mmayu_l": ["DEF-brow.T.L.001", "brow.T.L.001"],
+        "j_f_miken_01_r": ["DEF-brow.T.R.002", "brow.T.R.002"],
+        "j_f_miken_01_l": ["DEF-brow.T.L.002", "brow.T.L.002"],
+        "j_f_miken_02_r": ["DEF-brow.T.R.003", "brow.T.R.003"],
+        "j_f_miken_02_l": ["DEF-brow.T.L.003", "brow.T.L.003"],
+
 
         # Spine 
         "j_kosi": ["j_sebo_a", "hips.001"],
@@ -143,5 +151,14 @@ CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
     "j_f_dhoho_r": ["ORG-cheek.R.02"],
 
     # Brows
+    
+    "j_f_mayu_r": ["DEF-brow.T.R"],
+    "j_f_mayu_l": ["DEF-brow.T.L"],
+    "j_f_mmayu_r": ["DEF-brow.T.R.001"],
+    "j_f_mmayu_l": ["DEF-brow.T.L.001"],
+    "j_f_miken_01_r": ["DEF-brow.T.R.002"],
+    "j_f_miken_01_l": ["DEF-brow.T.L.002"],
+    "j_f_miken_02_r": ["DEF-brow.T.R.003"],
+    "j_f_miken_02_l": ["DEF-brow.T.L.003"],
 
     }
