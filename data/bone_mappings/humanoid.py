@@ -347,29 +347,29 @@ JAW: list[GenerativeBone] = [
     )
 ]
 
-MOUTH: list[GenerativeBone] = [
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="UpperLip.L", bone_a="j_f_ulip_01_l", bone_b="j_f_umlip_01_l", parent="j_f_ago", is_connected=False),
-        req_bones=["j_f_ulip_01_l", "j_f_umlip_01_l"],
-        b_collection="Face",
-        settings=RigifySettings(bone_name="UpperLip.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=2)
-    ),
+## MOUTH: list[GenerativeBone] = [
+    ## GenerativeBone(
+        ## ref="src",
+        ## data=ConnectBone(name="UpperLip.L", bone_a="j_f_ulip_01_l", bone_b="j_f_umlip_01_l", parent="j_f_ago", is_connected=False),
+        ## req_bones=["j_f_ulip_01_l", "j_f_umlip_01_l"],
+        ## b_collection="Face",
+        ## settings=RigifySettings(bone_name="UpperLip.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=2)
+    ## ),
 
-    GenerativeBone(
-        ref="src",
-        data=ConnectBone(name="UpperLip.L.01", bone_a="j_f_umlip_01_l", bone_b="j_f_uslip_l", parent="UpperLip.L", is_connected=True),
-        req_bones=["j_f_umlip_01_l", "j_f_uslip_l"],
-        b_collection="Face",
-    ),
+    ## GenerativeBone(
+        ## ref="src",
+        ## data=ConnectBone(name="UpperLip.L.01", bone_a="j_f_umlip_01_l", bone_b="j_f_uslip_l", parent="UpperLip.L", is_connected=True),
+        ## req_bones=["j_f_umlip_01_l", "j_f_uslip_l"],
+        ## b_collection="Face",
+    ## ),
 
-    GenerativeBone(
-        ref="tgt",
-        data=ExtensionBone(name="UpperLip.L.02", bone_a="UpperLip.L.01", parent="UpperLip.L.01", is_connected=True, axis_type="local", axis="X", start="tail", size_factor=0.6),
-        req_bones=["UpperLip.L.01"],
-        b_collection="Face",
-    ),
-]
+    ##GenerativeBone(
+        ## ref="tgt",
+        ## data=ExtensionBone(name="UpperLip.L.02", bone_a="UpperLip.L.01", parent="UpperLip.L.01", is_connected=True, axis_type="local", axis="X", start="tail", size_factor=0.6),
+        ## req_bones=["UpperLip.L.01"],
+        ## b_collection="Face",
+    ## ),
+## ]
 
 CHEEK_L: list[GenerativeBone] = [
      GenerativeBone(
