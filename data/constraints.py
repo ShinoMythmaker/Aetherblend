@@ -164,8 +164,8 @@ CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
     "j_f_shoho_r": ["DEF-Cheek.R.02"],
 
     # Mouth
-    "j_f_ulip_01_l": ["DEF-UpperLip.L"],
-    "j_f_umlip_01_l": ["DEF-UpperLip.L.01"],
+    ## "j_f_ulip_01_l": ["DEF-UpperLip.L"],
+    ## "j_f_umlip_01_l": ["DEF-UpperLip.L.01"],
 
     # Brows
     "j_f_mayu_r": ["DEF-brow.T.R"],

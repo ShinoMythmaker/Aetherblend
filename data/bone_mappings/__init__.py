@@ -26,7 +26,7 @@ HUMAN: list[list[list[GenerativeBone]]] = [
     [BROW_L],
     [BROW_R],
     [JAW],
-    [MOUTH],
+    ## [MOUTH],
     [EAR_L],
     [EAR_R],
 
