@@ -156,16 +156,16 @@ CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
     "j_kosi": ["j_sebo_a"],
 
     # Cheeks
-    "j_f_hoho_l": ["DEF-Cheek.L"],
-    "j_f_dhoho_l": ["DEF-Cheek.L.01"],
-    "j_f_shoho_l": ["DEF-Cheek.L.02"],
-    "j_f_hoho_r": ["DEF-Cheek.R"],
-    "j_f_dhoho_r": ["DEF-Cheek.R.01"],
-    "j_f_shoho_r": ["DEF-Cheek.R.02"],
+    # "j_f_hoho_l": ["DEF-Cheek.L"],
+    # "j_f_dhoho_l": ["DEF-Cheek.L.01"],
+    # "j_f_shoho_l": ["DEF-Cheek.L.02"],
+    # "j_f_hoho_r": ["DEF-Cheek.R"],
+    # "j_f_dhoho_r": ["DEF-Cheek.R.01"],
+    # "j_f_shoho_r": ["DEF-Cheek.R.02"],
 
-    # Mouth
-    "j_f_ulip_01_l": ["DEF-UpperLip.L"],
-    "j_f_umlip_01_l": ["DEF-UpperLip.L.01"],
+    # # Mouth
+    # "j_f_ulip_01_l": ["DEF-UpperLip.L"],
+    # "j_f_umlip_01_l": ["DEF-UpperLip.L.01"],
 
     # Brows
     "j_f_mayu_r": ["DEF-brow.T.R"],
