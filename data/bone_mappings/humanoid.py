@@ -480,3 +480,134 @@ EAR_R: list[GenerativeBone] = [
         settings=RigifySettings(bone_name="ear.R", rigify_type="basic.super_copy", super_copy_widget_type="bone")
     )
 ]
+
+
+SKIRT: list[GenerativeBone] = [
+    # Left Side
+    # Outside
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_out.L", bone_a="j_sk_s_a_l", bone_b="j_sk_s_b_l", parent="hips", is_connected=False),
+        req_bones=["j_sk_s_a_l", "j_sk_s_b_l"],
+        b_collection="Skirt",
+        settings=RigifySettings(bone_name="skirt_out.L", rigify_type="experimental.super_chain", tweak_coll="Skirt (Tweak)")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_out.L.001", bone_a="j_sk_s_b_l", bone_b="j_sk_s_c_l", parent="skirt_out.L", is_connected=True),
+        req_bones=["j_sk_s_b_l", "j_sk_s_c_l"],
+        b_collection="Skirt",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="skirt_out.L.002", bone_a="skirt_out.L.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8, parent="skirt_out.L.001"),
+        req_bones=["skirt_out.L.001"],
+        b_collection="Skirt",
+    ),
+
+    # Front
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_front.L", bone_a="j_sk_f_a_l", bone_b="j_sk_f_b_l", parent="hips", is_connected=False),
+        req_bones=["j_sk_f_a_l", "j_sk_f_b_l"],
+        b_collection="Skirt",
+        settings=RigifySettings(bone_name="skirt_front.L", rigify_type="experimental.super_chain", tweak_coll="Skirt (Tweak)")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_front.L.001", bone_a="j_sk_f_b_l", bone_b="j_sk_f_c_l", parent="skirt_front.L", is_connected=True),
+        req_bones=["j_sk_f_b_l", "j_sk_f_c_l", "skirt_front.L"],
+        b_collection="Skirt",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="skirt_front.L.002", bone_a="skirt_front.L.001", parent="skirt_front.L.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
+        req_bones=["skirt_front.L.001"],
+        b_collection="Skirt",
+    ),
+
+    # Back
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_back.L", bone_a="j_sk_b_a_l", bone_b="j_sk_b_b_l", parent="hips", is_connected=False),
+        req_bones=["j_sk_b_a_l", "j_sk_b_b_l"],
+        b_collection="Skirt",
+        settings=RigifySettings(bone_name="skirt_back.L", rigify_type="experimental.super_chain", tweak_coll="Skirt (Tweak)")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_back.L.001", bone_a="j_sk_b_b_l", bone_b="j_sk_b_c_l", parent="skirt_back.L", is_connected=True),
+        req_bones=["j_sk_b_b_l", "j_sk_b_c_l", "skirt_back.L"],
+        b_collection="Skirt",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="skirt_back.L.002", bone_a="skirt_back.L.001", parent="skirt_back.L.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
+        req_bones=["skirt_back.L.001"],
+        b_collection="Skirt",
+    ),
+
+    # Right Side
+    # Outside
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_out.R", bone_a="j_sk_s_a_r",bone_b="j_sk_s_b_r", parent="hips", is_connected=False),
+        req_bones=["j_sk_s_a_r", "j_sk_s_b_r"],
+        b_collection="Skirt",
+        settings=RigifySettings(bone_name="skirt_out.R", rigify_type="experimental.super_chain", tweak_coll="Skirt (Tweak)")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_out.R.001", bone_a="j_sk_s_b_r", bone_b="j_sk_s_c_r", parent="skirt_out.R", is_connected=True),
+        req_bones=["j_sk_s_b_r", "j_sk_s_c_r", "skirt_out.R"],
+        b_collection="Skirt",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="skirt_out.R.002", bone_a="skirt_out.R.001", parent="skirt_out.R.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
+        req_bones=["skirt_out.R.001"],
+        b_collection="Skirt",
+    ),
+
+    # Back
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_front.R", bone_a="j_sk_f_a_r",bone_b="j_sk_f_b_r", parent="hips", is_connected=False),
+        req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
+        b_collection="Skirt",
+        settings=RigifySettings(bone_name="skirt_front.R", rigify_type="experimental.super_chain", tweak_coll="Skirt (Tweak)")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_front.R.001", bone_a="j_sk_f_b_r", bone_b="j_sk_f_c_r", parent="skirt_front.R", is_connected=True),
+        req_bones=["j_sk_f_b_r", "j_sk_f_c_r", "skirt_front.R"],
+        b_collection="Skirt",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="skirt_front.R.002", bone_a="skirt_front.R.001", parent="skirt_front.R.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
+        req_bones=["skirt_front.R.001"],
+        b_collection="Skirt",
+    ),
+
+    # Front
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_back.R", bone_a="j_sk_b_a_r", bone_b="j_sk_b_b_r", parent="hips", is_connected=False),
+        req_bones=["j_sk_b_a_r", "j_sk_b_b_r"],
+        b_collection="Skirt",
+        settings=RigifySettings(bone_name="skirt_back.R", rigify_type="experimental.super_chain", tweak_coll="Skirt (Tweak)")
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="skirt_back.R.001", bone_a="j_sk_b_b_r", bone_b="j_sk_b_c_r", parent="skirt_back.R", is_connected=True),
+        req_bones=["j_sk_b_b_r", "j_sk_b_c_r", "skirt_back.R"],
+        b_collection="Skirt",
+    ),
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="skirt_back.R.002", bone_a="skirt_back.R.001", parent="skirt_back.R.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
+        req_bones=["skirt_back.R.001"],
+        b_collection="Skirt",
+    )
+]

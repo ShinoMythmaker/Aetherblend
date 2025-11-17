@@ -28,4 +28,7 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
 
     MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=18, title="Tail"),
     MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=19, title="Tweaks"),
+
+    MetaRigCollectionInfo(name="Skirt", color_type="Special", row_index=21, title="Skirt"),
+    MetaRigCollectionInfo(name="Skirt (Tweak)", color_type="Tweak", row_index=22, title="Tweak"),
 ]

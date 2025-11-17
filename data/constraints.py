@@ -1,4 +1,4 @@
-from . schemas import TrackToBone
+from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint
 
 CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
     #Eyes
@@ -22,12 +22,7 @@ CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
 ]
 
 CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
-        # Eyes
-        "j_f_eyepuru_l": ["MCH-eye.L"],
-        "j_f_mab_l": ["eye_master.L"],
-        "j_f_eyepuru_r": ["MCH-eye.R"],
-        "j_f_mab_r": ["eye_master.R"],
-
+        # Eyes are in new constraints list
         #Head
         "j_kubi": ["ORG-neck"],
         "j_kao": ["ORG-head"],
@@ -129,7 +124,33 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
         "n_sippo_b": ["tail.B"],
         "n_sippo_c": ["tail.C"],
         "n_sippo_d": ["tail.D"],
-        "n_sippo_e": ["Tail.A_master"]
+        "n_sippo_e": ["Tail.A_master"],
+
+
+        # Skirt 
+        "j_sk_s_a_l": ["DEF-skirt_out.L"],
+        "j_sk_f_a_l": ["DEF-skirt_front.L"],
+        "j_sk_b_a_l": ["DEF-skirt_back.L"],
+
+        "j_sk_s_a_r": ["DEF-skirt_out.R"],
+        "j_sk_f_a_r": ["DEF-skirt_front.R"],
+        "j_sk_b_a_r": ["DEF-skirt_back.R"],
+
+        "j_sk_s_b_l": ["DEF-skirt_out.L.001"],
+        "j_sk_f_b_l": ["DEF-skirt_front.L.001"],
+        "j_sk_b_b_l": ["DEF-skirt_back.L.001"],
+
+        "j_sk_s_b_r": ["DEF-skirt_out.R.001"],
+        "j_sk_f_b_r": ["DEF-skirt_front.R.001"],
+        "j_sk_b_b_r": ["DEF-skirt_back.R.001"],
+
+        "j_sk_s_c_l": ["DEF-skirt_out.L.002"],
+        "j_sk_f_c_l": ["DEF-skirt_front.L.002"],
+        "j_sk_b_c_l": ["DEF-skirt_back.L.002"],
+
+        "j_sk_s_c_r": ["DEF-skirt_out.R.002"],
+        "j_sk_f_c_r": ["DEF-skirt_front.R.002"],
+        "j_sk_b_c_r": ["DEF-skirt_back.R.002"],
     }
 
 CONSTRAINTS_CHILD_OF: dict[str, list[str]] = {
@@ -162,3 +183,22 @@ CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
     "j_f_miken_02_l": ["DEF-brow.T.L.003"],
 
     }
+
+
+NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
+    # Left Arm
+    "j_ude_a_l": [CopyScaleConstraint(target_bone="DEF-upper_arm.L")],
+    "j_ude_b_l": [CopyScaleConstraint(target_bone="DEF-forearm.L")],
+    "j_te_l": [CopyLocationConstraint(target_bone="DEF-hand.L")],
+
+    # Right Arm
+    "j_ude_a_r": [CopyScaleConstraint(target_bone="DEF-upper_arm.R")],
+    "j_ude_b_r": [CopyScaleConstraint(target_bone="DEF-forearm.R")],
+    "j_te_r": [CopyLocationConstraint(target_bone="DEF-hand.R")],
+
+    #Eyes 
+    "j_f_eyepuru_l": [CopyRotationConstraint(target_bone="MCH-eye.L", influence=0.5)],
+    "j_f_mab_l": [CopyRotationConstraint(target_bone="eye_master.L")],
+    "j_f_eyepuru_r": [CopyRotationConstraint(target_bone="MCH-eye.R", influence=0.5)],
+    "j_f_mab_r": [CopyRotationConstraint(target_bone="eye_master.R")],
+}
