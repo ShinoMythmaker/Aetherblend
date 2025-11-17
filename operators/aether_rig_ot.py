@@ -351,6 +351,14 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         constraints_copy_loc = utils.armature.bone.add_constraint_copy_location(ffxiv_armature, CONSTRAINTS_COPY_LOC, overwrite=False)
         constraints_child_of = utils.armature.bone.add_constraint_child_of(ffxiv_armature, CONSTRAINTS_CHILD_OF, overwrite=False)
 
+        for bone_name, constraints in NEW_CONSTRAINTS.items():
+           # get pose bone in ffxiv armature
+           pose_bone = ffxiv_armature.pose.bones.get(bone_name)
+           if pose_bone:
+               for constraint in constraints:
+                   constraint.apply(pose_bone, ffxiv_armature)
+
+                   
         bpy.ops.object.mode_set(mode=original_mode)
         return True
     

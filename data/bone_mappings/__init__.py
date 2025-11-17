@@ -32,4 +32,6 @@ HUMAN: list[list[list[GenerativeBone]]] = [
 
     [EYE_L],
     [EYE_R],
+
+    [SKIRT]
 ]
