@@ -197,6 +197,25 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_f_eyepuru_r": [CopyRotationConstraint(target_bone="MCH-eye.R", influence=0.5)],
     "j_f_mab_r": [CopyRotationConstraint(target_bone="eye_master.R")],
 
+    # Left Mouth
+
+    "j_f_ulip_01_l": [CopyLocationConstraint(target_bone="DEF-UpperLip.L")],
+    "j_f_umlip_01_l": [CopyLocationConstraint(target_bone="DEF-UpperLip.L.01")],
+    "j_f_uslip_l": [CopyLocationConstraint(target_bone="DEF-UpperLip.L.02")],
+
+    "j_f_dlip_01_l": [CopyLocationConstraint(target_bone="DEF-LowerLip.L")],
+    "j_f_dmlip_01_l": [CopyLocationConstraint(target_bone="DEF-LowerLip.L.01")],
+    "j_f_dslip_l": [CopyLocationConstraint(target_bone="DEF-LowerLip.L.02")],
+
+    # Right Mouth
+
+    "j_f_ulip_01_r": [CopyLocationConstraint(target_bone="DEF-UpperLip.R")],
+    "j_f_umlip_01_r": [CopyLocationConstraint(target_bone="DEF-UpperLip.R.01")],
+    "j_f_uslip_r": [CopyLocationConstraint(target_bone="DEF-UpperLip.R.02")],
+
+    "j_f_dlip_01_r": [CopyLocationConstraint(target_bone="DEF-LowerLip.R")],
+    "j_f_dmlip_01_r": [CopyLocationConstraint(target_bone="DEF-LowerLip.R.01")],
+    "j_f_dslip_r": [CopyLocationConstraint(target_bone="DEF-LowerLip.R.02")],
 
     # Simple Face Bones 
     "j_f_uhana": [CopyLocationConstraint(target_bone="DEF-nose"), CopyRotationConstraint(target_bone="nose")],
