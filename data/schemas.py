@@ -571,6 +571,7 @@ class CopyLocationConstraint(Constraint):
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
+        constraint.head_tail = self.head_tail
         constraint.use_x = self.axis[0]
         constraint.use_y = self.axis[1]
         constraint.use_z = self.axis[2]
