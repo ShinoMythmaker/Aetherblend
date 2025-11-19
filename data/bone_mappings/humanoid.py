@@ -1,6 +1,6 @@
 import mathutils
 
-from .. schemas import GenerativeBone, ConnectBone, ExtensionBone, RigifySettings, EyeBone, SkinBone, BridgeBone
+from .. schemas import GenerativeBone, ConnectBone, ExtensionBone, RigifySettings, CenterBone, SkinBone, BridgeBone
 
 
 LEG_L: list[GenerativeBone] = [
@@ -224,7 +224,7 @@ EYE_L: list[GenerativeBone] = [
 
     GenerativeBone(
         ref="tgt",
-        data=EyeBone(name="eye.L", ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"], parent="head"),
+        data=CenterBone(name="eye.L", ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"], parent="head", axis="Y", inverted=True),
         req_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
         b_collection="Face",
         settings=RigifySettings(bone_name="eye.L", rigify_type="face.skin_eye")
@@ -287,7 +287,7 @@ EYE_R: list[GenerativeBone] = [
 
     GenerativeBone(
         ref="tgt",
-        data=EyeBone(name="eye.R", ref_bones=["lid.T.R", "lid.T.R.002", "lid.B.R", "lid.B.R.002"], parent="head"),
+        data=CenterBone(name="eye.R", ref_bones=["lid.T.R", "lid.T.R.002", "lid.B.R", "lid.B.R.002"], parent="head", axis="Y", inverted=True),
         req_bones=["lid.T.R", "lid.T.R.002", "lid.B.R", "lid.B.R.002"],
         b_collection="Face",
         settings=RigifySettings(bone_name="eye.R", rigify_type="face.skin_eye")

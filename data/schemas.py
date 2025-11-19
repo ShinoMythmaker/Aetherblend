@@ -340,7 +340,7 @@ class BridgeBone:
     bone_a: str
     bone_b: str
     offset_factor: mathutils.Vector = mathutils.Vector((0.0, 0.0, 0.0))
-    is_connected: bool = True #Unlike ExtensionBone and SkinBone, BridgeBones is_connect defines weither the last bone is connected to bone_b
+    is_connected: bool = True #Unlike ExtensionBone and SkinBone, BridgeBones is_connect defines wether the last bone is connected to bone_b
     parent : str | None = None
 
     def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
@@ -417,16 +417,18 @@ class TrackToBone:
     parent_name: str | None
 
 @dataclass(frozen=True)
-class EyeBone:
+class CenterBone:
     name: str
     ref_bones: list[str]
     size_factor: float = 1.0
     parent: str | None = None
+    axis: str = "Z"  # e.g., "X", "Y", "Z" - axis direction for bone extension
+    inverted: bool = False  # True: tail to head, False: head to tail
 
     def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
-        """Generates the EyeBone at the center position of reference bones in target armature."""
+        """Generates the CenterBone at the center position of reference bones in target armature."""
         if not ref or not target:
-            print(f"[AetherBlend] Invalid armatures provided for EyeBone '{self.name}'.")
+            print(f"[AetherBlend] Invalid armatures provided for CenterBone '{self.name}'.")
             return None
         
         ref_bones_data = ref.data.bones
@@ -437,10 +439,10 @@ class EyeBone:
             if bone_ref:
                 valid_ref_bones.append(bone_ref)
             else:
-                print(f"[AetherBlend] Warning: Reference bone '{bone_name}' not found in source armature for EyeBone '{self.name}'.")
+                print(f"[AetherBlend] Warning: Reference bone '{bone_name}' not found in source armature for CenterBone '{self.name}'.")
         
         if not valid_ref_bones:
-            print(f"[AetherBlend] Error: No valid reference bones found for EyeBone '{self.name}'. Cannot create eye bone.")
+            print(f"[AetherBlend] Error: No valid reference bones found for CenterBone '{self.name}'. Cannot create center bone.")
             return None
         
         total_position = mathutils.Vector((0.0, 0.0, 0.0))
@@ -452,6 +454,16 @@ class EyeBone:
         center_position = total_position / len(valid_ref_bones)
         avg_length = total_length / len(valid_ref_bones) if total_length > 0 else 0.3
         eye_bone_length = avg_length * self.size_factor
+        
+        if self.axis == "X":
+            direction_vector = mathutils.Vector((eye_bone_length, 0.0, 0.0))
+        elif self.axis == "Y":
+            direction_vector = mathutils.Vector((0.0, eye_bone_length, 0.0))
+        elif self.axis == "Z":
+            direction_vector = mathutils.Vector((0.0, 0.0, eye_bone_length))
+        else:
+            print(f"[AetherBlend] Invalid axis '{self.axis}' for EyeBone '{self.name}'. Using default Y axis.")
+            direction_vector = mathutils.Vector((0.0, eye_bone_length, 0.0))
         
         original_mode = bpy.context.object.mode
         bpy.context.view_layer.objects.active = target
@@ -465,8 +477,12 @@ class EyeBone:
             
             new_bone = target_edit_bones.new(self.name)
             
-            new_bone.tail = center_position.copy()
-            new_bone.head = center_position + mathutils.Vector((0.0, eye_bone_length, 0.0))
+            if self.inverted:
+                new_bone.tail = center_position.copy()
+                new_bone.head = center_position + direction_vector
+            else:
+                new_bone.head = center_position.copy()
+                new_bone.tail = center_position + direction_vector
             
             if self.parent:
                 parent_bone = target_edit_bones.get(self.parent)
@@ -474,10 +490,11 @@ class EyeBone:
                     new_bone.parent = parent_bone
                     new_bone.use_connect = False
                 else:
-                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for EyeBone '{self.name}'.")
+                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for CenterBone '{self.name}'.")
             
             created_name = new_bone.name
-            print(f"[AetherBlend] Created eye bone '{created_name}' from {len(valid_ref_bones)} reference bones, center at {center_position}, length {eye_bone_length:.3f}")
+            orientation = "inverted (tail->head)" if self.inverted else "normal (head->tail)"
+            print(f"[AetherBlend] Created center bone '{created_name}' from {len(valid_ref_bones)} reference bones, center at {center_position}, length {eye_bone_length:.3f}, axis {self.axis}, {orientation}")
             return [created_name]
             
         finally:
