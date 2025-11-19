@@ -288,9 +288,11 @@ class ConnectBone:
     parent: str | None = None
     is_connected: bool = False
     roll: float = 0.0
+    start: str = "head"  # e.g., "head", "tail" - which end of bone_a to start from
+    end: str = "head"    # e.g., "head", "tail" - which end of bone_b to connect to
 
     def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
-        """Generates the ConnectBone from bone_a.head to bone_b.head in target armature."""
+        """Generates the ConnectBone from bone_a to bone_b in target armature."""
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for ConnectBone '{self.name}'.")
             return None
@@ -303,8 +305,15 @@ class ConnectBone:
             print(f"[AetherBlend] Cannot create ConnectBone '{self.name}': reference bones '{self.bone_a}' or '{self.bone_b}' not found in source armature.")
             return None
         
-        head_pos = bone_a_ref.head_local.copy()
-        tail_pos = bone_b_ref.head_local.copy()
+        if self.start == "tail":
+            head_pos = bone_a_ref.tail_local.copy()
+        else:  # "head"
+            head_pos = bone_a_ref.head_local.copy()
+        
+        if self.end == "tail":
+            tail_pos = bone_b_ref.tail_local.copy()
+        else:  # "head"
+            tail_pos = bone_b_ref.head_local.copy()
         
         original_mode = bpy.context.object.mode
         bpy.context.view_layer.objects.active = target
