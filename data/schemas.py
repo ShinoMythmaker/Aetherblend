@@ -24,9 +24,10 @@ class RigifySettings:
     make_extra_ik_control: bool | None = None
     super_copy_widget_type: str | None = None
     pivot_pos: int | None = None
-    primary_layer_extra: str | None  = None
     secondary_layer_extra: str | None  = None
     skin_chain_pivot_pos: int | None  = None
+    skin_chain_falloff: list[float] | None = None
+    skin_chain_falloff_length: bool | None = None
     skin_chain_falloff_spherical: list[bool] | None  = None
     skin_control_orientation_bone: str | None  = None
 

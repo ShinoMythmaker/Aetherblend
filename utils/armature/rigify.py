@@ -152,6 +152,7 @@ def rigify_set_pivot_pos(armature: bpy.types.Armature, bone_name: str, pivot_pos
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
+
 def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
     """Sets up rigify skin stretchy chain properties for a pose bone"""
 
@@ -172,6 +173,10 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
             rigify_params.skin_chain_pivot_pos = settings.skin_chain_pivot_pos
         if settings.skin_control_orientation_bone is not None:
             rigify_params.skin_control_orientation_bone = settings.skin_control_orientation_bone
+        if settings.skin_chain_falloff is not None:
+            rigify_params.skin_chain_falloff = settings.skin_chain_falloff
+        if settings.skin_chain_falloff_length is not None:
+            rigify_params.skin_chain_falloff_length = settings.skin_chain_falloff_length
         if settings.skin_chain_falloff_spherical is not None:
             rigify_params.skin_chain_falloff_spherical = settings.skin_chain_falloff_spherical
 
@@ -192,7 +197,7 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
         print(f"[AetherBlend] Error setting rigify skin stretchy chain properties: {e}")
 
     bpy.ops.object.mode_set(mode='OBJECT')
-
+    
 def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings, bone_name: str = None) -> None:
     """Sets up rigify properties for a pose bone"""
     original_mode = armature.mode
