@@ -155,18 +155,6 @@ CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
     "j_sebo_a": ["DEF-spine.01"],
     "j_kosi": ["j_sebo_a"],
 
-    # Cheeks
-    # "j_f_hoho_l": ["DEF-Cheek.L"],
-    # "j_f_dhoho_l": ["DEF-Cheek.L.01"],
-    # "j_f_shoho_l": ["DEF-Cheek.L.02"],
-    # "j_f_hoho_r": ["DEF-Cheek.R"],
-    # "j_f_dhoho_r": ["DEF-Cheek.R.01"],
-    # "j_f_shoho_r": ["DEF-Cheek.R.02"],
-
-    # # Mouth
-    # "j_f_ulip_01_l": ["DEF-UpperLip.L"],
-    # "j_f_umlip_01_l": ["DEF-UpperLip.L.01"],
-
     # Brows
     "j_f_mayu_r": ["DEF-brow.T.R"],
     "j_f_mayu_l": ["DEF-brow.T.L"],
@@ -201,35 +189,27 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     "j_f_ulip_01_l": [CopyLocationConstraint(target_bone="DEF-UpperLip.L")],
     "j_f_umlip_01_l": [CopyLocationConstraint(target_bone="DEF-UpperLip.L.01")],
-    "j_f_uslip_l": [CopyLocationConstraint(target_bone="DEF-UpperLip.L.02")],
+    "j_f_uslip_l": [CopyLocationConstraint(target_bone="DEF-UpperLip.L.01", head_tail=1.0)],
 
     "j_f_dlip_01_l": [CopyLocationConstraint(target_bone="DEF-LowerLip.L")],
     "j_f_dmlip_01_l": [CopyLocationConstraint(target_bone="DEF-LowerLip.L.01")],
-    "j_f_dslip_l": [CopyLocationConstraint(target_bone="DEF-LowerLip.L.02")],
+    "j_f_dslip_l": [CopyLocationConstraint(target_bone="DEF-LowerLip.L.01", head_tail=1.0)],
 
     # Right Mouth
 
     "j_f_ulip_01_r": [CopyLocationConstraint(target_bone="DEF-UpperLip.R")],
     "j_f_umlip_01_r": [CopyLocationConstraint(target_bone="DEF-UpperLip.R.01")],
-    "j_f_uslip_r": [CopyLocationConstraint(target_bone="DEF-UpperLip.R.02")],
+    "j_f_uslip_r": [CopyLocationConstraint(target_bone="DEF-UpperLip.R.01", head_tail=1.0)],
 
     "j_f_dlip_01_r": [CopyLocationConstraint(target_bone="DEF-LowerLip.R")],
     "j_f_dmlip_01_r": [CopyLocationConstraint(target_bone="DEF-LowerLip.R.01")],
-    "j_f_dslip_r": [CopyLocationConstraint(target_bone="DEF-LowerLip.R.02")],
+    "j_f_dslip_r": [CopyLocationConstraint(target_bone="DEF-LowerLip.R.01", head_tail=1.0)],
+
+    # Right Cheek
+
+    "j_f_shoho_r": [CopyLocationConstraint(target_bone="DEF-Cheek.R")],
+    "j_f_dhoho_r": [CopyLocationConstraint(target_bone="DEF-Cheek.R.01")],
+    "j_f_hoho_r": [CopyLocationConstraint(target_bone="DEF-Cheek.R.01", head_tail=1.0)],
 
     # Simple Face Bones 
-    "j_f_uhana": [CopyLocationConstraint(target_bone="DEF-nose"), CopyRotationConstraint(target_bone="nose")],
-
-    "j_f_shoho_l": [CopyLocationConstraint(target_bone="DEF-cheek.L"), CopyRotationConstraint(target_bone="cheek.L")],
-    "j_f_shoho_r": [CopyLocationConstraint(target_bone="DEF-cheek.R"), CopyRotationConstraint(target_bone="cheek.R")],
-    "j_f_dhoho_l": [CopyLocationConstraint(target_bone="DEF-cheek.L.001"), CopyRotationConstraint(target_bone="cheek.L.001")],
-    "j_f_dhoho_r": [CopyLocationConstraint(target_bone="DEF-cheek.R.001"), CopyRotationConstraint(target_bone="cheek.R.001")],
-    "j_f_hoho_l": [CopyLocationConstraint(target_bone="DEF-cheek.L.002"), CopyRotationConstraint(target_bone="cheek.L.002")],
-    "j_f_hoho_r": [CopyLocationConstraint(target_bone="DEF-cheek.R.002"), CopyRotationConstraint(target_bone="cheek.R.002")],
-    "j_f_dmiken_l": [CopyLocationConstraint(target_bone="DEF-nose_s.L"), CopyRotationConstraint(target_bone="nose_s.L")],
-    "j_f_dmiken_r": [CopyLocationConstraint(target_bone="DEF-nose_s.R"), CopyRotationConstraint(target_bone="nose_s.R")],
-    "j_f_dmemoto_l": [CopyLocationConstraint(target_bone="DEF-nose_s.L.001"), CopyRotationConstraint(target_bone="nose_s.L.001")],
-    "j_f_dmemoto_r": [CopyLocationConstraint(target_bone="DEF-nose_s.R.001"), CopyRotationConstraint(target_bone="nose_s.R.001")],
-    "j_f_hana_l": [CopyLocationConstraint(target_bone="DEF-nose_w.L"), CopyRotationConstraint(target_bone="nose_w.L")],
-    "j_f_hana_r": [CopyLocationConstraint(target_bone="DEF-nose_w.R"), CopyRotationConstraint(target_bone="nose_w.R")],
 }
