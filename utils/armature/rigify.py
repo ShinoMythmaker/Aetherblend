@@ -180,6 +180,19 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
         if settings.skin_chain_falloff_spherical is not None:
             rigify_params.skin_chain_falloff_spherical = settings.skin_chain_falloff_spherical
 
+        if settings.primary_layer_extra is not None:
+            rigify_params.skin_primary_layers_extra = True
+            rigify_params.skin_primary_coll_refs.clear()
+            if settings.primary_layer_extra in armature.data.collections:
+                bpy.ops.pose.rigify_collection_ref_add(prop_name="skin_primary_coll_refs")
+
+                if len(rigify_params.skin_primary_coll_refs) > 0:
+                    skin_ref = rigify_params.skin_primary_coll_refs[-1]
+                    skin_ref.name = settings.primary_layer_extra
+                    print(f"[AetherBlend] Set Skin Primary collection reference to '{settings.primary_layer_extra}' for bone '{bone_name}'")
+                else:
+                    print(f"[AetherBlend] Collection '{settings.primary_layer_extra}' not found in armature '{armature.name}'")
+
         if settings.secondary_layer_extra is not None:
             rigify_params.skin_secondary_layers_extra = True
             rigify_params.skin_secondary_coll_refs.clear()
