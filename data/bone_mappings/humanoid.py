@@ -361,13 +361,74 @@ JAW: list[GenerativeBone] = [
     )
 ]
 
-MOUTH_L: list[GenerativeBone] = [
+MOUTH_MASTER_MIDDLE: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="UpperLip.L", bone_a="j_f_ulip_01_l", bone_b="j_f_umlip_01_l", parent="head", is_connected=False),
+        data=CenterBone(name="MCH_mouth_master_middle_upper", ref_bones=["j_f_ulip_01_l", "j_f_ulip_01_r"], parent="head", axis="Y"),
+        req_bones=["j_f_ulip_01_l", "j_f_ulip_01_r"],
+        b_collection="MCH",
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="MCH_mouth_master_middle_support_l", bone_a="j_f_ulip_01_l", parent="MCH_mouth_master_middle_upper", is_connected=False, axis_type="local", axis="Y", start="head", size_factor=0.5),
+        req_bones=["j_f_ulip_01_l"],
+        b_collection="MCH",
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="MCH_mouth_master_middle_support_r", bone_a="j_f_ulip_01_r", parent="MCH_mouth_master_middle_upper", is_connected=False, axis_type="local", axis="Y", start="head", size_factor=0.5),
+        req_bones=["j_f_ulip_01_r"],
+        b_collection="MCH",
+    ),
+    GenerativeBone(
+        ref="src",
+        data=CenterBone(name="MCH_mouth_master_middle_lower", ref_bones=["j_f_dlip_01_l", "j_f_dlip_01_r"], parent="head", axis="Y"),
+        req_bones=["j_f_dlip_01_l", "j_f_dlip_01_r"],
+        b_collection="MCH",
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="MCH_mouth_master_middle_support_lower_l", bone_a="j_f_dlip_01_l", parent="MCH_mouth_master_middle_lower", is_connected=False, axis_type="local", axis="Y", start="head", size_factor=0.5),
+        req_bones=["j_f_dlip_01_l"],
+        b_collection="MCH",
+    ),
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="MCH_mouth_master_middle_support_lower_r", bone_a="j_f_dlip_01_r", parent="MCH_mouth_master_middle_lower", is_connected=False, axis_type="local", axis="Y", start="head", size_factor=0.5),
+        req_bones=["j_f_dlip_01_r"],
+        b_collection="MCH",
+    )
+]
+
+MOUTH_MASTER_CORNER: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=CenterBone(name="MCH_mouth_master_corner_left", ref_bones=["j_f_uslip_l", "j_f_dslip_l"], parent="head", axis="X", inverted=True, size_factor=0.5,),
+        req_bones=["j_f_uslip_l", "j_f_dslip_l"],
+        b_collection="MCH",
+    ),
+    GenerativeBone(
+        ref="src",
+        data=CenterBone(name="MCH_mouth_master_corner_right", ref_bones=["j_f_uslip_r", "j_f_dslip_r"], parent="head", axis="X", inverted=True, size_factor=-0.5),
+        req_bones=["j_f_uslip_r", "j_f_dslip_r"],
+        b_collection="MCH",
+    )    
+]
+
+MOUTH_L: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="UpperLip.Master.M.L", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_l", parent="head", is_connected=False),
+        req_bones=["MCH_mouth_master_middle_upper", "MCH_mouth_master_middle_support_l"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="UpperLip.Master.M.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="UpperLip.L", bone_a="j_f_ulip_01_l", bone_b="j_f_umlip_01_l", parent="UpperLip.Master.M.L", is_connected=True),
         req_bones=["j_f_ulip_01_l", "j_f_umlip_01_l"],
         b_collection="Face (Primary)",
-        settings=RigifySettings(bone_name="UpperLip.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=1, secondary_layer_extra="Face (Secondary)", skin_chain_falloff_length=True, skin_chain_falloff=[-4.0, 1.0, 0.0]),
     ),
 
     GenerativeBone(
@@ -375,15 +436,28 @@ MOUTH_L: list[GenerativeBone] = [
         data=ConnectBone(name="UpperLip.L.01", bone_a="j_f_umlip_01_l", bone_b="j_f_uslip_l", parent="UpperLip.L", is_connected=True),
         req_bones=["j_f_umlip_01_l", "j_f_uslip_l"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="UpperLip.L.01") 
+    ),
+
+    GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="UpperLip.Master.C.L", bone_a="UpperLip.L.01", bone_b="MCH_mouth_master_corner_left", parent="UpperLip.L.01", is_connected=True),
+        req_bones=["UpperLip.L.01", "MCH_mouth_master_corner_left"],
+        b_collection="Face (Secondary)",
+    ),
+
+    GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="LowerLip.Master.M.L", bone_a="MCH_mouth_master_middle_lower", bone_b="MCH_mouth_master_middle_support_lower_l", parent="jaw", is_connected=False),
+        req_bones=["MCH_mouth_master_middle_lower", "MCH_mouth_master_middle_support_lower_l"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="LowerLip.Master.M.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
     ),
 
      GenerativeBone(
          ref="src",
-         data=ConnectBone(name="LowerLip.L", bone_a="j_f_dlip_01_l", bone_b="j_f_dmlip_01_l", parent="jaw", is_connected=False),
+         data=ConnectBone(name="LowerLip.L", bone_a="j_f_dlip_01_l", bone_b="j_f_dmlip_01_l", parent="LowerLip.Master.M.L", is_connected=True),
          req_bones=["j_f_dlip_01_l", "j_f_dmlip_01_l"],
-         b_collection="Face (Primary)",
-         settings=RigifySettings(bone_name="LowerLip.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=1, secondary_layer_extra="Face (Secondary)", skin_chain_falloff_length=True, skin_chain_falloff=[-4.0, 1.0, 0.0]),
+         b_collection="Face (Secondary)",
      ),
 
         GenerativeBone(
@@ -391,17 +465,30 @@ MOUTH_L: list[GenerativeBone] = [
         data=ConnectBone(name="LowerLip.L.01", bone_a="j_f_dmlip_01_l", bone_b="j_f_dslip_l", parent="LowerLip.L", is_connected=True),
         req_bones=["j_f_dmlip_01_l", "j_f_dslip_l"],
         b_collection="Face (Secondary)",
-    )
+    ),
 
+    GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="LowerLip.Master.C.L", bone_a="LowerLip.L.01", bone_b="MCH_mouth_master_corner_left", parent="LowerLip.L.01", is_connected=True),
+        req_bones=["LowerLip.L.01", "MCH_mouth_master_corner_left"],
+        b_collection="Face (Secondary)",
+    )
 ]
 
 MOUTH_R: list[GenerativeBone] = [
     GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="UpperLip.Master.R", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_r", parent="head", is_connected=False),
+        req_bones=["MCH_mouth_master_middle_upper", "MCH_mouth_master_middle_support_r"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="UpperLip.Master.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
+    ),
+
+    GenerativeBone(
         ref="src",
-        data=ConnectBone(name="UpperLip.R", bone_a="j_f_ulip_01_r", bone_b="j_f_umlip_01_r", parent="head", is_connected=False),
+        data=ConnectBone(name="UpperLip.R", bone_a="j_f_ulip_01_r", bone_b="j_f_umlip_01_r", parent="UpperLip.Master.R", is_connected=True),
         req_bones=["j_f_ulip_01_r", "j_f_umlip_01_r"],
         b_collection="Face (Primary)",
-        settings=RigifySettings(bone_name="UpperLip.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=1, secondary_layer_extra="Face (Secondary)", skin_chain_falloff_length=True, skin_chain_falloff=[-4.0, 1.0, 0.0]),
     ),
 
     GenerativeBone(
@@ -412,11 +499,26 @@ MOUTH_R: list[GenerativeBone] = [
     ),
 
     GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="UpperLip.Master.C.R", bone_a="UpperLip.R.01", bone_b="MCH_mouth_master_corner_right", parent="UpperLip.R.01", is_connected=True),
+        req_bones=["UpperLip.R.01", "MCH_mouth_master_corner_right"],
+        b_collection="Face (Secondary)",
+    ),
+
+    
+    GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="LowerLip.Master.R", bone_a="MCH_mouth_master_middle_lower", bone_b="MCH_mouth_master_middle_support_lower_r", parent="jaw", is_connected=False),
+        req_bones=["MCH_mouth_master_middle_lower", "MCH_mouth_master_middle_support_lower_r"],
+        b_collection="Face (Secondary)",
+        settings=RigifySettings(bone_name="LowerLip.Master.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
+    ),
+
+    GenerativeBone(
         ref="src",
-        data=ConnectBone(name="LowerLip.R", bone_a="j_f_dlip_01_r", bone_b="j_f_dmlip_01_r", parent="jaw", is_connected=False),
+        data=ConnectBone(name="LowerLip.R", bone_a="j_f_dlip_01_r", bone_b="j_f_dmlip_01_r", parent="LowerLip.Master.R", is_connected=True),
         req_bones=["j_f_dlip_01_r", "j_f_dmlip_01_r"],
-        b_collection="Face (Primary)",
-        settings=RigifySettings(bone_name="LowerLip.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=1, secondary_layer_extra="Face (Secondary)", skin_chain_falloff_length=True, skin_chain_falloff=[-4.0, 1.0, 0.0]),
+        b_collection="Face (Secondary)",
     ),
 
     GenerativeBone(
@@ -424,7 +526,15 @@ MOUTH_R: list[GenerativeBone] = [
         data=ConnectBone(name="LowerLip.R.01", bone_a="j_f_dmlip_01_r", bone_b="j_f_dslip_r", parent="LowerLip.R", is_connected=True),
         req_bones=["j_f_dmlip_01_r", "j_f_dslip_r"],
         b_collection="Face (Secondary)",
-    )
+    ),
+
+    GenerativeBone(
+        ref="tgt",
+        data=ConnectBone(name="LowerLip.Master.C.R", bone_a="LowerLip.R.01", bone_b="MCH_mouth_master_corner_right", parent="LowerLip.R.01", is_connected=True),
+        req_bones=["LowerLip.R.01", "MCH_mouth_master_corner_right"],
+        b_collection="Face (Secondary)",
+    ),
+
 ]
 
 CHEEK_L: list[GenerativeBone] = [
