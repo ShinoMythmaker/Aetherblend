@@ -415,10 +415,27 @@ MOUTH_MASTER_CORNER: list[GenerativeBone] = [
     )    
 ]
 
+JAW_MASTER: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone("MCH_jaw_support", bone_a="j_f_dago", axis_type="local", axis="Y", parent="head", is_connected=False),
+        req_bones=["j_f_dago"],
+        b_collection="MCH",
+    ),
+    
+    GenerativeBone(
+        ref="tgt",
+        data=ConnectBone("jaw", bone_a="MCH_jaw_support", bone_b="MCH_mouth_master_middle_lower", parent="head", is_connected=False),
+        req_bones=["MCH_jaw_support", "MCH_mouth_master_middle_lower"],
+        b_collection="Face",
+        settings=RigifySettings("jaw", rigify_type="face.skin_jaw"),
+    )
+]
+
 MOUTH_L: list[GenerativeBone] = [
     GenerativeBone(
         ref="tgt",
-        data=ConnectBone(name="Lip.Master.T.L", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_l", parent="head", is_connected=False),
+        data=ConnectBone(name="Lip.Master.T.L", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_l", parent="jaw", is_connected=False),
         req_bones=["MCH_mouth_master_middle_upper", "MCH_mouth_master_middle_support_l"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="Lip.Master.T.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
@@ -478,7 +495,7 @@ MOUTH_L: list[GenerativeBone] = [
 MOUTH_R: list[GenerativeBone] = [
     GenerativeBone(
         ref="tgt",
-        data=ConnectBone(name="Lip.Master.T.R", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_r", parent="head", is_connected=False),
+        data=ConnectBone(name="Lip.Master.T.R", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_r", parent="jaw", is_connected=False),
         req_bones=["MCH_mouth_master_middle_upper", "MCH_mouth_master_middle_support_r"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="Lip.Master.T.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),

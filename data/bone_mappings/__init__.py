@@ -26,14 +26,14 @@ HUMAN: list[list[list[GenerativeBone]]] = [
     # [CHEEK_R],
     [BROW_L],
     [BROW_R],
-    [JAW],
+    # [JAW],
     [MOUTH_MASTER_MIDDLE],
     [MOUTH_MASTER_CORNER],
+    [JAW_MASTER],
     [MOUTH_L],
     [MOUTH_R],
     [EAR_L],
     [EAR_R],
-
     [EYE_L],
     [EYE_R],
 
