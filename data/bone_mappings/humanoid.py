@@ -200,7 +200,7 @@ EYE_L: list[GenerativeBone] = [
         data=SkinBone(name="lid.T.L", bone_a="j_f_mabup_02out_l", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabup_02out_l"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="lid.T.L", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False])
+        settings=RigifySettings(bone_name="lid.T.L", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False], skin_chain_falloff=[0.0, -2.0, 0.0], skin_chain_falloff_length=True)
     ),
     GenerativeBone(
         ref="src",
@@ -263,7 +263,7 @@ EYE_R: list[GenerativeBone] = [
         data=SkinBone(name="lid.T.R", bone_a="j_f_mabup_02out_r", mesh_restriction="eye_occlusion"),
         req_bones=["j_f_mabup_02out_r"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="lid.T.R", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False])
+        settings=RigifySettings(bone_name="lid.T.R", rigify_type="skin.stretchy_chain", skin_chain_pivot_pos=2,secondary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head", skin_chain_falloff_spherical=[False, True, False], skin_chain_falloff=[0.0, -2.0, 0.0], skin_chain_falloff_length=True)
     ),
     GenerativeBone(
         ref="src",
