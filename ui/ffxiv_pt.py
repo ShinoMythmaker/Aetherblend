@@ -2,7 +2,9 @@ import bpy
 import requests
 import json
 import re
+import time
 from bpy.types import Panel
+from concurrent.futures import ThreadPoolExecutor
 
 # Timer for auto-refresh
 _timer = None
@@ -12,6 +14,18 @@ _pose_timer = None
 _cached_character_items = [('NONE', 'None', 'No character assigned', 'CANCEL', 0)]
 # Track previous character IDs for change detection
 _previous_character_ids = []
+# Persistent HTTP session for streaming
+_streaming_session = None
+# Thread pool executor for async requests
+_executor = None
+# Cache bone name cleanup results
+_bone_name_cache = {}
+# Track if request is in flight
+_request_in_flight = False
+# Performance tracking
+_frames_sent = 0
+_frames_skipped = 0
+_last_frame_time = 0
 
 def refresh_characters():
     """Timer function to refresh character list"""
@@ -92,65 +106,138 @@ def refresh_characters():
 
 def stream_pose():
     """Timer function to stream pose data"""
+    global _streaming_session, _executor, _bone_name_cache, _request_in_flight
+    global _frames_sent, _frames_skipped, _last_frame_time
+    
+    frame_start = time.perf_counter()
     scene = bpy.context.scene
     
     # Check if streaming is still enabled
     if not scene.get("aether_ffxiv_connected", False) or not scene.aether_ffxiv_stream_enabled:
+        # Print final stats
+        if _frames_sent > 0 or _frames_skipped > 0:
+            total = _frames_sent + _frames_skipped
+            skip_rate = (_frames_skipped / total * 100) if total > 0 else 0
+            print(f"\n=== STREAMING STOPPED ===")
+            print(f"Frames sent: {_frames_sent}")
+            print(f"Frames skipped: {_frames_skipped}")
+            print(f"Skip rate: {skip_rate:.1f}%")
+            print(f"========================\n")
+        
+        # Close session when stopping
+        if _streaming_session:
+            _streaming_session.close()
+            _streaming_session = None
+        if _executor:
+            _executor.shutdown(wait=False)
+            _executor = None
+        _bone_name_cache.clear()
+        _request_in_flight = False
+        _frames_sent = 0
+        _frames_skipped = 0
+        _last_frame_time = 0
         return None  # Stop timer
     
-    # Find armature with streaming enabled
-    for obj in bpy.data.objects:
-        if obj.type == 'ARMATURE' and obj.aether_ffxiv_character_id and obj == bpy.context.active_object:
-            armature = obj
-            character_id = armature.aether_ffxiv_character_id
+    # Skip this frame if previous request is still in flight
+    if _request_in_flight:
+        _frames_skipped += 1
+        fps = scene.aether_ffxiv_stream_fps
+        return 1.0 / fps if fps > 0 else 0.1
+    
+    # Create persistent session and executor if needed
+    if _streaming_session is None:
+        _streaming_session = requests.Session()
+    if _executor is None:
+        _executor = ThreadPoolExecutor(max_workers=1)
+    
+    # Get active armature (faster than iterating all objects)
+    armature = bpy.context.active_object
+    if not armature or armature.type != 'ARMATURE' or not armature.aether_ffxiv_character_id:
+        return 1.0 / scene.aether_ffxiv_stream_fps if scene.aether_ffxiv_stream_fps > 0 else 0.1
+    
+    character_id = armature.aether_ffxiv_character_id
+    
+    # Find root bone
+    root_bone = armature.pose.bones.get("n_throw")
+    if not root_bone:
+        return 1.0 / scene.aether_ffxiv_stream_fps if scene.aether_ffxiv_stream_fps > 0 else 0.1
+    
+    # Get bones from FFXIV collection
+    ffxiv_col = armature.data.collections.get('FFXIV')
+    if not ffxiv_col:
+        return 1.0 / scene.aether_ffxiv_stream_fps if scene.aether_ffxiv_stream_fps > 0 else 0.1
+    
+    # Pre-calculate root matrix inverse once
+    root_matrix_inv = (armature.matrix_world @ root_bone.matrix).inverted()
+    armature_matrix = armature.matrix_world
+    
+    # Build bones data with optimized lookups
+    bones_data = {}
+    pose_bones = armature.pose.bones  # Cache reference
+    
+    for bone in ffxiv_col.bones:
+        # Cache bone name cleaning
+        bone_name = bone.name
+        if bone_name not in _bone_name_cache:
+            _bone_name_cache[bone_name] = re.sub(r"\.\d+$", "", bone_name)
+        clean_bone_name = _bone_name_cache[bone_name]
+        
+        pose_bone = pose_bones.get(bone_name)
+        if pose_bone:
+            # Calculate transform
+            relative_matrix = root_matrix_inv @ (armature_matrix @ pose_bone.matrix)
             
-            # Find root bone
-            root_bone = armature.pose.bones.get("n_throw")
-            if not root_bone:
-                continue
+            pos = relative_matrix.translation
+            rot = relative_matrix.to_quaternion()
+            scale = relative_matrix.to_scale()
             
-            # Build pose data
-            root_matrix_world = armature.matrix_world @ root_bone.matrix
-            pose_data = {
-                "FileExtension": ".pose",
-                "TypeName": "Aetherblend Pose",
-                "FileVersion": 2,
-                "Bones": {}
-            }
-            
-            # Get bones from FFXIV collection
-            ffxiv_col = armature.data.collections.get('FFXIV')
-            if not ffxiv_col:
-                continue
-            
-            selected_bones = [bone.name for bone in ffxiv_col.bones]
-            for bone_name in selected_bones:
-                clean_bone_name = re.sub(r"\.\d+$", "", bone_name)
-                bone = armature.pose.bones.get(bone_name)
-                if bone:
-                    bone_matrix_world = armature.matrix_world @ bone.matrix
-                    relative_matrix = root_matrix_world.inverted() @ bone_matrix_world
-                    
-                    pose_data["Bones"][clean_bone_name] = {
-                        "Position": f"{relative_matrix.translation.x:.6f}, {relative_matrix.translation.y:.6f}, {relative_matrix.translation.z:.6f}",
-                        "Rotation": f"{relative_matrix.to_quaternion().x:.6f}, {relative_matrix.to_quaternion().y:.6f}, {relative_matrix.to_quaternion().z:.6f}, {relative_matrix.to_quaternion().w:.6f}",
-                        "Scale": f"{relative_matrix.to_scale().x:.8f}, {relative_matrix.to_scale().y:.8f}, {relative_matrix.to_scale().z:.8f}"
-                    }
-            
-            # Send to server
-            port = scene.aether_ffxiv_port
-            try:
-                url = f"http://localhost:{port}/character/{character_id}/pose"
-                headers = {'Content-Type': 'application/json'}
-                requests.post(url, json=pose_data, headers=headers, timeout=0.5)
-            except:
-                pass  # Silently fail during streaming
-            
-            break
+            # Store as tuples (lighter than dicts)
+            bones_data[clean_bone_name] = (
+                (pos.x, pos.y, pos.z),
+                (rot.x, rot.y, rot.z, rot.w),
+                (scale.x, scale.y, scale.z)
+            )
+    
+    # Send to server asynchronously (only if we have data)
+    if bones_data:
+        _request_in_flight = True
+        _frames_sent += 1
+        port = scene.aether_ffxiv_port
+        url = f"http://localhost:{port}/character/{character_id}/bones?method=direct"
+        _executor.submit(_send_pose_async, url, bones_data)
+        
+        # Calculate and print frame time
+        frame_time = (time.perf_counter() - frame_start) * 1000
+        
+        # Print stats every 100 frames
+        if _frames_sent % 100 == 0:
+            total = _frames_sent + _frames_skipped
+            skip_rate = (_frames_skipped / total * 100) if total > 0 else 0
+            print(f"Frame {_frames_sent}: {frame_time:.2f}ms | Skipped: {_frames_skipped} ({skip_rate:.1f}%)")
     
     # Return interval based on FPS setting
     fps = scene.aether_ffxiv_stream_fps
     return 1.0 / fps if fps > 0 else 0.1
+
+
+def _send_pose_async(url, bones_data):
+    """Async helper to send pose data without blocking UI"""
+    global _streaming_session, _request_in_flight
+    try:
+        if _streaming_session:
+            # Convert tuples to JSON structure in background thread
+            json_data = {}
+            for bone_name, (pos, rot, scale) in bones_data.items():
+                json_data[bone_name] = {
+                    "position": {"x": pos[0], "y": pos[1], "z": pos[2]},
+                    "rotation": {"x": rot[0], "y": rot[1], "z": rot[2], "w": rot[3]},
+                    "scale": {"x": scale[0], "y": scale[1], "z": scale[2]}
+                }
+            _streaming_session.post(url, json=json_data, timeout=0.5)
+    except:
+        pass  # Silently fail during streaming
+    finally:
+        _request_in_flight = False
 
 
 class AETHER_MT_CharacterSelect(bpy.types.Menu):
@@ -475,9 +562,16 @@ def get_character_items(self, context):
 
 def on_stream_enabled_update(self, context):
     """Called when stream enabled checkbox changes"""
-    global _pose_timer
+    global _pose_timer, _streaming_session, _executor, _bone_name_cache, _request_in_flight
+    global _frames_sent, _frames_skipped, _last_frame_time
     
     if context.scene.aether_ffxiv_stream_enabled:
+        # Reset stats
+        _frames_sent = 0
+        _frames_skipped = 0
+        _last_frame_time = 0
+        print("\n=== STREAMING STARTED ===\n")
+        
         # Start streaming timer
         if _pose_timer is None:
             _pose_timer = bpy.app.timers.register(stream_pose)
@@ -486,6 +580,17 @@ def on_stream_enabled_update(self, context):
         if _pose_timer is not None:
             bpy.app.timers.unregister(_pose_timer)
             _pose_timer = None
+        # Close persistent session
+        if _streaming_session:
+            _streaming_session.close()
+            _streaming_session = None
+        # Shutdown executor
+        if _executor:
+            _executor.shutdown(wait=False)
+            _executor = None
+        # Clear cache
+        _bone_name_cache.clear()
+        _request_in_flight = False
 
 
 def register():
@@ -534,7 +639,8 @@ def register():
 
 
 def unregister():
-    global _timer, _pose_timer
+    global _timer, _pose_timer, _streaming_session, _executor, _bone_name_cache, _request_in_flight
+    global _frames_sent, _frames_skipped, _last_frame_time
     
     # Stop timers if running
     if _timer is not None:
@@ -544,6 +650,23 @@ def unregister():
     if _pose_timer is not None:
         bpy.app.timers.unregister(_pose_timer)
         _pose_timer = None
+    
+    # Close persistent session
+    if _streaming_session:
+        _streaming_session.close()
+        _streaming_session = None
+    
+    # Shutdown executor
+    if _executor:
+        _executor.shutdown(wait=False)
+        _executor = None
+    
+    # Clear cache
+    _bone_name_cache.clear()
+    _request_in_flight = False
+    _frames_sent = 0
+    _frames_skipped = 0
+    _last_frame_time = 0
     
     bpy.utils.unregister_class(AETHER_PT_FFXIVBridgePanel)
     bpy.utils.unregister_class(AETHER_OT_FFXIVSendPose)
