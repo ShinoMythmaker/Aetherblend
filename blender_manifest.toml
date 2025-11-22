@@ -12,7 +12,16 @@ blender_version_max = "5.1.0"
 website = "https://github.com/ShinoMythmaker/Aetherblend"
 tags = ["Animation", "Rigging", "Import-Export", "3D-View"]
 
+wheels = [
+  "./wheels/requests-2.31.0-py3-none-any.whl",
+  "./wheels/urllib3-2.2.1-py3-none-any.whl",
+  "./wheels/certifi-2024.2.2-py3-none-any.whl",
+  "./wheels/charset_normalizer-3.3.2-py3-none-any.whl",
+  "./wheels/idna-3.7-py3-none-any.whl",
+]
+
 [permissions]
 files = "Import files for most Aetherblends functions"
+network = "Connect to FFXIV HTTP server for pose streaming"
 
 
