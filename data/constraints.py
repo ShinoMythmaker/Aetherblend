@@ -119,29 +119,29 @@ CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
 
 
         # Skirt 
-        "j_sk_s_a_l": ["DEF-skirt_out.L"],
-        "j_sk_f_a_l": ["DEF-skirt_front.L"],
-        "j_sk_b_a_l": ["DEF-skirt_back.L"],
+        # "j_sk_s_a_l": ["DEF-skirt_out.L"],
+        # "j_sk_f_a_l": ["DEF-skirt_front.L"],
+        # "j_sk_b_a_l": ["DEF-skirt_back.L"],
 
-        "j_sk_s_a_r": ["DEF-skirt_out.R"],
-        "j_sk_f_a_r": ["DEF-skirt_front.R"],
-        "j_sk_b_a_r": ["DEF-skirt_back.R"],
+        # "j_sk_s_a_r": ["DEF-skirt_out.R"],
+        # "j_sk_f_a_r": ["DEF-skirt_front.R"],
+        # "j_sk_b_a_r": ["DEF-skirt_back.R"],
 
-        "j_sk_s_b_l": ["DEF-skirt_out.L.001"],
-        "j_sk_f_b_l": ["DEF-skirt_front.L.001"],
-        "j_sk_b_b_l": ["DEF-skirt_back.L.001"],
+        # "j_sk_s_b_l": ["DEF-skirt_out.L.001"],
+        # "j_sk_f_b_l": ["DEF-skirt_front.L.001"],
+        # "j_sk_b_b_l": ["DEF-skirt_back.L.001"],
 
-        "j_sk_s_b_r": ["DEF-skirt_out.R.001"],
-        "j_sk_f_b_r": ["DEF-skirt_front.R.001"],
-        "j_sk_b_b_r": ["DEF-skirt_back.R.001"],
+        # "j_sk_s_b_r": ["DEF-skirt_out.R.001"],
+        # "j_sk_f_b_r": ["DEF-skirt_front.R.001"],
+        # "j_sk_b_b_r": ["DEF-skirt_back.R.001"],
 
-        "j_sk_s_c_l": ["DEF-skirt_out.L.002"],
-        "j_sk_f_c_l": ["DEF-skirt_front.L.002"],
-        "j_sk_b_c_l": ["DEF-skirt_back.L.002"],
+        # "j_sk_s_c_l": ["DEF-skirt_out.L.002"],
+        # "j_sk_f_c_l": ["DEF-skirt_front.L.002"],
+        # "j_sk_b_c_l": ["DEF-skirt_back.L.002"],
 
-        "j_sk_s_c_r": ["DEF-skirt_out.R.002"],
-        "j_sk_f_c_r": ["DEF-skirt_front.R.002"],
-        "j_sk_b_c_r": ["DEF-skirt_back.R.002"],
+        # "j_sk_s_c_r": ["DEF-skirt_out.R.002"],
+        # "j_sk_f_c_r": ["DEF-skirt_front.R.002"],
+        # "j_sk_b_c_r": ["DEF-skirt_back.R.002"],
     }
 
 CONSTRAINTS_CHILD_OF: dict[str, list[str]] = {
@@ -222,6 +222,21 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_f_shoho_r": [CopyLocationConstraint(target_bone="DEF-Cheek.R")],
     "j_f_dhoho_r": [CopyLocationConstraint(target_bone="DEF-Cheek.R.01")],
     "j_f_hoho_r": [CopyLocationConstraint(target_bone="DEF-Cheek.R.01", head_tail=1.0)],
+
+    # Skirt Proto
+
+    "j_sk_f_a_l": [CopyRotationConstraint(target_bone="DEF-skirt_front.L")],
+    "j_sk_f_b_l": [CopyLocationConstraint(target_bone="DEF-skirt_front.L.001"), CopyRotationConstraint(target_bone="skirt_front.L.001")],
+    "j_sk_f_c_l": [CopyLocationConstraint(target_bone="DEF-skirt_front.L.002"), CopyRotationConstraint(target_bone="skirt_front.L.002")],
+
+    "j_sk_s_a_l": [CopyRotationConstraint(target_bone="DEF-skirt_out.L")],
+    "j_sk_s_b_l": [CopyLocationConstraint(target_bone="DEF-skirt_out.L.001"), CopyRotationConstraint(target_bone="skirt_out.L.001")],
+    "j_sk_s_c_l": [CopyLocationConstraint(target_bone="DEF-skirt_out.L.002"), CopyRotationConstraint(target_bone="skirt_out.L.002")],
+
+    "j_sk_b_a_l": [CopyRotationConstraint(target_bone="DEF-skirt_back.L")],
+    "j_sk_b_b_l": [CopyLocationConstraint(target_bone="DEF-skirt_back.L.001"), CopyRotationConstraint(target_bone="skirt_back.L.001")],
+    "j_sk_b_c_l": [CopyLocationConstraint(target_bone="DEF-skirt_back.L.002"), CopyRotationConstraint(target_bone="skirt_back.L.002")],
+
 
     # Simple Face Bones 
 }
