@@ -800,20 +800,20 @@ SKIRT: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="skirt_out.L", bone_a="j_sk_s_a_l", bone_b="j_sk_s_b_l", parent="hips", is_connected=False),
         req_bones=["j_sk_s_a_l", "j_sk_s_b_l"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_out.L", rigify_type="skin.basic_chain", tweak_coll="Skirt (Tweak)")
+        b_collection="Skirt (Tweak)",
+        settings=RigifySettings(bone_name="skirt_out.L", rigify_type="skin.stretchy_chain", primary_layer_extra="Skirt", skin_chain_falloff=[0.0, 0.0, -0.3], skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, True, True])
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="skirt_out.L.001", bone_a="j_sk_s_b_l", bone_b="j_sk_s_c_l", parent="skirt_out.L", is_connected=True),
         req_bones=["j_sk_s_b_l", "j_sk_s_c_l"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="skirt_out.L.002", bone_a="skirt_out.L.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8, parent="skirt_out.L.001"),
         req_bones=["skirt_out.L.001"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
 
     # Front
@@ -821,20 +821,20 @@ SKIRT: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="skirt_front.L", bone_a="j_sk_f_a_l", bone_b="j_sk_f_b_l", parent="hips", is_connected=False),
         req_bones=["j_sk_f_a_l", "j_sk_f_b_l"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_front.L", rigify_type="skin.basic_chain", tweak_coll="Skirt (Tweak)", skin_chain_priority=0),
+        b_collection="Skirt (Tweak)",
+        settings=RigifySettings(bone_name="skirt_front.L", rigify_type="skin.stretchy_chain", primary_layer_extra="Skirt", skin_chain_falloff=[0.0, 0.0, 0.2], skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, True, True]),
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="skirt_front.L.001", bone_a="j_sk_f_b_l", bone_b="j_sk_f_c_l", parent="skirt_front.L", is_connected=True),
         req_bones=["j_sk_f_b_l", "j_sk_f_c_l", "skirt_front.L"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="skirt_front.L.002", bone_a="skirt_front.L.001", parent="skirt_front.L.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
         req_bones=["skirt_front.L.001"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
 
     # Back
@@ -842,20 +842,20 @@ SKIRT: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="skirt_back.L", bone_a="j_sk_b_a_l", bone_b="j_sk_b_b_l", parent="hips", is_connected=False),
         req_bones=["j_sk_b_a_l", "j_sk_b_b_l"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_back.L", rigify_type="skin.basic_chain", tweak_coll="Skirt (Tweak)", skin_chain_priority=0)
+        b_collection="Skirt (Tweak)",
+        settings=RigifySettings(bone_name="skirt_back.L", rigify_type="skin.stretchy_chain", primary_layer_extra="Skirt", skin_chain_falloff=[0.0, 0.0, -0.3], skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, True, True])
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="skirt_back.L.001", bone_a="j_sk_b_b_l", bone_b="j_sk_b_c_l", parent="skirt_back.L", is_connected=True),
         req_bones=["j_sk_b_b_l", "j_sk_b_c_l", "skirt_back.L"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="skirt_back.L.002", bone_a="skirt_back.L.001", parent="skirt_back.L.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
         req_bones=["skirt_back.L.001"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
 
     # Right Side
@@ -864,20 +864,20 @@ SKIRT: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="skirt_out.R", bone_a="j_sk_s_a_r",bone_b="j_sk_s_b_r", parent="hips", is_connected=False),
         req_bones=["j_sk_s_a_r", "j_sk_s_b_r"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_out.R", rigify_type="skin.basic_chain", tweak_coll="Skirt (Tweak)")
+        b_collection="Skirt (Tweak)",
+        settings=RigifySettings(bone_name="skirt_out.R", rigify_type="skin.stretchy_chain", primary_layer_extra="Skirt", skin_chain_falloff=[0.0, 0.0, -0.3], skin_chain_falloff_length= True, skin_chain_falloff_spherical=[True, True, True])
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="skirt_out.R.001", bone_a="j_sk_s_b_r", bone_b="j_sk_s_c_r", parent="skirt_out.R", is_connected=True),
         req_bones=["j_sk_s_b_r", "j_sk_s_c_r", "skirt_out.R"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="skirt_out.R.002", bone_a="skirt_out.R.001", parent="skirt_out.R.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
         req_bones=["skirt_out.R.001"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
 
     # Front
@@ -885,20 +885,20 @@ SKIRT: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="skirt_front.R", bone_a="j_sk_f_a_r",bone_b="j_sk_f_b_r", parent="hips", is_connected=False),
         req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_front.R", rigify_type="skin.basic_chain", tweak_coll="Skirt (Tweak)")
+        b_collection="Skirt (Tweak)",
+        settings=RigifySettings(bone_name="skirt_front.R", rigify_type="skin.stretchy_chain", primary_layer_extra="Skirt", skin_chain_falloff=[0.0, 0.0, 0.2], skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, True, True])
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="skirt_front.R.001", bone_a="j_sk_f_b_r", bone_b="j_sk_f_c_r", parent="skirt_front.R", is_connected=True),
         req_bones=["j_sk_f_b_r", "j_sk_f_c_r", "skirt_front.R"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="skirt_front.R.002", bone_a="skirt_front.R.001", parent="skirt_front.R.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
         req_bones=["skirt_front.R.001"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
 
     # Back
@@ -906,173 +906,85 @@ SKIRT: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="skirt_back.R", bone_a="j_sk_b_a_r", bone_b="j_sk_b_b_r", parent="hips", is_connected=False),
         req_bones=["j_sk_b_a_r", "j_sk_b_b_r"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_back.R", rigify_type="skin.basic_chain", tweak_coll="Skirt (Tweak)")
+        b_collection="Skirt (Tweak)",
+        settings=RigifySettings(bone_name="skirt_back.R", rigify_type="skin.stretchy_chain", primary_layer_extra="Skirt", skin_chain_falloff=[0.0, 0.0, -0.3], skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, True, True])
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="skirt_back.R.001", bone_a="j_sk_b_b_r", bone_b="j_sk_b_c_r", parent="skirt_back.R", is_connected=True),
         req_bones=["j_sk_b_b_r", "j_sk_b_c_r", "skirt_back.R"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="skirt_back.R.002", bone_a="skirt_back.R.001", parent="skirt_back.R.001", is_connected=True, axis_type="local", axis="Y", start="tail", size_factor=0.8),
         req_bones=["skirt_back.R.001"],
-        b_collection="Skirt",
+        b_collection="Skirt (Tweak)",
     ),
 
     # Support Bones Front.L
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.F.L", bone_a="thigh.L", bone_b="skirt_front.L.001", parent="thigh.L", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["thigh.L", "skirt_front.L"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.F.L", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
 
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.F.L.001", bone_a="shin.L", bone_b="skirt_front.L.002", parent="shin.L", is_connected=False, start="head", end="head", roll=0),
-        req_bones=["shin.L", "skirt_front.L.002"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.F.L.001", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
 
     GenerativeBone(
         ref="tgt",
         data=ConnectBone(name="skirt_support.F.L.002", bone_a="shin.L", bone_b="skirt_front.L.002", parent="shin.L", is_connected=False, start="head", end="tail", roll=0),
         req_bones=["shin.L", "skirt_front.L.002"],
         b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.F.L.002", rigify_type="skin.basic_chain", skin_chain_priority=0),
+        settings=RigifySettings(bone_name="skirt_support.F.L.002", rigify_type="skin.basic_chain", skin_chain_priority=1),
     ),
 
     # Support Bones Side.L
-
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.S.L", bone_a="thigh.L", bone_b="skirt_out.L.001", parent="thigh.L", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["thigh.L", "skirt_out.L"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.S.L", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
-    
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.S.L.001", bone_a="shin.L", bone_b="skirt_out.L.002", parent="shin.L", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["shin.L", "skirt_out.L.002"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.S.L.001", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
     
     GenerativeBone(
         ref="tgt",
         data=ConnectBone(name="skirt_support.S.L.002", bone_a="shin.L", bone_b="skirt_out.L.002", parent="shin.L", is_connected=False, start="head", end="tail", roll=0.0),
         req_bones=["shin.L", "skirt_out.L.002"],
         b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.S.L.002", rigify_type="skin.basic_chain", skin_chain_priority=0),
+        settings=RigifySettings(bone_name="skirt_support.S.L.002", rigify_type="skin.basic_chain", skin_chain_priority=1),
     ),
 
     # Support Bones Back.L
     # For some reason the controller names are taken from these and not the main skirt bones. This isn't an issue with the other support bones so I dunno
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.B.L", bone_a="thigh.L", bone_b="skirt_back.L.001", parent="thigh.L", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["thigh.L", "skirt_back.L"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.B.L", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
-
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.B.L.001", bone_a="shin.L", bone_b="skirt_back.L.002", parent="shin.L", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["shin.L", "skirt_back.L"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.B.L.001", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
-
+    
     GenerativeBone(
         ref="tgt",
         data=ConnectBone(name="skirt_support.B.L.002", bone_a="shin.L", bone_b="skirt_back.L.002", parent="shin.L", is_connected=False, start="head", end="tail", roll=0.0),
         req_bones=["shin.L", "skirt_back.L"],
         b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.B.L.002", rigify_type="skin.basic_chain", skin_chain_priority=0),
+        settings=RigifySettings(bone_name="skirt_support.B.L.002", rigify_type="skin.basic_chain", skin_chain_priority=1),
     ),
 
     # Support Bones Front.R
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.F.R", bone_a="thigh.R", bone_b="skirt_front.R.001", parent="thigh.R", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["thigh.R", "skirt_front.R"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.F.R", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
-
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.F.R.001", bone_a="shin.R", bone_b="skirt_front.R.002", parent="shin.R", is_connected=False, start="head", end="head", roll=0),
-        req_bones=["shin.R", "skirt_front.R.002"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.F.R.001", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
+    
 
     GenerativeBone(
         ref="tgt",
         data=ConnectBone(name="skirt_support.F.R.002", bone_a="shin.R", bone_b="skirt_front.R.002", parent="shin.R", is_connected=False, start="head", end="tail", roll=0),
         req_bones=["shin.R", "skirt_front.R.002"],
         b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.F.R.002", rigify_type="skin.basic_chain", skin_chain_priority=0),
+        settings=RigifySettings(bone_name="skirt_support.F.R.002", rigify_type="skin.basic_chain", skin_chain_priority=1),
     ),
 
     # Support Bones Side.R
 
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.S.R", bone_a="thigh.R", bone_b="skirt_out.R.001", parent="thigh.R", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["thigh.R", "skirt_out.R.001"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.S.R", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
     
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.S.R.001", bone_a="shin.R", bone_b="skirt_out.R.002", parent="shin.R", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["shin.R", "skirt_out.R.002"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.S.R.001", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
     
     GenerativeBone(
         ref="tgt",
         data=ConnectBone(name="skirt_support.S.R.002", bone_a="shin.R", bone_b="skirt_out.R.002", parent="shin.R", is_connected=False, start="head", end="tail", roll=0.0),
         req_bones=["shin.R", "skirt_out.R.002"],
         b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.S.R.002", rigify_type="skin.basic_chain", skin_chain_priority=0),
+        settings=RigifySettings(bone_name="skirt_support.S.R.002", rigify_type="skin.basic_chain", skin_chain_priority=1),
     ),
 
     # Support Bones Back.R
 
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.B.R", bone_a="thigh.R", bone_b="skirt_back.R.001", parent="thigh.R", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["thigh.R", "skirt_back.R.001"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.B.R", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
-
-    GenerativeBone(
-        ref="tgt",
-        data=ConnectBone(name="skirt_support.B.R.001", bone_a="shin.R", bone_b="skirt_back.R.002", parent="shin.R", is_connected=False, start="head", end="head", roll=0.0),
-        req_bones=["shin.R", "skirt_back.R.002"],
-        b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.B.R.001", rigify_type="skin.basic_chain", skin_chain_priority=0),
-    ),
-
+    
     GenerativeBone(
         ref="tgt",
         data=ConnectBone(name="skirt_support.B.R.002", bone_a="shin.R", bone_b="skirt_back.R.002", parent="shin.R", is_connected=False, start="head", end="tail", roll=0.0),
         req_bones=["shin.R", "skirt_back.R.002"],
         b_collection="Skirt",
-        settings=RigifySettings(bone_name="skirt_support.B.R.002", rigify_type="skin.basic_chain", skin_chain_priority=0),
+        settings=RigifySettings(bone_name="skirt_support.B.R.002", rigify_type="skin.basic_chain", skin_chain_priority=1),
     ),
 ]
