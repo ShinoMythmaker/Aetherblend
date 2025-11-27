@@ -41,7 +41,7 @@ class AETHER_OT_VFXExport(Operator, ExportHelper):
                 filepath=self.filepath,
                 export_format='GLB',
                 use_selection=True,
-                export_yup=False,  # Y up disabled for VFX
+                export_yup=True,  # Y up enabled for VFX
                 export_apply=True,
                 export_animations=False,
                 export_normals=True,
