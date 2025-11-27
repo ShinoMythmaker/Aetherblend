@@ -88,6 +88,12 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         description="Select the default directory for saving animation files"
     ) #type: ignore
 
+    default_vfx_export_path: StringProperty(
+        name="VFX Export",
+        subtype='DIR_PATH',
+        description="Select the default directory for saving VFX model files"
+    ) #type: ignore
+
     # default_pose_import_path: StringProperty(
     #     name="Pose Import",
     #     subtype='DIR_PATH',
@@ -127,6 +133,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             # box.prop(self, "default_pose_import_path")
             box.prop(self, "default_pose_export_path")
             box.prop(self, "default_anim_export_path")
+            box.prop(self, "default_vfx_export_path")
 
 def register():
     bpy.utils.register_class(AetherBlendPreferences)

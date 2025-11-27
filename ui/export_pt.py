@@ -23,11 +23,15 @@ class AETHER_PT_ExportPanel(bpy.types.Panel):
         row = layout.row(align=True)
         row.operator("aether.pose_export", text="Pose Export", icon = "EXPORT")
         row.operator("aether.anim_export", text="Anim Export", icon = "EXPORT")
+        
+        row = layout.row(align=True)
+        row.operator("aether.vfx_export", text="VFX Model Export", icon = "EXPORT")
 
 def menu_func_export(self, context):
     """Add the export operator to the File > Export menu"""
-    self.layout.operator("aether.pose_export", text="FFXIV .pose File")
+    self.layout.operator("aether.pose_export", text="FFXIV Pose (.pose)")
     self.layout.operator("aether.anim_export", text="FFXIV Animation (.glb)")
+    self.layout.operator("aether.vfx_export", text="FFXIV VFX Model (.glb)")
 
 def register():
     bpy.utils.register_class(AETHER_PT_ExportPanel)
