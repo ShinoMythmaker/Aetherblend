@@ -30,6 +30,7 @@ class RigifySettings:
     skin_chain_falloff: list[float] | None = None
     skin_chain_falloff_length: bool | None = None
     skin_chain_falloff_spherical: list[bool] | None  = None
+    skin_chain_priority: int | None = None
     skin_control_orientation_bone: str | None  = None
 
 @dataclass(frozen=True)
