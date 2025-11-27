@@ -152,6 +152,29 @@ def rigify_set_pivot_pos(armature: bpy.types.Armature, bone_name: str, pivot_pos
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
+def rigify_set_skin_basic_chain_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
+    """Sets up rigify skin basic chain properties for a pose bone"""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+
+    try:
+        rigify_params = pose_bone.rigify_parameters
+
+        if settings.skin_chain_priority is not None:
+            rigify_params.skin_chain_priority = settings.skin_chain_priority
+
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify skin basic chain properties: {e}")
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
 
 def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
     """Sets up rigify skin stretchy chain properties for a pose bone"""
@@ -179,6 +202,8 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
             rigify_params.skin_chain_falloff_length = settings.skin_chain_falloff_length
         if settings.skin_chain_falloff_spherical is not None:
             rigify_params.skin_chain_falloff_spherical = settings.skin_chain_falloff_spherical
+        if settings.skin_chain_priority is not None:
+            rigify_params.skin_chain_priority = settings.skin_chain_priority
 
         if settings.primary_layer_extra is not None:
             rigify_params.skin_primary_layers_extra = True
@@ -264,6 +289,13 @@ def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings,
 
     if settings.rigify_type == "skin.stretchy_chain":
         rigify_set_skin_stretchy_chain_properties(
+            armature,
+            pose_bone.name,
+            settings=settings
+        )
+
+    if settings.rigify_type == "skin.basic_chain":
+        rigify_set_skin_basic_chain_properties(
             armature,
             pose_bone.name,
             settings=settings
