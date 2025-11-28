@@ -26,6 +26,11 @@ class RigifySettings:
     pivot_pos: int | None = None
     primary_layer_extra: str | None = None
     secondary_layer_extra: str | None  = None
+    relink_constraints: bool | None = None
+    skin_glue_use_tail: bool | None = None
+    skin_glue_tail_reparent: bool | None = None
+    skin_glue_add_constraint: str | None = None
+    skin_glue_add_constraint_influence: float | None = None
     skin_chain_pivot_pos: int | None  = None
     skin_chain_falloff: list[float] | None = None
     skin_chain_falloff_length: bool | None = None

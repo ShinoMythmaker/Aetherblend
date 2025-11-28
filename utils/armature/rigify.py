@@ -175,6 +175,38 @@ def rigify_set_skin_basic_chain_properties(armature: bpy.types.Armature, bone_na
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
+def rigify_set_skin_glue_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
+    """Sets up the rigify skin glue properties for a pose bone"""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    pose_bone.bone.select = True
+    armature.data.bones.active = pose_bone.bone
+
+    try:
+        rigify_params = pose_bone.rigify_parameters
+
+        if settings.relink_constraints is not None:
+            rigify_params.relink_constraints = settings.relink_constraints
+        if settings.skin_glue_use_tail is not None:
+            rigify_params.skin_glue_use_tail = settings.skin_glue_use_tail
+        if settings.skin_glue_tail_reparent is not None:
+            rigify_params.skin_glue_tail_reparent = settings.skin_glue_tail_reparent
+        if settings.skin_glue_add_constraint is not None:
+            rigify_params.skin_glue_add_constraint = settings.skin_glue_add_constraint
+        if settings.skin_glue_add_constraint_influence is not None:
+            rigify_params.skin_glue_add_constraint_influence = settings.skin_glue_add_constraint_influence
+
+    except Exception as e:
+        print(f"[AetherBlend] Error settings rigify skin glue properties: {e}")
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+
 
 def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
     """Sets up rigify skin stretchy chain properties for a pose bone"""
@@ -296,6 +328,13 @@ def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings,
 
     if settings.rigify_type == "skin.basic_chain":
         rigify_set_skin_basic_chain_properties(
+            armature,
+            pose_bone.name,
+            settings=settings
+        )
+
+    if settings.rigify_type == "skin.glue":
+        rigify_set_skin_glue_properties(
             armature,
             pose_bone.name,
             settings=settings
