@@ -20,10 +20,7 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        prefs = get_preferences()
-        if prefs.import_panel:
-            return prefs.import_panel == 'ON'
-        return False
+        return context.scene.aether_tabs.active_tab == 'IMPORT_EXPORT'
     
     def draw(self, context):
         layout = self.layout

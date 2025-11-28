@@ -12,10 +12,8 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        prefs = get_preferences()
-        if prefs.create_rig_panel:
-            if not prefs.create_rig_panel == 'ON':
-                return False
+        if context.scene.aether_tabs.active_tab != 'GENERATE':
+            return False
 
         armature = context.active_object
         return (
@@ -108,10 +106,8 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        prefs = get_preferences()
-        if prefs.rig_layers_panel:
-            if not prefs.rig_layers_panel == 'ON':
-                return False
+        if context.scene.aether_tabs.active_tab != 'RIG_LAYERS':
+            return False
 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
@@ -161,10 +157,8 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        prefs = get_preferences()
-        if prefs.rig_ui_panel:
-            if not prefs.rig_ui_panel == 'ON':
-                return False
+        if context.scene.aether_tabs.active_tab != 'RIG_UI':
+            return False
         
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
@@ -214,10 +208,8 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        prefs = get_preferences()
-        if prefs.rig_bake_panel:
-            if not prefs.rig_bake_panel == 'ON':
-                return False
+        if context.scene.aether_tabs.active_tab != 'RIG_UI':
+            return False
         
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':

@@ -11,10 +11,8 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        prefs = get_preferences()
-        if prefs.customize_plus_panel:
-            if not prefs.customize_plus_panel == 'ON':
-                return False
+        if context.scene.aether_tabs.active_tab != 'CPLUS':
+            return False
 
         armature = context.active_object
         return (
