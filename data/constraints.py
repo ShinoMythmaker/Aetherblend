@@ -56,8 +56,8 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_te_r": [CopyLocationConstraint(target_bone="DEF-hand.R"), CopyRotationConstraint(target_bone="ORG-hand.R")],
 
     # Twist
-    "n_hte_r": [CopyRotationConstraint(target_bone="ORG-hand.R", axis=[True, False, False])],
-    "n_hte_l": [CopyRotationConstraint(target_bone="ORG-hand.L", axis=[True, False, False])],
+    "n_hte_r": [CopyRotationConstraint(target_bone="ORG-hand.R", axis=[True, False, False], influence=0.5)],
+    "n_hte_l": [CopyRotationConstraint(target_bone="ORG-hand.L", axis=[True, False, False], influence=0.5)],
     "n_hhiji_r": [CopyRotationConstraint(target_bone="ORG-upper_arm.R", axis=[False, False, True])],
     "n_hhiji_l": [CopyRotationConstraint(target_bone="ORG-upper_arm.L", axis=[False, False, True])],
 
@@ -155,7 +155,7 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     #Head
     "j_kubi": [CopyRotationConstraint(target_bone="ORG-neck")],
-    "j_kao": [CopyRotationConstraint(target_bone="ORG-head")],
+    "j_kao": [CopyRotationConstraint(target_bone="ORG-head"), CopyLocationConstraint(target_bone="ORG-head")],
 
     "j_mimi_l": [CopyRotationConstraint(target_bone="ORG-ear.L")],
     "j_mimi_r": [CopyRotationConstraint(target_bone="ORG-ear.R")],
