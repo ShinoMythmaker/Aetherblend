@@ -26,6 +26,7 @@ class RigifySettings:
     pivot_pos: int | None = None
     primary_layer_extra: str | None = None
     secondary_layer_extra: str | None  = None
+    jaw_mouth_influence: str | None = None
     relink_constraints: bool | None = None
     skin_glue_use_tail: bool | None = None
     skin_glue_tail_reparent: bool | None = None
