@@ -52,8 +52,14 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     # Right Arm
     "j_ude_a_r": [CopyLocationConstraint(target_bone="DEF-upper_arm.R"), CopyRotationConstraint(target_bone="ORG-upper_arm.R")],
-    "j_ude_b_r": [CopyLocationConstraint(target_bone="DEF-forearm.R"), CopyRotationConstraint(target_bone="ORG-forearmm.R")],
+    "j_ude_b_r": [CopyLocationConstraint(target_bone="DEF-forearm.R"), CopyRotationConstraint(target_bone="ORG-forearm.R")],
     "j_te_r": [CopyLocationConstraint(target_bone="DEF-hand.R"), CopyRotationConstraint(target_bone="ORG-hand.R")],
+
+    # Twist
+    "n_hte_r": [CopyRotationConstraint(target_bone="ORG-hand.R", axis=[True, False, False])],
+    "n_hte_l": [CopyRotationConstraint(target_bone="ORG-hand.L", axis=[True, False, False])],
+    "n_hhiji_r": [CopyRotationConstraint(target_bone="ORG-upper_arm.R", axis=[False, False, True])],
+    "n_hhiji_l": [CopyRotationConstraint(target_bone="ORG-upper_arm.L", axis=[False, False, True])],
 
     # Right Fingers
     "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R01")],
