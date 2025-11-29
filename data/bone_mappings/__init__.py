@@ -3,6 +3,7 @@ from .hand import *
 
 HUMAN: list[list[list[GenerativeBone]]] = [
     [SPINE],
+    [CHEST],
     [ARM_L],
     [ARM_R],
     [LEG_L],

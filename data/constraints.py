@@ -45,6 +45,11 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_sako_l": [CopyRotationConstraint(target_bone="shoulder.L")],
     "j_sako_r": [CopyRotationConstraint(target_bone="shoulder.R")],
 
+    # Chest
+    "j_mune_l": [CopyLocationConstraint(target_bone="ORG-Chest.L"), CopyRotationConstraint(target_bone="ORG-Chest.L")],
+    "j_mune_r": [CopyLocationConstraint(target_bone="ORG-Chest.R"), CopyRotationConstraint(target_bone="ORG-Chest.R")],
+
+
     # Left Arm
     "j_ude_a_l": [CopyLocationConstraint(target_bone="DEF-upper_arm.L"), CopyRotationConstraint(target_bone="ORG-upper_arm.L")],
     "j_ude_b_l": [CopyLocationConstraint(target_bone="DEF-forearm.L"), CopyRotationConstraint(target_bone="ORG-forearm.L")],
