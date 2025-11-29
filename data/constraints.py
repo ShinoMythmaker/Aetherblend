@@ -164,6 +164,10 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     "j_mimi_l": [CopyRotationConstraint(target_bone="ORG-ear.L")],
     "j_mimi_r": [CopyRotationConstraint(target_bone="ORG-ear.R")],
+    "j_zerd_a_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L")],
+    "j_zerd_b_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L.001")],
+    "j_zerd_a_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R")],
+    "j_zerd_b_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R.001")],
 
     # Right Cheek
 
@@ -235,5 +239,10 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_sk_b_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.002")],
 
 
-    # Simple Face Bones 
+    # Simple Face Bones
+    # I genuinely despise this with all of my heart
+
+    "j_ago": [CopyRotationConstraint(target_bone="ORG-simple.jaw")],
+    "j_f_dlip_b": [CopyRotationConstraint(target_bone="ORG-simple.lip.B"), CopyLocationConstraint(target_bone="ORG-simple.lip.B")],
+    "j_f_ulip_b": [CopyRotationConstraint(target_bone="ORG-simple.lip.T"), CopyLocationConstraint(target_bone="ORG-simple.lip.T")],
 }

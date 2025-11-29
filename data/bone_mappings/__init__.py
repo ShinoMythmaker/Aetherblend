@@ -22,9 +22,9 @@ HUMAN: list[list[list[GenerativeBone]]] = [
     [PINKY_R_IV, PINKY_R],
 
     [HEAD],
+    # [SIMPLE_FACE_BONES],
     [EYE_L],
     [EYE_R],
-    #[SIMPLE_FACE_BONES],
     [CHEEKS],
     [BROW_L],
     [BROW_R],
@@ -32,8 +32,8 @@ HUMAN: list[list[list[GenerativeBone]]] = [
     [JAW_MASTER],
     [MOUTH],
     [NOSE],
-    [EAR_L],
-    [EAR_R],
+    [VIERA_EAR_L, EAR_L],
+    [VIERA_EAR_R, EAR_R],
 
     [SKIRT]
 ]
