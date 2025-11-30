@@ -1,6 +1,15 @@
 import bpy
 from ...data import *
 
+def _select_pose_bone(pose_bone: bpy.types.PoseBone, state: bool = True) -> None:
+    """Helper function to select a pose bone in a version-compatible way.
+    
+    Blender 5.0+ uses pose_bone.select, while 4.x uses pose_bone.bone.select.
+    """
+    try:
+        pose_bone.select = state
+    except AttributeError:
+        pose_bone.bone.select = state
 
 def rigify_set_tweak_collection(armature: bpy.types.Armature, bone_name: str, collection_name: str) -> None:
     """Sets the rigify tweak collection for a given bone."""
@@ -9,9 +18,9 @@ def rigify_set_tweak_collection(armature: bpy.types.Armature, bone_name: str, co
     bpy.ops.object.mode_set(mode='POSE')
     
     pose_bone = armature.pose.bones.get(bone_name)
-    
+    _select_pose_bone(pose_bone)
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    
     armature.data.bones.active = pose_bone.bone
     
     try:
@@ -43,7 +52,7 @@ def rigify_set_fk_collection(armature: bpy.types.Armature, bone_name: str, colle
     pose_bone = armature.pose.bones.get(bone_name)
     
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
     
     try:
@@ -75,7 +84,7 @@ def rigify_set_copy_rotation_axes(armature: bpy.types.Armature, bone_name: str, 
     pose_bone = armature.pose.bones.get(bone_name)
     
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
     
     try:
@@ -98,7 +107,7 @@ def rigify_make_extra_ik_control(armature: bpy.types.Armature, bone_name: str, m
     pose_bone = armature.pose.bones.get(bone_name)
 
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
 
     try:
@@ -119,7 +128,7 @@ def rigify_set_super_copy_widget_type(armature: bpy.types.Armature, bone_name: s
     pose_bone = armature.pose.bones.get(bone_name)
 
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
 
     try:
@@ -140,7 +149,7 @@ def rigify_set_pivot_pos(armature: bpy.types.Armature, bone_name: str, pivot_pos
     pose_bone = armature.pose.bones.get(bone_name)
 
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
 
     try:
@@ -161,7 +170,7 @@ def rigify_set_jaw_master_properties(armature: bpy.types.Armature, bone_name: st
     pose_bone = armature.pose.bones.get(bone_name)
 
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
 
     try:
@@ -184,7 +193,7 @@ def rigify_set_skin_basic_chain_properties(armature: bpy.types.Armature, bone_na
     pose_bone = armature.pose.bones.get(bone_name)
 
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
 
     try:
@@ -207,7 +216,7 @@ def rigify_set_skin_glue_properties(armature: bpy.types.Armature, bone_name: str
     pose_bone = armature.pose.bones.get(bone_name)
 
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
 
     try:
@@ -240,7 +249,7 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
     pose_bone = armature.pose.bones.get(bone_name)
 
     bpy.ops.pose.select_all(action='DESELECT')
-    pose_bone.bone.select = True
+    _select_pose_bone(pose_bone)
     armature.data.bones.active = pose_bone.bone
 
     try:
