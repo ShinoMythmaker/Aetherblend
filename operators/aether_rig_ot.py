@@ -179,7 +179,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 coll.rigify_color_set_name = collection.color_type
                 coll.rigify_ui_row = collection.row_index
                 coll.rigify_ui_title = collection.title
-                coll.is_visible = collection.visible
+                # coll.is_visible = collection.visible
 
 
         ## Propegate data 
