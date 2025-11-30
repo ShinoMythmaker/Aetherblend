@@ -164,9 +164,9 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_mimi_l": [OffsetTransformConstraint(target_bone="DEF-ear.L")],
     "j_mimi_r": [OffsetTransformConstraint(target_bone="DEF-ear.R")],
     "j_zerd_a_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L")],
-    "j_zerd_b_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L.001")],
+    "j_zerd_b_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L.001"), CopyLocationConstraint(target_bone="ORG-v_ear.L.001")],
     "j_zerd_a_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R")],
-    "j_zerd_b_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R.001")],
+    "j_zerd_b_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R.001"), CopyLocationConstraint(target_bone="ORG-v_ear.R.001")],
 
     # Right Cheek
 
@@ -298,5 +298,8 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     "lid.T.L.002": [CopyLocationConstraint(target_bone="lid.B.L.002", name="eye_lid_close.L", influence=0)],
     "lid.T.R.002": [CopyLocationConstraint(target_bone="lid.B.R.002", name="eye_lid_close.R", influence=0)],
+
+    "v_ear.L": [UnmapConstraint()],
+    "v_ear.R": [UnmapConstraint()]
 
 }
