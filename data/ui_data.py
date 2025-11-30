@@ -49,7 +49,113 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
         property_name="influence",
         title="Eyelid Close R",
         ui_element="slider"
-    )
+    ),
+    "eye_lid_brow_follow.L": ConstraintUIController(
+        name="eye_lid_brow_follow.L",
+        target_bone="lid.T.L.002",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Eyelid Brow Follow L",
+        ui_element="slider"
+    ),
+    "eye_lid_brow_follow.R": ConstraintUIController(
+        name="eye_lid_brow_follow.R",
+        target_bone="lid.T.R.002",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Eyelid Brow Follow R",
+        ui_element="slider"
+    ),
+    "eye_lid_cheek_follow.L": ConstraintUIController(
+        name="eye_lid_cheek_follow.L",
+        target_bone="lid.B.L.002",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Eyelid Cheek Follow L",
+        ui_element="slider"
+    ),
+    "eye_lid_cheek_follow.R": ConstraintUIController(
+        name="eye_lid_cheek_follow.R",
+        target_bone="lid.B.R.002",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Eyelid Cheek Follow R",
+        ui_element="slider"
+    ),
+    "nose_tip_follow": ConstraintUIController(
+        name="nose_tip_follow",
+        target_bone="Nose_end",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Nose Tip Follow",
+        ui_element="slider"
+    ),
+    "nostril_follow.L": ConstraintUIController(
+        name="nostril_follow.L",
+        target_bone="Nose.L.001",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Nostril Follow L",
+        ui_element="slider"
+    ),
+    "nostril_follow.R": ConstraintUIController(
+        name="nostril_follow.R",
+        target_bone="Nose.R.001",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Nostril Follow R",
+        ui_element="slider"
+    ),
+    "glabella_follow.L": ConstraintUIController(
+        name="glabella_follow.L",
+        target_bone="Nose.L",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Glabella Follow L",
+        ui_element="slider"
+    ),
+     "glabella_follow.R": ConstraintUIController(
+        name="glabella_follow.R",
+        target_bone="Nose.R",
+        target_constraint="Copy Location",
+        property_name="influence",
+        title="Glabella Follow R",
+        ui_element="slider"
+     ),
+     "glabella_follow.L.001": ConstraintUIController(
+        name="glabella_follow.L.001",
+        target_bone="Nose.L",
+        target_constraint="Copy Location.001",
+        property_name="influence",
+        title="Glabella Follow L",
+        ui_element="slider"
+    ),
+     "glabella_follow.R.001": ConstraintUIController(
+        name="glabella_follow.R.001",
+        target_bone="Nose.R",
+        target_constraint="Copy Location.001",
+        property_name="influence",
+        title="Glabella Follow R",
+        ui_element="slider"
+     ),
+
+     "cheek_follow.L": ConstraintUIController(
+         name="cheek_follow.L",
+         target_bone="Cheek.B.L",
+         target_constraint="Copy Location",
+         property_name="influence",
+         title="Cheek Follow L",
+         ui_element="slider"
+     ),
+    "cheek_follow.R": ConstraintUIController(
+         name="cheek_follow.R",
+         target_bone="Cheek.B.R",
+         target_constraint="Copy Location",
+         property_name="influence",
+         title="Cheek Follow R",
+         ui_element="slider"
+     ),
+
     }
 
 UI_CONTROLLER_MAPPING: dict[str, list[ConstraintUIController]] = {
@@ -58,4 +164,17 @@ UI_CONTROLLER_MAPPING: dict[str, list[ConstraintUIController]] = {
     "lid.T.L.002": [UI_CONTROLLERS["eye_lid_close.L"]],
     "lid.T.R.002": [UI_CONTROLLERS["eye_lid_close.R"]],
     "eye_common": [UI_CONTROLLERS["eye_lid_close.L"], UI_CONTROLLERS["eye_lid_close.R"]],
+
+    "brow.T.L.002": [UI_CONTROLLERS["eye_lid_brow_follow.L"]],
+    "brow.T.R.002": [UI_CONTROLLERS["eye_lid_brow_follow.R"]],
+    "Cheek.T.L": [UI_CONTROLLERS["eye_lid_cheek_follow.L"]],
+    "Cheek.T.R": [UI_CONTROLLERS["eye_lid_cheek_follow.R"]],
+
+    "Nose": [UI_CONTROLLERS["nose_tip_follow"], UI_CONTROLLERS["glabella_follow.L"], UI_CONTROLLERS["glabella_follow.R"]],
+    "Nose_end": [UI_CONTROLLERS["nostril_follow.L"], UI_CONTROLLERS["nostril_follow.R"]],
+    "brow_end.T.L.003": [UI_CONTROLLERS["glabella_follow.L.001"]],
+    "brow_end.T.R.003": [UI_CONTROLLERS["glabella_follow.R.001"]],
+
+    "Lip.Master_end.B.L.001": [UI_CONTROLLERS["cheek_follow.L"]],
+    "Lip.Master_end.B.R.001": [UI_CONTROLLERS["cheek_follow.R"]],
     }
