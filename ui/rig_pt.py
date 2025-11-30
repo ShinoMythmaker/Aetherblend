@@ -1,6 +1,7 @@
 import bpy
 import addon_utils
 from ..preferences import get_preferences
+from ..data.ui_data import UI_CONTROLLER_MAPPING
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -191,11 +192,38 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         panel_class = getattr(bpy.types, panel_name, None)
         
         if panel_class and hasattr(panel_class, 'draw'):
+
+            # Add custom AetherBlend controls before Rigify UI
+            layout = self.layout
+            
+            # Check what bones are selected
+            selected_bones = {bone.name for bone in context.selected_pose_bones or []}
+            
+            # Collect all UI controllers to display based on selection
+            controllers_to_show = []
+            for bone_name in selected_bones:
+                if bone_name in UI_CONTROLLER_MAPPING:
+                    controllers_to_show.extend(UI_CONTROLLER_MAPPING[bone_name])
+            
+            # Remove duplicates while preserving order
+            seen = set()
+            unique_controllers = []
+            for controller in controllers_to_show:
+                if controller.name not in seen:
+                    seen.add(controller.name)
+                    unique_controllers.append(controller)
+            
+            # Render UI controllers
+            if unique_controllers:
+                for controller in unique_controllers:
+                    controller.create_ui(layout, armature)
+
             panel_class.draw(self, context)
         else:
             # Fallback to default behavior if panel not found
             layout = self.layout
             layout.label(text=f"Rig UI panel not found for: {rig_id}")
+       
 
 
 class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):

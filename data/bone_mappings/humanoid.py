@@ -98,7 +98,7 @@ SPINE: list[GenerativeBone] = [
         ref="tgt",
         data=ExtensionBone(name="hips", bone_a="spine.01", size_factor= (-1.2), start="head", parent="spine.01"),
         req_bones=["spine.01"],
-        settings=RigifySettings(bone_name="hips", rigify_type="basic.super_copy", super_copy_widget_type="pivot"),
+        settings=RigifySettings(bone_name="hips", rigify_type="basic.super_copy", super_copy_widget_type="palm"),
         b_collection="Torso",
     ),
 

@@ -13,6 +13,7 @@ class MetaRigCollectionInfo:
     color_type: str
     row_index: int
     title: str
+    visible: bool = True
 
 @dataclass(frozen=True)
 class RigifySettings:
@@ -652,3 +653,160 @@ class CopyRotationConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
+
+
+@dataclass(frozen=True)
+class CopyTransformsConstraint(Constraint):
+    target_bone: str | None = None
+    head_tail: float = 0.0
+    remove_target_shear: bool = False
+    mix_mode: str = "REPLACE"
+    target_space: str = "LOCAL_OWNER_ORIENT"
+    owner_space: str = "LOCAL_WITH_PARENT"
+    influence: float = 1.0
+    name: str = "AetherBlend_CopyTransform"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+        """Applies the Copy Transforms constraint to the given bone."""
+        constraint = bone.constraints.new(type='COPY_TRANSFORMS')
+        constraint.name = self.name
+        target_obj = armature
+        if not target_obj:
+            print(f"[AetherBlend] Target object '{self.target_object}' not found for Copy Transforms constraint.")
+            return
+        constraint.target = target_obj
+        constraint.subtarget = self.target_bone
+        constraint.head_tail = self.head_tail
+        constraint.remove_target_shear = self.remove_target_shear
+        constraint.mix_mode = self.mix_mode
+        constraint.target_space = self.target_space
+        constraint.owner_space = self.owner_space
+        constraint.influence = self.influence
+
+
+@dataclass(frozen=True)
+class UnmapConstraint(Constraint):
+    """Pseudo-constraint that moves bones to an 'Unmapped Bones' collection."""
+    name: str = "AetherBlend_Unmap"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+        """Moves the bone to the 'Unmapped Bones' collection."""
+        collection_name = "Unmapped Bones"
+        
+        bone_collections = armature.data.collections
+        unmapped_collection = bone_collections.get(collection_name)
+        
+        if unmapped_collection is None:
+            unmapped_collection = bone_collections.new(collection_name)
+            unmapped_collection.is_visible = False
+            print(f"[AetherBlend] Created bone collection '{collection_name}'")
+        
+        for collection in bone.bone.collections:
+            collection.unassign(bone.bone)
+        
+        unmapped_collection.assign(bone.bone)
+        print(f"[AetherBlend] Moved bone '{bone.name}' to collection '{collection_name}'")
+
+
+@dataclass(frozen=True)
+class OffsetTransformConstraint(Constraint):
+    """Pseudo-constraint that creates a mechanism bone to properly handle world-to-local transforms."""
+    target_bone: str | None = None
+    name: str = "AetherBlend_OffsetTransform"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+        """Creates a MCH bone copy and sets up proper transform inheritance."""
+        if not self.target_bone:
+            print(f"[AetherBlend] No target bone specified for OffsetTransform constraint on '{bone.name}'")
+            return
+        
+        mch_bone_name = f"MCH_{bone.name}"
+        collection_name = "MCH"
+        
+        original_mode = bpy.context.object.mode
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='EDIT')
+        
+        try:
+            edit_bones = armature.data.edit_bones
+            
+            if mch_bone_name in edit_bones:
+                edit_bones.remove(edit_bones[mch_bone_name])
+            
+            original_edit_bone = edit_bones.get(bone.name)
+            if not original_edit_bone:
+                print(f"[AetherBlend] Could not find bone '{bone.name}' in edit mode")
+                return
+            
+            mch_bone = edit_bones.new(mch_bone_name)
+            mch_bone.head = original_edit_bone.head.copy()
+            mch_bone.tail = original_edit_bone.tail.copy()
+            mch_bone.roll = original_edit_bone.roll
+            
+            target_edit_bone = edit_bones.get(self.target_bone)
+            if target_edit_bone:
+                mch_bone.parent = target_edit_bone
+                mch_bone.use_connect = False
+            else:
+                print(f"[AetherBlend] Warning: Target bone '{self.target_bone}' not found for OffsetTransform")
+            
+            bone_collections = armature.data.collections
+            mch_collection = bone_collections.get(collection_name)
+            
+            if mch_collection is None:
+                mch_collection = bone_collections.new(collection_name)
+                print(f"[AetherBlend] Created bone collection '{collection_name}'")
+            
+        finally:
+            bpy.ops.object.mode_set(mode='POSE')
+        
+        mch_pose_bone = armature.pose.bones.get(mch_bone_name)
+        if mch_pose_bone and bone:
+            mch_collection.assign(mch_pose_bone.bone)
+            
+            copy_transform = CopyTransformsConstraint(
+                target_bone=mch_pose_bone.name,
+                mix_mode="REPLACE",
+                target_space="WORLD",
+                owner_space="WORLD",
+                name="AetherBlend_OffsetTransform_Copy"
+            )
+            copy_transform.apply(bone, armature)
+            
+            print(f"[AetherBlend] Created MCH bone '{mch_bone_name}' for OffsetTransform on '{bone.name}'")
+        
+        if original_mode != 'POSE':
+            bpy.ops.object.mode_set(mode=original_mode)
+
+
+## UI Controller 
+@dataclass(frozen=True)
+class ConstraintUIController:
+    name: str
+    target_bone: str
+    target_constraint: str
+    property_name: str
+    title: str
+    ui_element: str  # e.g., "checkbox", "slider", "dropdown"
+    ui_params: dict | None = None  # Additional parameters for the UI element
+
+    def create_ui(self, layout: bpy.types.UILayout, armature: bpy.types.Object) -> None:
+        """Creates the UI element for controlling the constraint property."""
+        if self.target_bone not in armature.pose.bones:
+            return
+        
+        bone = armature.pose.bones[self.target_bone]
+        constraint = bone.constraints.get(self.target_constraint)
+        
+        if not constraint:
+            return
+        
+        col = layout.column(align=True)
+        if self.ui_element == "checkbox":
+            col.prop(constraint, "mute", text=self.title)
+        elif self.ui_element == "slider":
+            col.prop(constraint, self.property_name, text=self.title, slider=True, **(self.ui_params or {}))
+        elif self.ui_element == "dropdown":
+            col.prop(constraint, self.property_name, text=self.title, **(self.ui_params or {}))
+        else:
+            print(f"[AetherBlend] Unknown UI element type '{self.ui_element}' for ConstraintUIController '{self.name}'")

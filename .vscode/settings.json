@@ -1,0 +1,10 @@
+{
+    "python.analysis.extraPaths": [
+        "E:/SteamLibrary/steamapps/common/Blender/4.5/scripts/modules",
+        "E:/SteamLibrary/steamapps/common/Blender/4.5/python/lib/site-packages"
+    ],
+    "python.autoComplete.extraPaths": [
+        "E:/SteamLibrary/steamapps/common/Blender/4.5/scripts/modules",
+        "E:/SteamLibrary/steamapps/common/Blender/4.5/python/lib/site-packages"
+    ]
+}
