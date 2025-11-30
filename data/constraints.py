@@ -1,4 +1,4 @@
-from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint, CopyTransformsConstraint
+from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint, CopyTransformsConstraint, UnmapConstraint, OffsetTransformConstraint
 
 CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
     #Eyes
@@ -154,11 +154,11 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_f_hagukidn": [CopyLocationConstraint(target_bone="ORG-Teeth.B"), CopyRotationConstraint(target_bone="ORG-Teeth.B")],
 
     #Head
-    "j_kubi": [CopyRotationConstraint(target_bone="ORG-neck")],
-    "j_kao": [CopyTransformsConstraint(target_bone="head")],
+    "j_kubi": [OffsetTransformConstraint(target_bone="DEF-neck")],
+    "j_kao": [OffsetTransformConstraint(target_bone="DEF-head")],
 
-    "j_mimi_l": [CopyRotationConstraint(target_bone="ORG-ear.L")],
-    "j_mimi_r": [CopyRotationConstraint(target_bone="ORG-ear.R")],
+    "j_mimi_l": [OffsetTransformConstraint(target_bone="DEF-ear.L")],
+    "j_mimi_r": [OffsetTransformConstraint(target_bone="DEF-ear.R")],
 
     # Right Cheek
 
@@ -230,5 +230,56 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_sk_b_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.002")],
 
 
-    # Simple Face Bones 
+    # Rigify Bones 
+    ## Arms
+    "hand_tweak.L": [UnmapConstraint()],
+    "hand_tweak.R": [UnmapConstraint()],
+    "forearm_tweak.L.001": [UnmapConstraint()],
+    "forearm_tweak.R.001": [UnmapConstraint()],
+    "forearm_tweak.L": [UnmapConstraint()],
+    "forearm_tweak.R": [UnmapConstraint()],
+    "upper_arm_tweak.L.001": [UnmapConstraint()],
+    "upper_arm_tweak.R.001": [UnmapConstraint()],
+    "upper_arm_tweak.L": [UnmapConstraint()],
+    "upper_arm_tweak.R": [UnmapConstraint()],
+    "upper_arm_parent.L": [UnmapConstraint()],
+    "upper_arm_parent.R": [UnmapConstraint()],
+
+    ## Legs
+    "foot_tweak.L": [UnmapConstraint()],
+    "foot_tweak.R": [UnmapConstraint()],
+    "shin_tweak.L.001": [UnmapConstraint()],
+    "shin_tweak.R.001": [UnmapConstraint()],
+    "shin_tweak.L": [UnmapConstraint()],
+    "shin_tweak.R": [UnmapConstraint()],
+    "thigh_tweak.L.001": [UnmapConstraint()],
+    "thigh_tweak.R.001": [UnmapConstraint()],
+    "thigh_tweak.L": [UnmapConstraint()],
+    "thigh_tweak.R": [UnmapConstraint()],
+    "thigh_parent.L": [UnmapConstraint()],
+    "thigh_parent.R": [UnmapConstraint()],
+
+    ## Skirt
+    "skirt_support.B.L.002": [UnmapConstraint()],
+    "skirt_support.B.R.002": [UnmapConstraint()],
+    "skirt_out.L": [UnmapConstraint()],
+    "skirt_out.R": [UnmapConstraint()],
+    "skirt_front.L": [UnmapConstraint()],
+    "skirt_front.R": [UnmapConstraint()],
+    "skirt_back.L": [UnmapConstraint()],
+    "skirt_back.R": [UnmapConstraint()],
+
+    ## Spine
+    "tweak_spine.004": [UnmapConstraint()],
+    "spine_fk.01": [UnmapConstraint()],
+
+    ## Tail
+    "tweak_base_tail.A": [UnmapConstraint()],
+    "tweak_tail.A": [UnmapConstraint()],
+    "tweak_tail.B": [UnmapConstraint()],
+    "tweak_tail.C": [UnmapConstraint()],
+    "tweak_tail.D": [UnmapConstraint()],
+
+    ## Face
+    "jaw_mouth": [UnmapConstraint()],
 }

@@ -681,3 +681,98 @@ class CopyTransformsConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
+
+
+@dataclass(frozen=True)
+class UnmapConstraint(Constraint):
+    """Pseudo-constraint that moves bones to an 'Unmapped Bones' collection."""
+    name: str = "AetherBlend_Unmap"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+        """Moves the bone to the 'Unmapped Bones' collection."""
+        collection_name = "Unmapped Bones"
+        
+        bone_collections = armature.data.collections
+        unmapped_collection = bone_collections.get(collection_name)
+        
+        if unmapped_collection is None:
+            unmapped_collection = bone_collections.new(collection_name)
+            unmapped_collection.is_visible = False
+            print(f"[AetherBlend] Created bone collection '{collection_name}'")
+        
+        for collection in bone.bone.collections:
+            collection.unassign(bone.bone)
+        
+        unmapped_collection.assign(bone.bone)
+        print(f"[AetherBlend] Moved bone '{bone.name}' to collection '{collection_name}'")
+
+
+@dataclass(frozen=True)
+class OffsetTransformConstraint(Constraint):
+    """Pseudo-constraint that creates a mechanism bone to properly handle world-to-local transforms."""
+    target_bone: str | None = None
+    name: str = "AetherBlend_OffsetTransform"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+        """Creates a MCH bone copy and sets up proper transform inheritance."""
+        if not self.target_bone:
+            print(f"[AetherBlend] No target bone specified for OffsetTransform constraint on '{bone.name}'")
+            return
+        
+        mch_bone_name = f"MCH_{bone.name}"
+        collection_name = "MCH"
+        
+        original_mode = bpy.context.object.mode
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='EDIT')
+        
+        try:
+            edit_bones = armature.data.edit_bones
+            
+            if mch_bone_name in edit_bones:
+                edit_bones.remove(edit_bones[mch_bone_name])
+            
+            original_edit_bone = edit_bones.get(bone.name)
+            if not original_edit_bone:
+                print(f"[AetherBlend] Could not find bone '{bone.name}' in edit mode")
+                return
+            
+            mch_bone = edit_bones.new(mch_bone_name)
+            mch_bone.head = original_edit_bone.head.copy()
+            mch_bone.tail = original_edit_bone.tail.copy()
+            mch_bone.roll = original_edit_bone.roll
+            
+            target_edit_bone = edit_bones.get(self.target_bone)
+            if target_edit_bone:
+                mch_bone.parent = target_edit_bone
+                mch_bone.use_connect = False
+            else:
+                print(f"[AetherBlend] Warning: Target bone '{self.target_bone}' not found for OffsetTransform")
+            
+            bone_collections = armature.data.collections
+            mch_collection = bone_collections.get(collection_name)
+            
+            if mch_collection is None:
+                mch_collection = bone_collections.new(collection_name)
+                print(f"[AetherBlend] Created bone collection '{collection_name}'")
+            
+        finally:
+            bpy.ops.object.mode_set(mode='POSE')
+        
+        mch_pose_bone = armature.pose.bones.get(mch_bone_name)
+        if mch_pose_bone and bone:
+            mch_collection.assign(mch_pose_bone.bone)
+            
+            copy_transform = CopyTransformsConstraint(
+                target_bone=mch_pose_bone.name,
+                mix_mode="REPLACE",
+                target_space="WORLD",
+                owner_space="WORLD",
+                name="AetherBlend_OffsetTransform_Copy"
+            )
+            copy_transform.apply(bone, armature)
+            
+            print(f"[AetherBlend] Created MCH bone '{mch_bone_name}' for OffsetTransform on '{bone.name}'")
+        
+        if original_mode != 'POSE':
+            bpy.ops.object.mode_set(mode=original_mode)
