@@ -161,6 +161,29 @@ def rigify_set_pivot_pos(armature: bpy.types.Armature, bone_name: str, pivot_pos
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
+def rigify_set_skin_anchor_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
+    """Sets up rigify skin anchor properties for a pose bone"""
+
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='POSE')
+
+    pose_bone = armature.pose.bones.get(bone_name)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    _select_pose_bone(pose_bone)
+    armature.data.bones.active = pose_bone.bone
+
+    try:
+        rigify_params = pose_bone.rigify_parameters
+
+        if settings.pivot_master_widget_type is not None:
+            rigify_params.pivot_master_widget_type = settings.pivot_master_widget_type
+
+    except Exception as e:
+        print(f"[AetherBlend] Error setting rigify skin anchor properties: {e}")
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
 def rigify_set_jaw_master_properties(armature: bpy.types.Armature, bone_name: str, settings: RigifySettings) -> None:
     """Sets up rigify jaw master properties for a pose bone"""
 
@@ -370,7 +393,7 @@ def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings,
             armature,
             pose_bone.name,
             settings=settings
-        ),
+        )
     
     if settings.rigify_type == "face.skin_jaw":
         rigify_set_jaw_master_properties(
@@ -378,5 +401,13 @@ def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings,
             pose_bone.name,
             settings=settings
         )
+
+    if settings.rigify_type == "skin.anchor":
+        rigify_set_skin_anchor_properties(
+            armature,
+            pose_bone.name,
+            settings=settings
+        )
+
 
     bpy.ops.object.mode_set(mode=original_mode)

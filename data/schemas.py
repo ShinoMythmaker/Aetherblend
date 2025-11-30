@@ -39,6 +39,7 @@ class RigifySettings:
     skin_chain_falloff_spherical: list[bool] | None  = None
     skin_chain_priority: int | None = None
     skin_control_orientation_bone: str | None  = None
+    pivot_master_widget_type: str | None = None
 
 @dataclass(frozen=True)
 class ExtensionBone:
