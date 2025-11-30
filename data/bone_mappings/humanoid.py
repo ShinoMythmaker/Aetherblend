@@ -941,6 +941,111 @@ EAR_R: list[GenerativeBone] = [
     ),
 ]
 
+IV_PENIS: list[GenerativeBone] = [
+    #this is the most unemployed thing I've ever done in my life
+    #shaft
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="shaft", bone_a="iv_ochinko_f", bone_b="iv_ochinko_e", parent="hips", is_connected=False),
+        req_bones=["iv_ochinko_f", "iv_ochinko_e"],
+        b_collection="Genitals (Male)", #Placeholder since we don't have a collection for it
+        settings=RigifySettings(bone_name="shaft", rigify_type="face.basic_tongue"),
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="shaft.001", bone_a="iv_ochinko_e", bone_b="iv_ochinko_d", parent="shaft", is_connected=True),
+        req_bones=["iv_ochinko_e", "iv_ochinko_d"],
+        b_collection="Tweak (Male)", #Placeholder since we don't have a collection for it
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="shaft.002", bone_a="iv_ochinko_d", bone_b="iv_ochinko_c", parent="shaft.001", is_connected=True),
+        req_bones=["iv_ochinko_d", "iv_ochinko_c"],
+        b_collection="Tweak (Male)", #Placeholder since we don't have a collection for it
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="shaft.003", bone_a="iv_ochinko_c", bone_b="iv_ochinko_b", parent="shaft.002", is_connected=True),
+        req_bones=["iv_ochinko_c", "iv_ochinko_b"],
+        b_collection="Tweak (Male)", #Placeholder since we don't have a collection for it
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="shaft.004", bone_a="iv_ochinko_b", bone_b="iv_ochinko_a", parent="shaft.003", is_connected=True),
+        req_bones=["iv_ochinko_b", "iv_ochinko_a"],
+        b_collection="Tweak (Male)", #Placeholder since we don't have a collection for it
+    ),
+
+    #testicles
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="testicle.L", bone_a="iv_kougan_l", axis_type="local", axis="Y", start="head", parent="hips", is_connected=False, size_factor=0.3),
+        req_bones=["iv_kougan_l"],
+        b_collection="Genitals (Male)",
+        settings=RigifySettings(bone_name="testicle.L", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="testicle.R", bone_a="iv_kougan_r", axis_type="local", axis="Y", start="head", parent="hips", is_connected=False, size_factor=-0.3),
+        req_bones=["iv_kougan_r"],
+        b_collection="Genitals (Male)",
+        settings=RigifySettings(bone_name="testicle.R", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
+    )
+]
+
+IV_VULVA: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="clitoris", bone_a="iv_kuritto", bone_b="iv_inshin_l", parent="hips", is_connected=False),
+        req_bones=["iv_kuritto", "iv_inshin_l"],
+        b_collection="Tweak (Female)",
+        settings=RigifySettings(bone_name="clitoris", rigify_type="skin.stretchy_chain",)
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="clitoris.001", bone_a="iv_kuritto", bone_b="iv_inshin_r", parent="hips", is_connected=False),
+        req_bones=["iv_kuritto", "iv_inshin_r"],
+        b_collection="Tweak (Female)",
+        settings=RigifySettings(bone_name="clitoris.001", rigify_type="skin.stretchy_chain",)
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="clitoris.control", bone_a="iv_kuritto", axis_type="local", axis="Y", start="head", parent="hips", is_connected=False, size_factor=0.05),
+        req_bones=["iv_kuritto"],
+        b_collection="Genitals (Female)",
+        settings=RigifySettings(bone_name="clitoris.control", rigify_type="skin.anchor", pivot_master_widget_type="sphere"),
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="labia.L", bone_a="iv_inshin_l", bone_b="iv_koumon", parent="clitoris", is_connected=True),
+        req_bones=["iv_inshin_l", "iv_koumon"],
+        b_collection="Tweak (Female)",
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ConnectBone(name="labia.R", bone_a="iv_inshin_r", bone_b="iv_koumon", parent="clitoris.001", is_connected=True),
+        req_bones=["iv_inshin_r", "iv_koumon"],
+        b_collection="Tweak (Female)",
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="fourchette.control", bone_a="iv_koumon", axis_type="local", axis="Y", start="head", parent="hips", is_connected=False, size_factor=0.05),
+        req_bones=["iv_koumon"],
+        b_collection="Genitals (Female)",
+        settings=RigifySettings(bone_name="fourchette.control", rigify_type="skin.anchor", pivot_master_widget_type="sphere")
+    ),
+]
+
 SIMPLE_FACE_BONES: list[GenerativeBone] = [
     #I wish so much misfortune on whoever made the pre-DT vanilla face armature for FF
     GenerativeBone(

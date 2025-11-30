@@ -31,6 +31,12 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
 
     MetaRigCollectionInfo(name="Skirt", color_type="Special", row_index=21, title="Skirt", visible=False),
     MetaRigCollectionInfo(name="Skirt (Tweak)", color_type="Tweak", row_index=22, title="Tweak", visible=False),
+
+    MetaRigCollectionInfo(name="Genitals (Male)", color_type="FK", row_index=24, title="Genitals (Male)"),
+    MetaRigCollectionInfo(name="Tweak (Male)", color_type="Tweak", row_index=25, title="Tweak (Male)"),
+    MetaRigCollectionInfo(name="Genitals (Female)", color_type="FK", row_index=24, title="Genitals (Female)"),
+    MetaRigCollectionInfo(name="Tweak (Female)", color_type="Tweak", row_index=25, title="Tweak (Female)"),
+
 ]
 
 UI_CONTROLLERS: dict[str, ConstraintUIController] = {

@@ -237,6 +237,21 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_sk_b_b_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.001")],
     "j_sk_b_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.002")],
 
+    # Genitals
+
+    "iv_ochinko_f": [CopyRotationConstraint(target_bone="DEF-shaft"), CopyLocationConstraint(target_bone="DEF-shaft")],
+    "iv_ochinko_e": [CopyRotationConstraint(target_bone="DEF-shaft.001"), CopyLocationConstraint(target_bone="DEF-shaft.001")],
+    "iv_ochinko_d": [CopyRotationConstraint(target_bone="DEF-shaft.002"), CopyLocationConstraint(target_bone="DEF-shaft.002")],
+    "iv_ochinko_c": [CopyRotationConstraint(target_bone="DEF-shaft.003"), CopyLocationConstraint(target_bone="DEF-shaft.003")],
+    "iv_ochinko_b": [CopyRotationConstraint(target_bone="DEF-shaft.004"), CopyLocationConstraint(target_bone="DEF-shaft.004")],
+
+    "iv_kougan_l": [CopyRotationConstraint(target_bone="ORG-testicle.L")],
+    "iv_kougan_r": [CopyRotationConstraint(target_bone="ORG-testicle.R")],
+
+    "iv_kuritto": [CopyLocationConstraint(target_bone="ORG-clitoris.control")],
+    "iv_inshin_l": [CopyRotationConstraint(target_bone="labia.L"), CopyLocationConstraint(target_bone="DEF-labial.L")],
+    "iv_inshin_r": [CopyRotationConstraint(target_bone="labia.R"), CopyLocationConstraint(target_bone="DEF-labia.R")],
+    "iv_koumon": [CopyLocationConstraint(target_bone="ORG-fourchette.control")],
 
     # Rigify Bones 
     ## Arms
