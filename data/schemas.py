@@ -652,3 +652,32 @@ class CopyRotationConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
+
+
+@dataclass(frozen=True)
+class CopyTransformsConstraint(Constraint):
+    target_bone: str | None = None
+    head_tail: float = 0.0
+    remove_target_shear: bool = False
+    mix_mode: str = "REPLACE"
+    target_space: str = "LOCAL_OWNER_ORIENT"
+    owner_space: str = "LOCAL_WITH_PARENT"
+    influence: float = 1.0
+    name: str = "AetherBlend_CopyTransform"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+        """Applies the Copy Transforms constraint to the given bone."""
+        constraint = bone.constraints.new(type='COPY_TRANSFORMS')
+        constraint.name = self.name
+        target_obj = armature
+        if not target_obj:
+            print(f"[AetherBlend] Target object '{self.target_object}' not found for Copy Transforms constraint.")
+            return
+        constraint.target = target_obj
+        constraint.subtarget = self.target_bone
+        constraint.head_tail = self.head_tail
+        constraint.remove_target_shear = self.remove_target_shear
+        constraint.mix_mode = self.mix_mode
+        constraint.target_space = self.target_space
+        constraint.owner_space = self.owner_space
+        constraint.influence = self.influence

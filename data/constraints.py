@@ -1,4 +1,4 @@
-from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint
+from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint, CopyTransformsConstraint
 
 CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
     #Eyes
@@ -155,7 +155,7 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     #Head
     "j_kubi": [CopyRotationConstraint(target_bone="ORG-neck")],
-    "j_kao": [CopyRotationConstraint(target_bone="ORG-head"), CopyLocationConstraint(target_bone="ORG-head")],
+    "j_kao": [CopyTransformsConstraint(target_bone="head")],
 
     "j_mimi_l": [CopyRotationConstraint(target_bone="ORG-ear.L")],
     "j_mimi_r": [CopyRotationConstraint(target_bone="ORG-ear.R")],
