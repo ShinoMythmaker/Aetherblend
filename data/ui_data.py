@@ -26,6 +26,9 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
     MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=15, title="FK.R", visible=False),
     MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=16, title="Tweak.R", visible=False),
 
+    MetaRigCollectionInfo(name="Toes", color_type="Extra", row_index=7, title="Toes"),
+    MetaRigCollectionInfo(name="Toes (Details)", color_type="FK", row_index=8, title="(Details)", visible=False),
+
     MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=18, title="Tail"),
     MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=19, title="Tweaks", visible=False),
 

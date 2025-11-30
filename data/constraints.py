@@ -97,6 +97,32 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_ko_b_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L02")],
     "iv_ko_c_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L03")],
 
+    # Left Toes
+
+    "iv_asi_oya_a_l": [CopyRotationConstraint(target_bone="ORG-Hallux.L")],
+    "iv_asi_oya_b_l": [CopyRotationConstraint(target_bone="ORG-Hallux.L.001")],
+    "iv_asi_hito_a_l": [CopyRotationConstraint(target_bone="ORG-Index.L")],
+    "iv_asi_hito_b_l": [CopyRotationConstraint(target_bone="ORG-Index.L.001")],
+    "iv_asi_naka_a_l": [CopyRotationConstraint(target_bone="ORG-Middle.L")],
+    "iv_asi_naka_b_l": [CopyRotationConstraint(target_bone="ORG-Middle.L.001")],
+    "iv_asi_kusu_a_l": [CopyRotationConstraint(target_bone="ORG-Ring.L")],
+    "iv_asi_kusu_b_l": [CopyRotationConstraint(target_bone="ORG-Ring.L.001")],
+    "iv_asi_ko_a_l": [CopyRotationConstraint(target_bone="ORG-Pinky.L")],
+    "iv_asi_ko_b_l": [CopyRotationConstraint(target_bone="ORG-Pinky.L.001")],
+
+    # RIght Toes
+
+    "iv_asi_oya_a_r": [CopyRotationConstraint(target_bone="ORG-Hallux.R")],
+    "iv_asi_oya_b_r": [CopyRotationConstraint(target_bone="ORG-Hallux.R.001")],
+    "iv_asi_hito_a_r": [CopyRotationConstraint(target_bone="ORG-Index.R")],
+    "iv_asi_hito_b_r": [CopyRotationConstraint(target_bone="ORG-Index.R.001")],
+    "iv_asi_naka_a_r": [CopyRotationConstraint(target_bone="ORG-Middle.R")],
+    "iv_asi_naka_b_r": [CopyRotationConstraint(target_bone="ORG-Middle.R.001")],
+    "iv_asi_kusu_a_r": [CopyRotationConstraint(target_bone="ORG-Ring.R")],
+    "iv_asi_kusu_b_r": [CopyRotationConstraint(target_bone="ORG-Ring.R.001")],
+    "iv_asi_ko_a_r": [CopyRotationConstraint(target_bone="ORG-Pinky.R")],
+    "iv_asi_ko_b_r": [CopyRotationConstraint(target_bone="ORG-Pinky.R.001")],
+
     #Brows
 
     "j_f_mayu_r": [CopyLocationConstraint(target_bone="DEF-brow.T.R"), CopyRotationConstraint(target_bone="brow.T.R")],

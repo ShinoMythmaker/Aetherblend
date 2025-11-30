@@ -36,5 +36,6 @@ HUMAN: list[list[list[GenerativeBone]]] = [
     [VIERA_EAR_R, EAR_R],
     [IV_PENIS],
     [IV_VULVA],
+    [IV_TOES],
     [SKIRT]
 ]
