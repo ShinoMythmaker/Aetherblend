@@ -34,7 +34,6 @@ CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
 
 
 NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
-
     # Spine 
     "j_kosi": [CopyLocationConstraint(target_bone="j_sebo_a"), CopyRotationConstraint(target_bone="j_sebo_a"), CopyRotationConstraint(target_bone="hips.001")],
 
@@ -282,4 +281,7 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     ## Face
     "jaw_mouth": [UnmapConstraint()],
+
+    "lid.T.L.002": [CopyLocationConstraint(target_bone="lid.B.L.002", name="eye_lid_close.L")],
+    "lid.T.R.002": [CopyLocationConstraint(target_bone="lid.B.R.002", name="eye_lid_close.R")],
 }

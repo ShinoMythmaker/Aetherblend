@@ -13,6 +13,7 @@ class MetaRigCollectionInfo:
     color_type: str
     row_index: int
     title: str
+    visible: bool = True
 
 @dataclass(frozen=True)
 class RigifySettings:
@@ -776,3 +777,36 @@ class OffsetTransformConstraint(Constraint):
         
         if original_mode != 'POSE':
             bpy.ops.object.mode_set(mode=original_mode)
+
+
+## UI Controller 
+@dataclass(frozen=True)
+class ConstraintUIController:
+    name: str
+    target_bone: str
+    target_constraint: str
+    property_name: str
+    title: str
+    ui_element: str  # e.g., "checkbox", "slider", "dropdown"
+    ui_params: dict | None = None  # Additional parameters for the UI element
+
+    def create_ui(self, layout: bpy.types.UILayout, armature: bpy.types.Object) -> None:
+        """Creates the UI element for controlling the constraint property."""
+        if self.target_bone not in armature.pose.bones:
+            return
+        
+        bone = armature.pose.bones[self.target_bone]
+        constraint = bone.constraints.get(self.target_constraint)
+        
+        if not constraint:
+            return
+        
+        col = layout.column(align=True)
+        if self.ui_element == "checkbox":
+            col.prop(constraint, "mute", text=self.title)
+        elif self.ui_element == "slider":
+            col.prop(constraint, self.property_name, text=self.title, slider=True, **(self.ui_params or {}))
+        elif self.ui_element == "dropdown":
+            col.prop(constraint, self.property_name, text=self.title, **(self.ui_params or {}))
+        else:
+            print(f"[AetherBlend] Unknown UI element type '{self.ui_element}' for ConstraintUIController '{self.name}'")
