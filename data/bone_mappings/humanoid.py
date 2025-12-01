@@ -123,18 +123,18 @@ SPINE: list[GenerativeBone] = [
 CHEST: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=47),
+        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=47, size_factor=1.5),
         req_bones=["j_mune_l"],
         b_collection="Torso",
-        settings=RigifySettings(bone_name="Chest.L", rigify_type="basic.super_copy", super_copy_widget_type="circle"),
+        settings=RigifySettings(bone_name="Chest.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
     ),
 
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=43),
+        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=43, size_factor=1.5),
         req_bones=["j_mune_r"],
         b_collection="Torso",
-        settings=RigifySettings(bone_name="Chest.R", rigify_type="basic.super_copy", super_copy_widget_type="circle"),
+        settings=RigifySettings(bone_name="Chest.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
     )
 ]
 
@@ -724,7 +724,7 @@ BROW_L: list[GenerativeBone] = [
         data=ConnectBone(name="brow.T.L.002.glue", bone_a="lid.T.L.002", bone_b="brow.T.L.002", parent="head", is_connected=False),
         req_bones=["brow.T.L.002", "lid.T.L.002"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="brow.T.L.002.glue", rigify_type="skin.glue", relink_constraints=True, skin_glue_use_tail=True, skin_glue_tail_reparent=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1),
+        settings=RigifySettings(bone_name="brow.T.L.002.glue", rigify_type="skin.glue", relink_constraints=True, skin_glue_use_tail=True, skin_glue_tail_reparent=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2),
     )
 ]
 
@@ -763,7 +763,7 @@ BROW_R: list[GenerativeBone] = [
         data=ConnectBone(name="brow.T.R.002.glue", bone_a="lid.T.R.002", bone_b="brow.T.R.002", parent="head", is_connected=False),
         req_bones=["brow.T.R.002", "lid.T.R.002"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="brow.T.R.002.glue", rigify_type="skin.glue", relink_constraints=True, skin_glue_use_tail=True, skin_glue_tail_reparent=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1),
+        settings=RigifySettings(bone_name="brow.T.R.002.glue", rigify_type="skin.glue", relink_constraints=True, skin_glue_use_tail=True, skin_glue_tail_reparent=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2),
     )
 ]
 

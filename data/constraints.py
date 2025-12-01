@@ -39,10 +39,10 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     "j_sebo_a": [CopyLocationConstraint(target_bone="DEF-spine.01"), CopyRotationConstraint(target_bone="DEF-spine.01")],
     "j_sebo_b": [CopyRotationConstraint(target_bone="DEF-spine.02")],
-    "j_sebo_c": [CopyRotationConstraint(target_bone="DEF-spine.03")],
+    "j_sebo_c": [OffsetTransformConstraint(target_bone="DEF-spine.03")],
 
-    "j_sako_l": [CopyRotationConstraint(target_bone="shoulder.L")],
-    "j_sako_r": [CopyRotationConstraint(target_bone="shoulder.R")],
+    "j_sako_l": [OffsetTransformConstraint(target_bone="shoulder.L")],
+    "j_sako_r": [OffsetTransformConstraint(target_bone="shoulder.R")],
 
     # Chest
     "j_mune_l": [CopyLocationConstraint(target_bone="ORG-Chest.L"), CopyRotationConstraint(target_bone="ORG-Chest.L")],
@@ -60,10 +60,10 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_te_r": [CopyLocationConstraint(target_bone="DEF-hand.R"), CopyRotationConstraint(target_bone="ORG-hand.R")],
 
     # Twist
-    "n_hte_r": [CopyRotationConstraint(target_bone="ORG-hand.R", axis=[True, False, False], influence=0.5)],
-    "n_hte_l": [CopyRotationConstraint(target_bone="ORG-hand.L", axis=[True, False, False], influence=0.5)],
-    "n_hhiji_r": [CopyRotationConstraint(target_bone="ORG-upper_arm.R", axis=[False, False, True])],
-    "n_hhiji_l": [CopyRotationConstraint(target_bone="ORG-upper_arm.L", axis=[False, False, True])],
+    "n_hte_r": [CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False], influence=0.5), CopyRotationConstraint(target_bone="heand_tweak.L")],
+    "n_hte_l": [CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False], influence=0.5), CopyRotationConstraint(target_bone="heand_tweak.R")],
+    "n_hhiji_r": [CopyRotationConstraint(target_bone="DEF-upper_arm.R", axis=[False, False, True])],
+    "n_hhiji_l": [CopyRotationConstraint(target_bone="DEF-upper_arm.L", axis=[False, False, True])],
 
     # Right Fingers
     "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R01")],
@@ -281,8 +281,6 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     # Rigify Bones 
     ## Arms
-    "hand_tweak.L": [UnmapConstraint()],
-    "hand_tweak.R": [UnmapConstraint()],
     "forearm_tweak.L.001": [UnmapConstraint()],
     "forearm_tweak.R.001": [UnmapConstraint()],
     "forearm_tweak.L": [UnmapConstraint()],
