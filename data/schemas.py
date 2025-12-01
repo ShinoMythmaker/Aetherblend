@@ -790,6 +790,7 @@ class ConstraintUIController:
     title: str
     ui_element: str  # e.g., "checkbox", "slider", "dropdown"
     ui_params: dict | None = None  # Additional parameters for the UI element
+    rename_constraint: str | None = None
 
     def create_ui(self, layout: bpy.types.UILayout, armature: bpy.types.Object) -> None:
         """Creates the UI element for controlling the constraint property."""
@@ -797,7 +798,8 @@ class ConstraintUIController:
             return
         
         bone = armature.pose.bones[self.target_bone]
-        constraint = bone.constraints.get(self.target_constraint)
+        constraint_name = self.rename_constraint if self.rename_constraint is not None else self.target_constraint
+        constraint = bone.constraints.get(constraint_name)
         
         if not constraint:
             return
@@ -811,3 +813,23 @@ class ConstraintUIController:
             col.prop(constraint, self.property_name, text=self.title, **(self.ui_params or {}))
         else:
             print(f"[AetherBlend] Unknown UI element type '{self.ui_element}' for ConstraintUIController '{self.name}'")
+    
+    def name_change(self, armature: bpy.types.Object) -> bool:
+        """Renames the target constraint to a new name."""
+        if self.rename_constraint is None:
+            return False
+        
+        if self.target_bone not in armature.pose.bones:
+            print(f"[AetherBlend] Bone '{self.target_bone}' not found in armature for ConstraintUIController '{self.name}'")
+            return False
+        
+        bone = armature.pose.bones[self.target_bone]
+        constraint = bone.constraints.get(self.target_constraint)
+        
+        if not constraint:
+            print(f"[AetherBlend] Constraint '{self.target_constraint}' not found on bone '{self.target_bone}' for ConstraintUIController '{self.name}'")
+            return False
+        
+        constraint.name = self.rename_constraint
+        print(f"[AetherBlend] Renamed constraint '{self.target_constraint}' to '{self.rename_constraint}' on bone '{self.target_bone}'")
+        return True

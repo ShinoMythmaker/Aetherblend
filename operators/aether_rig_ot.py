@@ -2,7 +2,7 @@ import bpy
 from .. import utils
 from ..data import *
 
-def cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> None:
+def _cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> None:
     """Remove old control rig bones and data from FFXIV armature before linking new ones."""
     original_mode = bpy.context.object.mode
     bpy.ops.object.mode_set(mode='POSE')
@@ -20,7 +20,7 @@ def cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: 
     
     bpy.ops.object.mode_set(mode=original_mode)
 
-def find_objects_with_armature_and_material_property(armature: bpy.types.Armature, property_name: str, property_value=None) -> list[bpy.types.Object]:
+def _find_objects_with_armature_and_material_property(armature: bpy.types.Armature, property_name: str, property_value=None) -> list[bpy.types.Object]:
     """Find all objects that have the specified armature as a constraint target and have materials with a specific custom property.
     
     Args:
@@ -183,7 +183,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
 
         ## Propegate data 
-        eye_occlusion_object = find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
+        eye_occlusion_object = _find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
 
         data = {}
         if eye_occlusion_object:
@@ -293,9 +293,11 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         rigify_rig.hide_set(False)
 
         if armature.aether_rig.rigify_linked:
-            cleanup_linked_rigify_bones(armature, rigify_rig)
+            _cleanup_linked_rigify_bones(armature, rigify_rig)
 
-        self.merge_control_rig_bones(armature, rigify_rig)
+        self._merge_control_rig_bones(armature, rigify_rig)
+
+        self._rename_constraints(armature)
 
         armature.aether_rig.rigify_linked = True
 
@@ -318,8 +320,14 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
-            
-    def merge_control_rig_bones(self, ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> bool:
+
+    def _rename_constraints(self, armature: bpy.types.Armature) -> None:
+        """Rename constraints based on ConstraintUIController settings."""
+        for controller in ui_data.UI_CONTROLLERS.values():
+            if controller.rename_constraint is not None:
+                controller.name_change(armature)    
+
+    def _merge_control_rig_bones(self, ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> bool:
         """Duplicate the control rig and merge it with the FFXIV armature."""
         original_mode = bpy.context.object.mode
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -410,7 +418,7 @@ class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
         rigify_rig = armature.aether_rig.rigify_rig
         if rigify_rig:
             rigify_rig.hide_set(False)
-            cleanup_linked_rigify_bones(armature, rigify_rig)
+            _cleanup_linked_rigify_bones(armature, rigify_rig)
             armature.aether_rig.rigify_linked = False
             bpy.context.window.cursor_set('DEFAULT')
             return {'FINISHED'}
