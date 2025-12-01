@@ -20,8 +20,8 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
             return {'CANCELLED'}
 
         version, cplus_dict = utils.c_plus.translate_hash(cplus_string)
-        if not cplus_dict or version != 4:
-            self.report({'ERROR'}, "Invalid or unsupported C+ string (must be version 4).")
+        if not cplus_dict or version not in [4, 5]:
+            self.report({'ERROR'}, "Invalid or unsupported C+ string (must be version 4 or 5).")
             return {'CANCELLED'}
 
         scale_dict = utils.c_plus.get_bone_values(cplus_dict, 'Scaling')
