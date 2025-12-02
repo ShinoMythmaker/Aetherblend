@@ -176,14 +176,16 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         bpy.ops.armature.rigify_add_color_sets()
 
+        ## Setup collections
+        hide_collections = []
         for collection in META_RIG_COLLECTIONS_INFO:
             coll = meta_rig.data.collections.new(collection.name)
             if coll:
                 coll.rigify_color_set_name = collection.color_type
                 coll.rigify_ui_row = collection.row_index
                 coll.rigify_ui_title = collection.title
-                # coll.is_visible = collection.visible
-
+                if not collection.visible:
+                    hide_collections.append(coll)
 
         ## Propegate data 
         eye_occlusion_object = _find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
@@ -207,6 +209,12 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                     print(bones)
                     break
                 
+
+        ## Hide Collections
+        for hide_coll in hide_collections:
+            hide_coll.is_visible = False
+
+        ## Safe Rig Reference
         armature.aether_rig.meta_rig = meta_rig
         
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -221,6 +229,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         return {'FINISHED'}
 
 class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
+
     bl_idname = "aether.generate_rigify_rig"
     bl_label = "Generate Rigify Rig"
     bl_description = ("Generate the rigify control rig from the meta rig")

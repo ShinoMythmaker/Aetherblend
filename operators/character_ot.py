@@ -165,6 +165,20 @@ def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
     
     utils.armature.unparent_all_bones(armature)
     
+    # Parent all bones to n_root if it exists
+    bpy.ops.object.mode_set(mode='EDIT')
+    edit_bones = armature.data.edit_bones
+    n_root = edit_bones.get('n_root')
+    
+    if n_root:
+        for bone in edit_bones:
+            if bone != n_root and bone.parent is None:
+                bone.parent = n_root
+                bone.use_connect = False
+        print(f"[AetherBlend] Parented all bones to n_root")
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    
     utils.armature.apply_all_as_shapekey(armature, shapekey_name=f"ImportedPose")
     
     utils.armature.new_rest_pose(armature)
