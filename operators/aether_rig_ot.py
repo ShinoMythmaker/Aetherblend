@@ -335,7 +335,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
     def _rename_constraints(self, armature: bpy.types.Armature) -> None:
         """Rename constraints based on ConstraintUIController settings."""
-        for controller in ui_data.UI_CONTROLLERS.values():
+        for controller in UI_CONTROLLERS.values():
             if controller.rename_constraint is not None:
                 controller.name_change(armature)    
 
@@ -358,14 +358,12 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         bpy.context.view_layer.objects.active = ffxiv_armature 
         
         bpy.ops.object.join()
-
-        bpy.ops.object.mode_set(mode='EDIT')
-        self.set_org_bone_parents(bpy.context.active_object)
         
         bpy.ops.object.mode_set(mode='OBJECT')
         
         self.copy_rigify_properties(ffxiv_armature, rigify_rig)
 
+        self._override_property_values(ffxiv_armature)
 
         constraints_track_to_after = utils.armature.bone.add_constraint_track_to_after_original(ffxiv_armature, CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL)
         constraints_copy_rot = utils.armature.bone.add_constraint_copy_rotation(ffxiv_armature, CONSTRAINTS_COPY_ROT, overwrite=False)
@@ -385,35 +383,15 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
             for pose_bone in ffxiv_armature.pose.bones:
                 match = re.match(pattern, pose_bone.name)
                 if match:
-                    # Extract the owner bone name from the first capture group
                     owner_bone_name = match.group(1) if match.groups() else re.sub(pattern, '', pose_bone.name)
                     print(f"Applying regex constraints to bone: {pose_bone.name}, owner bone: {owner_bone_name}")
                     
-                    # Get the owner bone
                     owner_bone = ffxiv_armature.pose.bones.get(owner_bone_name)
                     if owner_bone:
-                        # Apply constraints to the owner bone
-                        # Pass the regex-matched bone name as target_override
                         for constraint in constraints:
                             constraint.apply(owner_bone, ffxiv_armature, target_override=pose_bone.name)
 
                    
-        bpy.ops.object.mode_set(mode=original_mode)
-        return True
-    
-    def set_org_bone_parents(self, armature: bpy.types.Armature) -> bool:
-        original_mode = bpy.context.object.mode
-        bpy.ops.object.mode_set(mode='EDIT')
-
-        edit_bones = armature.data.edit_bones
-        for edit_bone in edit_bones:
-            if edit_bone.name.startswith("ORG-"):
-                ref_bone_name = edit_bone.name[4:]
-                ref_bone = edit_bones.get(ref_bone_name)
-                if ref_bone and ref_bone.collections.get("FFXIV"):
-                    edit_bone.parent = ref_bone
-                    edit_bone.use_connect = False
-
         bpy.ops.object.mode_set(mode=original_mode)
         return True
 
@@ -430,6 +408,23 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
                 print(f"[AetherBlend] Copied rigify property from armature data: {prop_name}")
         
         return True
+    
+    def _override_property_values(self, armature: bpy.types.Armature) -> None:
+        """Override specific custom property values based on PROP_OVERRIDES."""
+        bpy.ops.object.mode_set(mode='POSE')
+        
+        for bone_name, properties in PROP_OVERRIDES.items():
+            pose_bone = armature.pose.bones.get(bone_name)
+            
+            if pose_bone:
+                for property_name, override_value in properties.items():
+                    try:
+                        pose_bone[property_name] = override_value
+                        print(f"[AetherBlend] Set {bone_name}['{property_name}'] = {override_value}")
+                    except Exception as e:
+                        print(f"[AetherBlend] Failed to set {bone_name}['{property_name}'] = {override_value}: {e}")
+            else:
+                print(f"[AetherBlend] Pose bone not found: {bone_name}")
 
 class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
     bl_idname = "aether.unlink_rigify_rig"

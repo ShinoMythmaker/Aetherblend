@@ -209,3 +209,10 @@ UI_CONTROLLER_MAPPING: dict[str, list[ConstraintUIController]] = {
     "Cheek.B.R": [UI_CONTROLLERS["cheek_follow.R"]],
     "Cheek.B.L": [UI_CONTROLLERS["cheek_follow.L"]]
     }
+
+PROP_OVERRIDES: dict[str, dict[str, int]] = {
+    "upper_arm_parent.L": {"IK_Stretch":0},
+    "upper_arm_parent.R": {"IK_Stretch":0},
+    "thigh_parent.L": {"IK_Stretch":0},
+    "thigh_parent.R": {"IK_Stretch":0},
+}
