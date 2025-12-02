@@ -118,22 +118,6 @@ SPINE: list[GenerativeBone] = [
         b_collection="Torso",
     ),
 
-    GenerativeBone(
-        ref="src",
-        data=ExtensionBone(name="shoulder_tweak.L", bone_a="n_hkata_l", axis_type="local", axis="Y", start="head", parent="spine.03", is_connected=False, size_factor=0.5, roll=45),
-        req_bones=["n_hkata_l"],
-        b_collection="Arm.L (Tweak)",
-        settings=RigifySettings(bone_name="shoulder_tweak.L", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
-    ),
-
-    GenerativeBone(
-        ref="src",
-        data=ExtensionBone(name="shoulder_tweak.R", bone_a="n_hkata_r", axis_type="local", axis="Y", start="head", parent="spine.03", is_connected=False, size_factor=0.5, roll=45),
-        req_bones=["n_hkata_r"],
-        b_collection="Arm.L (Tweak)",
-        settings=RigifySettings(bone_name="shoulder_tweak.R", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
-    ),
-
 ]
 
 CHEST: list[GenerativeBone] = [
@@ -192,6 +176,16 @@ ARM_L:list[GenerativeBone] = [
         settings=RigifySettings(bone_name="elbow.L", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
     ),
 
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="shoulder_tweak.L", bone_a="n_hkata_l", axis_type="local", axis="Y", start="head", parent="upper_arm.L", is_connected=False, size_factor=0.5, roll=45),
+        req_bones=["n_hkata_l"],
+        b_collection="Arm.L (Tweak)",
+        settings=RigifySettings(bone_name="shoulder_tweak.L", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
+    ),
+
+    
+
 
 ]
 
@@ -231,7 +225,15 @@ ARM_R:list[GenerativeBone] = [
         req_bones=["n_hhiji_r"],
         b_collection="Arm.R (Tweak)",
         settings=RigifySettings(bone_name="elbow.R", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
-    )
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="shoulder_tweak.R", bone_a="n_hkata_r", axis_type="local", axis="Y", start="head", parent="upper_arm.R", is_connected=False, size_factor=0.5, roll=45),
+        req_bones=["n_hkata_r"],
+        b_collection="Arm.L (Tweak)",
+        settings=RigifySettings(bone_name="shoulder_tweak.R", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
+    ),
 ] 
 
 TAIL: list[GenerativeBone] = [
