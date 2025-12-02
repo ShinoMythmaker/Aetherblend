@@ -35,18 +35,18 @@ CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
 
 NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     # Spine 
-    "j_kosi": [CopyLocationConstraint(target_bone="j_sebo_a"), CopyRotationConstraint(target_bone="j_sebo_a"), CopyRotationConstraint(target_bone="hips.001")],
+    "j_kosi": [OffsetTransformConstraint(target_bone="DEF-hips")],
 
-    "j_sebo_a": [CopyLocationConstraint(target_bone="DEF-spine.01"), CopyRotationConstraint(target_bone="DEF-spine.01")],
-    "j_sebo_b": [CopyRotationConstraint(target_bone="DEF-spine.02")],
+    "j_sebo_a": [OffsetTransformConstraint(target_bone="DEF-spine.01")],
+    "j_sebo_b": [OffsetTransformConstraint(target_bone="DEF-spine.02")],
     "j_sebo_c": [OffsetTransformConstraint(target_bone="DEF-spine.03")],
 
     "j_sako_l": [OffsetTransformConstraint(target_bone="shoulder.L")],
     "j_sako_r": [OffsetTransformConstraint(target_bone="shoulder.R")],
 
     # Chest
-    "j_mune_l": [CopyLocationConstraint(target_bone="ORG-Chest.L"), CopyRotationConstraint(target_bone="ORG-Chest.L")],
-    "j_mune_r": [CopyLocationConstraint(target_bone="ORG-Chest.R"), CopyRotationConstraint(target_bone="ORG-Chest.R")],
+    "j_mune_l": [OffsetTransformConstraint(target_bone="DEF-Chest.L")],
+    "j_mune_r": [OffsetTransformConstraint(target_bone="DEF-Chest.R")],
 
 
     # Left Arm
@@ -60,10 +60,12 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_te_r": [CopyLocationConstraint(target_bone="DEF-hand.R"), CopyRotationConstraint(target_bone="ORG-hand.R")],
 
     # Twist
-    "n_hte_r": [CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False], influence=0.5), CopyRotationConstraint(target_bone="heand_tweak.L")],
-    "n_hte_l": [CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False], influence=0.5), CopyRotationConstraint(target_bone="heand_tweak.R")],
-    "n_hhiji_r": [CopyRotationConstraint(target_bone="DEF-upper_arm.R", axis=[False, False, True])],
-    "n_hhiji_l": [CopyRotationConstraint(target_bone="DEF-upper_arm.L", axis=[False, False, True])],
+    "n_hte_r": [CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.R", axis=[True, False, False])],
+    "n_hte_l": [CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.L", axis=[True, False, False])],
+    "n_hhiji_r": [OffsetTransformConstraint(target_bone="DEF-elbow.R")],
+    "n_hhiji_l": [OffsetTransformConstraint(target_bone="DEF-elbow.L")],
+    "n_hkata_l": [OffsetTransformConstraint(target_bone="DEF-shoulder_tweak.L")],
+    "n_hkata_r": [OffsetTransformConstraint(target_bone="DEF-shoulder_tweak.R")],
 
     # Right Fingers
     "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R01")],
@@ -110,7 +112,7 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "iv_asi_ko_a_l": [CopyRotationConstraint(target_bone="ORG-Pinky.L")],
     "iv_asi_ko_b_l": [CopyRotationConstraint(target_bone="ORG-Pinky.L.001")],
 
-    # RIght Toes
+    # Right Toes
 
     "iv_asi_oya_a_r": [CopyRotationConstraint(target_bone="ORG-Hallux.R")],
     "iv_asi_oya_b_r": [CopyRotationConstraint(target_bone="ORG-Hallux.R.001")],
@@ -219,47 +221,47 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     # DEF-toe because the ORG bone here stays still in local space. 
     # This issue is a mystery to me because it works when manually merging the rigify rig with the ffxiv rig. 
     # So i assume this happens in the parent clean up step.
-    "j_asi_a_l": [CopyRotationConstraint(target_bone="ORG-thigh.L")],
-    "j_asi_c_l": [CopyRotationConstraint(target_bone="ORG-shin.L")],
-    "j_asi_d_l": [CopyRotationConstraint(target_bone="ORG-foot.L")],
-    "j_asi_e_l": [CopyRotationConstraint(target_bone="DEF-toe.L")],
+    "j_asi_a_l": [OffsetTransformConstraint(target_bone="DEF-thigh.L")],
+    "j_asi_c_l": [OffsetTransformConstraint(target_bone="DEF-shin.L")],
+    "j_asi_d_l": [OffsetTransformConstraint(target_bone="DEF-foot.L")],
+    "j_asi_e_l": [OffsetTransformConstraint(target_bone="DEF-toe.L")],
 
     # Right Leg
-    "j_asi_a_r": [CopyRotationConstraint(target_bone="ORG-thigh.R")],
-    "j_asi_c_r": [CopyRotationConstraint(target_bone="ORG-shin.R")],
-    "j_asi_d_r": [CopyRotationConstraint(target_bone="ORG-foot.R")],
-    "j_asi_e_r": [CopyRotationConstraint(target_bone="DEF-toe.R")],
+    "j_asi_a_r": [OffsetTransformConstraint(target_bone="DEF-thigh.R")],
+    "j_asi_c_r": [OffsetTransformConstraint(target_bone="DEF-shin.R")],
+    "j_asi_d_r": [OffsetTransformConstraint(target_bone="DEF-foot.R")],
+    "j_asi_e_r": [OffsetTransformConstraint(target_bone="DEF-toe.R")],
 
     # Tail
-    "n_sippo_a": [CopyRotationConstraint(target_bone="ORG-tail.A")],
-    "n_sippo_b": [CopyRotationConstraint(target_bone="tail.B")],
-    "n_sippo_c": [CopyRotationConstraint(target_bone="tail.C")],
-    "n_sippo_d": [CopyRotationConstraint(target_bone="tail.D")],
-    "n_sippo_e": [CopyRotationConstraint(target_bone="Tail.A_master")],
+    "n_sippo_a": [OffsetTransformConstraint(target_bone="DEF-tail.A")],
+    "n_sippo_b": [OffsetTransformConstraint(target_bone="DEF-tail.B")],
+    "n_sippo_c": [OffsetTransformConstraint(target_bone="DEF-tail.C")],
+    "n_sippo_d": [OffsetTransformConstraint(target_bone="DEF-tail.D")],
+    "n_sippo_e": [OffsetTransformConstraint(target_bone="DEF-tail.A_master")],
 
     # Skirt
 
-    "j_sk_f_a_l": [CopyRotationConstraint(target_bone="DEF-skirt_front.L")],
+    "j_sk_f_a_l": [OffsetTransformConstraint(target_bone="DEF-skirt_front.L")],
     "j_sk_f_b_l": [CopyRotationConstraint(target_bone="DEF-skirt_front.L.001")],
     "j_sk_f_c_l": [CopyRotationConstraint(target_bone="DEF-skirt_front.L.002")],
 
-    "j_sk_s_a_l": [CopyRotationConstraint(target_bone="DEF-skirt_out.L")],
+    "j_sk_s_a_l": [OffsetTransformConstraint(target_bone="DEF-skirt_out.L")],
     "j_sk_s_b_l": [CopyRotationConstraint(target_bone="DEF-skirt_out.L.001")],
     "j_sk_s_c_l": [CopyRotationConstraint(target_bone="DEF-skirt_out.L.002")],
 
-    "j_sk_b_a_l": [CopyRotationConstraint(target_bone="DEF-skirt_back.L")],
+    "j_sk_b_a_l": [OffsetTransformConstraint(target_bone="DEF-skirt_back.L")],
     "j_sk_b_b_l": [CopyRotationConstraint(target_bone="DEF-skirt_back.L.001")],
     "j_sk_b_c_l": [CopyRotationConstraint(target_bone="DEF-skirt_back.L.002")],
 
-    "j_sk_f_a_r": [CopyRotationConstraint(target_bone="DEF-skirt_front.R")],
+    "j_sk_f_a_r": [OffsetTransformConstraint(target_bone="DEF-skirt_front.R")],
     "j_sk_f_b_r": [CopyRotationConstraint(target_bone="DEF-skirt_front.R.001")],
     "j_sk_f_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_front.R.002")],
 
-    "j_sk_s_a_r": [CopyRotationConstraint(target_bone="DEF-skirt_out.R")],
+    "j_sk_s_a_r": [OffsetTransformConstraint(target_bone="DEF-skirt_out.R")],
     "j_sk_s_b_r": [CopyRotationConstraint(target_bone="DEF-skirt_out.R.001")],
     "j_sk_s_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_out.R.002")],
 
-    "j_sk_b_a_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R")],
+    "j_sk_b_a_r": [OffsetTransformConstraint(target_bone="DEF-skirt_back.R")],
     "j_sk_b_b_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.001")],
     "j_sk_b_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.002")],
 
@@ -274,10 +276,10 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "iv_kougan_l": [CopyRotationConstraint(target_bone="ORG-testicle.L")],
     "iv_kougan_r": [CopyRotationConstraint(target_bone="ORG-testicle.R")],
 
-    "iv_kuritto": [CopyLocationConstraint(target_bone="ORG-clitoris.control")],
-    "iv_inshin_l": [CopyRotationConstraint(target_bone="labia.L"), CopyLocationConstraint(target_bone="DEF-labial.L")],
+    "iv_kuritto": [CopyLocationConstraint(target_bone="DEF-clitoris.control"), CopyRotationConstraint(target_bone="clitoris.control")],
+    "iv_inshin_l": [CopyRotationConstraint(target_bone="labia.L"), CopyLocationConstraint(target_bone="DEF-labia.L")],
     "iv_inshin_r": [CopyRotationConstraint(target_bone="labia.R"), CopyLocationConstraint(target_bone="DEF-labia.R")],
-    "iv_koumon": [CopyLocationConstraint(target_bone="ORG-fourchette.control")],
+    "iv_koumon": [CopyLocationConstraint(target_bone="DEF-fourchette.control")],
 
     # Rigify Bones 
     ## Arms
@@ -291,6 +293,9 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "upper_arm_tweak.R": [UnmapConstraint()],
     "upper_arm_parent.L": [UnmapConstraint()],
     "upper_arm_parent.R": [UnmapConstraint()],
+
+    "hand_tweak.R": [UnmapConstraint()],
+    "hand_tweak.L": [UnmapConstraint()],
 
     ## Legs
     "foot_tweak.L": [UnmapConstraint()],
@@ -319,6 +324,10 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     ## Spine
     "tweak_spine.004": [UnmapConstraint()],
     "spine_fk.01": [UnmapConstraint()],
+    "tweak_spine.03": [UnmapConstraint()],
+    "tweak_spine.02": [UnmapConstraint()],
+    "tweak_spine.01": [UnmapConstraint()],
+    "tweak_neck": [UnmapConstraint()],
 
     ## Tail
     "tweak_base_tail.A": [UnmapConstraint()],
@@ -332,6 +341,9 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "Lip.Master.B.L.001": [CopyRotationConstraint(target_bone="Lip.Master_end.B.L.001")],
     "Lip.Master.T.R.002": [CopyRotationConstraint(target_bone="Lip.Master_end.B.R.001")],
     "Lip.Master.B.R.001": [CopyRotationConstraint(target_bone="Lip.Master_end.B.R.001")],
+
+    "eye_master.L": [UnmapConstraint()],
+    "eye_master.R": [UnmapConstraint()],
 
     "jaw_mouth": [UnmapConstraint()],
 

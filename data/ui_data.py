@@ -36,10 +36,10 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
     MetaRigCollectionInfo(name="Skirt", color_type="Special", row_index=22, title="Skirt", visible=False),
     MetaRigCollectionInfo(name="Skirt (Tweak)", color_type="Tweak", row_index=23, title="Tweak", visible=False),
 
-    MetaRigCollectionInfo(name="Genitals (Male)", color_type="FK", row_index=25, title="Genitals (Male)"),
-    MetaRigCollectionInfo(name="Tweak (Male)", color_type="Tweak", row_index=26, title="Tweak (Male)"),
-    MetaRigCollectionInfo(name="Genitals (Female)", color_type="FK", row_index=25, title="Genitals (Female)"),
-    MetaRigCollectionInfo(name="Tweak (Female)", color_type="Tweak", row_index=26, title="Tweak (Female)"),
+    MetaRigCollectionInfo(name="Genitals (Male)", color_type="FK", row_index=25, title="Genitals (Male)", visible=False),
+    MetaRigCollectionInfo(name="Tweak (Male)", color_type="Tweak", row_index=26, title="Tweak (Male)", visible=False),
+    MetaRigCollectionInfo(name="Genitals (Female)", color_type="FK", row_index=25, title="Genitals (Female)", visible=False),
+    MetaRigCollectionInfo(name="Tweak (Female)", color_type="Tweak", row_index=26, title="Tweak (Female)", visible=False),
 
 ]
 
@@ -179,6 +179,66 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider"
      ),
 
+     "auto_twist.L": ConstraintUIController(
+         name="auto_twist.L",
+         target_bone="n_hte_l",
+         target_constraint="AetherBlend_CopyRotation",
+         rename_constraint="auto_twist.L",
+         property_name="influence",
+         title="Automatic Wrist Twist",
+         ui_element="slider",
+     ),
+
+     "auto_twist.R": ConstraintUIController(
+         name="auto_twist.R",
+         target_bone="n_hte_r",
+         target_constraint="AetherBlend_CopyRotation",
+         rename_constraint="auto_twist.R",
+         property_name="influence",
+         title="Automatic Wrist Twist",
+         ui_element="slider",
+     ),
+
+     "jaw_follow_B.L": ConstraintUIController(
+         name="jaw_follow_B.L",
+         target_bone="Cheek.B.L.001",
+         target_constraint="Copy Location",
+         rename_constraint="jaw_follow_B.L",
+         property_name="influence",
+         title="Jaw Follow Bottom L",
+         ui_element="slider"
+     ),
+
+     "jaw_follow_B.R": ConstraintUIController(
+         name="jaw_follow_B.R",
+         target_bone="Cheek.B.R.001",
+         target_constraint="Copy Location",
+         rename_constraint="jaw_follow_B.R",
+         property_name="influence",
+         title="Jaw Follow Bottom R",
+         ui_element="slider"
+     ),
+
+     "jaw_follow_T.L": ConstraintUIController(
+         name="jaw_follow_T.L",
+         target_bone="Cheek.B.L.001",
+         target_constraint="Copy Location.001",
+         rename_constraint="jaw_follow_T.L",
+         property_name="influence",
+         title="Jaw Follow Top L",
+         ui_element="slider"
+     ),
+
+     "jaw_follow_T.R": ConstraintUIController(
+         name="jaw_follow_T.R",
+         target_bone="Cheek.B.R.001",
+         target_constraint="Copy Location.001",
+         rename_constraint="jaw_follow_T.R",
+         property_name="influence",
+         title="Jaw Follow Top R",
+         ui_element="slider"
+     ),
+
     }
 
 UI_CONTROLLER_MAPPING: dict[str, list[ConstraintUIController]] = {
@@ -192,8 +252,10 @@ UI_CONTROLLER_MAPPING: dict[str, list[ConstraintUIController]] = {
     "brow.T.R.002": [UI_CONTROLLERS["eye_lid_brow_follow.R"]],
     "lid.B.L.002": [UI_CONTROLLERS["eye_lid_cheek_follow.L"]],
     "lid.B.R.002": [UI_CONTROLLERS["eye_lid_cheek_follow.R"]],
-    "Cheek.T.L": [UI_CONTROLLERS["eye_lid_cheek_follow.L"]],
-    "Cheek.T.R": [UI_CONTROLLERS["eye_lid_cheek_follow.R"]],
+    "Cheek.T.L": [UI_CONTROLLERS["eye_lid_cheek_follow.L"], UI_CONTROLLERS["jaw_follow_T.L"]],
+    "Cheek.T.R": [UI_CONTROLLERS["eye_lid_cheek_follow.R"], UI_CONTROLLERS["jaw_follow_T.R"]],
+
+    #Face
 
     "Nose": [UI_CONTROLLERS["nose_tip_follow"], UI_CONTROLLERS["glabella_follow.L"], UI_CONTROLLERS["glabella_follow.R"]],
     "Nose_end": [UI_CONTROLLERS["nostril_follow.L"], UI_CONTROLLERS["nostril_follow.R"]],
@@ -206,8 +268,16 @@ UI_CONTROLLER_MAPPING: dict[str, list[ConstraintUIController]] = {
 
     "Lip.Master_end.B.L.001": [UI_CONTROLLERS["cheek_follow.L"]],
     "Lip.Master_end.B.R.001": [UI_CONTROLLERS["cheek_follow.R"]],
-    "Cheek.B.R": [UI_CONTROLLERS["cheek_follow.R"]],
-    "Cheek.B.L": [UI_CONTROLLERS["cheek_follow.L"]]
+    "Cheek.B.R": [UI_CONTROLLERS["cheek_follow.R"], UI_CONTROLLERS["jaw_follow_B.R"]],
+    "Cheek.B.L": [UI_CONTROLLERS["cheek_follow.L"], UI_CONTROLLERS["jaw_follow_B.L"]],
+    "Cheek.B.L.001": [UI_CONTROLLERS["jaw_follow_T.L"], UI_CONTROLLERS["jaw_follow_B.L"]],
+    "Cheek.B.R.001": [UI_CONTROLLERS["jaw_follow_T.R"], UI_CONTROLLERS["jaw_follow_B.R"]],
+
+    #Wrist
+    "wrist.L": [UI_CONTROLLERS["auto_twist.L"]],
+    "wrist.R": [UI_CONTROLLERS["auto_twist.R"]],
+    "hand_ik.L": [UI_CONTROLLERS["auto_twist.L"]],
+    "hand_ik.R": [UI_CONTROLLERS["auto_twist.R"]],
     }
 
 PROP_OVERRIDES: dict[str, dict[str, int]] = {
