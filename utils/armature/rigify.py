@@ -326,13 +326,15 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
 def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings, bone_name: str = None) -> None:
     """Sets up rigify properties for a pose bone"""
     original_mode = armature.mode
+    bpy.ops.object.mode_set(mode='POSE')
+    print(f"[AetherBlend] Setting rigify properties for bone '{bone_name}'")
     if bone_name is None:
         if settings.bone_name is not None:
             bone_name = settings.bone_name
         
     pose_bone = armature.pose.bones.get(bone_name)
 
-    if settings is None:
+    if settings is None or pose_bone is None:
         return
     
     if settings.rigify_type:

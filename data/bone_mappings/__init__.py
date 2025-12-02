@@ -22,6 +22,7 @@ HUMAN: list[list[list[GenerativeBone]]] = [
     [PINKY_R_IV, PINKY_R],
 
     [HEAD],
+    [HEAD_OPTIONAL],
     # [SIMPLE_FACE_BONES],
     [EYE_L],
     [EYE_R],

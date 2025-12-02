@@ -340,5 +340,9 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
 
     "v_ear.L": [UnmapConstraint()],
     "v_ear.R": [UnmapConstraint()]
+}
 
+REGEX_CONSTRAINTS: dict[str, list[Constraint]] = {
+    "^DEF-HAIR_(.+)$": [OffsetTransformConstraint(name="AetherBlend_OffsetTransform_Hair")],
+    "^DEF-ACCESSORY_(.+)$": [OffsetTransformConstraint(name="AetherBlend_OffsetTransform_Accessory")],
 }

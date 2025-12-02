@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import math
 import mathutils
+import re
 
 import bpy
 
@@ -139,6 +140,140 @@ class ExtensionBone:
             
         finally:
             bpy.ops.object.mode_set(mode=original_mode)
+
+@dataclass(frozen=True)
+class RegexBoneGroup:
+    pattern: str
+    prefix: str = "RegexBoneGroup"
+    extension_size_factor: float = 1.0
+    extension_axis_type: str = "local"  # e.g., "global", "local", "armature"
+    extension_axis: str  = "Y"  # e.g., "X", "Y", "Z"
+    standalone_widget: str | None = None 
+    parent: str | None = None
+    is_connected: bool = False
+    rigify_type_standalone: str | None = "basic.super_copy"
+    rigify_type_chain: str | None = "skin.stretchy_chain" 
+
+    def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
+        """Generates bone chains for pattern-matched bones in the target armature."""
+        import re
+
+        if not ref or not target:
+            print(f"[AetherBlend] Invalid armatures provided for RegexBoneGroup with pattern '{self.pattern}'.")
+            return None
+        
+        ref_bones = ref.data.bones
+        matched_bones = [bone for bone in ref_bones if re.match(self.pattern, bone.name)]
+
+        created_bones = []
+        processed_bones = set()  
+        root_chain_bones = [] 
+
+        for bone in matched_bones:
+            if bone.name in processed_bones:
+                continue
+
+            children = [child for child in bone.children if re.match(self.pattern, child.name)]
+
+            if not children:
+                extension_bone = ExtensionBone(
+                    name=f"{self.prefix}_{bone.name}",
+                    bone_a=bone.name,
+                    size_factor=self.extension_size_factor,
+                    axis_type=self.extension_axis_type,
+                    axis=self.extension_axis,
+                    parent=self.parent,
+                    is_connected=self.is_connected,
+                    start="head"
+                )
+                result = extension_bone.generate(ref, target, data)
+                if result:
+                    created_bones.extend(result)
+                    
+                    if self.rigify_type_standalone:
+                        self._apply_rigify_to_bone(target, result[-1], self.rigify_type_standalone, self.standalone_widget)
+                
+                processed_bones.add(bone.name)
+            else:
+                chain_bones = self._build_chain(bone, ref_bones)
+                processed_bones.update(chain_bones)
+                
+                is_valid_chain = len(chain_bones) >= 3
+                chain_connect_bones = []  
+                
+                for i in range(len(chain_bones) - 1):
+                    connect_bone_name = f"{self.prefix}_{chain_bones[i]}"
+                    connect_bone = ConnectBone(
+                        name=connect_bone_name,
+                        bone_a=chain_bones[i],
+                        bone_b=chain_bones[i+1],
+                        parent=self.parent if i == 0 else created_bones[-1],
+                        start="head",
+                        end="head",
+                        is_connected=self.is_connected if i == 0 else True
+                    )
+                    result = connect_bone.generate(ref, target, data)
+                    if result:
+                        created_bone_name = result[-1]
+                        created_bones.extend(result)
+                        chain_connect_bones.append(created_bone_name)
+                
+                if is_valid_chain and self.rigify_type_chain:
+                    if chain_connect_bones:
+                        root_chain_bones.append(chain_connect_bones[0])
+                elif not is_valid_chain and self.rigify_type_standalone:
+                    for connect_bone_name in chain_connect_bones:
+                        self._apply_rigify_to_bone(target, connect_bone_name, self.rigify_type_standalone, self.standalone_widget)
+                
+                last_bone = created_bones[-1]
+                extension_bone = ExtensionBone(
+                    name=f"{self.prefix}_{chain_bones[-1]}",
+                    bone_a=last_bone,
+                    size_factor=1.0,
+                    axis_type="local",
+                    axis="Y",
+                    parent=created_bones[-1],
+                    is_connected=True,
+                    start="tail"
+                )
+                result = extension_bone.generate(target, target, data)
+                if result:
+                    created_bones.extend(result)
+                    if not is_valid_chain and self.rigify_type_standalone:
+                        self._apply_rigify_to_bone(target, result[-1], self.rigify_type_standalone, self.standalone_widget)
+
+        if root_chain_bones and self.rigify_type_chain:
+            for root_bone_name in root_chain_bones:
+                self._apply_rigify_to_bone(target, root_bone_name, self.rigify_type_chain)
+
+        return created_bones if created_bones else None
+
+    def _build_chain(self, start_bone: bpy.types.Bone, ref_bones) -> list[str]:
+        """Recursively builds a chain of bones following the hierarchy."""
+        chain = [start_bone.name]
+        current = start_bone
+        
+        while True:
+            children = [child for child in current.children if re.match(self.pattern, child.name)]   
+            if not children:
+                break
+            current = children[0]
+            chain.append(current.name)
+        
+        return chain
+
+    def _apply_rigify_to_bone(self, target: bpy.types.Armature, bone_name: str, rigify_type: str, widget: str | None = None) -> None:
+        """Applies rigify type to a specific bone using the utility function."""
+        settings = RigifySettings(
+            bone_name=bone_name,
+            rigify_type=rigify_type,
+            super_copy_widget_type=widget
+        )    
+        utils.armature.rigify.set_rigify_properties(
+            armature=target,
+            settings=settings,
+            bone_name=bone_name,   
+        )
 
 @dataclass(frozen=True)
 class SkinBone:
@@ -715,13 +850,15 @@ class OffsetTransformConstraint(Constraint):
     target_bone: str | None = None
     name: str = "AetherBlend_OffsetTransform"
 
-    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature, target_override: str | None = None) -> None:
         """Creates a MCH bone copy and sets up proper transform inheritance."""
-        if not self.target_bone:
+        if not self.target_bone and not target_override:
             print(f"[AetherBlend] No target bone specified for OffsetTransform constraint on '{bone.name}'")
             return
         
-        mch_bone_name = f"MCH_{bone.name}"
+        target_bone = target_override if target_override else self.target_bone
+        
+        mch_bone_name = f"MCH-{bone.name}"
         collection_name = "MCH"
         
         original_mode = bpy.context.object.mode
@@ -744,12 +881,12 @@ class OffsetTransformConstraint(Constraint):
             mch_bone.tail = original_edit_bone.tail.copy()
             mch_bone.roll = original_edit_bone.roll
             
-            target_edit_bone = edit_bones.get(self.target_bone)
+            target_edit_bone = edit_bones.get(target_bone)
             if target_edit_bone:
                 mch_bone.parent = target_edit_bone
                 mch_bone.use_connect = False
             else:
-                print(f"[AetherBlend] Warning: Target bone '{self.target_bone}' not found for OffsetTransform")
+                print(f"[AetherBlend] Warning: Target bone '{target_bone}' not found for OffsetTransform")
             
             bone_collections = armature.data.collections
             mch_collection = bone_collections.get(collection_name)

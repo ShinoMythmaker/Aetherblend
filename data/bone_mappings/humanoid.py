@@ -1,6 +1,6 @@
 import mathutils
 
-from .. schemas import GenerativeBone, ConnectBone, ExtensionBone, RigifySettings, CenterBone, SkinBone, BridgeBone
+from .. schemas import GenerativeBone, ConnectBone, ExtensionBone, RigifySettings, CenterBone, SkinBone, BridgeBone, RegexBoneGroup
 
 
 LEG_L: list[GenerativeBone] = [
@@ -1202,7 +1202,7 @@ IV_TOES: list[GenerativeBone] = [
 ]
 
 SIMPLE_FACE_BONES: list[GenerativeBone] = [
-    #I wish so much misfortune on whoever made the pre-DT vanilla face armature for FF
+    #I wish so much misfortune on whoever made the pre-DT vanilla face armature for FF @oats
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="simple.jaw", bone_a="j_ago", bone_b="j_f_dlip_b", parent="head", is_connected=False),
@@ -1423,3 +1423,19 @@ SKIRT: list[GenerativeBone] = [
         settings=RigifySettings(bone_name="skirt_support.B.R.002", rigify_type="skin.basic_chain", skin_chain_priority=1),
     ),
 ]
+
+HEAD_OPTIONAL: list[GenerativeBone] = [
+    GenerativeBone(
+        ref="src",
+        data=RegexBoneGroup(pattern=r"^j_ex_h.*",prefix="HAIR", rigify_type_standalone="basic.super_copy", rigify_type_chain="skin.stretchy_chain", parent="head", is_connected=False, extension_size_factor=10.0, extension_axis="X", extension_axis_type="local", standalone_widget="bone"),
+        req_bones=[],
+        b_collection="Hair",
+        is_optional=True
+    ),
+    GenerativeBone(
+        ref="src",
+        data=RegexBoneGroup(pattern=r"^j_ex_met.*",prefix="ACCESSORY", rigify_type_standalone="basic.super_copy", rigify_type_chain="skin.stretchy_chain", parent="head", is_connected=False, extension_size_factor=10.0, extension_axis="X", extension_axis_type="local", standalone_widget="bone"),
+        req_bones=[],
+        b_collection="Accessory",
+        is_optional=True
+    ),]

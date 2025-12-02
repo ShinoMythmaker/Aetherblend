@@ -95,6 +95,9 @@ class GenerativeMetaBoneGroup():
         future_bones = []
         for gen_bone in self.generative_bones:
             armature_to_check = self.src_armature if gen_bone.ref == "src" else self.target_armature
+            ## skip if genbone is a regex bone group if yes then return true 
+            if isinstance(gen_bone.data, RegexBoneGroup):
+                return True
             future_bones.append(gen_bone.data.name)
             if gen_bone.req_bones:
                 for req_bone in gen_bone.req_bones:
@@ -366,6 +369,24 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
            if pose_bone:
                for constraint in constraints:
                    constraint.apply(pose_bone, ffxiv_armature)
+
+
+        ## implement regex constrainst 
+        for pattern, constraints in REGEX_CONSTRAINTS.items():
+            for pose_bone in ffxiv_armature.pose.bones:
+                match = re.match(pattern, pose_bone.name)
+                if match:
+                    # Extract the owner bone name from the first capture group
+                    owner_bone_name = match.group(1) if match.groups() else re.sub(pattern, '', pose_bone.name)
+                    print(f"Applying regex constraints to bone: {pose_bone.name}, owner bone: {owner_bone_name}")
+                    
+                    # Get the owner bone
+                    owner_bone = ffxiv_armature.pose.bones.get(owner_bone_name)
+                    if owner_bone:
+                        # Apply constraints to the owner bone
+                        # Pass the regex-matched bone name as target_override
+                        for constraint in constraints:
+                            constraint.apply(owner_bone, ffxiv_armature, target_override=pose_bone.name)
 
                    
         bpy.ops.object.mode_set(mode=original_mode)
