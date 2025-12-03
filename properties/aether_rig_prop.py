@@ -20,6 +20,13 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         description="Whether the Rigify-Rig is linked to this armature",
         default=False
     ) # type: ignore
+    
+    ffxiv_backup : bpy.props.PointerProperty(
+        name="FFXIV Backup",
+        type=bpy.types.Object,
+        description="Backup of the FFXIV armature before linking (used for restoration)",
+        poll=lambda self, obj: obj.type == 'ARMATURE'
+    ) # type: ignore
 
 
 def register():

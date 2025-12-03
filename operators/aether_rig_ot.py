@@ -4,24 +4,6 @@ from .. import utils
 from ..data import *
 from ..preferences import get_preferences
 
-def _cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> None:
-    """Remove old control rig bones and data from FFXIV armature before linking new ones."""
-    original_mode = bpy.context.object.mode
-    bpy.ops.object.mode_set(mode='POSE')
-
-    for rigify_coll in rigify_rig.data.collections:
-        bpy.ops.object.mode_set(mode='POSE')
-        if ffxiv_armature.data.collections.get(rigify_coll.name):
-            utils.armature.b_collection.delete_with_bones(ffxiv_armature, collection_name=rigify_coll.name)
-
-    bpy.ops.object.mode_set(mode='POSE')
-    pose_bones = ffxiv_armature.pose.bones
-
-    for bone in pose_bones:
-        utils.armature.bone.remove_constraint_by_name_contains(armature=ffxiv_armature, bone_name=bone.name, substring='AetherBlend')
-    
-    bpy.ops.object.mode_set(mode=original_mode)
-
 def _find_objects_with_armature_and_material_property(armature: bpy.types.Armature, property_name: str, property_value=None) -> list[bpy.types.Object]:
     """Find all objects that have the specified armature as a constraint target and have materials with a specific custom property.
     
@@ -161,11 +143,21 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         armature.hide_set(False)
 
+        if armature.aether_rig.rigify_linked:
+            if debug_mode: print(f"[AetherBlend] Unlinking rigify rig before generating new meta rig")
+            bpy.ops.aether.unlink_rigify_rig()
+
         existing_meta_rig = armature.aether_rig.meta_rig
+        existing_rigify_rig = armature.aether_rig.rigify_rig
         
         if existing_meta_rig:
-            existing_meta_rig.hide_set(False)
+            if debug_mode: print(f"[AetherBlend] Removing existing Meta-Rig: {existing_meta_rig.name}")
             bpy.data.objects.remove(existing_meta_rig, do_unlink=True)
+        
+        if existing_rigify_rig:
+            if debug_mode: print(f"[AetherBlend] Removing existing Rigify-Rig: {existing_rigify_rig.name}")
+            bpy.data.objects.remove(existing_rigify_rig, do_unlink=True)
+            armature.aether_rig.rigify_rig = None
 
         ## Creating Meta Rig and setting up basic Settings
         setup_start = time.time()
@@ -232,6 +224,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         meta_rig.parent = armature
         meta_rig.hide_set(True)
+        meta_rig.hide_viewport = True
 
         bpy.ops.object.select_all(action='DESELECT')
         bpy.context.view_layer.objects.active = armature
@@ -249,6 +242,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        debug_mode = get_preferences().debug_mode
         bpy.context.window.cursor_set('WAIT') 
 
         armature = context.active_object
@@ -256,12 +250,25 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
             self.report({'ERROR'}, "Select an armature object")
             return {'CANCELLED'}
 
+        if armature.aether_rig.rigify_linked:
+            if debug_mode: print(f"[AetherBlend] Unlinking rigify rig before generating new rigify rig")
+            bpy.ops.aether.unlink_rigify_rig()
+
         if not armature.aether_rig.meta_rig:
             self.report({'ERROR'}, "No meta rig found. Generate a meta rig first.")
             return {'CANCELLED'}
 
+        existing_rigify_rig = armature.aether_rig.rigify_rig
+        if existing_rigify_rig:
+            debug_mode = get_preferences().debug_mode
+            if debug_mode: print(f"[AetherBlend] Removing existing Rigify-Rig: {existing_rigify_rig.name}")
+            bpy.data.objects.remove(existing_rigify_rig, do_unlink=True)
+            armature.aether_rig.rigify_rig = None
+
         meta_rig = armature.aether_rig.meta_rig
         meta_rig.hide_set(False)
+        meta_rig.hide_viewport = False
+
         bpy.context.view_layer.objects.active = meta_rig
         bpy.ops.object.select_all(action='DESELECT')
         meta_rig.select_set(True)
@@ -281,18 +288,22 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
 
                 bpy.ops.object.select_all(action='DESELECT')
                 rigify_rig.hide_set(True)
+                rigify_rig.hide_viewport = True
 
                 bpy.context.view_layer.objects.active = armature
                 armature.select_set(True)
                 
                 meta_rig.hide_set(True)
+                meta_rig.hide_viewport = True
                 return {'FINISHED'}
             else:
                 meta_rig.hide_set(True)
+                meta_rig.hide_viewport = True
                 self.report({'ERROR'}, "Failed to get reference to generated Rigify Rig")
                 return {'CANCELLED'}
         else:
             meta_rig.hide_set(True)
+            meta_rig.hide_viewport = True
             self.report({'ERROR'}, "Rigify generation failed")
             return {'CANCELLED'}
             
@@ -319,11 +330,11 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
         rigify_rig = armature.aether_rig.rigify_rig
         rigify_rig.hide_set(False)
+        rigify_rig.hide_viewport = False
 
-        cleanup_start = time.time()
-        if armature.aether_rig.rigify_linked:
-            _cleanup_linked_rigify_bones(armature, rigify_rig)
-        if debug_mode: print(f"[AetherBlend] Cleanup: {time.time() - cleanup_start:.3f}s")
+        backup_start = time.time()        
+        self._create_ffxiv_backup(armature)
+        if debug_mode: print(f"[AetherBlend] Backup creation: {time.time() - backup_start:.3f}s")
 
         merge_start = time.time()
         self._merge_control_rig_bones(armature, rigify_rig)
@@ -337,6 +348,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.select_all(action='DESELECT')
         rigify_rig.hide_set(True)
+        rigify_rig.hide_viewport = True
         bpy.context.view_layer.objects.active = armature
 
         bpy.ops.object.mode_set(mode='POSE')
@@ -354,6 +366,38 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         bpy.context.window.cursor_set('DEFAULT')
         print(f"[AetherBlend] Total link time: {time.time() - start_time:.3f}s")
         return {'FINISHED'}
+
+    def _create_ffxiv_backup(self, armature: bpy.types.Armature) -> None:
+        """Create a backup copy of the FFXIV armature before linking."""
+        debug_mode = get_preferences().debug_mode
+        
+        existing_backup = armature.aether_rig.ffxiv_backup
+        if existing_backup:
+            if debug_mode: print(f"[AetherBlend] Removing existing backup: {existing_backup.name}")
+            bpy.data.objects.remove(existing_backup, do_unlink=True)
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.select_all(action='DESELECT')
+        armature.select_set(True)
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.duplicate()
+        
+        backup = bpy.context.active_object
+        backup.name = f"{armature.name}_FFXIV_Backup"
+        backup.data.name = f"{armature.data.name}_FFXIV_Backup"
+        
+        backup.parent = armature
+        
+        backup.hide_set(True)
+        backup.hide_viewport = True
+        backup.hide_render = True
+        armature.aether_rig.ffxiv_backup = backup
+        
+        if debug_mode: print(f"[AetherBlend] Created backup: {backup.name}")
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        armature.select_set(True)
+        bpy.context.view_layer.objects.active = armature
 
     def _rename_constraints(self, armature: bpy.types.Armature) -> None:
         """Rename constraints based on ConstraintUIController settings."""
@@ -462,28 +506,72 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
     bl_idname = "aether.unlink_rigify_rig"
     bl_label = "Unlink Rigify Rig"
-    bl_description = ("Unlink the Rigify Rig from the FFXIV Rig by removing control bones and constraints")
+    bl_description = ("Unlink the Rigify Rig from the FFXIV Rig by restoring from backup")
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        debug_mode = get_preferences().debug_mode
         bpy.context.window.cursor_set('WAIT') 
+        
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
             bpy.context.window.cursor_set('DEFAULT')
             return {'CANCELLED'}
         
-        rigify_rig = armature.aether_rig.rigify_rig
-        if rigify_rig:
-            rigify_rig.hide_set(False)
-            _cleanup_linked_rigify_bones(armature, rigify_rig)
-            armature.aether_rig.rigify_linked = False
-            bpy.context.window.cursor_set('DEFAULT')
-            return {'FINISHED'}
-        else:
-            self.report({'ERROR'}, "No Rigify Rig found to unlink.")
+        if not armature.aether_rig.rigify_linked:
+            self.report({'WARNING'}, "Rigify rig is not currently linked.")
             bpy.context.window.cursor_set('DEFAULT')
             return {'CANCELLED'}
+        
+        backup = armature.aether_rig.ffxiv_backup
+        if not backup:
+            self.report({'ERROR'}, "No backup found. Cannot restore FFXIV rig.")
+            bpy.context.window.cursor_set('DEFAULT')
+            return {'CANCELLED'}
+        
+        backup.hide_set(False)
+        backup.hide_viewport = False
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        armature.select_set(True)
+        bpy.context.view_layer.objects.active = armature
+        
+        for coll in armature.data.collections:
+            coll.is_visible = True
+        
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.armature.select_all(action='SELECT')
+        bpy.ops.armature.delete()
+        if debug_mode: print(f"[AetherBlend] Deleted all bones from linked rig")
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
+        collections_to_remove = [coll for coll in armature.data.collections]
+        for coll in collections_to_remove:
+            armature.data.collections.remove(coll)
+        if debug_mode: print(f"[AetherBlend] Removed {len(collections_to_remove)} bone collections")
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        backup.select_set(True)
+        armature.select_set(True)
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.join()
+        if debug_mode: print(f"[AetherBlend] Joined backup into FFXIV rig")
+        
+        armature.aether_rig.rigify_linked = False
+        armature.aether_rig.ffxiv_backup = None
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        armature.select_set(True)
+        bpy.context.view_layer.objects.active = armature
+        
+        if debug_mode: print(f"[AetherBlend] Successfully restored FFXIV rig from backup")
+        
+        bpy.context.window.cursor_set('DEFAULT')
+        self.report({'INFO'}, "FFXIV rig restored from backup")
+        return {'FINISHED'}
     
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
