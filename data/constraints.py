@@ -25,6 +25,7 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_kao", src_bone_name="j_kao", parent_bone_name="DEF-head"),
     copyBone(bone_name="MCH-j_mimi_l", src_bone_name="j_mimi_l", parent_bone_name="DEF-ear.L"),
     copyBone(bone_name="MCH-j_mimi_r", src_bone_name="j_mimi_r", parent_bone_name="DEF-ear.R"),
+    copyBone(bone_name="MCH-j_f_ago", src_bone_name="j_f_ago", parent_bone_name="DEF-jaw"),
 
     # Arms
 
@@ -255,7 +256,7 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "j_f_bero_01": [CopyLocationConstraint(target_bone="ORG-Tongue.002"), CopyRotationConstraint(target_bone="ORG-Tongue.002")],
     
     # Jaw
-    "j_f_ago": [CopyRotationConstraint(target_bone="jaw",)],
+    "j_f_ago": [CopyTransformsConstraint(target_bone="MCH-j_f_ago", target_space="WORLD", owner_space="WORLD")],
     "j_f_hagukiup": [CopyLocationConstraint(target_bone="ORG-Teeth.T"), CopyRotationConstraint(target_bone="ORG-Teeth.T")],
     "j_f_hagukidn": [CopyLocationConstraint(target_bone="ORG-Teeth.B"), CopyRotationConstraint(target_bone="ORG-Teeth.B")],
 
