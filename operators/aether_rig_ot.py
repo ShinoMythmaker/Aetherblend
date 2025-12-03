@@ -1,5 +1,6 @@
 import bpy
 import time
+from bpy.props import IntProperty
 from .. import utils
 from ..data import *
 from ..preferences import get_preferences
@@ -130,18 +131,33 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_label = "Generate Meta Rig"
     bl_description = ("Generate a meta rig based on available bones")
     bl_options = {'REGISTER', 'UNDO'}
+    
+    progress_offset: IntProperty(default=0, options={'HIDDEN', 'SKIP_SAVE'})  # type: ignore
+    progress_scale: IntProperty(default=100, options={'HIDDEN', 'SKIP_SAVE'})  # type: ignore
 
     def execute(self, context):
         debug_mode = get_preferences().debug_mode
         start_time = time.time()
+        wm = context.window_manager
+        
+        use_own_progress = self.progress_offset == 0 and self.progress_scale == 100
+        progress_offset = self.progress_offset
+        progress_scale = self.progress_scale
+        
+        if use_own_progress:
+            wm.progress_begin(0, 100)
+        
         bpy.context.window.cursor_set('WAIT') 
 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
+            if use_own_progress:
+                wm.progress_end()
             return {'CANCELLED'}
 
         armature.hide_set(False)
+        wm.progress_update(int(progress_offset + 5 * progress_scale / 100))
 
         if armature.aether_rig.rigify_linked:
             if debug_mode: print(f"[AetherBlend] Unlinking rigify rig before generating new meta rig")
@@ -159,6 +175,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             bpy.data.objects.remove(existing_rigify_rig, do_unlink=True)
             armature.aether_rig.rigify_rig = None
 
+        wm.progress_update(int(progress_offset + 10 * progress_scale / 100))
         setup_start = time.time()
         meta_rig = utils.armature.create(location=armature.location, armature_name=f"META_{armature.name}")
         bpy.context.view_layer.objects.active = meta_rig
@@ -173,6 +190,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         if debug_mode: print(f"[AetherBlend] Meta rig creation: {time.time() - setup_start:.3f}s")
 
+        wm.progress_update(int(progress_offset + 20 * progress_scale / 100))
         collection_start = time.time()
         hide_collections = []
         for collection in META_RIG_COLLECTIONS_INFO:
@@ -185,6 +203,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                     hide_collections.append(coll)
         if debug_mode: print(f"[AetherBlend] Collection setup: {time.time() - collection_start:.3f}s")
 
+        wm.progress_update(int(progress_offset + 25 * progress_scale / 100))
         data_start = time.time()
         eye_occlusion_object = _find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
 
@@ -197,6 +216,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if debug_mode: print(f"[AetherBlend] Data propagation: {time.time() - data_start:.3f}s")
 
         bone_gen_start = time.time()
+        total_bone_groups = len(HUMAN)
+        progress_per_group = 65 / total_bone_groups if total_bone_groups > 0 else 0
+        
         for bone_group_idx, bone_group in enumerate(HUMAN):
             for sub_group in bone_group:
                 group_name = "Unknown"
@@ -211,9 +233,13 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 gen_group = GenerativeMetaBoneGroup(src_armature=armature, target_armature=meta_rig, generative_bones=sub_group)
                 gen_group.execute(data=data)
                 if debug_mode: print(f"[AetherBlend]   Group {bone_group_idx} ({group_name}): {time.time() - group_start:.3f}s")
+            
+            current_progress = 30 + int((bone_group_idx + 1) * progress_per_group)
+            wm.progress_update(int(progress_offset + current_progress * progress_scale / 100))
+        
         if debug_mode: print(f"[AetherBlend] Bone generation: {time.time() - bone_gen_start:.3f}s")
                 
-
+        wm.progress_update(int(progress_offset + 95 * progress_scale / 100))
         for hide_coll in hide_collections:
             hide_coll.is_visible = False
 
@@ -228,6 +254,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         bpy.context.view_layer.objects.active = armature
         armature.select_set(True)
 
+        wm.progress_update(int(progress_offset + 100 * progress_scale / 100))
+        if use_own_progress:
+            wm.progress_end()
         bpy.context.window.cursor_set('DEFAULT')
         if debug_mode: print(f"[AetherBlend] Total meta rig generation time: {time.time() - start_time:.3f}s")
         return {'FINISHED'}
@@ -238,24 +267,42 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
     bl_label = "Generate Rigify Rig"
     bl_description = ("Generate the rigify control rig from the meta rig")
     bl_options = {'REGISTER', 'UNDO'}
+    
+    progress_offset: IntProperty(default=0, options={'HIDDEN', 'SKIP_SAVE'})  # type: ignore
+    progress_scale: IntProperty(default=100, options={'HIDDEN', 'SKIP_SAVE'})  # type: ignore
 
     def execute(self, context):
         debug_mode = get_preferences().debug_mode
+        wm = context.window_manager
+        
+        use_own_progress = self.progress_offset == 0 and self.progress_scale == 100
+        progress_offset = self.progress_offset
+        progress_scale = self.progress_scale
+        
+        if use_own_progress:
+            wm.progress_begin(0, 100)
+        
         bpy.context.window.cursor_set('WAIT') 
 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
+            if use_own_progress:
+                wm.progress_end()
             return {'CANCELLED'}
 
+        wm.progress_update(int(progress_offset + 5 * progress_scale / 100))
         if armature.aether_rig.rigify_linked:
             if debug_mode: print(f"[AetherBlend] Unlinking rigify rig before generating new rigify rig")
             bpy.ops.aether.unlink_rigify_rig()
 
         if not armature.aether_rig.meta_rig:
             self.report({'ERROR'}, "No meta rig found. Generate a meta rig first.")
+            if use_own_progress:
+                wm.progress_end()
             return {'CANCELLED'}
 
+        wm.progress_update(int(progress_offset + 10 * progress_scale / 100))
         existing_rigify_rig = armature.aether_rig.rigify_rig
         if existing_rigify_rig:
             debug_mode = get_preferences().debug_mode
@@ -263,6 +310,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
             bpy.data.objects.remove(existing_rigify_rig, do_unlink=True)
             armature.aether_rig.rigify_rig = None
 
+        wm.progress_update(int(progress_offset + 20 * progress_scale / 100))
         meta_rig = armature.aether_rig.meta_rig
         meta_rig.hide_set(False)
         meta_rig.hide_viewport = False
@@ -271,16 +319,19 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         bpy.ops.object.select_all(action='DESELECT')
         meta_rig.select_set(True)
     
-
+        wm.progress_update(int(progress_offset + 30 * progress_scale / 100))
         bpy.ops.object.mode_set(mode='POSE')
 
         result = bpy.ops.pose.rigify_generate()
+        wm.progress_update(int(progress_offset + 80 * progress_scale / 100))
+        wm.progress_update(80)
         
         bpy.context.window.cursor_set('DEFAULT') 
         if result == {'FINISHED'}:
             rigify_rig = getattr(meta_rig.data, 'rigify_target_rig', None)
             
             if rigify_rig:
+                wm.progress_update(int(progress_offset + 90 * progress_scale / 100))
                 armature.aether_rig.rigify_rig = rigify_rig
                 rigify_rig.parent = armature
                 
@@ -298,15 +349,22 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
                 
                 meta_rig.hide_set(True)
                 meta_rig.hide_viewport = True
+                wm.progress_update(int(progress_offset + 100 * progress_scale / 100))
+                if use_own_progress:
+                    wm.progress_end()
                 return {'FINISHED'}
             else:
                 meta_rig.hide_set(True)
                 meta_rig.hide_viewport = True
+                if use_own_progress:
+                    wm.progress_end()
                 self.report({'ERROR'}, "Failed to get reference to generated Rigify Rig")
                 return {'CANCELLED'}
         else:
             meta_rig.hide_set(True)
             meta_rig.hide_viewport = True
+            if use_own_progress:
+                wm.progress_end()
             self.report({'ERROR'}, "Rigify generation failed")
             return {'CANCELLED'}
             
@@ -315,37 +373,58 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
     bl_label = "Link Rigify Rig"
     bl_description = ("Link the Rigify Rig to the FFXIV Rig by merging control bones and setting up constraints")
     bl_options = {'REGISTER', 'UNDO'}
+    
+    progress_offset: IntProperty(default=0, options={'HIDDEN', 'SKIP_SAVE'})  # type: ignore
+    progress_scale: IntProperty(default=100, options={'HIDDEN', 'SKIP_SAVE'})  # type: ignore
 
     def execute(self, context):
         start_time = time.time()
         debug_mode = get_preferences().debug_mode
+        wm = context.window_manager
+        
+        use_own_progress = self.progress_offset == 0 and self.progress_scale == 100
+        progress_offset = self.progress_offset
+        progress_scale = self.progress_scale
+        
+        if use_own_progress:
+            wm.progress_begin(0, 100)
         
         bpy.context.window.cursor_set('WAIT') 
 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
+            if use_own_progress:
+                wm.progress_end()
             return {'CANCELLED'}
 
         if not armature.aether_rig.rigify_rig:
             self.report({'ERROR'}, "No Rigify Rig found. Generate a Rigify Rig first.")
+            if use_own_progress:
+                wm.progress_end()
             return {'CANCELLED'}
 
+        wm.progress_update(int(progress_offset + 5 * progress_scale / 100))
         rigify_rig = armature.aether_rig.rigify_rig
         rigify_rig.hide_set(False)
         rigify_rig.hide_viewport = False
 
+        wm.progress_update(int(progress_offset + 10 * progress_scale / 100))
         backup_start = time.time()        
         self._create_ffxiv_backup(armature)
         if debug_mode: print(f"[AetherBlend] Backup creation: {time.time() - backup_start:.3f}s")
 
+        wm.progress_update(int(progress_offset + 20 * progress_scale / 100))
         merge_start = time.time()
-        self._merge_control_rig_bones(armature, rigify_rig)
+        self._merge_control_rig_bones(armature, rigify_rig, wm, progress_offset, progress_scale)
         if debug_mode: print(f"[AetherBlend] Merge control rig bones: {time.time() - merge_start:.3f}s")
+        
+        wm.progress_update(int(progress_offset + 80 * progress_scale / 100))
         rename_start = time.time()
         self._rename_constraints(armature)
         if debug_mode: print(f"[AetherBlend] Rename constraints: {time.time() - rename_start:.3f}s")
 
+        wm.progress_update(int(progress_offset + 90 * progress_scale / 100))
         armature.aether_rig.rigify_linked = True
         
         if get_preferences().auto_navigate_tabs:
@@ -369,6 +448,9 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
         armature.select_set(True)
 
+        wm.progress_update(int(progress_offset + 100 * progress_scale / 100))
+        if use_own_progress:
+            wm.progress_end()
         bpy.context.window.cursor_set('DEFAULT')
         if debug_mode: print(f"[AetherBlend] Total link time: {time.time() - start_time:.3f}s")
         return {'FINISHED'}
@@ -411,7 +493,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
             if controller.rename_constraint is not None:
                 controller.name_change(armature)    
 
-    def _merge_control_rig_bones(self, ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> bool:
+    def _merge_control_rig_bones(self, ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature, wm=None, progress_offset=0, progress_scale=100) -> bool:
         """Duplicate the control rig and merge it with the FFXIV armature."""
         debug_mode = get_preferences().debug_mode
         original_mode = bpy.context.object.mode
@@ -433,6 +515,8 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         
         bpy.ops.object.join()
         if debug_mode: print(f"[AetherBlend]   Duplicate & join: {time.time() - duplicate_start:.3f}s")
+        if wm:
+            wm.progress_update(int(progress_offset + 25 * progress_scale / 100))
         
         bpy.ops.object.mode_set(mode='OBJECT')
         
@@ -440,28 +524,41 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         self.copy_rigify_properties(ffxiv_armature, rigify_rig)
         self._override_property_values(ffxiv_armature)
         if debug_mode: print(f"[AetherBlend]   Copy properties: {time.time() - props_start:.3f}s")
-
+        if wm:
+            wm.progress_update(int(progress_offset + 30 * progress_scale / 100))
 
         link_edits_start = time.time()
-        for operation in LINK_EDIT_OPERATIONS:
+        total_edits = len(LINK_EDIT_OPERATIONS)
+        for idx, operation in enumerate(LINK_EDIT_OPERATIONS):
             operation.execute(ffxiv_armature)
+            if wm and idx % 5 == 0:  # Update every 5 operations
+                current_progress = 30 + int((idx + 1) / total_edits * 15)
+                wm.progress_update(int(progress_offset + current_progress * progress_scale / 100))
         if debug_mode: print(f"[AetherBlend]   Link edits: {time.time() - link_edits_start:.3f}s")
+        if wm:
+            wm.progress_update(int(progress_offset + 45 * progress_scale / 100))
 
 
         bpy.ops.object.mode_set(mode='POSE')
 
         link_pose_start = time.time()
-        for bone_name, constraints in LINK_POSE_OPERATIONS.items():
+        total_pose_ops = len(LINK_POSE_OPERATIONS)
+        for idx, (bone_name, constraints) in enumerate(LINK_POSE_OPERATIONS.items()):
            pose_bone = ffxiv_armature.pose.bones.get(bone_name)
            if pose_bone:
                for constraint in constraints:
                    constraint.apply(pose_bone, ffxiv_armature)
+           if wm and idx % 3 == 0:  # Update every 3 operations
+               current_progress = 45 + int((idx + 1) / total_pose_ops * 15)
+               wm.progress_update(int(progress_offset + current_progress * progress_scale / 100))
         if debug_mode: print(f"[AetherBlend]   New constraints: {time.time() - link_pose_start:.3f}s")
-
+        if wm:
+            wm.progress_update(int(progress_offset + 60 * progress_scale / 100))
 
         regex_start = time.time()
-        for pattern, constraints in REGEX_CONSTRAINTS.items():
-            for pose_bone in ffxiv_armature.pose.bones:
+        total_bones = len(ffxiv_armature.pose.bones)
+        for bone_idx, pose_bone in enumerate(ffxiv_armature.pose.bones):
+            for pattern, constraints in REGEX_CONSTRAINTS.items():
                 match = re.match(pattern, pose_bone.name)
                 if match:
                     owner_bone_name = match.group(1) if match.groups() else re.sub(pattern, '', pose_bone.name)
@@ -469,11 +566,18 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
                     if owner_bone:
                         for constraint in constraints:
                             constraint.apply(owner_bone, ffxiv_armature, target_override=pose_bone.name)
+            if wm and bone_idx % 20 == 0:  # Update every 20 bones
+                current_progress = 60 + int((bone_idx + 1) / total_bones * 10)
+                wm.progress_update(int(progress_offset + current_progress * progress_scale / 100))
         if debug_mode: print(f"[AetherBlend]   Regex constraints: {time.time() - regex_start:.3f}s")
+        if wm:
+            wm.progress_update(int(progress_offset + 70 * progress_scale / 100))
 
         pose_apply_start = time.time()
         bpy.ops.pose.armature_apply()
         if debug_mode: print(f"[AetherBlend]   Apply pose: {time.time() - pose_apply_start:.3f}s")
+        if wm:
+            wm.progress_update(int(progress_offset + 75 * progress_scale / 100))
                    
         bpy.ops.object.mode_set(mode=original_mode)
         return True
@@ -590,38 +694,46 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
     def execute(self, context):
         debug_mode = get_preferences().debug_mode
         start_time = time.time()
+        wm = context.window_manager
+        wm.progress_begin(0, 100)
         
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
+            wm.progress_end()
             return {'CANCELLED'}
         
         if debug_mode: print(f"[AetherBlend] Starting full rig generation workflow")
         
-        # Generate Meta Rig
+        # Phase 1: Generate Meta Rig (0-30%)
         meta_start = time.time()
-        result = bpy.ops.aether.generate_meta_rig()
+        result = bpy.ops.aether.generate_meta_rig(progress_offset=0, progress_scale=30)
         if result != {'FINISHED'}:
             self.report({'ERROR'}, "Meta rig generation failed")
+            wm.progress_end()
             return {'CANCELLED'}
         print(f"[AetherBlend] Meta rig generation: {time.time() - meta_start:.3f}s")
         
-        # Generate Rigify Rig
+        # Phase 2: Generate Rigify Rig (30-55%)
         rigify_start = time.time()
-        result = bpy.ops.aether.generate_rigify_rig()
+        result = bpy.ops.aether.generate_rigify_rig(progress_offset=30, progress_scale=25)
         if result != {'FINISHED'}:
             self.report({'ERROR'}, "Rigify rig generation failed")
+            wm.progress_end()
             return {'CANCELLED'}
         print(f"[AetherBlend] Rigify rig generation: {time.time() - rigify_start:.3f}s")
         
-        # Link Rigify Rig
+        # Phase 3: Link Rigify Rig (55-100%)
         link_start = time.time()
-        result = bpy.ops.aether.link_rigify_rig()
+        result = bpy.ops.aether.link_rigify_rig(progress_offset=55, progress_scale=45)
         if result != {'FINISHED'}:
             self.report({'ERROR'}, "Rigify rig linking failed")
+            wm.progress_end()
             return {'CANCELLED'}
         print(f"[AetherBlend] Rigify rig linking: {time.time() - link_start:.3f}s")
         
+        wm.progress_update(100)
+        wm.progress_end()
         print(f"[AetherBlend] Total full rig generation time: {time.time() - start_time:.3f}s")
         self.report({'INFO'}, "Full rig generation complete")
         return {'FINISHED'}
