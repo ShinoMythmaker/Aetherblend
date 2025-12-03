@@ -1149,14 +1149,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Hallux.L", bone_a="iv_asi_oya_a_l", bone_b="iv_asi_oya_b_l", parent="toe.L", is_connected=False),
         req_bones=["iv_asi_oya_a_l", "iv_asi_oya_b_l"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Hallux.L", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Hallux.L", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Hallux.L.001", bone_a="Hallux.L", parent="Hallux.L", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Hallux.L"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1164,14 +1164,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Index.L", bone_a="iv_asi_hito_a_l", bone_b="iv_asi_hito_b_l", parent="toe.L", is_connected=False),
         req_bones=["iv_asi_hito_a_l", "iv_asi_hito_b_l"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Index.L", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Index.L", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Index.L.001", bone_a="Index.L", parent="Index.L", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Index.L"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1179,14 +1179,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Middle.L", bone_a="iv_asi_naka_a_l", bone_b="iv_asi_naka_b_l", parent="toe.L", is_connected=False),
         req_bones=["iv_asi_naka_a_l", "iv_asi_naka_b_l"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Middle.L", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Middle.L", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Middle.L.001", bone_a="Middle.L", parent="Middle.L", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Middle.L"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1194,14 +1194,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Ring.L", bone_a="iv_asi_kusu_a_l", bone_b="iv_asi_kusu_b_l", parent="toe.L", is_connected=False),
         req_bones=["iv_asi_kusu_a_l", "iv_asi_kusu_b_l"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Ring.L", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Ring.L", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Ring.L.001", bone_a="Ring.L", parent="Ring.L", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Ring.L"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1209,14 +1209,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Pinky.L", bone_a="iv_asi_ko_a_l", bone_b="iv_asi_ko_b_l", parent="toe.L", is_connected=False),
         req_bones=["iv_asi_ko_a_l", "iv_asi_ko_b_l"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Pinky.L", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Pinky.L", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Pinky.L.001", bone_a="Pinky.L", parent="Pinky.L", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Pinky.L"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     # Right
@@ -1226,14 +1226,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Hallux.R", bone_a="iv_asi_oya_a_r", bone_b="iv_asi_oya_b_r", parent="toe.R", is_connected=False),
         req_bones=["iv_asi_oya_a_r", "iv_asi_oya_b_r"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Hallux.R", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Hallux.R", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Hallux.R.001", bone_a="Hallux.R", parent="Hallux.R", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Hallux.R"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1241,14 +1241,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Index.R", bone_a="iv_asi_hito_a_r", bone_b="iv_asi_hito_b_r", parent="toe.R", is_connected=False),
         req_bones=["iv_asi_hito_a_r", "iv_asi_hito_b_r"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Index.R", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Index.R", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Index.R.001", bone_a="Index.R", parent="Index.R", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Index.R"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1256,14 +1256,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Middle.R", bone_a="iv_asi_naka_a_r", bone_b="iv_asi_naka_b_r", parent="toe.R", is_connected=False),
         req_bones=["iv_asi_naka_a_r", "iv_asi_naka_b_r"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Middle.R", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Middle.R", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Middle.R.001", bone_a="Middle.R", parent="Middle.R", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Middle.R"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1271,14 +1271,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Ring.R", bone_a="iv_asi_kusu_a_r", bone_b="iv_asi_kusu_b_r", parent="toe.R", is_connected=False),
         req_bones=["iv_asi_kusu_a_r", "iv_asi_kusu_b_r"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Ring.R", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Ring.R", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Ring.R.001", bone_a="Ring.R", parent="Ring.R", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Ring.R"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 
     GenerativeBone(
@@ -1286,14 +1286,14 @@ IV_TOES: list[GenerativeBone] = [
         data=ConnectBone(name="Pinky.R", bone_a="iv_asi_ko_a_r", bone_b="iv_asi_ko_b_r", parent="toe.R", is_connected=False),
         req_bones=["iv_asi_ko_a_r", "iv_asi_ko_b_r"],
         b_collection="Toes",
-        settings=RigifySettings(bone_name="Pinky.R", rigify_type="limbs.super_finger", make_extra_ik_control=True),
+        settings=RigifySettings(bone_name="Pinky.R", rigify_type="limbs.super_finger", make_extra_ik_control=True, tweak_coll="Toes (Details)"),
     ),
 
     GenerativeBone(
         ref="tgt",
         data=ExtensionBone(name="Pinky.R.001", bone_a="Pinky.R", parent="Pinky.R", is_connected=True, axis_type="local", axis="Y"),
         req_bones=["Pinky.R"],
-        b_collection="Toes (Details)",
+        b_collection="Toes",
     ),
 ]
 

@@ -25,13 +25,22 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_kao", src_bone_name="j_kao", parent_bone_name="DEF-head"),
     copyBone(bone_name="MCH-j_mimi_l", src_bone_name="j_mimi_l", parent_bone_name="DEF-ear.L"),
     copyBone(bone_name="MCH-j_mimi_r", src_bone_name="j_mimi_r", parent_bone_name="DEF-ear.R"),
-    
+
+    # Arms
+
+    copyBone(bone_name="MCH-j_ude_a_l", src_bone_name="j_ude_a_l", parent_bone_name="ORG-upper_arm.L"),
+    copyBone(bone_name="MCH-j_ude_a_r", src_bone_name="j_ude_a_r", parent_bone_name="ORG-upper_arm.R"),
+    copyBone(bone_name="MCH-j_ude_b_l", src_bone_name="j_ude_b_l", parent_bone_name="DEF-forearm.L"),
+    copyBone(bone_name="MCH-j_ude_b_r", src_bone_name="j_ude_b_r", parent_bone_name="DEF-forearm.R"),
+    copyBone(bone_name="MCH-j_te_l", src_bone_name="j_te_l", parent_bone_name="DEF-hand.L"),
+    copyBone(bone_name="MCH-j_te_r", src_bone_name="j_te_r", parent_bone_name="DEF-hand.R"),
+
     # Legs
-    copyBone(bone_name="MCH-j_asi_a_l", src_bone_name="j_asi_a_l", parent_bone_name="DEF-thigh.L"),
+    copyBone(bone_name="MCH-j_asi_a_l", src_bone_name="j_asi_a_l", parent_bone_name="ORG-thigh.L"),
     copyBone(bone_name="MCH-j_asi_c_l", src_bone_name="j_asi_c_l", parent_bone_name="DEF-shin.L"),
     copyBone(bone_name="MCH-j_asi_d_l", src_bone_name="j_asi_d_l", parent_bone_name="DEF-foot.L"),
     copyBone(bone_name="MCH-j_asi_e_l", src_bone_name="j_asi_e_l", parent_bone_name="DEF-toe.L"),
-    copyBone(bone_name="MCH-j_asi_a_r", src_bone_name="j_asi_a_r", parent_bone_name="DEF-thigh.R"),
+    copyBone(bone_name="MCH-j_asi_a_r", src_bone_name="j_asi_a_r", parent_bone_name="ORG-thigh.R"),
     copyBone(bone_name="MCH-j_asi_c_r", src_bone_name="j_asi_c_r", parent_bone_name="DEF-shin.R"),
     copyBone(bone_name="MCH-j_asi_d_r", src_bone_name="j_asi_d_r", parent_bone_name="DEF-foot.R"),
     copyBone(bone_name="MCH-j_asi_e_r", src_bone_name="j_asi_e_r", parent_bone_name="DEF-toe.R"),
@@ -86,14 +95,14 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
 
     # Left Arm
-    "j_ude_a_l": [CopyLocationConstraint(target_bone="DEF-upper_arm.L"), CopyRotationConstraint(target_bone="ORG-upper_arm.L")],
-    "j_ude_b_l": [CopyLocationConstraint(target_bone="DEF-forearm.L"), CopyRotationConstraint(target_bone="ORG-forearm.L")],
-    "j_te_l": [CopyLocationConstraint(target_bone="DEF-hand.L"), CopyRotationConstraint(target_bone="ORG-hand.L")],
+    "j_ude_a_l": [CopyTransformsConstraint(target_bone="MCH-j_ude_a_l", target_space="WORLD", owner_space="WORLD")],
+    "j_ude_b_l": [CopyTransformsConstraint(target_bone="MCH-j_ude_b_l", target_space="WORLD", owner_space="WORLD")],
+    "j_te_l": [CopyTransformsConstraint(target_bone="MCH-j_te_l", target_space="WORLD", owner_space="WORLD")],
 
     # Right Arm
-    "j_ude_a_r": [CopyLocationConstraint(target_bone="DEF-upper_arm.R"), CopyRotationConstraint(target_bone="ORG-upper_arm.R")],
-    "j_ude_b_r": [CopyLocationConstraint(target_bone="DEF-forearm.R"), CopyRotationConstraint(target_bone="ORG-forearm.R")],
-    "j_te_r": [CopyLocationConstraint(target_bone="DEF-hand.R"), CopyRotationConstraint(target_bone="ORG-hand.R")],
+    "j_ude_a_r": [CopyTransformsConstraint(target_bone="MCH-j_ude_a_r", target_space="WORLD", owner_space="WORLD")],
+    "j_ude_b_r": [CopyTransformsConstraint(target_bone="MCH-j_ude_b_r", target_space="WORLD", owner_space="WORLD")],
+    "j_te_r": [CopyTransformsConstraint(target_bone="MCH-j_te_r", target_space="WORLD", owner_space="WORLD")],
 
     # Twist
     "n_hte_r": [CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.R", axis=[True, False, False])],
