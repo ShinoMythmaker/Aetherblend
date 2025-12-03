@@ -159,16 +159,20 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             bpy.data.objects.remove(existing_rigify_rig, do_unlink=True)
             armature.aether_rig.rigify_rig = None
 
-        ## Creating Meta Rig and setting up basic Settings
         setup_start = time.time()
         meta_rig = utils.armature.create(location=armature.location, armature_name=f"META_{armature.name}")
         bpy.context.view_layer.objects.active = meta_rig
         meta_rig.show_in_front = True 
         bpy.ops.armature.rigify_use_standard_colors()
         bpy.ops.armature.rigify_add_color_sets()
+        
+        armature_collection = utils.collection.get_collection(armature)
+        if armature_collection:
+            utils.collection.link_to_collection([meta_rig], armature_collection)
+            if debug_mode: print(f"[AetherBlend] Moved meta rig to collection: {armature_collection.name}")
+        
         if debug_mode: print(f"[AetherBlend] Meta rig creation: {time.time() - setup_start:.3f}s")
 
-        ## Setup collections
         collection_start = time.time()
         hide_collections = []
         for collection in META_RIG_COLLECTIONS_INFO:
@@ -181,7 +185,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                     hide_collections.append(coll)
         if debug_mode: print(f"[AetherBlend] Collection setup: {time.time() - collection_start:.3f}s")
 
-        ## Propegate data 
         data_start = time.time()
         eye_occlusion_object = _find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
 
@@ -193,11 +196,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             data = None
         if debug_mode: print(f"[AetherBlend] Data propagation: {time.time() - data_start:.3f}s")
 
-        ## Generate bones
         bone_gen_start = time.time()
         for bone_group_idx, bone_group in enumerate(HUMAN):
             for sub_group in bone_group:
-                # Get the name from the first GenerativeBone's data if available
                 group_name = "Unknown"
                 if sub_group and len(sub_group) > 0:
                     first_bone = sub_group[0]
@@ -213,14 +214,11 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if debug_mode: print(f"[AetherBlend] Bone generation: {time.time() - bone_gen_start:.3f}s")
                 
 
-        ## Hide Collections
         for hide_coll in hide_collections:
             hide_coll.is_visible = False
 
-        ## Safe Rig Reference
         armature.aether_rig.meta_rig = meta_rig
         
-        ## Parenting and context
         bpy.ops.object.mode_set(mode='OBJECT')
         meta_rig.parent = armature
         meta_rig.hide_set(True)
@@ -231,7 +229,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         armature.select_set(True)
 
         bpy.context.window.cursor_set('DEFAULT')
-        print(f"[AetherBlend] Total meta rig generation time: {time.time() - start_time:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Total meta rig generation time: {time.time() - start_time:.3f}s")
         return {'FINISHED'}
 
 class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
@@ -285,6 +283,11 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
             if rigify_rig:
                 armature.aether_rig.rigify_rig = rigify_rig
                 rigify_rig.parent = armature
+                
+                armature_collection = utils.collection.get_collection(armature)
+                if armature_collection:
+                    utils.collection.link_to_collection([rigify_rig], armature_collection)
+                    if debug_mode: print(f"[AetherBlend] Moved rigify rig to collection: {armature_collection.name}")
 
                 bpy.ops.object.select_all(action='DESELECT')
                 rigify_rig.hide_set(True)
@@ -344,6 +347,9 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         if debug_mode: print(f"[AetherBlend] Rename constraints: {time.time() - rename_start:.3f}s")
 
         armature.aether_rig.rigify_linked = True
+        
+        if get_preferences().auto_navigate_tabs:
+            bpy.context.scene.aether_tabs.active_tab = 'RIG_LAYERS'
 
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.select_all(action='DESELECT')
@@ -364,7 +370,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         armature.select_set(True)
 
         bpy.context.window.cursor_set('DEFAULT')
-        print(f"[AetherBlend] Total link time: {time.time() - start_time:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Total link time: {time.time() - start_time:.3f}s")
         return {'FINISHED'}
 
     def _create_ffxiv_backup(self, armature: bpy.types.Armature) -> None:
@@ -446,7 +452,6 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
         link_pose_start = time.time()
         for bone_name, constraints in LINK_POSE_OPERATIONS.items():
-           # get pose bone in ffxiv armature
            pose_bone = ffxiv_armature.pose.bones.get(bone_name)
            if pose_bone:
                for constraint in constraints:
@@ -454,7 +459,6 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         if debug_mode: print(f"[AetherBlend]   New constraints: {time.time() - link_pose_start:.3f}s")
 
 
-        ## implement regex constrainst 
         regex_start = time.time()
         for pattern, constraints in REGEX_CONSTRAINTS.items():
             for pose_bone in ffxiv_armature.pose.bones:
@@ -560,6 +564,10 @@ class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
         bpy.ops.object.join()
         if debug_mode: print(f"[AetherBlend] Joined backup into FFXIV rig")
         
+        if "rig_id" in armature.data:
+            del armature.data["rig_id"]
+            if debug_mode: print(f"[AetherBlend] Removed rig_id from armature")
+        
         armature.aether_rig.rigify_linked = False
         armature.aether_rig.ffxiv_backup = None
         
@@ -572,15 +580,62 @@ class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
         bpy.context.window.cursor_set('DEFAULT')
         self.report({'INFO'}, "FFXIV rig restored from backup")
         return {'FINISHED'}
+
+class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
+    bl_idname = "aether.generate_full_rig"
+    bl_label = "Generate Full Rig"
+    bl_description = ("Generate meta rig, rigify rig, and link them in one operation")
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        debug_mode = get_preferences().debug_mode
+        start_time = time.time()
+        
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature object")
+            return {'CANCELLED'}
+        
+        if debug_mode: print(f"[AetherBlend] Starting full rig generation workflow")
+        
+        # Generate Meta Rig
+        meta_start = time.time()
+        result = bpy.ops.aether.generate_meta_rig()
+        if result != {'FINISHED'}:
+            self.report({'ERROR'}, "Meta rig generation failed")
+            return {'CANCELLED'}
+        print(f"[AetherBlend] Meta rig generation: {time.time() - meta_start:.3f}s")
+        
+        # Generate Rigify Rig
+        rigify_start = time.time()
+        result = bpy.ops.aether.generate_rigify_rig()
+        if result != {'FINISHED'}:
+            self.report({'ERROR'}, "Rigify rig generation failed")
+            return {'CANCELLED'}
+        print(f"[AetherBlend] Rigify rig generation: {time.time() - rigify_start:.3f}s")
+        
+        # Link Rigify Rig
+        link_start = time.time()
+        result = bpy.ops.aether.link_rigify_rig()
+        if result != {'FINISHED'}:
+            self.report({'ERROR'}, "Rigify rig linking failed")
+            return {'CANCELLED'}
+        print(f"[AetherBlend] Rigify rig linking: {time.time() - link_start:.3f}s")
+        
+        print(f"[AetherBlend] Total full rig generation time: {time.time() - start_time:.3f}s")
+        self.report({'INFO'}, "Full rig generation complete")
+        return {'FINISHED'}
     
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Rigify_Rig)
     bpy.utils.register_class(AETHER_OT_Link_Rigify_Rig)
     bpy.utils.register_class(AETHER_OT_Unlink_Rigify_Rig)
+    bpy.utils.register_class(AETHER_OT_Generate_Full_Rig)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Rigify_Rig)
     bpy.utils.unregister_class(AETHER_OT_Link_Rigify_Rig)
     bpy.utils.unregister_class(AETHER_OT_Unlink_Rigify_Rig)
+    bpy.utils.unregister_class(AETHER_OT_Generate_Full_Rig)

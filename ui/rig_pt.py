@@ -40,6 +40,12 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
 
         col = layout.column(align=True)
         
+        full_rig_button = col.row(align=True)
+        full_rig_button.scale_y = 1.5
+        full_rig_button.operator("aether.generate_full_rig", text="Generate Full Rig", icon="PLAY")
+        
+        col.separator()
+        
         row = col.row(align=True)
         
         meta_col = row.column(align=True)
@@ -73,28 +79,40 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         else:
             link_col.operator("aether.link_rigify_rig", text="Link", icon="LINKED")
 
-        layout.separator()
-
-        col = layout.column(align=True)
-        col.label(text="Rig References:")
+        status_row = col.row(align=True)
         
-        row = col.row(align=True)
-        label_col = row.column(align=True)
-        label_col.scale_x = 0.8
-        label_col.label(text="Meta Rig")
+        meta_status = status_row.column(align=True)
+        meta_status.scale_x = 2.0
+        if aether_rig.meta_rig:
+            meta_status.label(text="Good", icon='STRIP_COLOR_04')
+        else:
+            meta_status.label(text="Ready", icon='STRIP_COLOR_02')
         
-        field_col = row.column(align=True)
-        field_col.scale_x = 1.2
-        field_col.prop_search(aether_rig, "meta_rig", bpy.context.scene, "objects", text="")
-
-        row = col.row(align=True)
-        label_col = row.column(align=True)
-        label_col.scale_x = 0.8
-        label_col.label(text="Rigify Rig")
+        status_spacer = status_row.column(align=True)
+        status_spacer.scale_x = 0.3
+        status_spacer.label(text="")
         
-        field_col = row.column(align=True)
-        field_col.scale_x = 1.2
-        field_col.prop_search(aether_rig, "rigify_rig", bpy.context.scene, "objects", text="")
+        control_status = status_row.column(align=True)
+        control_status.scale_x = 2.0
+        if aether_rig.rigify_rig:
+            control_status.label(text="Good", icon='STRIP_COLOR_04')
+        elif aether_rig.meta_rig:
+            control_status.label(text="Ready", icon='STRIP_COLOR_02')
+        else:
+            control_status.label(text="Missing", icon='STRIP_COLOR_01')
+        
+        status_spacer2 = status_row.column(align=True)
+        status_spacer2.scale_x = 0.3
+        status_spacer2.label(text="")
+        
+        link_status = status_row.column(align=True)
+        link_status.scale_x = 2.0
+        if aether_rig.rigify_linked:
+            link_status.label(text="Good", icon='STRIP_COLOR_04')
+        elif aether_rig.rigify_rig:
+            link_status.label(text="Ready", icon='STRIP_COLOR_02')
+        else:
+            link_status.label(text="Missing", icon='STRIP_COLOR_01')
 
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
@@ -183,7 +201,6 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         if not armature or armature.type != 'ARMATURE':
             return
         
-        # Get rig_id from armature custom properties
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return
@@ -193,19 +210,15 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         
         if panel_class and hasattr(panel_class, 'draw'):
 
-            # Add custom AetherBlend controls before Rigify UI
             layout = self.layout
             
-            # Check what bones are selected
             selected_bones = {bone.name for bone in context.selected_pose_bones or []}
             
-            # Collect all UI controllers to display based on selection
             controllers_to_show = []
             for bone_name in selected_bones:
                 if bone_name in UI_CONTROLLER_MAPPING:
                     controllers_to_show.extend(UI_CONTROLLER_MAPPING[bone_name])
             
-            # Remove duplicates while preserving order
             seen = set()
             unique_controllers = []
             for controller in controllers_to_show:
@@ -213,7 +226,6 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
                     seen.add(controller.name)
                     unique_controllers.append(controller)
             
-            # Render UI controllers
             if unique_controllers:
                 for controller in unique_controllers:
                     controller.create_ui(layout, armature)

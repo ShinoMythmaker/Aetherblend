@@ -26,6 +26,12 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         default=False
     ) #type: ignore
 
+    auto_navigate_tabs: BoolProperty(
+        name="Auto Navigate Tabs",
+        description="Automatically switch to relevant tabs after operations (Import → Generate, Link → Rig Layers)",
+        default=True
+    ) #type: ignore
+
     # Default File Paths
     default_meddle_import_path: StringProperty(
         name="Meddle Import",
@@ -73,6 +79,12 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             box.label(text="  • Detailed terminal/console logging")
             box.label(text="  • Additional error information")
             box.label(text="  • Less simplified functionality for advanced users")
+            
+            box.separator()
+            box.prop(self, "auto_navigate_tabs")
+            box.label(text="When enabled, automatically switches tabs:", icon='INFO')
+            box.label(text="  • After import → Generate tab")
+            box.label(text="  • After linking → Rig Layers tab")
 
         elif self.tabs == 'PATHS':
             box = layout.box()

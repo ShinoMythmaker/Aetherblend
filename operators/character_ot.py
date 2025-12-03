@@ -14,7 +14,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     
     s_pack_images: BoolProperty(name="Pack-Images", description="Pack all Images into .blend file", default=True)  # type: ignore
     s_merge_vertices: BoolProperty(name="Merge Vertices", description="The glTF format requires discontinuous normals, UVs, and other vertex attributes to be stored as separate vertices, as required for rendering on typical graphics hardware. This option attempts to combine co -located vertices where possible. Currently cannot combine verts with different normals.", default=False)  # type: ignore
-    s_import_collection: BoolProperty(name="Import-Collection", description="Stores all import in a seperatre Collection", default=False)  # type: ignore
+    s_import_collection: BoolProperty(name="Import-Collection", description="Stores all import in a seperatre Collection", default=True)  # type: ignore
     
     s_merge_skin: BoolProperty(name="Merge Skin", description="Merges all skin objects", default=True)  # type: ignore
     s_merge_by_material: BoolProperty(name="Merge by Material", description="Merges all objects with the same material", default=True)  # type: ignore
@@ -145,6 +145,10 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             bpy.ops.object.mode_set(mode='OBJECT')
         
         self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
+        
+        if get_preferences().auto_navigate_tabs:
+            bpy.context.scene.aether_tabs.active_tab = 'GENERATE'
+        
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
     
