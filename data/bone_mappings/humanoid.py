@@ -1530,7 +1530,7 @@ HEAD_OPTIONAL: list[GenerativeBone] = [
     ),
     GenerativeBone(
         ref="src",
-        data=RegexBoneGroup(pattern=r"^j_ex_met.*",prefix="ACCESSORY", rigify_type_standalone="basic.super_copy", rigify_type_chain="skin.stretchy_chain", parent="head", is_connected=False, extension_size_factor=10.0, extension_axis="X", extension_axis_type="local", standalone_widget="bone"),
+        data=RegexBoneGroup(pattern=r"^j_ex_met.*",prefix="ACCESSORY", rigify_type_standalone="basic.super_copy", rigify_type_chain="skin.basic_chain", parent="head", is_connected=False, extension_size_factor=10.0, extension_axis="X", extension_axis_type="local", standalone_widget="bone"),
         req_bones=[],
         b_collection="Accessory",
         is_optional=True
