@@ -17,8 +17,6 @@ LINK_EDIT_OPERATIONS = [
     # Twist
     copyBone(bone_name="MCH-n_hhiji_r", src_bone_name="n_hhiji_r", parent_bone_name="DEF-elbow.R"),
     copyBone(bone_name="MCH-n_hhiji_l", src_bone_name="n_hhiji_l", parent_bone_name="DEF-elbow.L"),
-    copyBone(bone_name="MCH-n_hkata_l", src_bone_name="n_hkata_l", parent_bone_name="DEF-shoulder_tweak.L"),
-    copyBone(bone_name="MCH-n_hkata_r", src_bone_name="n_hkata_r", parent_bone_name="DEF-shoulder_tweak.R"),
     
     # Head
     copyBone(bone_name="MCH-j_kubi", src_bone_name="j_kubi", parent_bone_name="DEF-neck"),
@@ -29,20 +27,13 @@ LINK_EDIT_OPERATIONS = [
 
     # Arms
 
-    copyBone(bone_name="MCH-j_ude_a_l", src_bone_name="j_ude_a_l", parent_bone_name="ORG-upper_arm.L"),
-    copyBone(bone_name="MCH-j_ude_a_r", src_bone_name="j_ude_a_r", parent_bone_name="ORG-upper_arm.R"),
-    copyBone(bone_name="MCH-j_ude_b_l", src_bone_name="j_ude_b_l", parent_bone_name="DEF-forearm.L"),
-    copyBone(bone_name="MCH-j_ude_b_r", src_bone_name="j_ude_b_r", parent_bone_name="DEF-forearm.R"),
     copyBone(bone_name="MCH-j_te_l", src_bone_name="j_te_l", parent_bone_name="DEF-hand.L"),
     copyBone(bone_name="MCH-j_te_r", src_bone_name="j_te_r", parent_bone_name="DEF-hand.R"),
 
     # Legs
-    copyBone(bone_name="MCH-j_asi_a_l", src_bone_name="j_asi_a_l", parent_bone_name="ORG-thigh.L"),
-    copyBone(bone_name="MCH-j_asi_c_l", src_bone_name="j_asi_c_l", parent_bone_name="DEF-shin.L"),
+    
     copyBone(bone_name="MCH-j_asi_d_l", src_bone_name="j_asi_d_l", parent_bone_name="DEF-foot.L"),
     copyBone(bone_name="MCH-j_asi_e_l", src_bone_name="j_asi_e_l", parent_bone_name="DEF-toe.L"),
-    copyBone(bone_name="MCH-j_asi_a_r", src_bone_name="j_asi_a_r", parent_bone_name="ORG-thigh.R"),
-    copyBone(bone_name="MCH-j_asi_c_r", src_bone_name="j_asi_c_r", parent_bone_name="DEF-shin.R"),
     copyBone(bone_name="MCH-j_asi_d_r", src_bone_name="j_asi_d_r", parent_bone_name="DEF-foot.R"),
     copyBone(bone_name="MCH-j_asi_e_r", src_bone_name="j_asi_e_r", parent_bone_name="DEF-toe.R"),
     
@@ -96,13 +87,13 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
 
     # Left Arm
-    "j_ude_a_l": [CopyTransformsConstraint(target_bone="MCH-j_ude_a_l", target_space="WORLD", owner_space="WORLD")],
-    "j_ude_b_l": [CopyTransformsConstraint(target_bone="MCH-j_ude_b_l", target_space="WORLD", owner_space="WORLD")],
+    "j_ude_a_l": [CopyRotationConstraint(target_bone="ORG-upper_arm.L"), CopyLocationConstraint(target_bone="ORG-upper_arm.L")],
+    "j_ude_b_l": [CopyRotationConstraint(target_bone="ORG-forearm.L"), CopyLocationConstraint(target_bone="ORG-forearm.L")],
     "j_te_l": [CopyTransformsConstraint(target_bone="MCH-j_te_l", target_space="WORLD", owner_space="WORLD")],
 
     # Right Arm
-    "j_ude_a_r": [CopyTransformsConstraint(target_bone="MCH-j_ude_a_r", target_space="WORLD", owner_space="WORLD")],
-    "j_ude_b_r": [CopyTransformsConstraint(target_bone="MCH-j_ude_b_r", target_space="WORLD", owner_space="WORLD")],
+    "j_ude_a_r": [CopyRotationConstraint(target_bone="ORG-upper_arm.R"), CopyLocationConstraint(target_bone="ORG-upper_arm.R")],
+    "j_ude_b_r": [CopyRotationConstraint(target_bone="ORG-forearm.R"), CopyLocationConstraint(target_bone="ORG-forearm.R")],
     "j_te_r": [CopyTransformsConstraint(target_bone="MCH-j_te_r", target_space="WORLD", owner_space="WORLD")],
 
     # Twist
@@ -110,8 +101,8 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "n_hte_l": [CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.L", axis=[True, False, False])],
     "n_hhiji_r": [CopyTransformsConstraint(target_bone="MCH-n_hhiji_r", target_space="WORLD", owner_space="WORLD")],
     "n_hhiji_l": [CopyTransformsConstraint(target_bone="MCH-n_hhiji_l", target_space="WORLD", owner_space="WORLD")],
-    "n_hkata_l": [CopyTransformsConstraint(target_bone="MCH-n_hkata_l", target_space="WORLD", owner_space="WORLD")],
-    "n_hkata_r": [CopyTransformsConstraint(target_bone="MCH-n_hkata_r", target_space="WORLD", owner_space="WORLD")],
+    "n_hkata_l": [CopyRotationConstraint(target_bone="DEF-shoulder_tweak.L"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.L")],
+    "n_hkata_r": [CopyRotationConstraint(target_bone="DEF-shoulder_tweak.L"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.L")],
 
     # Right Fingers
     "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R01")],
@@ -296,14 +287,14 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     # DEF-toe because the ORG bone here stays still in local space. 
     # This issue is a mystery to me because it works when manually merging the rigify rig with the ffxiv rig. 
     # So i assume this happens in the parent clean up step.
-    "j_asi_a_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_a_l", target_space="WORLD", owner_space="WORLD")],
-    "j_asi_c_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_c_l", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_a_l": [CopyRotationConstraint(target_bone="ORG-thigh.L"), CopyLocationConstraint(target_bone="ORG-thigh.L")],
+    "j_asi_c_l": [CopyRotationConstraint(target_bone="ORG-shin.L"), CopyLocationConstraint(target_bone="ORG-shin.L")],
     "j_asi_d_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_d_l", target_space="WORLD", owner_space="WORLD")],
     "j_asi_e_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_e_l", target_space="WORLD", owner_space="WORLD")],
 
     # Right Leg
-    "j_asi_a_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_a_r", target_space="WORLD", owner_space="WORLD")],
-    "j_asi_c_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_c_r", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_a_r": [CopyRotationConstraint(target_bone="ORG-thigh.R"), CopyLocationConstraint(target_bone="ORG-thigh.R")],
+    "j_asi_c_r": [CopyRotationConstraint(target_bone="ORG-shin.R"), CopyLocationConstraint(target_bone="ORG-shin.R")],
     "j_asi_d_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_d_r", target_space="WORLD", owner_space="WORLD")],
     "j_asi_e_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_e_r", target_space="WORLD", owner_space="WORLD")],
 
@@ -416,6 +407,10 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "Lip.Master.B.L.001": [CopyRotationConstraint(target_bone="Lip.Master_end.B.L.001")],
     "Lip.Master.T.R.002": [CopyRotationConstraint(target_bone="Lip.Master_end.B.R.001")],
     "Lip.Master.B.R.001": [CopyRotationConstraint(target_bone="Lip.Master_end.B.R.001")],
+    "Lip.T.R": [CopyRotationConstraint(target_bone="Lip.Master.T")],
+    "Lip.T.L": [CopyRotationConstraint(target_bone="Lip.Master.T")],
+    "Lip.B.L": [CopyRotationConstraint(target_bone="Lip.Master.B")],
+    "Lip.B.R": [CopyRotationConstraint(target_bone="Lip.Master.B")],
 
     "eye_master.L": [UnmapConstraint()],
     "eye_master.R": [UnmapConstraint()],
