@@ -161,21 +161,21 @@ def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.view_layer.objects.active = armature
     
-    parent_map = utils.armature.snapshot_parenting(armature)
+    # parent_map = utils.armature.snapshot_parenting(armature)
     
-    utils.armature.unparent_all_bones(armature)
+    # utils.armature.unparent_all_bones(armature)
     
-    # Parent all bones to n_root if it exists
-    bpy.ops.object.mode_set(mode='EDIT')
-    edit_bones = armature.data.edit_bones
-    n_root = edit_bones.get('n_root')
+    # # Parent all bones to n_root if it exists
+    # bpy.ops.object.mode_set(mode='EDIT')
+    # edit_bones = armature.data.edit_bones
+    # n_root = edit_bones.get('n_root')
     
-    if n_root:
-        for bone in edit_bones:
-            if bone != n_root and bone.parent is None:
-                bone.parent = n_root
-                bone.use_connect = False
-        print(f"[AetherBlend] Parented all bones to n_root")
+    # if n_root:
+    #     for bone in edit_bones:
+    #         if bone != n_root and bone.parent is None:
+    #             bone.parent = n_root
+    #             bone.use_connect = False
+    #     print(f"[AetherBlend] Parented all bones to n_root")
     
     bpy.ops.object.mode_set(mode='OBJECT')
     
@@ -183,7 +183,7 @@ def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
     
     utils.armature.new_rest_pose(armature)
     
-    utils.armature.restore_bone_parenting(armature, parent_map)
+    # utils.armature.restore_bone_parenting(armature, parent_map)
     
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
