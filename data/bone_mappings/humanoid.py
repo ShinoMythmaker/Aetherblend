@@ -231,7 +231,7 @@ ARM_R:list[GenerativeBone] = [
         ref="src",
         data=ExtensionBone(name="shoulder_tweak.R", bone_a="n_hkata_r", axis_type="local", axis="Y", start="head", parent="upper_arm.R", is_connected=False, size_factor=0.5, roll=45),
         req_bones=["n_hkata_r"],
-        b_collection="Arm.L (Tweak)",
+        b_collection="Arm.R (Tweak)",
         settings=RigifySettings(bone_name="shoulder_tweak.R", rigify_type="basic.super_copy", super_copy_widget_type="sphere"),
     ),
 ] 
