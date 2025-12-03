@@ -815,25 +815,27 @@ class CopyTransformsConstraint(Constraint):
 
 
 @dataclass(frozen=True)
-class UnmapConstraint(Constraint):
-    """Pseudo-constraint that moves bones to an 'Unmapped Bones' collection."""
-    name: str = "AetherBlend_Unmap"
+class AssignCollection(Constraint):
+    """Pseudo-constraint that moves bones to a specified collection."""
+    collection_name: str = "UnmappedBones"
+    state: bool = False 
 
     def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
-        """Moves the bone to the 'Unmapped Bones' collection."""
-        collection_name = "Unmapped Bones"
+        """Assigns Bones to specified collection."""
+        if bpy.context.object.mode != 'POSE':
+            bpy.ops.object.mode_set(mode='POSE')
         
         bone_collections = armature.data.collections
-        unmapped_collection = bone_collections.get(collection_name)
+        collection = bone_collections.get(self.collection_name)
         
-        if unmapped_collection is None:
-            unmapped_collection = bone_collections.new(collection_name)
-            unmapped_collection.is_visible = False
+        if collection is None:
+            collection = bone_collections.new(self.collection_name)
+            collection.is_visible = self.state
         
-        for collection in bone.bone.collections:
-            collection.unassign(bone.bone)
+        for other_collection in bone.bone.collections:
+            other_collection.unassign(bone.bone)
         
-        unmapped_collection.assign(bone.bone)
+        collection.assign(bone.bone)
 
 
 @dataclass(frozen=True)

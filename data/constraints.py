@@ -1,4 +1,4 @@
-from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint, CopyTransformsConstraint, UnmapConstraint, OffsetTransformConstraint, copyBone, connectBone, TrackToConstraint
+from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint, CopyTransformsConstraint, AssignCollection, OffsetTransformConstraint, copyBone, connectBone, TrackToConstraint
 
 LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-n_root", src_bone_name="n_root", parent_bone_name="root"),
@@ -196,18 +196,18 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
 
 
-    "MCH-track_j_f_mabdn_03in_l": [TrackToConstraint(target_bone="lid.B.L.001", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabdn_01_l": [TrackToConstraint(target_bone="lid.B.L.002", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabdn_02out_l": [TrackToConstraint(target_bone="lid.B.L.003", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabup_03in_l": [TrackToConstraint(target_bone="lid.T.L.003", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabup_01_l": [TrackToConstraint(target_bone="lid.T.L.002", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabup_02out_l": [TrackToConstraint(target_bone="lid.T.L.001", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabdn_03in_r": [TrackToConstraint(target_bone="lid.B.R.001", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabdn_01_r": [TrackToConstraint(target_bone="lid.B.R.002", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabdn_02out_r": [TrackToConstraint(target_bone="lid.B.R.003", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabup_03in_r": [TrackToConstraint(target_bone="lid.T.R.003", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabup_01_r": [TrackToConstraint(target_bone="lid.T.R.002", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
-    "MCH-track_j_f_mabup_02out_r": [TrackToConstraint(target_bone="lid.T.R.001", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabdn_03in_l": [TrackToConstraint(target_bone="lid.B.L.001", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabdn_01_l": [TrackToConstraint(target_bone="lid.B.L.002", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabdn_02out_l": [TrackToConstraint(target_bone="lid.B.L.003", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabup_03in_l": [TrackToConstraint(target_bone="lid.T.L.003", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabup_01_l": [TrackToConstraint(target_bone="lid.T.L.002", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabup_02out_l": [TrackToConstraint(target_bone="lid.T.L.001", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabdn_03in_r": [TrackToConstraint(target_bone="lid.B.R.001", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabdn_01_r": [TrackToConstraint(target_bone="lid.B.R.002", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabdn_02out_r": [TrackToConstraint(target_bone="lid.B.R.003", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabup_03in_r": [TrackToConstraint(target_bone="lid.T.R.003", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabup_01_r": [TrackToConstraint(target_bone="lid.T.R.002", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
+    "MCH-track_j_f_mabup_02out_r": [TrackToConstraint(target_bone="lid.T.R.001", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM"), AssignCollection(collection_name="MCH")],
 
 
     # Left Mouth
@@ -349,58 +349,58 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
     # Rigify Bones 
     ## Arms
-    "forearm_tweak.L.001": [UnmapConstraint()],
-    "forearm_tweak.R.001": [UnmapConstraint()],
-    "forearm_tweak.L": [UnmapConstraint()],
-    "forearm_tweak.R": [UnmapConstraint()],
-    "upper_arm_tweak.L.001": [UnmapConstraint()],
-    "upper_arm_tweak.R.001": [UnmapConstraint()],
-    "upper_arm_tweak.L": [UnmapConstraint()],
-    "upper_arm_tweak.R": [UnmapConstraint()],
-    "upper_arm_parent.L": [UnmapConstraint()],
-    "upper_arm_parent.R": [UnmapConstraint()],
+    "forearm_tweak.L.001": [AssignCollection()],
+    "forearm_tweak.R.001": [AssignCollection()],
+    "forearm_tweak.L": [AssignCollection()],
+    "forearm_tweak.R": [AssignCollection()],
+    "upper_arm_tweak.L.001": [AssignCollection()],
+    "upper_arm_tweak.R.001": [AssignCollection()],
+    "upper_arm_tweak.L": [AssignCollection()],
+    "upper_arm_tweak.R": [AssignCollection()],
+    "upper_arm_parent.L": [AssignCollection()],
+    "upper_arm_parent.R": [AssignCollection()],
 
-    "hand_tweak.R": [UnmapConstraint()],
-    "hand_tweak.L": [UnmapConstraint()],
+    "hand_tweak.R": [AssignCollection()],
+    "hand_tweak.L": [AssignCollection()],
 
     ## Legs
-    "foot_tweak.L": [UnmapConstraint()],
-    "foot_tweak.R": [UnmapConstraint()],
-    "shin_tweak.L.001": [UnmapConstraint()],
-    "shin_tweak.R.001": [UnmapConstraint()],
-    "shin_tweak.L": [UnmapConstraint()],
-    "shin_tweak.R": [UnmapConstraint()],
-    "thigh_tweak.L.001": [UnmapConstraint()],
-    "thigh_tweak.R.001": [UnmapConstraint()],
-    "thigh_tweak.L": [UnmapConstraint()],
-    "thigh_tweak.R": [UnmapConstraint()],
-    "thigh_parent.L": [UnmapConstraint()],
-    "thigh_parent.R": [UnmapConstraint()],
+    "foot_tweak.L": [AssignCollection()],
+    "foot_tweak.R": [AssignCollection()],
+    "shin_tweak.L.001": [AssignCollection()],
+    "shin_tweak.R.001": [AssignCollection()],
+    "shin_tweak.L": [AssignCollection()],
+    "shin_tweak.R": [AssignCollection()],
+    "thigh_tweak.L.001": [AssignCollection()],
+    "thigh_tweak.R.001": [AssignCollection()],
+    "thigh_tweak.L": [AssignCollection()],
+    "thigh_tweak.R": [AssignCollection()],
+    "thigh_parent.L": [AssignCollection()],
+    "thigh_parent.R": [AssignCollection()],
 
     ## Skirt
-    "skirt_support.B.L.002": [UnmapConstraint()],
-    "skirt_support.B.R.002": [UnmapConstraint()],
-    "skirt_out.L": [UnmapConstraint()],
-    "skirt_out.R": [UnmapConstraint()],
-    "skirt_front.L": [UnmapConstraint()],
-    "skirt_front.R": [UnmapConstraint()],
-    "skirt_back.L": [UnmapConstraint()],
-    "skirt_back.R": [UnmapConstraint()],
+    "skirt_support.B.L.002": [AssignCollection()],
+    "skirt_support.B.R.002": [AssignCollection()],
+    "skirt_out.L": [AssignCollection()],
+    "skirt_out.R": [AssignCollection()],
+    "skirt_front.L": [AssignCollection()],
+    "skirt_front.R": [AssignCollection()],
+    "skirt_back.L": [AssignCollection()],
+    "skirt_back.R": [AssignCollection()],
 
     ## Spine
-    "tweak_spine.004": [UnmapConstraint()],
-    "spine_fk.01": [UnmapConstraint()],
-    "tweak_spine.03": [UnmapConstraint()],
-    "tweak_spine.02": [UnmapConstraint()],
-    "tweak_spine.01": [UnmapConstraint()],
-    "tweak_neck": [UnmapConstraint()],
+    "tweak_spine.004": [AssignCollection()],
+    "spine_fk.01": [AssignCollection()],
+    "tweak_spine.03": [AssignCollection()],
+    "tweak_spine.02": [AssignCollection()],
+    "tweak_spine.01": [AssignCollection()],
+    "tweak_neck": [AssignCollection()],
 
     ## Tail
-    "tweak_base_tail.A": [UnmapConstraint()],
-    "tweak_tail.A": [UnmapConstraint()],
-    "tweak_tail.B": [UnmapConstraint()],
-    "tweak_tail.C": [UnmapConstraint()],
-    "tweak_tail.D": [UnmapConstraint()],
+    "tweak_base_tail.A": [AssignCollection()],
+    "tweak_tail.A": [AssignCollection()],
+    "tweak_tail.B": [AssignCollection()],
+    "tweak_tail.C": [AssignCollection()],
+    "tweak_tail.D": [AssignCollection()],
 
     ## Face
     "Lip.Master.T.L.002": [CopyRotationConstraint(target_bone="Lip.Master_end.B.L.001")],
@@ -412,16 +412,68 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "Lip.B.L": [CopyRotationConstraint(target_bone="Lip.Master.B")],
     "Lip.B.R": [CopyRotationConstraint(target_bone="Lip.Master.B")],
 
-    "eye_master.L": [UnmapConstraint()],
-    "eye_master.R": [UnmapConstraint()],
+    "eye_master.L": [AssignCollection()],
+    "eye_master.R": [AssignCollection()],
 
-    "jaw_mouth": [UnmapConstraint()],
+    "jaw_mouth": [AssignCollection()],
 
     "lid.T.L.002": [CopyLocationConstraint(target_bone="lid.B.L.002", name="eye_lid_close.L", influence=0)],
     "lid.T.R.002": [CopyLocationConstraint(target_bone="lid.B.R.002", name="eye_lid_close.R", influence=0)],
 
-    "v_ear.L": [UnmapConstraint()],
-    "v_ear.R": [UnmapConstraint()]
+    "v_ear.L": [AssignCollection()],
+    "v_ear.R": [AssignCollection()],
+
+    ## MCH Bones 
+
+    "MCH-n_root": [AssignCollection(collection_name="MCH")],
+    # Spine
+    "MCH-j_kosi": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sebo_a": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sebo_b": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sebo_c": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sako_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sako_r": [AssignCollection(collection_name="MCH")],
+    
+    # Chest
+    "MCH-j_mune_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_mune_r": [AssignCollection(collection_name="MCH")],
+    
+    # Twist
+    "MCH-n_hhiji_r": [AssignCollection(collection_name="MCH")],
+    "MCH-n_hhiji_l": [AssignCollection(collection_name="MCH")],
+    
+    # Head
+    "MCH-j_kubi": [AssignCollection(collection_name="MCH")],
+    "MCH-j_kao": [AssignCollection(collection_name="MCH")],
+    "MCH-j_mimi_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_mimi_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_ago": [AssignCollection(collection_name="MCH")],
+
+    # Arms
+    "MCH-j_te_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_te_r": [AssignCollection(collection_name="MCH")],
+
+    # Legs
+    "MCH-j_asi_d_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_asi_e_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_asi_d_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_asi_e_r": [AssignCollection(collection_name="MCH")],
+    
+    # Tail
+    "MCH-n_sippo_a": [AssignCollection(collection_name="MCH")],
+    "MCH-n_sippo_b": [AssignCollection(collection_name="MCH")],
+    "MCH-n_sippo_c": [AssignCollection(collection_name="MCH")],
+    "MCH-n_sippo_d": [AssignCollection(collection_name="MCH")],
+    "MCH-n_sippo_e": [AssignCollection(collection_name="MCH")],
+    
+    # Skirt
+    "MCH-j_sk_f_a_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sk_s_a_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sk_b_a_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sk_f_a_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sk_s_a_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_sk_b_a_r": [AssignCollection(collection_name="MCH")],
+
 }
 
 REGEX_CONSTRAINTS: dict[str, list[Constraint]] = {
