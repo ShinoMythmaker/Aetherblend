@@ -8,7 +8,7 @@ LEG_L: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="thigh.L", bone_a="j_asi_a_l", bone_b="j_asi_c_l", parent="hips"),
         req_bones=["j_asi_a_l", "j_asi_c_l"],
-        settings=RigifySettings(bone_name="thigh.L", rigify_type="limbs.leg", fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)"),
+        settings=RigifySettings(bone_name="thigh.L", rigify_type="limbs.leg", fk_coll="Leg.L (FK)"),
         b_collection="Leg.L (IK)"
     ),
     GenerativeBone(
@@ -42,7 +42,7 @@ LEG_R: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="thigh.R", bone_a="j_asi_a_r", bone_b="j_asi_c_r", parent="hips"),
         req_bones=["j_asi_a_r", "j_asi_c_r"],
-        settings=RigifySettings(bone_name="thigh.R", rigify_type="limbs.leg", fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)"),
+        settings=RigifySettings(bone_name="thigh.R", rigify_type="limbs.leg", fk_coll="Leg.R (FK)"),
         b_collection="Leg.R (IK)"
     ),
     GenerativeBone(
@@ -241,7 +241,7 @@ TAIL: list[GenerativeBone] = [
         ref="src",
         data=ConnectBone(name="tail.A", bone_a="n_sippo_a", bone_b="n_sippo_b", parent="hips"),
         req_bones=["n_sippo_a", "n_sippo_b"],
-        settings=RigifySettings(bone_name="tail.A", rigify_type="spines.basic_tail", copy_rot_axes={"use_x": True, "use_y": True, "use_z": True}, tweak_coll="Tail (Tweak)"),
+        settings=RigifySettings(bone_name="tail.A", rigify_type="spines.basic_tail", copy_rot_axes={"use_x": True, "use_y": True, "use_z": True}),
         b_collection="Tail"
     ),
     GenerativeBone(
