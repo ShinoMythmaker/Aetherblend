@@ -2,6 +2,7 @@ import bpy
 import time
 from .. import utils
 from ..data import *
+from ..preferences import get_preferences
 
 def _cleanup_linked_rigify_bones(ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> None:
     """Remove old control rig bones and data from FFXIV armature before linking new ones."""
@@ -149,6 +150,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        debug_mode = get_preferences().debug_mode
         start_time = time.time()
         bpy.context.window.cursor_set('WAIT') 
 
@@ -172,7 +174,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         meta_rig.show_in_front = True 
         bpy.ops.armature.rigify_use_standard_colors()
         bpy.ops.armature.rigify_add_color_sets()
-        print(f"[AetherBlend] Meta rig creation: {time.time() - setup_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Meta rig creation: {time.time() - setup_start:.3f}s")
 
         ## Setup collections
         collection_start = time.time()
@@ -185,7 +187,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 coll.rigify_ui_title = collection.title
                 if not collection.visible:
                     hide_collections.append(coll)
-        print(f"[AetherBlend] Collection setup: {time.time() - collection_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Collection setup: {time.time() - collection_start:.3f}s")
 
         ## Propegate data 
         data_start = time.time()
@@ -197,7 +199,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         if len(data) == 0:
             data = None
-        print(f"[AetherBlend] Data propagation: {time.time() - data_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Data propagation: {time.time() - data_start:.3f}s")
 
         ## Generate bones
         bone_gen_start = time.time()
@@ -215,8 +217,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 group_start = time.time()
                 gen_group = GenerativeMetaBoneGroup(src_armature=armature, target_armature=meta_rig, generative_bones=sub_group)
                 gen_group.execute(data=data)
-                print(f"[AetherBlend]   Group {bone_group_idx} ({group_name}): {time.time() - group_start:.3f}s")
-        print(f"[AetherBlend] Bone generation: {time.time() - bone_gen_start:.3f}s")
+                if debug_mode: print(f"[AetherBlend]   Group {bone_group_idx} ({group_name}): {time.time() - group_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Bone generation: {time.time() - bone_gen_start:.3f}s")
                 
 
         ## Hide Collections
@@ -302,6 +304,8 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
     def execute(self, context):
         start_time = time.time()
+        debug_mode = get_preferences().debug_mode
+        
         bpy.context.window.cursor_set('WAIT') 
 
         armature = context.active_object
@@ -319,15 +323,14 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         cleanup_start = time.time()
         if armature.aether_rig.rigify_linked:
             _cleanup_linked_rigify_bones(armature, rigify_rig)
-        print(f"[AetherBlend] Cleanup: {time.time() - cleanup_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Cleanup: {time.time() - cleanup_start:.3f}s")
 
         merge_start = time.time()
         self._merge_control_rig_bones(armature, rigify_rig)
-        print(f"[AetherBlend] Merge control rig bones: {time.time() - merge_start:.3f}s")
-
+        if debug_mode: print(f"[AetherBlend] Merge control rig bones: {time.time() - merge_start:.3f}s")
         rename_start = time.time()
         self._rename_constraints(armature)
-        print(f"[AetherBlend] Rename constraints: {time.time() - rename_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend] Rename constraints: {time.time() - rename_start:.3f}s")
 
         armature.aether_rig.rigify_linked = True
 
@@ -360,6 +363,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
 
     def _merge_control_rig_bones(self, ffxiv_armature: bpy.types.Armature, rigify_rig: bpy.types.Armature) -> bool:
         """Duplicate the control rig and merge it with the FFXIV armature."""
+        debug_mode = get_preferences().debug_mode
         original_mode = bpy.context.object.mode
         
         duplicate_start = time.time()
@@ -378,20 +382,20 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         bpy.context.view_layer.objects.active = ffxiv_armature 
         
         bpy.ops.object.join()
-        print(f"[AetherBlend]   Duplicate & join: {time.time() - duplicate_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend]   Duplicate & join: {time.time() - duplicate_start:.3f}s")
         
         bpy.ops.object.mode_set(mode='OBJECT')
         
         props_start = time.time()
         self.copy_rigify_properties(ffxiv_armature, rigify_rig)
         self._override_property_values(ffxiv_armature)
-        print(f"[AetherBlend]   Copy properties: {time.time() - props_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend]   Copy properties: {time.time() - props_start:.3f}s")
 
 
         link_edits_start = time.time()
         for operation in LINK_EDIT_OPERATIONS:
             operation.execute(ffxiv_armature)
-        print(f"[AetherBlend]   Link edits: {time.time() - link_edits_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend]   Link edits: {time.time() - link_edits_start:.3f}s")
 
 
         bpy.ops.object.mode_set(mode='POSE')
@@ -403,7 +407,7 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
            if pose_bone:
                for constraint in constraints:
                    constraint.apply(pose_bone, ffxiv_armature)
-        print(f"[AetherBlend]   New constraints: {time.time() - link_pose_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend]   New constraints: {time.time() - link_pose_start:.3f}s")
 
 
         ## implement regex constrainst 
@@ -417,12 +421,11 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
                     if owner_bone:
                         for constraint in constraints:
                             constraint.apply(owner_bone, ffxiv_armature, target_override=pose_bone.name)
-        print(f"[AetherBlend]   Regex constraints: {time.time() - regex_start:.3f}s")
+        if debug_mode: print(f"[AetherBlend]   Regex constraints: {time.time() - regex_start:.3f}s")
 
         pose_apply_start = time.time()
         bpy.ops.pose.armature_apply()
-        print(f"[AetherBlend]   Apply pose: {time.time() - pose_apply_start:.3f}s")
-
+        if debug_mode: print(f"[AetherBlend]   Apply pose: {time.time() - pose_apply_start:.3f}s")
                    
         bpy.ops.object.mode_set(mode=original_mode)
         return True

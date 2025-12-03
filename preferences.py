@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import StringProperty, EnumProperty
+from bpy.props import StringProperty, EnumProperty, BoolProperty
 
 def get_preferences():
     """Retrieve addon preferences."""
@@ -14,8 +14,16 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         description="Select a preference tab",
         items=[
             ('PATHS', "Paths", "Set default paths for various functions"),
+            ('GENERAL', "General", "General addon settings"),
         ],
         default='PATHS'
+    ) #type: ignore
+
+    # General Settings
+    debug_mode: BoolProperty(
+        name="Debug Mode",
+        description="Enable detailed terminal logging and less simplified functionality for troubleshooting and development",
+        default=False
     ) #type: ignore
 
     # Default File Paths
@@ -54,13 +62,26 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
     def draw(self, context):        
         layout = self.layout
 
-        box = layout.box()
-        box.label(text="Default File Paths")
-        box.prop(self, "default_meddle_import_path")
-        # box.prop(self, "default_pose_import_path")
-        box.prop(self, "default_pose_export_path")
-        box.prop(self, "default_anim_export_path")
-        box.prop(self, "default_vfx_export_path")
+        row = layout.row()
+        row.prop(self, "tabs", expand=True)
+
+        if self.tabs == 'GENERAL':
+            box = layout.box()
+            box.label(text="General Settings", icon='SETTINGS')
+            box.prop(self, "debug_mode")
+            box.label(text="When enabled, debug mode provides:", icon='INFO')
+            box.label(text="  • Detailed terminal/console logging")
+            box.label(text="  • Additional error information")
+            box.label(text="  • Less simplified functionality for advanced users")
+
+        elif self.tabs == 'PATHS':
+            box = layout.box()
+            box.label(text="Default File Paths", icon='FILE_FOLDER')
+            box.prop(self, "default_meddle_import_path")
+            # box.prop(self, "default_pose_import_path")
+            box.prop(self, "default_pose_export_path")
+            box.prop(self, "default_anim_export_path")
+            box.prop(self, "default_vfx_export_path")
 
 def register():
     bpy.utils.register_class(AetherBlendPreferences)
