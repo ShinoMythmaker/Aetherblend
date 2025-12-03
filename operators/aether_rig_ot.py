@@ -168,6 +168,11 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         if existing_meta_rig:
             if debug_mode: print(f"[AetherBlend] Removing existing Meta-Rig: {existing_meta_rig.name}")
+            if hasattr(existing_meta_rig.data, 'rigify_rig_ui') and existing_meta_rig.data.rigify_rig_ui:
+                script = existing_meta_rig.data.rigify_rig_ui
+                if script and script.name in bpy.data.texts:
+                    bpy.data.texts.remove(script)
+                    if debug_mode: print(f"[AetherBlend] Removed rigify script")
             bpy.data.objects.remove(existing_meta_rig, do_unlink=True)
         
         if existing_rigify_rig:
@@ -245,6 +250,13 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         armature.aether_rig.meta_rig = meta_rig
         
+        if hasattr(meta_rig.data, 'rigify_rig_ui') and meta_rig.data.rigify_rig_ui:
+            script = meta_rig.data.rigify_rig_ui
+            if script and script.name in bpy.data.texts:
+                bpy.data.texts.remove(script)
+                if debug_mode: print(f"[AetherBlend] Cleared old rigify script from new meta rig")
+            meta_rig.data.rigify_rig_ui = None
+        
         bpy.ops.object.mode_set(mode='OBJECT')
         meta_rig.parent = armature
         meta_rig.hide_set(True)
@@ -307,6 +319,12 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         if existing_rigify_rig:
             debug_mode = get_preferences().debug_mode
             if debug_mode: print(f"[AetherBlend] Removing existing Rigify-Rig: {existing_rigify_rig.name}")
+            meta_rig = armature.aether_rig.meta_rig
+            if meta_rig and hasattr(meta_rig.data, 'rigify_rig_ui') and meta_rig.data.rigify_rig_ui:
+                script = meta_rig.data.rigify_rig_ui
+                if script and script.name in bpy.data.texts:
+                    bpy.data.texts.remove(script)
+                    if debug_mode: print(f"[AetherBlend] Removed rigify script")
             bpy.data.objects.remove(existing_rigify_rig, do_unlink=True)
             armature.aether_rig.rigify_rig = None
 
@@ -323,8 +341,8 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='POSE')
 
         result = bpy.ops.pose.rigify_generate()
+        
         wm.progress_update(int(progress_offset + 80 * progress_scale / 100))
-        wm.progress_update(80)
         
         bpy.context.window.cursor_set('DEFAULT') 
         if result == {'FINISHED'}:
@@ -452,12 +470,13 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         if use_own_progress:
             wm.progress_end()
         bpy.context.window.cursor_set('DEFAULT')
-        if debug_mode: print(f"[AetherBlend] Total link time: {time.time() - start_time:.3f}s")
         return {'FINISHED'}
 
     def _create_ffxiv_backup(self, armature: bpy.types.Armature) -> None:
         """Create a backup copy of the FFXIV armature before linking."""
         debug_mode = get_preferences().debug_mode
+        
+        original_data_name = armature.data.name
         
         existing_backup = armature.aether_rig.ffxiv_backup
         if existing_backup:
@@ -472,7 +491,9 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         
         backup = bpy.context.active_object
         backup.name = f"{armature.name}_FFXIV_Backup"
-        backup.data.name = f"{armature.data.name}_FFXIV_Backup"
+        backup.data.name = f"{original_data_name}_FFXIV_Backup"
+        
+        backup.data["original_name"] = original_data_name
         
         backup.parent = armature
         
@@ -647,13 +668,13 @@ class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
         armature.select_set(True)
         bpy.context.view_layer.objects.active = armature
         
-        for coll in armature.data.collections:
-            coll.is_visible = True
-        
         bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.armature.select_all(action='SELECT')
-        bpy.ops.armature.delete()
-        if debug_mode: print(f"[AetherBlend] Deleted all bones from linked rig")
+        
+        bone_count_before = len(armature.data.edit_bones)
+        while armature.data.edit_bones:
+            armature.data.edit_bones.remove(armature.data.edit_bones[0])
+        
+        if debug_mode: print(f"[AetherBlend] Deleted {bone_count_before} bones from linked rig")
         
         bpy.ops.object.mode_set(mode='OBJECT')
         collections_to_remove = [coll for coll in armature.data.collections]
@@ -661,12 +682,24 @@ class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
             armature.data.collections.remove(coll)
         if debug_mode: print(f"[AetherBlend] Removed {len(collections_to_remove)} bone collections")
         
-        bpy.ops.object.select_all(action='DESELECT')
-        backup.select_set(True)
-        armature.select_set(True)
-        bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.join()
-        if debug_mode: print(f"[AetherBlend] Joined backup into FFXIV rig")
+        if backup.animation_data:
+            nla_tracks = backup.animation_data.nla_tracks
+            while nla_tracks:
+                nla_tracks.remove(nla_tracks[0])
+            if debug_mode: print(f"[AetherBlend] Cleared NLA tracks from backup before joining")
+        
+        old_armature_data = armature.data
+        original_name = backup.data.get("original_name", armature.data.name)
+        armature.data = backup.data
+        
+        armature.data.name = original_name
+        if "original_name" in armature.data:
+            del armature.data["original_name"]
+        
+        bpy.data.armatures.remove(old_armature_data)
+
+        bpy.data.objects.remove(backup, do_unlink=True)
+        if debug_mode: print(f"[AetherBlend] Restored armature data from backup")
         
         if "rig_id" in armature.data:
             del armature.data["rig_id"]

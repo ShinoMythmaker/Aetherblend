@@ -337,10 +337,10 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "iv_kougan_l": [CopyRotationConstraint(target_bone="ORG-testicle.L")],
     "iv_kougan_r": [CopyRotationConstraint(target_bone="ORG-testicle.R")],
 
-    "iv_kuritto": [CopyLocationConstraint(target_bone="DEF-clitoris.control"), CopyRotationConstraint(target_bone="clitoris.control")],
+    "iv_kuritto": [CopyLocationConstraint(target_bone="clitoris.control"), CopyRotationConstraint(target_bone="clitoris.control")],
     "iv_inshin_l": [CopyRotationConstraint(target_bone="labia.L"), CopyLocationConstraint(target_bone="DEF-labia.L")],
     "iv_inshin_r": [CopyRotationConstraint(target_bone="labia.R"), CopyLocationConstraint(target_bone="DEF-labia.R")],
-    "iv_koumon": [CopyLocationConstraint(target_bone="DEF-fourchette.control")],
+    "iv_koumon": [CopyLocationConstraint(target_bone="fourchette.control")],
 
     # Rigify Bones 
     ## Arms
