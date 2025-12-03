@@ -56,6 +56,9 @@ class ExtensionBone:
 
     def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the ExtensionBone extending from bone_a in the target armature."""
+        if bpy.context.object.mode != 'EDIT':
+            bpy.ops.object.mode_set(mode='EDIT')
+
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for ExtensionBone '{self.name}'.")
             return None
@@ -105,41 +108,36 @@ class ExtensionBone:
         extension_length = ref_bone_length * self.size_factor
         tail_pos = start_pos + direction_vector.normalized() * extension_length
 
-        original_mode = bpy.context.object.mode
         bpy.context.view_layer.objects.active = target
-        bpy.ops.object.mode_set(mode='EDIT')
         
-        try:
-            target_edit_bones = target.data.edit_bones
-            
-            if self.name in target_edit_bones:
-                target_edit_bones.remove(target_edit_bones[self.name])
+        target_edit_bones = target.data.edit_bones
+        
+        if self.name in target_edit_bones:
+            target_edit_bones.remove(target_edit_bones[self.name])
 
-            new_bone = target_edit_bones.new(self.name)
-            new_bone.head = start_pos
-            new_bone.tail = tail_pos
-            new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
+        new_bone = target_edit_bones.new(self.name)
+        new_bone.head = start_pos
+        new_bone.tail = tail_pos
+        new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
 
-            if self.parent:
-                if isinstance(self.parent, list):
-                    for bone_name in self.parent:
-                        parent_bone = target_edit_bones.get(bone_name)
-                        if parent_bone and parent_bone != new_bone:
-                            break
-                else :
-                    parent_bone = target_edit_bones.get(self.parent)
+        if self.parent:
+            if isinstance(self.parent, list):
+                for bone_name in self.parent:
+                    parent_bone = target_edit_bones.get(bone_name)
+                    if parent_bone and parent_bone != new_bone:
+                        break
+            else :
+                parent_bone = target_edit_bones.get(self.parent)
 
-                if parent_bone:
-                    new_bone.parent = parent_bone
-                    new_bone.use_connect = self.is_connected
-                else:
-                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ExtensionBone '{self.name}'.")
+            if parent_bone:
+                new_bone.parent = parent_bone
+                new_bone.use_connect = self.is_connected
+            else:
+                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ExtensionBone '{self.name}'.")
+        
+        created_name = new_bone.name  
+        return [created_name]
             
-            created_name = new_bone.name  
-            return [created_name]
-            
-        finally:
-            bpy.ops.object.mode_set(mode=original_mode)
 
 @dataclass(frozen=True)
 class RegexBoneGroup:
@@ -438,6 +436,9 @@ class ConnectBone:
 
     def generate(self, ref: bpy.types.Armature, target: bpy.types.Armature, data: dict | None = None) -> list[str] | None:
         """Generates the ConnectBone from bone_a to bone_b in target armature."""
+        if bpy.context.object.mode != 'EDIT':
+            bpy.ops.object.mode_set(mode='EDIT')
+
         if not ref or not target:
             print(f"[AetherBlend] Invalid armatures provided for ConnectBone '{self.name}'.")
             return None
@@ -460,34 +461,29 @@ class ConnectBone:
         else:  # "head"
             tail_pos = bone_b_ref.head_local.copy()
         
-        original_mode = bpy.context.object.mode
         bpy.context.view_layer.objects.active = target
-        bpy.ops.object.mode_set(mode='EDIT')
-        
-        try:
-            target_edit_bones = target.data.edit_bones
-            
-            if self.name in target_edit_bones:
-                target_edit_bones.remove(target_edit_bones[self.name])
 
-            new_bone = target_edit_bones.new(self.name)
-            new_bone.head = head_pos
-            new_bone.tail = tail_pos
-            new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
+        target_edit_bones = target.data.edit_bones
+        
+        if self.name in target_edit_bones:
+            target_edit_bones.remove(target_edit_bones[self.name])
+
+        new_bone = target_edit_bones.new(self.name)
+        new_bone.head = head_pos
+        new_bone.tail = tail_pos
+        new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
+        
+        if self.parent:
+            parent_bone = target_edit_bones.get(self.parent)
+            if parent_bone:
+                new_bone.parent = parent_bone
+                new_bone.use_connect = self.is_connected
+            else:
+                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ConnectBone '{self.name}'.")
+        
+        created_name = new_bone.name  
+        return [created_name]
             
-            if self.parent:
-                parent_bone = target_edit_bones.get(self.parent)
-                if parent_bone:
-                    new_bone.parent = parent_bone
-                    new_bone.use_connect = self.is_connected
-                else:
-                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ConnectBone '{self.name}'.")
-            
-            created_name = new_bone.name  
-            return [created_name]
-            
-        finally:
-            bpy.ops.object.mode_set(mode=original_mode)
 
 @dataclass(frozen=True)
 class BridgeBone:
@@ -617,7 +613,7 @@ class CenterBone:
         elif self.axis == "Z":
             direction_vector = mathutils.Vector((0.0, 0.0, eye_bone_length))
         else:
-            print(f"[AetherBlend] Invalid axis '{self.axis}' for EyeBone '{self.name}'. Using default Y axis.")
+            # Default to Y axis if invalid
             direction_vector = mathutils.Vector((0.0, eye_bone_length, 0.0))
         
         original_mode = bpy.context.object.mode
@@ -648,8 +644,6 @@ class CenterBone:
                     print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for CenterBone '{self.name}'.")
             
             created_name = new_bone.name
-            orientation = "inverted (tail->head)" if self.inverted else "normal (head->tail)"
-            print(f"[AetherBlend] Created center bone '{created_name}' from {len(valid_ref_bones)} reference bones, center at {center_position}, length {eye_bone_length:.3f}, axis {self.axis}, {orientation}")
             return [created_name]
             
         finally:
@@ -658,7 +652,7 @@ class CenterBone:
 @dataclass(frozen=True)
 class GenerativeBone:
     ref: str # e.g. "src" or "tgt"
-    data: ConnectBone | ExtensionBone
+    data: ConnectBone | ExtensionBone | SkinBone | BridgeBone | CenterBone | RegexBoneGroup
     req_bones: list[str] | None = None
     settings: RigifySettings | None = None
     b_collection: str | None = None
@@ -835,13 +829,54 @@ class UnmapConstraint(Constraint):
         if unmapped_collection is None:
             unmapped_collection = bone_collections.new(collection_name)
             unmapped_collection.is_visible = False
-            print(f"[AetherBlend] Created bone collection '{collection_name}'")
         
         for collection in bone.bone.collections:
             collection.unassign(bone.bone)
         
         unmapped_collection.assign(bone.bone)
-        print(f"[AetherBlend] Moved bone '{bone.name}' to collection '{collection_name}'")
+
+
+@dataclass(frozen=True)
+class TrackToConstraint(Constraint):
+    target_bone: str
+    track_axis: str = "TRACK_Y"
+    up_axis: str = "UP_X"
+    target_z: bool = False 
+    target_space: str = "LOCAL_OWNER_ORIENT"
+    owner_space: str = "LOCAL_WITH_PARENT"
+    space_object: str | None = None
+    space_subtarget: str | None = None
+    influence: float = 1.0
+    name: str = "AetherBlend_TrackTo"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Armature) -> None:
+        """Applies the Track To constraint to the given bone."""
+        constraint = bone.constraints.new(type='TRACK_TO')
+        constraint.name = self.name
+        target_obj = armature
+        if not target_obj:
+            print(f"[AetherBlend] Target object '{self.target_object}' not found for Track To constraint.")
+            return
+        constraint.target = target_obj
+        constraint.subtarget = self.target_bone
+        constraint.track_axis = self.track_axis
+        constraint.up_axis = self.up_axis
+        constraint.use_target_z = self.target_z
+        constraint.target_space = self.target_space
+        constraint.owner_space = self.owner_space
+
+        if self.owner_space == 'CUSTOM' or self.target_space == 'CUSTOM':
+            space_object = bpy.data.objects.get(self.space_object) if self.space_object else armature
+            if space_object:
+                constraint.space_object = space_object
+                constraint.space_subtarget = self.space_subtarget
+            else:
+                print(f"[AetherBlend] Warning: Space object '{self.space_object}' not found for Track To constraint.")
+        constraint.influence = self.influence
+
+        utils.armature.rigify._select_pose_bone(bone, True)
+        bpy.ops.pose.armature_apply(selected=True)
+        utils.armature.rigify._select_pose_bone(bone, False)
 
 
 @dataclass(frozen=True)
@@ -910,12 +945,100 @@ class OffsetTransformConstraint(Constraint):
                 name="AetherBlend_OffsetTransform_Copy"
             )
             copy_transform.apply(bone, armature)
-            
-            print(f"[AetherBlend] Created MCH bone '{mch_bone_name}' for OffsetTransform on '{bone.name}'")
         
         if original_mode != 'POSE':
             bpy.ops.object.mode_set(mode=original_mode)
 
+
+## LINK Edit Operations 
+
+class LinkEditOperation(ABC):
+    """Abstract base class for all link edit operations."""
+    
+    @abstractmethod
+    def execute(self, armature: bpy.types.Armature) -> None:
+        """Executes the link edit operation on the given armature."""
+        pass
+
+
+@dataclass(frozen=True)
+class copyBone(LinkEditOperation):
+    bone_name: str
+    src_bone_name: str
+    parent_bone_name: str | None = None
+
+    def execute(self, armature: bpy.types.Armature) -> None:
+        """Executes the link edit operation on the given armature."""
+        if bpy.context.object.mode != 'EDIT':
+            bpy.ops.object.mode_set(mode='EDIT')
+
+        edit_bones = armature.data.edit_bones
+        
+        src_bone = edit_bones.get(self.src_bone_name)
+        if not src_bone:
+            print(f"[AetherBlend] Source bone '{self.src_bone_name}' not found in armature for copyBone operation.")
+            return
+        
+        new_bone = edit_bones.new(self.bone_name)
+        new_bone.head = src_bone.head.copy()
+        new_bone.tail = src_bone.tail.copy()
+        new_bone.roll = src_bone.roll
+        
+        if self.parent_bone_name:
+            parent_bone = edit_bones.get(self.parent_bone_name)
+            if parent_bone:
+                new_bone.parent = parent_bone
+                new_bone.use_connect = False
+            else:
+                print(f"[AetherBlend] Warning: Parent bone '{self.parent_bone_name}' not found for copyBone operation.")
+
+@dataclass(frozen=True)
+class connectBone(LinkEditOperation):
+    bone_name: str
+    bone_a: str
+    bone_b: str
+    start: str = "head"
+    end: str = "head"
+    is_connected: bool = False
+    parent_bone_name: str | None = None
+
+    ## a bone that is created from head of bone_a to head or tail of bone B
+    def execute(self, armature: bpy.types.Armature) -> None:
+        """Executes the link edit operation on the given armature."""
+        if bpy.context.object.mode != 'EDIT':
+            bpy.ops.object.mode_set(mode='EDIT')
+
+        ref_bones = armature.data.bones
+        bone_a_ref = ref_bones.get(self.bone_a)
+        bone_b_ref = ref_bones.get(self.bone_b)
+
+        if not bone_a_ref or not bone_b_ref:
+            print(f"[AetherBlend] Cannot execute connectBone '{self.bone_name}': reference bones '{self.bone_a}' or '{self.bone_b}' not found in armature.")
+            return
+        
+        if self.start == "tail":
+            head_pos = bone_a_ref.tail_local.copy()
+        else:  # "head"
+            head_pos = bone_a_ref.head_local.copy()
+        
+        if self.end == "tail":
+            tail_pos = bone_b_ref.tail_local.copy()
+        else:  # "head"
+            tail_pos = bone_b_ref.head_local.copy()
+        
+        edit_bones = armature.data.edit_bones
+        
+        new_bone = edit_bones.new(self.bone_name)
+        new_bone.head = head_pos
+        new_bone.tail = tail_pos
+        
+        if self.parent_bone_name:
+            parent_bone = edit_bones.get(self.parent_bone_name)
+            if parent_bone:
+                new_bone.parent = parent_bone
+                new_bone.use_connect = False
+            else:
+                print(f"[AetherBlend] Warning: Parent bone '{self.parent_bone_name}' not found for connectBone operation.")
 
 ## UI Controller 
 @dataclass(frozen=True)
@@ -968,5 +1091,4 @@ class ConstraintUIController:
             return False
         
         constraint.name = self.rename_constraint
-        print(f"[AetherBlend] Renamed constraint '{self.target_constraint}' to '{self.rename_constraint}' on bone '{self.target_bone}'")
         return True

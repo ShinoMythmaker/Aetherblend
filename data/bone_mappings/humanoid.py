@@ -262,6 +262,12 @@ TAIL: list[GenerativeBone] = [
         req_bones=["n_sippo_d", "n_sippo_e"],
         b_collection="Tail",
     ),
+    GenerativeBone(
+        ref="tgt",
+        data=ExtensionBone(name="tail.E", bone_a="tail.D", parent="tail.D", is_connected=True, size_factor=1, ),
+        req_bones=["tail.D"],
+        b_collection="Tail",
+    ),
 ]
 
 EYE_L: list[GenerativeBone] = [

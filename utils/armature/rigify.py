@@ -34,7 +34,6 @@ def rigify_set_tweak_collection(armature: bpy.types.Armature, bone_name: str, co
             if len(rigify_params.tweak_coll_refs) > 0:
                 tweak_ref = rigify_params.tweak_coll_refs[-1]
                 tweak_ref.name = collection_name
-                print(f"[AetherBlend] Set tweak collection reference to '{collection_name}' for bone '{bone_name}'")
         else:
             print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
             
@@ -66,7 +65,6 @@ def rigify_set_fk_collection(armature: bpy.types.Armature, bone_name: str, colle
             if len(rigify_params.fk_coll_refs) > 0:
                 fk_ref = rigify_params.fk_coll_refs[-1]
                 fk_ref.name = collection_name
-                print(f"[AetherBlend] Set FK collection reference to '{collection_name}' for bone '{bone_name}'")
         else:
             print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
             
@@ -301,7 +299,6 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
                 if len(rigify_params.skin_primary_coll_refs) > 0:
                     skin_ref = rigify_params.skin_primary_coll_refs[-1]
                     skin_ref.name = settings.primary_layer_extra
-                    print(f"[AetherBlend] Set Skin Primary collection reference to '{settings.primary_layer_extra}' for bone '{bone_name}'")
                 else:
                     print(f"[AetherBlend] Collection '{settings.primary_layer_extra}' not found in armature '{armature.name}'")
 
@@ -314,7 +311,6 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
                 if len(rigify_params.skin_secondary_coll_refs) > 0:
                     skin_ref = rigify_params.skin_secondary_coll_refs[-1]
                     skin_ref.name = settings.secondary_layer_extra
-                    print(f"[AetherBlend] Set Skin Secondary collection reference to '{settings.secondary_layer_extra}' for bone '{bone_name}'")
                 else:
                     print(f"[AetherBlend] Collection '{settings.secondary_layer_extra}' not found in armature '{armature.name}'")
 
@@ -327,7 +323,6 @@ def set_rigify_properties(armature: bpy.types.Armature,settings: RigifySettings,
     """Sets up rigify properties for a pose bone"""
     original_mode = armature.mode
     bpy.ops.object.mode_set(mode='POSE')
-    print(f"[AetherBlend] Setting rigify properties for bone '{bone_name}'")
     if bone_name is None:
         if settings.bone_name is not None:
             bone_name = settings.bone_name

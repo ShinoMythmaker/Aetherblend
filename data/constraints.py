@@ -1,52 +1,88 @@
-from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint, CopyTransformsConstraint, UnmapConstraint, OffsetTransformConstraint
+from . schemas import CopyLocationConstraint, CopyRotationConstraint, TrackToBone, Constraint, CopyScaleConstraint, CopyTransformsConstraint, UnmapConstraint, OffsetTransformConstraint, copyBone, connectBone, TrackToConstraint
 
-CONSTRAINTS_TRACK_TO_AFTER_ORIGINAL: list[TrackToBone] = [
-    #Eyes
-    # Left Eye
-    TrackToBone(origin_name="j_f_mabdn_03in_l", target_name="lid.B.L.001", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
-    TrackToBone(origin_name="j_f_mabdn_01_l", target_name="lid.B.L.002", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
-    TrackToBone(origin_name="j_f_mabdn_02out_l", target_name="lid.B.L.003", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
+LINK_EDIT_OPERATIONS = [
+    copyBone(bone_name="MCH-n_root", src_bone_name="n_root", parent_bone_name="root"),
+    # Spine
+    copyBone(bone_name="MCH-j_kosi", src_bone_name="j_kosi", parent_bone_name="DEF-hips"),
+    copyBone(bone_name="MCH-j_sebo_a", src_bone_name="j_sebo_a", parent_bone_name="DEF-spine.01"),
+    copyBone(bone_name="MCH-j_sebo_b", src_bone_name="j_sebo_b", parent_bone_name="DEF-spine.02"),
+    copyBone(bone_name="MCH-j_sebo_c", src_bone_name="j_sebo_c", parent_bone_name="DEF-spine.03"),
+    copyBone(bone_name="MCH-j_sako_l", src_bone_name="j_sako_l", parent_bone_name="shoulder.L"),
+    copyBone(bone_name="MCH-j_sako_r", src_bone_name="j_sako_r", parent_bone_name="shoulder.R"),
+    
+    # Chest
+    copyBone(bone_name="MCH-j_mune_l", src_bone_name="j_mune_l", parent_bone_name="DEF-Chest.L"),
+    copyBone(bone_name="MCH-j_mune_r", src_bone_name="j_mune_r", parent_bone_name="DEF-Chest.R"),
+    
+    # Twist
+    copyBone(bone_name="MCH-n_hhiji_r", src_bone_name="n_hhiji_r", parent_bone_name="DEF-elbow.R"),
+    copyBone(bone_name="MCH-n_hhiji_l", src_bone_name="n_hhiji_l", parent_bone_name="DEF-elbow.L"),
+    copyBone(bone_name="MCH-n_hkata_l", src_bone_name="n_hkata_l", parent_bone_name="DEF-shoulder_tweak.L"),
+    copyBone(bone_name="MCH-n_hkata_r", src_bone_name="n_hkata_r", parent_bone_name="DEF-shoulder_tweak.R"),
+    
+    # Head
+    copyBone(bone_name="MCH-j_kubi", src_bone_name="j_kubi", parent_bone_name="DEF-neck"),
+    copyBone(bone_name="MCH-j_kao", src_bone_name="j_kao", parent_bone_name="DEF-head"),
+    copyBone(bone_name="MCH-j_mimi_l", src_bone_name="j_mimi_l", parent_bone_name="DEF-ear.L"),
+    copyBone(bone_name="MCH-j_mimi_r", src_bone_name="j_mimi_r", parent_bone_name="DEF-ear.R"),
+    
+    # Legs
+    copyBone(bone_name="MCH-j_asi_a_l", src_bone_name="j_asi_a_l", parent_bone_name="DEF-thigh.L"),
+    copyBone(bone_name="MCH-j_asi_c_l", src_bone_name="j_asi_c_l", parent_bone_name="DEF-shin.L"),
+    copyBone(bone_name="MCH-j_asi_d_l", src_bone_name="j_asi_d_l", parent_bone_name="DEF-foot.L"),
+    copyBone(bone_name="MCH-j_asi_e_l", src_bone_name="j_asi_e_l", parent_bone_name="DEF-toe.L"),
+    copyBone(bone_name="MCH-j_asi_a_r", src_bone_name="j_asi_a_r", parent_bone_name="DEF-thigh.R"),
+    copyBone(bone_name="MCH-j_asi_c_r", src_bone_name="j_asi_c_r", parent_bone_name="DEF-shin.R"),
+    copyBone(bone_name="MCH-j_asi_d_r", src_bone_name="j_asi_d_r", parent_bone_name="DEF-foot.R"),
+    copyBone(bone_name="MCH-j_asi_e_r", src_bone_name="j_asi_e_r", parent_bone_name="DEF-toe.R"),
+    
+    # Tail
+    copyBone(bone_name="MCH-n_sippo_a", src_bone_name="n_sippo_a", parent_bone_name="DEF-tail.A"),
+    copyBone(bone_name="MCH-n_sippo_b", src_bone_name="n_sippo_b", parent_bone_name="DEF-tail.B"),
+    copyBone(bone_name="MCH-n_sippo_c", src_bone_name="n_sippo_c", parent_bone_name="DEF-tail.C"),
+    copyBone(bone_name="MCH-n_sippo_d", src_bone_name="n_sippo_d", parent_bone_name="DEF-tail.D"),
+    copyBone(bone_name="MCH-n_sippo_e", src_bone_name="n_sippo_e", parent_bone_name="DEF-tail.E"),
+    
+    # Skirt
+    copyBone(bone_name="MCH-j_sk_f_a_l", src_bone_name="j_sk_f_a_l", parent_bone_name="DEF-skirt_front.L"),
+    copyBone(bone_name="MCH-j_sk_s_a_l", src_bone_name="j_sk_s_a_l", parent_bone_name="DEF-skirt_out.L"),
+    copyBone(bone_name="MCH-j_sk_b_a_l", src_bone_name="j_sk_b_a_l", parent_bone_name="DEF-skirt_back.L"),
+    copyBone(bone_name="MCH-j_sk_f_a_r", src_bone_name="j_sk_f_a_r", parent_bone_name="DEF-skirt_front.R"),
+    copyBone(bone_name="MCH-j_sk_s_a_r", src_bone_name="j_sk_s_a_r", parent_bone_name="DEF-skirt_out.R"),
+    copyBone(bone_name="MCH-j_sk_b_a_r", src_bone_name="j_sk_b_a_r", parent_bone_name="DEF-skirt_back.R"),
 
-    TrackToBone(origin_name="j_f_mabup_03in_l", target_name="lid.T.L.003", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
-    TrackToBone(origin_name="j_f_mabup_01_l", target_name="lid.T.L.002", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
-    TrackToBone(origin_name="j_f_mabup_02out_l", target_name="lid.T.L.001", custom_space="ORG-eye.L", parent_name="ORG-eye.L"),
 
-    # Right Eye
-    TrackToBone(origin_name="j_f_mabdn_03in_r", target_name="lid.B.R.001", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
-    TrackToBone(origin_name="j_f_mabdn_01_r", target_name="lid.B.R.002", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
-    TrackToBone(origin_name="j_f_mabdn_02out_r", target_name="lid.B.R.003", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
-
-    TrackToBone(origin_name="j_f_mabup_03in_r", target_name="lid.T.R.003", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
-    TrackToBone(origin_name="j_f_mabup_01_r", target_name="lid.T.R.002", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
-    TrackToBone(origin_name="j_f_mabup_02out_r", target_name="lid.T.R.001", custom_space="ORG-eye.R", parent_name="ORG-eye.R"),
+    # Eyes 
+    connectBone(bone_name="MCH-track_j_f_mabdn_03in_l", bone_a="j_f_mabdn_03in_l", bone_b="lid.B.L.001", parent_bone_name="ORG-eye.L"),
+    connectBone(bone_name="MCH-track_j_f_mabdn_01_l", bone_a="j_f_mabdn_01_l", bone_b="lid.B.L.002", parent_bone_name="ORG-eye.L"),
+    connectBone(bone_name="MCH-track_j_f_mabdn_02out_l", bone_a="j_f_mabdn_02out_l", bone_b="lid.B.L.003", parent_bone_name="ORG-eye.L"),
+    connectBone(bone_name="MCH-track_j_f_mabup_03in_l", bone_a="j_f_mabup_03in_l", bone_b="lid.T.L.003", parent_bone_name="ORG-eye.L"),
+    connectBone(bone_name="MCH-track_j_f_mabup_01_l", bone_a="j_f_mabup_01_l", bone_b="lid.T.L.002", parent_bone_name="ORG-eye.L"),
+    connectBone(bone_name="MCH-track_j_f_mabup_02out_l", bone_a="j_f_mabup_02out_l", bone_b="lid.T.L.001", parent_bone_name="ORG-eye.L"),
+    connectBone(bone_name="MCH-track_j_f_mabdn_03in_r", bone_a="j_f_mabdn_03in_r", bone_b="lid.B.R.001", parent_bone_name="ORG-eye.R"),
+    connectBone(bone_name="MCH-track_j_f_mabdn_01_r", bone_a="j_f_mabdn_01_r", bone_b="lid.B.R.002", parent_bone_name="ORG-eye.R"),
+    connectBone(bone_name="MCH-track_j_f_mabdn_02out_r", bone_a="j_f_mabdn_02out_r", bone_b="lid.B.R.003", parent_bone_name="ORG-eye.R"),
+    connectBone(bone_name="MCH-track_j_f_mabup_03in_r", bone_a="j_f_mabup_03in_r", bone_b="lid.T.R.003", parent_bone_name="ORG-eye.R"),
+    connectBone(bone_name="MCH-track_j_f_mabup_01_r", bone_a="j_f_mabup_01_r", bone_b="lid.T.R.002", parent_bone_name="ORG-eye.R"),
+    connectBone(bone_name="MCH-track_j_f_mabup_02out_r", bone_a="j_f_mabup_02out_r", bone_b="lid.T.R.001", parent_bone_name="ORG-eye.R"),
 ]
 
-CONSTRAINTS_COPY_ROT: dict[str, list[str]] = {
-    }
+LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
+    "n_root": [CopyTransformsConstraint(target_bone="MCH-n_root", target_space="WORLD", owner_space="WORLD")],
 
-CONSTRAINTS_CHILD_OF: dict[str, list[str]] = {
-    # Root
-    "n_root": ["root"],
-}
-
-CONSTRAINTS_COPY_LOC: dict[str, list[str]] = {
-    }
-
-
-NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     # Spine 
-    "j_kosi": [OffsetTransformConstraint(target_bone="DEF-hips")],
+    "j_kosi": [CopyTransformsConstraint(target_bone="MCH-j_kosi", target_space="WORLD", owner_space="WORLD")],
 
-    "j_sebo_a": [OffsetTransformConstraint(target_bone="DEF-spine.01")],
-    "j_sebo_b": [OffsetTransformConstraint(target_bone="DEF-spine.02")],
-    "j_sebo_c": [OffsetTransformConstraint(target_bone="DEF-spine.03")],
+    "j_sebo_a": [CopyTransformsConstraint(target_bone="MCH-j_sebo_a", target_space="WORLD", owner_space="WORLD")],
+    "j_sebo_b": [CopyTransformsConstraint(target_bone="MCH-j_sebo_b", target_space="WORLD", owner_space="WORLD")],
+    "j_sebo_c": [CopyTransformsConstraint(target_bone="MCH-j_sebo_c", target_space="WORLD", owner_space="WORLD")],
 
-    "j_sako_l": [OffsetTransformConstraint(target_bone="shoulder.L")],
-    "j_sako_r": [OffsetTransformConstraint(target_bone="shoulder.R")],
+    "j_sako_l": [CopyTransformsConstraint(target_bone="MCH-j_sako_l", target_space="WORLD", owner_space="WORLD")],
+    "j_sako_r": [CopyTransformsConstraint(target_bone="MCH-j_sako_r", target_space="WORLD", owner_space="WORLD")],
 
     # Chest
-    "j_mune_l": [OffsetTransformConstraint(target_bone="DEF-Chest.L")],
-    "j_mune_r": [OffsetTransformConstraint(target_bone="DEF-Chest.R")],
+    "j_mune_l": [CopyTransformsConstraint(target_bone="MCH-j_mune_l", target_space="WORLD", owner_space="WORLD")],
+    "j_mune_r": [CopyTransformsConstraint(target_bone="MCH-j_mune_r", target_space="WORLD", owner_space="WORLD")],
 
 
     # Left Arm
@@ -62,10 +98,10 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     # Twist
     "n_hte_r": [CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.R", axis=[True, False, False])],
     "n_hte_l": [CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.L", axis=[True, False, False])],
-    "n_hhiji_r": [OffsetTransformConstraint(target_bone="DEF-elbow.R")],
-    "n_hhiji_l": [OffsetTransformConstraint(target_bone="DEF-elbow.L")],
-    "n_hkata_l": [OffsetTransformConstraint(target_bone="DEF-shoulder_tweak.L")],
-    "n_hkata_r": [OffsetTransformConstraint(target_bone="DEF-shoulder_tweak.R")],
+    "n_hhiji_r": [CopyTransformsConstraint(target_bone="MCH-n_hhiji_r", target_space="WORLD", owner_space="WORLD")],
+    "n_hhiji_l": [CopyTransformsConstraint(target_bone="MCH-n_hhiji_l", target_space="WORLD", owner_space="WORLD")],
+    "n_hkata_l": [CopyTransformsConstraint(target_bone="MCH-n_hkata_l", target_space="WORLD", owner_space="WORLD")],
+    "n_hkata_r": [CopyTransformsConstraint(target_bone="MCH-n_hkata_r", target_space="WORLD", owner_space="WORLD")],
 
     # Right Fingers
     "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R01")],
@@ -144,6 +180,35 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_f_eyepuru_r": [CopyRotationConstraint(target_bone="MCH-eye.R", influence=0.5)],
     "j_f_mab_r": [CopyRotationConstraint(target_bone="eye_master.R")],
 
+    "j_f_mabdn_03in_l": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabdn_03in_l")],
+    "j_f_mabdn_01_l": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabdn_01_l")],
+    "j_f_mabdn_02out_l": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabdn_02out_l")],
+    "j_f_mabup_03in_l": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabup_03in_l")],
+    "j_f_mabup_01_l": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabup_01_l")],
+    "j_f_mabup_02out_l": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabup_02out_l")],
+    "j_f_mabdn_03in_r": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabdn_03in_r")],
+    "j_f_mabdn_01_r": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabdn_01_r")],
+    "j_f_mabdn_02out_r": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabdn_02out_r")],
+    "j_f_mabup_03in_r": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabup_03in_r")],
+    "j_f_mabup_01_r": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabup_01_r")],
+    "j_f_mabup_02out_r": [CopyRotationConstraint(target_bone="MCH-track_j_f_mabup_02out_r")],
+
+
+
+    "MCH-track_j_f_mabdn_03in_l": [TrackToConstraint(target_bone="lid.B.L.001", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabdn_01_l": [TrackToConstraint(target_bone="lid.B.L.002", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabdn_02out_l": [TrackToConstraint(target_bone="lid.B.L.003", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabup_03in_l": [TrackToConstraint(target_bone="lid.T.L.003", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabup_01_l": [TrackToConstraint(target_bone="lid.T.L.002", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabup_02out_l": [TrackToConstraint(target_bone="lid.T.L.001", space_subtarget="ORG-eye.L", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabdn_03in_r": [TrackToConstraint(target_bone="lid.B.R.001", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabdn_01_r": [TrackToConstraint(target_bone="lid.B.R.002", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabdn_02out_r": [TrackToConstraint(target_bone="lid.B.R.003", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabup_03in_r": [TrackToConstraint(target_bone="lid.T.R.003", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabup_01_r": [TrackToConstraint(target_bone="lid.T.R.002", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
+    "MCH-track_j_f_mabup_02out_r": [TrackToConstraint(target_bone="lid.T.R.001", space_subtarget="ORG-eye.R", target_space="CUSTOM", owner_space="CUSTOM")],
+
+
     # Left Mouth
 
     "j_f_ulip_01_l": [CopyLocationConstraint(target_bone="DEF-Lip.T.L")],
@@ -186,11 +251,11 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     "j_f_hagukidn": [CopyLocationConstraint(target_bone="ORG-Teeth.B"), CopyRotationConstraint(target_bone="ORG-Teeth.B")],
 
     #Head
-    "j_kubi": [OffsetTransformConstraint(target_bone="DEF-neck")],
-    "j_kao": [OffsetTransformConstraint(target_bone="DEF-head")],
+    "j_kubi": [CopyTransformsConstraint(target_bone="MCH-j_kubi", target_space="WORLD", owner_space="WORLD")],
+    "j_kao": [CopyTransformsConstraint(target_bone="MCH-j_kao", target_space="WORLD", owner_space="WORLD")],
 
-    "j_mimi_l": [OffsetTransformConstraint(target_bone="DEF-ear.L")],
-    "j_mimi_r": [OffsetTransformConstraint(target_bone="DEF-ear.R")],
+    "j_mimi_l": [CopyTransformsConstraint(target_bone="MCH-j_mimi_l", target_space="WORLD", owner_space="WORLD")],
+    "j_mimi_r": [CopyTransformsConstraint(target_bone="MCH-j_mimi_r", target_space="WORLD", owner_space="WORLD")],
     "j_zerd_a_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L")],
     "j_zerd_b_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L.001"), CopyLocationConstraint(target_bone="ORG-v_ear.L.001")],
     "j_zerd_a_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R")],
@@ -221,47 +286,47 @@ NEW_CONSTRAINTS: dict[str, list[Constraint]] = {
     # DEF-toe because the ORG bone here stays still in local space. 
     # This issue is a mystery to me because it works when manually merging the rigify rig with the ffxiv rig. 
     # So i assume this happens in the parent clean up step.
-    "j_asi_a_l": [OffsetTransformConstraint(target_bone="DEF-thigh.L")],
-    "j_asi_c_l": [OffsetTransformConstraint(target_bone="DEF-shin.L")],
-    "j_asi_d_l": [OffsetTransformConstraint(target_bone="DEF-foot.L")],
-    "j_asi_e_l": [OffsetTransformConstraint(target_bone="DEF-toe.L")],
+    "j_asi_a_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_a_l", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_c_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_c_l", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_d_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_d_l", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_e_l": [CopyTransformsConstraint(target_bone="MCH-j_asi_e_l", target_space="WORLD", owner_space="WORLD")],
 
     # Right Leg
-    "j_asi_a_r": [OffsetTransformConstraint(target_bone="DEF-thigh.R")],
-    "j_asi_c_r": [OffsetTransformConstraint(target_bone="DEF-shin.R")],
-    "j_asi_d_r": [OffsetTransformConstraint(target_bone="DEF-foot.R")],
-    "j_asi_e_r": [OffsetTransformConstraint(target_bone="DEF-toe.R")],
+    "j_asi_a_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_a_r", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_c_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_c_r", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_d_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_d_r", target_space="WORLD", owner_space="WORLD")],
+    "j_asi_e_r": [CopyTransformsConstraint(target_bone="MCH-j_asi_e_r", target_space="WORLD", owner_space="WORLD")],
 
     # Tail
-    "n_sippo_a": [OffsetTransformConstraint(target_bone="DEF-tail.A")],
-    "n_sippo_b": [OffsetTransformConstraint(target_bone="DEF-tail.B")],
-    "n_sippo_c": [OffsetTransformConstraint(target_bone="DEF-tail.C")],
-    "n_sippo_d": [OffsetTransformConstraint(target_bone="DEF-tail.D")],
-    "n_sippo_e": [OffsetTransformConstraint(target_bone="DEF-tail.A_master")],
+    "n_sippo_a": [CopyTransformsConstraint(target_bone="MCH-n_sippo_a", target_space="WORLD", owner_space="WORLD")],
+    "n_sippo_b": [CopyTransformsConstraint(target_bone="MCH-n_sippo_b", target_space="WORLD", owner_space="WORLD")],
+    "n_sippo_c": [CopyTransformsConstraint(target_bone="MCH-n_sippo_c", target_space="WORLD", owner_space="WORLD")],
+    "n_sippo_d": [CopyTransformsConstraint(target_bone="MCH-n_sippo_d", target_space="WORLD", owner_space="WORLD")],
+    "n_sippo_e": [CopyTransformsConstraint(target_bone="MCH-n_sippo_e", target_space="WORLD", owner_space="WORLD")],
 
     # Skirt
 
-    "j_sk_f_a_l": [OffsetTransformConstraint(target_bone="DEF-skirt_front.L")],
+    "j_sk_f_a_l": [CopyTransformsConstraint(target_bone="MCH-j_sk_f_a_l", target_space="WORLD", owner_space="WORLD")],
     "j_sk_f_b_l": [CopyRotationConstraint(target_bone="DEF-skirt_front.L.001")],
     "j_sk_f_c_l": [CopyRotationConstraint(target_bone="DEF-skirt_front.L.002")],
 
-    "j_sk_s_a_l": [OffsetTransformConstraint(target_bone="DEF-skirt_out.L")],
+    "j_sk_s_a_l": [CopyTransformsConstraint(target_bone="MCH-j_sk_s_a_l", target_space="WORLD", owner_space="WORLD")],
     "j_sk_s_b_l": [CopyRotationConstraint(target_bone="DEF-skirt_out.L.001")],
     "j_sk_s_c_l": [CopyRotationConstraint(target_bone="DEF-skirt_out.L.002")],
 
-    "j_sk_b_a_l": [OffsetTransformConstraint(target_bone="DEF-skirt_back.L")],
+    "j_sk_b_a_l": [CopyTransformsConstraint(target_bone="MCH-j_sk_b_a_l", target_space="WORLD", owner_space="WORLD")],
     "j_sk_b_b_l": [CopyRotationConstraint(target_bone="DEF-skirt_back.L.001")],
     "j_sk_b_c_l": [CopyRotationConstraint(target_bone="DEF-skirt_back.L.002")],
 
-    "j_sk_f_a_r": [OffsetTransformConstraint(target_bone="DEF-skirt_front.R")],
+    "j_sk_f_a_r": [CopyTransformsConstraint(target_bone="MCH-j_sk_f_a_r", target_space="WORLD", owner_space="WORLD")],
     "j_sk_f_b_r": [CopyRotationConstraint(target_bone="DEF-skirt_front.R.001")],
     "j_sk_f_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_front.R.002")],
 
-    "j_sk_s_a_r": [OffsetTransformConstraint(target_bone="DEF-skirt_out.R")],
+    "j_sk_s_a_r": [CopyTransformsConstraint(target_bone="MCH-j_sk_s_a_r", target_space="WORLD", owner_space="WORLD")],
     "j_sk_s_b_r": [CopyRotationConstraint(target_bone="DEF-skirt_out.R.001")],
     "j_sk_s_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_out.R.002")],
 
-    "j_sk_b_a_r": [OffsetTransformConstraint(target_bone="DEF-skirt_back.R")],
+    "j_sk_b_a_r": [CopyTransformsConstraint(target_bone="MCH-j_sk_b_a_r", target_space="WORLD", owner_space="WORLD")],
     "j_sk_b_b_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.001")],
     "j_sk_b_c_r": [CopyRotationConstraint(target_bone="DEF-skirt_back.R.002")],
 
