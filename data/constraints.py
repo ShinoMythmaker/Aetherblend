@@ -14,10 +14,6 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_mune_l", src_bone_name="j_mune_l", parent_bone_name="DEF-Chest.L"),
     copyBone(bone_name="MCH-j_mune_r", src_bone_name="j_mune_r", parent_bone_name="DEF-Chest.R"),
     
-    # Twist
-    copyBone(bone_name="MCH-n_hhiji_r", src_bone_name="n_hhiji_r", parent_bone_name="DEF-elbow.R"),
-    copyBone(bone_name="MCH-n_hhiji_l", src_bone_name="n_hhiji_l", parent_bone_name="DEF-elbow.L"),
-    
     # Head
     copyBone(bone_name="MCH-j_kubi", src_bone_name="j_kubi", parent_bone_name="DEF-neck"),
     copyBone(bone_name="MCH-j_kao", src_bone_name="j_kao", parent_bone_name="DEF-head"),
@@ -25,10 +21,6 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_mimi_r", src_bone_name="j_mimi_r", parent_bone_name="DEF-ear.R"),
     copyBone(bone_name="MCH-j_f_ago", src_bone_name="j_f_ago", parent_bone_name="DEF-jaw"),
 
-    # Arms
-
-    copyBone(bone_name="MCH-j_te_l", src_bone_name="j_te_l", parent_bone_name="DEF-hand.L"),
-    copyBone(bone_name="MCH-j_te_r", src_bone_name="j_te_r", parent_bone_name="DEF-hand.R"),
 
     # Legs
     
@@ -99,10 +91,10 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     # Twist
     "n_hte_r": [CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.R", axis=[True, False, False])],
     "n_hte_l": [CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.L", axis=[True, False, False])],
-    "n_hhiji_r": [CopyTransformsConstraint(target_bone="MCH-n_hhiji_r", target_space="WORLD", owner_space="WORLD")],
-    "n_hhiji_l": [CopyTransformsConstraint(target_bone="MCH-n_hhiji_l", target_space="WORLD", owner_space="WORLD")],
-    "n_hkata_l": [CopyRotationConstraint(target_bone="DEF-shoulder_tweak.L"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.L")],
-    "n_hkata_r": [CopyRotationConstraint(target_bone="DEF-shoulder_tweak.L"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.L")],
+    "n_hhiji_r": [CopyRotationConstraint(target_bone="elbow.R"), CopyLocationConstraint(target_bone="DEF-elbow.R")],
+    "n_hhiji_l": [CopyRotationConstraint(target_bone="elbow.L"), CopyLocationConstraint(target_bone="DEF-elbow.L")],
+    "n_hkata_l": [CopyRotationConstraint(target_bone="shoulder_tweak.L"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.L")],
+    "n_hkata_r": [CopyRotationConstraint(target_bone="shoulder_tweak.R"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.R")],
 
     # Right Fingers
     "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R01")],
