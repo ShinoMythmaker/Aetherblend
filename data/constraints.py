@@ -21,6 +21,9 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_mimi_r", src_bone_name="j_mimi_r", parent_bone_name="DEF-ear.R"),
     copyBone(bone_name="MCH-j_f_ago", src_bone_name="j_f_ago", parent_bone_name="DEF-jaw"),
 
+    # Hands
+    copyBone(bone_name="MCH-j_te_l", src_bone_name="j_te_l", parent_bone_name="DEF-hand.L"),
+    copyBone(bone_name="MCH-j_te_r", src_bone_name="j_te_r", parent_bone_name="DEF-hand.R"),
 
     # Legs
     
@@ -89,8 +92,8 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "j_te_r": [CopyTransformsConstraint(target_bone="MCH-j_te_r", target_space="WORLD", owner_space="WORLD")],
 
     # Twist
-    "n_hte_r": [CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.R", axis=[True, False, False])],
-    "n_hte_l": [CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.L", axis=[True, False, False])],
+    "n_hte_r": [CopyLocationConstraint(target_bone="DEF-wrist.R"), CopyRotationConstraint(target_bone="DEF-hand.R", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.R", axis=[True, False, False])],
+    "n_hte_l": [CopyLocationConstraint(target_bone="DEF-wrist.L"), CopyRotationConstraint(target_bone="DEF-hand.L", axis=[True, False, False]), CopyRotationConstraint(target_bone="wrist.L", axis=[True, False, False])],
     "n_hhiji_r": [CopyRotationConstraint(target_bone="elbow.R"), CopyLocationConstraint(target_bone="DEF-elbow.R")],
     "n_hhiji_l": [CopyRotationConstraint(target_bone="elbow.L"), CopyLocationConstraint(target_bone="DEF-elbow.L")],
     "n_hkata_l": [CopyRotationConstraint(target_bone="shoulder_tweak.L"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.L")],

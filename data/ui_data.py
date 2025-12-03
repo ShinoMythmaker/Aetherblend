@@ -25,10 +25,10 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
 
     MetaRigCollectionInfo(name="Leg.L (IK)", color_type="IK", row_index=15, title="Leg IK.L"),
     MetaRigCollectionInfo(name="Leg.L (FK)", color_type="FK", row_index=16, title="FK.L", visible=False),
-    MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=17, title="Tweak.L", visible=False),
+    # MetaRigCollectionInfo(name="Leg.L (Tweak)", color_type="Tweak", row_index=17, title="Tweak.L", visible=False), Nothing in here right now - Oats
     MetaRigCollectionInfo(name="Leg.R (IK)", color_type="IK", row_index=15, title="Leg IK.R"),
     MetaRigCollectionInfo(name="Leg.R (FK)", color_type="FK", row_index=16, title="FK.R", visible=False),
-    MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=17, title="Tweak.R", visible=False),
+    # MetaRigCollectionInfo(name="Leg.R (Tweak)", color_type="Tweak", row_index=17, title="Tweak.R", visible=False),
 
     MetaRigCollectionInfo(name="Tail", color_type="Special", row_index=19, title="Tail"),
     MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=20, title="Tweaks", visible=False),
@@ -36,10 +36,10 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
     MetaRigCollectionInfo(name="Skirt", color_type="Special", row_index=22, title="Skirt", visible=False),
     MetaRigCollectionInfo(name="Skirt (Tweak)", color_type="Tweak", row_index=23, title="Tweak", visible=False),
 
-    MetaRigCollectionInfo(name="Genitals (Male)", color_type="FK", row_index=25, title="Genitals (Male)", visible=False),
-    MetaRigCollectionInfo(name="Tweak (Male)", color_type="Tweak", row_index=26, title="Tweak (Male)", visible=False),
-    MetaRigCollectionInfo(name="Genitals (Female)", color_type="FK", row_index=25, title="Genitals (Female)", visible=False),
-    MetaRigCollectionInfo(name="Tweak (Female)", color_type="Tweak", row_index=26, title="Tweak (Female)", visible=False),
+    # MetaRigCollectionInfo(name="Genitals (Male)", color_type="FK", row_index=25, title="Genitals (Male)", visible=False),
+    # MetaRigCollectionInfo(name="Tweak (Male)", color_type="Tweak", row_index=26, title="Tweak (Male)", visible=False),
+    # MetaRigCollectionInfo(name="Genitals (Female)", color_type="FK", row_index=25, title="Genitals (Female)", visible=False),
+    # MetaRigCollectionInfo(name="Tweak (Female)", color_type="Tweak", row_index=26, title="Tweak (Female)", visible=False),
 
 ]
 
