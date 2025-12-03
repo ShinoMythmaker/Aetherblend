@@ -874,9 +874,9 @@ class TrackToConstraint(Constraint):
                 print(f"[AetherBlend] Warning: Space object '{self.space_object}' not found for Track To constraint.")
         constraint.influence = self.influence
 
-        utils.armature.rigify._select_pose_bone(bone, True)
-        bpy.ops.pose.armature_apply(selected=True)
-        utils.armature.rigify._select_pose_bone(bone, False)
+        # utils.armature.rigify._select_pose_bone(bone, True)
+        # bpy.ops.pose.armature_apply(selected=True)
+        # utils.armature.rigify._select_pose_bone(bone, False)
 
 
 @dataclass(frozen=True)

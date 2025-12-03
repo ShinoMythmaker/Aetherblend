@@ -419,6 +419,10 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
                             constraint.apply(owner_bone, ffxiv_armature, target_override=pose_bone.name)
         print(f"[AetherBlend]   Regex constraints: {time.time() - regex_start:.3f}s")
 
+        pose_apply_start = time.time()
+        bpy.ops.pose.armature_apply()
+        print(f"[AetherBlend]   Apply pose: {time.time() - pose_apply_start:.3f}s")
+
                    
         bpy.ops.object.mode_set(mode=original_mode)
         return True
