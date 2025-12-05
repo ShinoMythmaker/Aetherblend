@@ -123,7 +123,7 @@ SPINE: list[GenerativeBone] = [
 CHEST: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=47, size_factor=1.5),
+        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=0, size_factor=1.5),
         req_bones=["j_mune_l"],
         b_collection="Torso",
         settings=RigifySettings(bone_name="Chest.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
@@ -131,7 +131,7 @@ CHEST: list[GenerativeBone] = [
 
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=43, size_factor=1.5),
+        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=0, size_factor=1.5),
         req_bones=["j_mune_r"],
         b_collection="Torso",
         settings=RigifySettings(bone_name="Chest.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
