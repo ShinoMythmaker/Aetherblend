@@ -236,8 +236,14 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 
                 group_start = time.time()
                 gen_group = GenerativeMetaBoneGroup(src_armature=armature, target_armature=meta_rig, generative_bones=sub_group)
-                gen_group.execute(data=data)
-                if debug_mode: print(f"[AetherBlend]   Group {bone_group_idx} ({group_name}): {time.time() - group_start:.3f}s")
+                if gen_group.check() is False:
+                    continue
+                else:
+                    bones = gen_group.execute(data=data)
+                    print(bones)
+                    break
+
+            if debug_mode: print(f"[AetherBlend]   Group {bone_group_idx} ({group_name}): {time.time() - group_start:.3f}s")
             
             current_progress = 30 + int((bone_group_idx + 1) * progress_per_group)
             wm.progress_update(int(progress_offset + current_progress * progress_scale / 100))
