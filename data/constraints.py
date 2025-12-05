@@ -227,31 +227,31 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
     # Left Mouth
 
-    "j_f_ulip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_ulip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_ulip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD")],
-    "j_f_umlip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_umlip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_umlip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD")],
-    "j_f_uslip_l": [CopyLocationConstraint(target_bone="MCH-j_f_uslip_l"), CopyRotationConstraint(target_bone="MCH-j_f_uslip_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyRotationConstraint(target_bone="Lip.Master.T.L.002")],
+    "j_f_ulip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_ulip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_ulip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.T.L")],
+    "j_f_umlip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_umlip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_umlip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.T.L.001")],
+    "j_f_uslip_l": [CopyLocationConstraint(target_bone="MCH-j_f_uslip_l"), CopyRotationConstraint(target_bone="MCH-j_f_uslip_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyRotationConstraint(target_bone="Lip.Master.T.L.002"), CopyScaleConstraint(target_bone="Lip.Master.T.L.002")],
     "j_f_ulip_02_l":[CopyRotationConstraint(target_bone="Lip.T.L")],
     "j_f_umlip_02_l":[CopyRotationConstraint(target_bone="Lip.T.L.001")],
 
 
 
-    "j_f_dlip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_dlip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_dlip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD")],
-    "j_f_dmlip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_dmlip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_dmlip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD")],
-    "j_f_dslip_l": [CopyLocationConstraint(target_bone="MCH-j_f_dslip_l"), CopyRotationConstraint(target_bone="MCH-j_f_dslip_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"),CopyRotationConstraint(target_bone="Lip.Master.B.L.001")],
+    "j_f_dlip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_dlip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_dlip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.B.L")],
+    "j_f_dmlip_01_l": [CopyLocationConstraint(target_bone="MCH-j_f_dmlip_01_l"), CopyRotationConstraint(target_bone="MCH-j_f_dmlip_01_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.B.L.001")],
+    "j_f_dslip_l": [CopyLocationConstraint(target_bone="MCH-j_f_dslip_l"), CopyRotationConstraint(target_bone="MCH-j_f_dslip_l", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"),CopyRotationConstraint(target_bone="Lip.Master.B.L.001"), CopyScaleConstraint(target_bone="Lip.Master.B.L.001")],
     "j_f_dlip_02_l":[CopyRotationConstraint(target_bone="Lip.B.L")],
     "j_f_dmlip_02_l":[CopyRotationConstraint(target_bone="Lip.B.L.001")],
 
     # Right Mouth
 
-    "j_f_ulip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_ulip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_ulip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD")],
-    "j_f_umlip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_umlip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_umlip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD" )],
-    "j_f_uslip_r": [CopyLocationConstraint(target_bone="MCH-j_f_uslip_r"), CopyRotationConstraint(target_bone="MCH-j_f_uslip_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyRotationConstraint(target_bone="Lip.Master.T.R.002")],
+    "j_f_ulip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_ulip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_ulip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.T.R")],
+    "j_f_umlip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_umlip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_umlip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.T.R.001")],
+    "j_f_uslip_r": [CopyLocationConstraint(target_bone="MCH-j_f_uslip_r"), CopyRotationConstraint(target_bone="MCH-j_f_uslip_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyRotationConstraint(target_bone="Lip.Master.T.R.002"), CopyScaleConstraint(target_bone="Lip.Master.T.R.002")],
     "j_f_ulip_02_r":[CopyRotationConstraint(target_bone="Lip.T.R")],
     "j_f_umlip_02_r":[CopyRotationConstraint(target_bone="Lip.T.R.001")],
 
-    "j_f_dlip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_dlip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_dlip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD")],
-    "j_f_dmlip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_dmlip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_dmlip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD")],
-    "j_f_dslip_r": [CopyLocationConstraint(target_bone="MCH-j_f_dslip_r"), CopyRotationConstraint(target_bone="MCH-j_f_dslip_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyRotationConstraint(target_bone="Lip.Master.B.R.001")],
+    "j_f_dlip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_dlip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_dlip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.B.R")],
+    "j_f_dmlip_01_r": [CopyLocationConstraint(target_bone="MCH-j_f_dmlip_01_r"), CopyRotationConstraint(target_bone="MCH-j_f_dmlip_01_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyScaleConstraint(target_bone="Lip.B.R.001")],
+    "j_f_dslip_r": [CopyLocationConstraint(target_bone="MCH-j_f_dslip_r"), CopyRotationConstraint(target_bone="MCH-j_f_dslip_r", mix_mode="REPLACE", owner_space="WORLD", target_space="WORLD"), CopyRotationConstraint(target_bone="Lip.Master.B.R.001"), CopyScaleConstraint(target_bone="Lip.Master.B.R.001")],
     "j_f_dlip_02_r":[CopyRotationConstraint(target_bone="Lip.B.R")],
     "j_f_dmlip_02_r":[CopyRotationConstraint(target_bone="Lip.B.R.001")],
 
@@ -464,6 +464,23 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "MCH-j_mimi_l": [AssignCollection(collection_name="MCH")],
     "MCH-j_mimi_r": [AssignCollection(collection_name="MCH")],
     "MCH-j_f_ago": [AssignCollection(collection_name="MCH")],
+
+    # Mouth
+    "MCH-j_f_dlip_01_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_dmlip_01_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_dslip_l": [AssignCollection(collection_name="MCH")],
+
+    "MCH-j_f_dlip_01_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_dmlip_01_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_dslip_r": [AssignCollection(collection_name="MCH")],
+
+    "MCH-j_f_ulip_01_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_umlip_01_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_uslip_l": [AssignCollection(collection_name="MCH")],
+
+    "MCH-j_f_ulip_01_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_umlip_01_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_uslip_r": [AssignCollection(collection_name="MCH")],
 
     # Arms
     "MCH-j_te_l": [AssignCollection(collection_name="MCH")],

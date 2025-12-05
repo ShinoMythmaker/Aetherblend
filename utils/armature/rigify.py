@@ -289,6 +289,8 @@ def rigify_set_skin_stretchy_chain_properties(armature: bpy.types.Armature, bone
             rigify_params.skin_chain_falloff_spherical = settings.skin_chain_falloff_spherical
         if settings.skin_chain_priority is not None:
             rigify_params.skin_chain_priority = settings.skin_chain_priority
+        if settings.skin_chain_use_scale is not None:
+            rigify_params.skin_chain_use_scale = settings.skin_chain_use_scale
 
         if settings.primary_layer_extra is not None:
             rigify_params.skin_primary_layers_extra = True
