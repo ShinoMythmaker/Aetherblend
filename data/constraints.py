@@ -13,7 +13,8 @@ LINK_EDIT_OPERATIONS = [
     # Chest
     copyBone(bone_name="MCH-j_mune_l", src_bone_name="j_mune_l", parent_bone_name="DEF-Chest.L"),
     copyBone(bone_name="MCH-j_mune_r", src_bone_name="j_mune_r", parent_bone_name="DEF-Chest.R"),
-    
+    copyBone(bone_name="MCH-n_hara", src_bone_name="n_hara", parent_bone_name="torso"),
+
     # Head
     copyBone(bone_name="MCH-j_kubi", src_bone_name="j_kubi", parent_bone_name="DEF-neck"),
     copyBone(bone_name="MCH-j_kao", src_bone_name="j_kao", parent_bone_name="DEF-head"),
@@ -85,6 +86,8 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
     # Spine 
     "j_kosi": [CopyTransformsConstraint(target_bone="MCH-j_kosi", target_space="WORLD", owner_space="WORLD")],
+
+    "n_hara": [CopyTransformsConstraint(target_bone="MCH-n_hara", target_space="WORLD", owner_space="WORLD")],
 
     "j_sebo_a": [CopyTransformsConstraint(target_bone="MCH-j_sebo_a", target_space="WORLD", owner_space="WORLD")],
     "j_sebo_b": [CopyTransformsConstraint(target_bone="MCH-j_sebo_b", target_space="WORLD", owner_space="WORLD")],
@@ -445,6 +448,7 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "MCH-j_sebo_c": [AssignCollection(collection_name="MCH")],
     "MCH-j_sako_l": [AssignCollection(collection_name="MCH")],
     "MCH-j_sako_r": [AssignCollection(collection_name="MCH")],
+    "MCH-n_hara": [AssignCollection(collection_name="MCH")],
     
     # Chest
     "MCH-j_mune_l": [AssignCollection(collection_name="MCH")],
