@@ -22,6 +22,23 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_mimi_r", src_bone_name="j_mimi_r", parent_bone_name="DEF-ear.R"),
     copyBone(bone_name="MCH-j_f_ago", src_bone_name="j_f_ago", parent_bone_name="DEF-jaw"),
 
+    copyBone(bone_name="MCH-j_zera_a_l", src_bone_name="j_zera_a_l", parent_bone_name="DEF-v_ear.L"),
+    copyBone(bone_name="MCH-j_zera_b_l", src_bone_name="j_zera_b_l", parent_bone_name="DEF-v_ear.L.001"),
+    copyBone(bone_name="MCH-j_zera_a_r", src_bone_name="j_zera_a_r", parent_bone_name="DEF-v_ear.R"),
+    copyBone(bone_name="MCH-j_zera_b_r", src_bone_name="j_zera_b_r", parent_bone_name="DEF-v_ear.R.001"),
+
+    copyBone(bone_name="MCH-j_zerc_a_l", src_bone_name="j_zerc_a_l", parent_bone_name="DEF-v_ear.L"),
+    copyBone(bone_name="MCH-j_zerc_b_l", src_bone_name="j_zerc_b_l", parent_bone_name="DEF-v_ear.L.001"),
+    copyBone(bone_name="MCH-j_zerc_a_r", src_bone_name="j_zerc_a_r", parent_bone_name="DEF-v_ear.R"),
+    copyBone(bone_name="MCH-j_zerc_b_r", src_bone_name="j_zerc_b_r", parent_bone_name="DEF-v_ear.R.001"),
+
+    copyBone(bone_name="MCH-j_zerd_a_l", src_bone_name="j_zerd_a_l", parent_bone_name="DEF-v_ear.L"),
+    copyBone(bone_name="MCH-j_zerd_b_l", src_bone_name="j_zerd_b_l", parent_bone_name="DEF-v_ear.L.001"),
+    copyBone(bone_name="MCH-j_zerd_a_r", src_bone_name="j_zerd_a_r", parent_bone_name="DEF-v_ear.R"),
+    copyBone(bone_name="MCH-j_zerd_b_r", src_bone_name="j_zerd_b_r", parent_bone_name="DEF-v_ear.R.001"),
+
+
+
     # Hands
     copyBone(bone_name="MCH-j_te_l", src_bone_name="j_te_l", parent_bone_name="DEF-hand.L"),
     copyBone(bone_name="MCH-j_te_r", src_bone_name="j_te_r", parent_bone_name="DEF-hand.R"),
@@ -272,10 +289,18 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
     "j_mimi_l": [CopyTransformsConstraint(target_bone="MCH-j_mimi_l", target_space="WORLD", owner_space="WORLD")],
     "j_mimi_r": [CopyTransformsConstraint(target_bone="MCH-j_mimi_r", target_space="WORLD", owner_space="WORLD")],
-    "j_zerd_a_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L")],
-    "j_zerd_b_l": [CopyRotationConstraint(target_bone="ORG-v_ear.L.001"), CopyLocationConstraint(target_bone="ORG-v_ear.L.001")],
-    "j_zerd_a_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R")],
-    "j_zerd_b_r": [CopyRotationConstraint(target_bone="ORG-v_ear.R.001"), CopyLocationConstraint(target_bone="ORG-v_ear.R.001")],
+    "j_zerd_a_l": [CopyTransformsConstraint(target_bone="MCH-j_zerd_a_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zerd_b_l": [CopyTransformsConstraint(target_bone="MCH-j_zerd_b_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zerd_a_r": [CopyTransformsConstraint(target_bone="MCH-j_zerd_a_r", target_space="WORLD", owner_space="WORLD")],
+    "j_zerd_b_r": [CopyTransformsConstraint(target_bone="MCH-j_zerd_b_r", target_space="WORLD", owner_space="WORLD")],
+    "j_zerc_a_l": [CopyTransformsConstraint(target_bone="MCH-j_zerc_a_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zerc_b_l": [CopyTransformsConstraint(target_bone="MCH-j_zerc_b_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zerc_a_r": [CopyTransformsConstraint(target_bone="MCH-j_zerc_a_r", target_space="WORLD", owner_space="WORLD")],
+    "j_zerc_b_r": [CopyTransformsConstraint(target_bone="MCH-j_zerc_b_r", target_space="WORLD", owner_space="WORLD")],
+    "j_zera_a_l": [CopyTransformsConstraint(target_bone="MCH-j_zera_a_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zera_b_l": [CopyTransformsConstraint(target_bone="MCH-j_zera_b_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zera_a_r": [CopyTransformsConstraint(target_bone="MCH-j_zera_a_r", target_space="WORLD", owner_space="WORLD")],
+    "j_zera_b_r": [CopyTransformsConstraint(target_bone="MCH-j_zera_b_r", target_space="WORLD", owner_space="WORLD")],
 
     # Right Cheek
 
@@ -457,6 +482,20 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     # Twist
     "MCH-n_hhiji_r": [AssignCollection(collection_name="MCH")],
     "MCH-n_hhiji_l": [AssignCollection(collection_name="MCH")],
+
+    "MCH-j_zera_a_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zera_b_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerc_a_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerc_b_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerd_a_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerd_b_l": [AssignCollection(collection_name="MCH")],
+
+    "MCH-j_zera_a_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zera_b_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerc_a_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerc_b_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerd_a_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerd_b_r": [AssignCollection(collection_name="MCH")],
     
     # Head
     "MCH-j_kubi": [AssignCollection(collection_name="MCH")],
