@@ -96,6 +96,11 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_f_ulip_01_r", src_bone_name="j_f_ulip_01_r", parent_bone_name="DEF-Lip.T.R"),
     copyBone(bone_name="MCH-j_f_umlip_01_r", src_bone_name="j_f_umlip_01_r", parent_bone_name="DEF-Lip.T.R.001"),
     copyBone(bone_name="MCH-j_f_uslip_r", src_bone_name="j_f_uslip_r", parent_bone_name="DEF-Lip.Master.T.R.002"),
+
+    # Tongue 
+    copyBone(bone_name="MCH-j_f_bero_01", src_bone_name="j_f_bero_01", parent_bone_name="DEF-Tongue.002"),
+    copyBone(bone_name="MCH-j_f_bero_02", src_bone_name="j_f_bero_02", parent_bone_name="DEF-Tongue.001"),
+    copyBone(bone_name="MCH-j_f_bero_03", src_bone_name="j_f_bero_03", parent_bone_name="DEF-Tongue"),
 ]
 
 LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
@@ -274,9 +279,9 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
     # Tongue
 
-    "j_f_bero_03": [CopyLocationConstraint(target_bone="ORG-Tongue"), CopyRotationConstraint(target_bone="ORG-Tongue")],
-    "j_f_bero_02": [CopyLocationConstraint(target_bone="ORG-Tongue.001"), CopyRotationConstraint(target_bone="ORG-Tongue.001")],
-    "j_f_bero_01": [CopyLocationConstraint(target_bone="ORG-Tongue.002"), CopyRotationConstraint(target_bone="ORG-Tongue.002")],
+    "j_f_bero_03": [CopyTransformsConstraint(target_bone="MCH-j_f_bero_03", target_space="WORLD", owner_space="WORLD")],
+    "j_f_bero_02": [CopyTransformsConstraint(target_bone="MCH-j_f_bero_02", target_space="WORLD", owner_space="WORLD")],
+    "j_f_bero_01": [CopyTransformsConstraint(target_bone="MCH-j_f_bero_01", target_space="WORLD", owner_space="WORLD")],
     
     # Jaw
     "j_f_ago": [CopyTransformsConstraint(target_bone="MCH-j_f_ago", target_space="WORLD", owner_space="WORLD")],
@@ -503,6 +508,13 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "MCH-j_mimi_l": [AssignCollection(collection_name="MCH")],
     "MCH-j_mimi_r": [AssignCollection(collection_name="MCH")],
     "MCH-j_f_ago": [AssignCollection(collection_name="MCH")],
+
+    # Tongue 
+
+    "tweak_Tongue": [AssignCollection(collection_name="Face (Secondary)")],
+    "MCH-j_f_bero_01": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_bero_02": [AssignCollection(collection_name="MCH")],
+    "MCH-j_f_bero_03": [AssignCollection(collection_name="MCH")],
 
     # Mouth
     "MCH-j_f_dlip_01_l": [AssignCollection(collection_name="MCH")],
