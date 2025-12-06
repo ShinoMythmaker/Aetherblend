@@ -40,6 +40,7 @@ class RigifySettings:
     skin_chain_falloff_spherical: list[bool] | None  = None
     skin_chain_priority: int | None = None
     skin_control_orientation_bone: str | None  = None
+    skin_chain_use_scale: list[float] | None = None
     pivot_master_widget_type: str | None = None
 
 @dataclass(frozen=True)
@@ -164,8 +165,7 @@ class RegexBoneGroup:
         matched_bones = [bone for bone in ref_bones if re.match(self.pattern, bone.name)]
 
         created_bones = []
-        processed_bones = set()  
-        root_chain_bones = [] 
+        processed_bones = set()
 
         for bone in matched_bones:
             if bone.name in processed_bones:
@@ -196,7 +196,6 @@ class RegexBoneGroup:
                 chain_bones = self._build_chain(bone, ref_bones)
                 processed_bones.update(chain_bones)
                 
-                is_valid_chain = len(chain_bones) >= 3
                 chain_connect_bones = []  
                 
                 for i in range(len(chain_bones) - 1):
@@ -216,10 +215,8 @@ class RegexBoneGroup:
                         created_bones.extend(result)
                         chain_connect_bones.append(created_bone_name)
                 
-                if is_valid_chain and self.rigify_type_chain:
-                    if chain_connect_bones:
-                        root_chain_bones.append(chain_connect_bones[0])
-                elif not is_valid_chain and self.rigify_type_standalone:
+                # Apply standalone rigify to all chain bones
+                if self.rigify_type_standalone:
                     for connect_bone_name in chain_connect_bones:
                         self._apply_rigify_to_bone(target, connect_bone_name, self.rigify_type_standalone, self.standalone_widget)
                 
@@ -237,12 +234,8 @@ class RegexBoneGroup:
                 result = extension_bone.generate(target, target, data)
                 if result:
                     created_bones.extend(result)
-                    if not is_valid_chain and self.rigify_type_standalone:
+                    if self.rigify_type_standalone:
                         self._apply_rigify_to_bone(target, result[-1], self.rigify_type_standalone, self.standalone_widget)
-
-        if root_chain_bones and self.rigify_type_chain:
-            for root_bone_name in root_chain_bones:
-                self._apply_rigify_to_bone(target, root_bone_name, self.rigify_type_chain)
 
         return created_bones if created_bones else None
 

@@ -132,7 +132,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
         title="Glabella Nose Follow L",
         ui_element="slider"
     ),
-     "glabella_follow.R": ConstraintUIController(
+    "glabella_follow.R": ConstraintUIController(
         name="glabella_follow.R",
         target_bone="Nose.R",
         target_constraint="Copy Location",
@@ -141,7 +141,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
         title="Glabella Nose Follow R",
         ui_element="slider"
      ),
-     "glabella_follow.L.001": ConstraintUIController(
+    "glabella_follow.L.001": ConstraintUIController(
         name="glabella_follow.L.001",
         target_bone="Nose.L",
         target_constraint="Copy Location.001",
@@ -150,7 +150,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
         title="Glabella Brow Follow L",
         ui_element="slider"
     ),
-     "glabella_follow.R.001": ConstraintUIController(
+    "glabella_follow.R.001": ConstraintUIController(
         name="glabella_follow.R.001",
         target_bone="Nose.R",
         target_constraint="Copy Location.001",
@@ -160,7 +160,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
         ui_element="slider"
      ),
 
-     "cheek_follow.L": ConstraintUIController(
+    "cheek_follow.L": ConstraintUIController(
          name="cheek_follow.L",
          target_bone="Cheek.B.L",
          target_constraint="Copy Location",
@@ -179,7 +179,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider"
      ),
 
-     "auto_twist.L": ConstraintUIController(
+    "auto_twist.L": ConstraintUIController(
          name="auto_twist.L",
          target_bone="n_hte_l",
          target_constraint="AetherBlend_CopyRotation",
@@ -189,7 +189,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider",
      ),
 
-     "auto_twist.R": ConstraintUIController(
+    "auto_twist.R": ConstraintUIController(
          name="auto_twist.R",
          target_bone="n_hte_r",
          target_constraint="AetherBlend_CopyRotation",
@@ -199,7 +199,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider",
      ),
 
-     "jaw_follow_B.L": ConstraintUIController(
+    "jaw_follow_B.L": ConstraintUIController(
          name="jaw_follow_B.L",
          target_bone="Cheek.B.L.001",
          target_constraint="Copy Location",
@@ -209,7 +209,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider"
      ),
 
-     "jaw_follow_B.R": ConstraintUIController(
+    "jaw_follow_B.R": ConstraintUIController(
          name="jaw_follow_B.R",
          target_bone="Cheek.B.R.001",
          target_constraint="Copy Location",
@@ -219,7 +219,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider"
      ),
 
-     "jaw_follow_T.L": ConstraintUIController(
+    "jaw_follow_T.L": ConstraintUIController(
          name="jaw_follow_T.L",
          target_bone="Cheek.B.L.001",
          target_constraint="Copy Location.001",
@@ -229,7 +229,7 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider"
      ),
 
-     "jaw_follow_T.R": ConstraintUIController(
+    "jaw_follow_T.R": ConstraintUIController(
          name="jaw_follow_T.R",
          target_bone="Cheek.B.R.001",
          target_constraint="Copy Location.001",
@@ -239,9 +239,62 @@ UI_CONTROLLERS: dict[str, ConstraintUIController] = {
          ui_element="slider"
      ),
 
+    "tail.A": ConstraintUIController(
+        name="tail.A_FK_IK_switch",
+        target_bone="tail.A",
+        target_constraint="Copy Rotation",
+        rename_constraint="tail.A_FK_IK_switch",
+        property_name="influence",
+        title="Tail.A FK->IK",
+        ui_element="slider" 
+     ),
+    "tail.B": ConstraintUIController(
+        name="tail.B_FK_IK_switch",
+        target_bone="tail.B",
+        target_constraint="Copy Rotation",
+        rename_constraint="tail.B_FK_IK_switch",
+        property_name="influence",
+        title="Tail.B FK->IK",
+        ui_element="slider"
+        ),
+    "tail.C": ConstraintUIController(
+        name="tail.C_FK_IK_switch",
+        target_bone="tail.C",
+        target_constraint="Copy Rotation",
+        rename_constraint="tail.C_FK_IK_switch",
+        property_name="influence",
+        title="Tail.C FK->IK",
+        ui_element="slider"
+        ),
+    "tail.D": ConstraintUIController(
+        name="tail.D_FK_IK_switch",
+        target_bone="tail.D",
+        target_constraint="Copy Rotation",
+        rename_constraint="tail.D_FK_IK_switch",
+        property_name="influence",
+        title="Tail.D FK->IK",
+        ui_element="slider"
+        ),
+    "tail.E": ConstraintUIController(
+        name="tail.E_FK_IK_switch",
+        target_bone="tail.E",
+        target_constraint="Copy Rotation",
+        rename_constraint="tail.E_FK_IK_switch",
+        property_name="influence",
+        title="Tail.E FK->IK",
+        ui_element="slider"
+        ),
     }
 
 UI_CONTROLLER_MAPPING: dict[str, list[ConstraintUIController]] = {
+    # Tail 
+    "tail.A": [UI_CONTROLLERS["tail.A"], UI_CONTROLLERS["tail.B"], UI_CONTROLLERS["tail.C"], UI_CONTROLLERS["tail.D"], UI_CONTROLLERS["tail.E"]],
+    "tail.B": [UI_CONTROLLERS["tail.A"], UI_CONTROLLERS["tail.B"], UI_CONTROLLERS["tail.C"], UI_CONTROLLERS["tail.D"], UI_CONTROLLERS["tail.E"]],
+    "tail.C": [UI_CONTROLLERS["tail.A"], UI_CONTROLLERS["tail.B"], UI_CONTROLLERS["tail.C"], UI_CONTROLLERS["tail.D"], UI_CONTROLLERS["tail.E"]],
+    "tail.D": [UI_CONTROLLERS["tail.A"], UI_CONTROLLERS["tail.B"], UI_CONTROLLERS["tail.C"], UI_CONTROLLERS["tail.D"], UI_CONTROLLERS["tail.E"]],
+    "tail.E": [UI_CONTROLLERS["tail.A"], UI_CONTROLLERS["tail.B"], UI_CONTROLLERS["tail.C"], UI_CONTROLLERS["tail.D"], UI_CONTROLLERS["tail.E"]],
+    "tail.A_master": [UI_CONTROLLERS["tail.A"], UI_CONTROLLERS["tail.B"], UI_CONTROLLERS["tail.C"], UI_CONTROLLERS["tail.D"], UI_CONTROLLERS["tail.E"]],
+
     # Eyes
 
     "lid.T.L.002": [UI_CONTROLLERS["eye_lid_close.L"], UI_CONTROLLERS["eye_lid_brow_follow.L"]],
@@ -285,4 +338,5 @@ PROP_OVERRIDES: dict[str, dict[str, int]] = {
     "upper_arm_parent.R": {"IK_Stretch":0},
     "thigh_parent.L": {"IK_Stretch":0},
     "thigh_parent.R": {"IK_Stretch":0},
+    "head": {"head_follow":1},
 }

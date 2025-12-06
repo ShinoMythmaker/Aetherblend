@@ -123,7 +123,7 @@ SPINE: list[GenerativeBone] = [
 CHEST: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=47, size_factor=1.5),
+        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=0, size_factor=1.5),
         req_bones=["j_mune_l"],
         b_collection="Torso",
         settings=RigifySettings(bone_name="Chest.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
@@ -131,7 +131,7 @@ CHEST: list[GenerativeBone] = [
 
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=43, size_factor=1.5),
+        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=0, size_factor=1.5),
         req_bones=["j_mune_r"],
         b_collection="Torso",
         settings=RigifySettings(bone_name="Chest.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
@@ -490,7 +490,7 @@ MOUTH: list[GenerativeBone] = [
         data=ConnectBone(name="Lip.Master.T.L", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_l", parent="jaw", is_connected=False),
         req_bones=["MCH_mouth_master_middle_upper", "MCH_mouth_master_middle_support_l"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="Lip.Master.T.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
+        settings=RigifySettings(bone_name="Lip.Master.T.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_use_scale=[True, True, True, True]),
     ),
 
     GenerativeBone(
@@ -519,7 +519,7 @@ MOUTH: list[GenerativeBone] = [
         data=ConnectBone(name="Lip.Master.B.L", bone_a="MCH_mouth_master_middle_lower", bone_b="MCH_mouth_master_middle_support_lower_l", parent="jaw", is_connected=False),
         req_bones=["MCH_mouth_master_middle_lower", "MCH_mouth_master_middle_support_lower_l"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="Lip.Master.B.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
+        settings=RigifySettings(bone_name="Lip.Master.B.L", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_use_scale=[True, True, True, True]),
     ),
 
      GenerativeBone(
@@ -549,7 +549,7 @@ MOUTH: list[GenerativeBone] = [
         data=ConnectBone(name="Lip.Master.T.R", bone_a="MCH_mouth_master_middle_upper", bone_b="MCH_mouth_master_middle_support_r", parent="jaw", is_connected=False),
         req_bones=["MCH_mouth_master_middle_upper", "MCH_mouth_master_middle_support_r"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="Lip.Master.T.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
+        settings=RigifySettings(bone_name="Lip.Master.T.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_use_scale=[True, True, True, True]),
     ),
 
     GenerativeBone(
@@ -579,7 +579,7 @@ MOUTH: list[GenerativeBone] = [
         data=ConnectBone(name="Lip.Master.B.R", bone_a="MCH_mouth_master_middle_lower", bone_b="MCH_mouth_master_middle_support_lower_r", parent="jaw", is_connected=False),
         req_bones=["MCH_mouth_master_middle_lower", "MCH_mouth_master_middle_support_lower_r"],
         b_collection="Face (Secondary)",
-        settings=RigifySettings(bone_name="Lip.Master.B.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0]),
+        settings=RigifySettings(bone_name="Lip.Master.B.R", rigify_type="skin.stretchy_chain", skin_control_orientation_bone="head", skin_chain_pivot_pos=0, primary_layer_extra="Face (Primary)", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_use_scale=[True, True, True, True]),
     ),
 
     GenerativeBone(
@@ -1524,6 +1524,13 @@ HEAD_OPTIONAL: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
         data=RegexBoneGroup(pattern=r"^j_ex_h.*",prefix="HAIR", rigify_type_standalone="basic.super_copy", rigify_type_chain="skin.stretchy_chain", parent="head", is_connected=False, extension_size_factor=10.0, extension_axis="X", extension_axis_type="local", standalone_widget="bone"),
+        req_bones=[],
+        b_collection="Hair",
+        is_optional=True
+    ),
+    GenerativeBone(
+        ref="src",
+        data=RegexBoneGroup(pattern=r"^j_kami.*",prefix="HAIR", rigify_type_standalone="basic.super_copy", rigify_type_chain="skin.stretchy_chain", parent="head", is_connected=False, extension_size_factor=10.0, extension_axis="X", extension_axis_type="local", standalone_widget="bone"),
         req_bones=[],
         b_collection="Hair",
         is_optional=True
