@@ -338,4 +338,5 @@ PROP_OVERRIDES: dict[str, dict[str, int]] = {
     "upper_arm_parent.R": {"IK_Stretch":0},
     "thigh_parent.L": {"IK_Stretch":0},
     "thigh_parent.R": {"IK_Stretch":0},
+    "head": {"head_follow":1},
 }
