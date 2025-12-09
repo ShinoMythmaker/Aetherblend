@@ -601,7 +601,26 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
             wm.progress_update(int(progress_offset + 70 * progress_scale / 100))
 
         pose_apply_start = time.time()
-        bpy.ops.pose.armature_apply()
+        bpy.ops.object.mode_set(mode='POSE')
+        bpy.ops.pose.select_all(action='DESELECT')
+        # First unhide MCH collection to ensure all bones are selectable
+        mch_collection = ffxiv_armature.data.collections.get("MCH")
+        if mch_collection:
+            mch_collection.is_visible = True
+
+        for bone_name in REST_POSE:
+            pose_bone = ffxiv_armature.pose.bones.get(bone_name)
+            print(f"selecting bone: {bone_name} -> {pose_bone}")
+            if pose_bone:
+                utils.armature.rigify._select_pose_bone(pose_bone, state=True)
+            
+        bpy.ops.pose.armature_apply(selected=True)
+
+        if mch_collection:
+            mch_collection.is_visible = False
+
+        bpy.ops.pose.select_all(action='DESELECT')
+
         if debug_mode: print(f"[AetherBlend]   Apply pose: {time.time() - pose_apply_start:.3f}s")
         if wm:
             wm.progress_update(int(progress_offset + 75 * progress_scale / 100))

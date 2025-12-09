@@ -7,8 +7,8 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_sebo_a", src_bone_name="j_sebo_a", parent_bone_name="DEF-spine.01"),
     copyBone(bone_name="MCH-j_sebo_b", src_bone_name="j_sebo_b", parent_bone_name="DEF-spine.02"),
     copyBone(bone_name="MCH-j_sebo_c", src_bone_name="j_sebo_c", parent_bone_name="DEF-spine.03"),
-    copyBone(bone_name="MCH-j_sako_l", src_bone_name="j_sako_l", parent_bone_name="shoulder.L"),
-    copyBone(bone_name="MCH-j_sako_r", src_bone_name="j_sako_r", parent_bone_name="shoulder.R"),
+    copyBone(bone_name="MCH-j_sako_l", src_bone_name="j_sako_l", parent_bone_name="clavicle.L"),
+    copyBone(bone_name="MCH-j_sako_r", src_bone_name="j_sako_r", parent_bone_name="clavicle.R"),
     
     # Chest
     copyBone(bone_name="MCH-j_mune_l", src_bone_name="j_mune_l", parent_bone_name="DEF-Chest.L"),
@@ -142,36 +142,36 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "n_hkata_r": [CopyRotationConstraint(target_bone="shoulder_tweak.R"), CopyLocationConstraint(target_bone="DEF-shoulder_tweak.R")],
 
     # Right Fingers
-    "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R01")],
-    "j_oya_b_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R02")],
-    "j_hito_a_r": [CopyRotationConstraint(target_bone="ORG-f_pointer.R01")],
-    "j_hito_b_r": [CopyRotationConstraint(target_bone="ORG-f_pointer.R02")],
-    "iv_hito_c_r": [CopyRotationConstraint(target_bone="ORG-f_pointer.R03")],
-    "j_naka_a_r": [CopyRotationConstraint(target_bone="ORG-f_middle.R01")],
-    "j_naka_b_r": [CopyRotationConstraint(target_bone="ORG-f_middle.R02")],
-    "iv_naka_c_r": [CopyRotationConstraint(target_bone="ORG-f_middle.R03")],
-    "j_kusu_a_r": [CopyRotationConstraint(target_bone="ORG-f_ring.R01")],
-    "j_kusu_b_r": [CopyRotationConstraint(target_bone="ORG-f_ring.R02")],
-    "iv_kusu_c_r": [CopyRotationConstraint(target_bone="ORG-f_ring.R03")],
-    "j_ko_a_r": [CopyRotationConstraint(target_bone="ORG-f_pinky.R01")],
-    "j_ko_b_r": [CopyRotationConstraint(target_bone="ORG-f_pinky.R02")],
-    "iv_ko_c_r": [CopyRotationConstraint(target_bone="ORG-f_pinky.R03")],
+    "j_oya_a_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R.001")],
+    "j_oya_b_r": [CopyRotationConstraint(target_bone="ORG-f_thumb.R.002")],
+    "j_hito_a_r": [CopyRotationConstraint(target_bone="ORG-f_pointer.R.001")],
+    "j_hito_b_r": [CopyRotationConstraint(target_bone="ORG-f_pointer.R.002")],
+    "iv_hito_c_r": [CopyRotationConstraint(target_bone="ORG-f_pointer.R.003")],
+    "j_naka_a_r": [CopyRotationConstraint(target_bone="ORG-f_middle.R.001")],
+    "j_naka_b_r": [CopyRotationConstraint(target_bone="ORG-f_middle.R.002")],
+    "iv_naka_c_r": [CopyRotationConstraint(target_bone="ORG-f_middle.R.003")],
+    "j_kusu_a_r": [CopyRotationConstraint(target_bone="ORG-f_ring.R.001")],
+    "j_kusu_b_r": [CopyRotationConstraint(target_bone="ORG-f_ring.R.002")],
+    "iv_kusu_c_r": [CopyRotationConstraint(target_bone="ORG-f_ring.R.003")],
+    "j_ko_a_r": [CopyRotationConstraint(target_bone="ORG-f_pinky.R.001")],
+    "j_ko_b_r": [CopyRotationConstraint(target_bone="ORG-f_pinky.R.002")],
+    "iv_ko_c_r": [CopyRotationConstraint(target_bone="ORG-f_pinky.R.003")],
 
     # Left Fingers 
-    "j_oya_a_l": [CopyRotationConstraint(target_bone="ORG-f_thumb.L01")],
-    "j_oya_b_l": [CopyRotationConstraint(target_bone="ORG-f_thumb.L02")],
-    "j_hito_a_l": [CopyRotationConstraint(target_bone="ORG-f_pointer.L01")],
-    "j_hito_b_l": [CopyRotationConstraint(target_bone="ORG-f_pointer.L02")],
-    "iv_hito_c_l": [CopyRotationConstraint(target_bone="ORG-f_pointer.L03")],
-    "j_naka_a_l": [CopyRotationConstraint(target_bone="ORG-f_middle.L01")],
-    "j_naka_b_l": [CopyRotationConstraint(target_bone="ORG-f_middle.L02")],
-    "iv_naka_c_l": [CopyRotationConstraint(target_bone="ORG-f_middle.L03")],
-    "j_kusu_a_l": [CopyRotationConstraint(target_bone="ORG-f_ring.L01")],
-    "j_kusu_b_l": [CopyRotationConstraint(target_bone="ORG-f_ring.L02")],
-    "iv_kusu_c_l": [CopyRotationConstraint(target_bone="ORG-f_ring.L03")],
-    "j_ko_a_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L01")],
-    "j_ko_b_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L02")],
-    "iv_ko_c_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L03")],
+    "j_oya_a_l": [CopyRotationConstraint(target_bone="ORG-f_thumb.L.001")],
+    "j_oya_b_l": [CopyRotationConstraint(target_bone="ORG-f_thumb.L.002")],
+    "j_hito_a_l": [CopyRotationConstraint(target_bone="ORG-f_pointer.L.001")],
+    "j_hito_b_l": [CopyRotationConstraint(target_bone="ORG-f_pointer.L.002")],
+    "iv_hito_c_l": [CopyRotationConstraint(target_bone="ORG-f_pointer.L.003")],
+    "j_naka_a_l": [CopyRotationConstraint(target_bone="ORG-f_middle.L.001")],
+    "j_naka_b_l": [CopyRotationConstraint(target_bone="ORG-f_middle.L.002")],
+    "iv_naka_c_l": [CopyRotationConstraint(target_bone="ORG-f_middle.L.003")],
+    "j_kusu_a_l": [CopyRotationConstraint(target_bone="ORG-f_ring.L.001")],
+    "j_kusu_b_l": [CopyRotationConstraint(target_bone="ORG-f_ring.L.002")],
+    "iv_kusu_c_l": [CopyRotationConstraint(target_bone="ORG-f_ring.L.003")],
+    "j_ko_a_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L.001")],
+    "j_ko_b_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L.002")],
+    "iv_ko_c_l": [CopyRotationConstraint(target_bone="ORG-f_pinky.L.003")],
 
     # Left Toes
 
@@ -559,6 +559,21 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "MCH-j_sk_b_a_r": [AssignCollection(collection_name="MCH")],
 
 }
+
+REST_POSE: list[str] = [
+    "MCH-track_j_f_mabdn_03in_l",
+    "MCH-track_j_f_mabdn_01_l",
+    "MCH-track_j_f_mabdn_02out_l",
+    "MCH-track_j_f_mabup_03in_l",
+    "MCH-track_j_f_mabup_01_l",
+    "MCH-track_j_f_mabup_02out_l",
+    "MCH-track_j_f_mabdn_03in_r",
+    "MCH-track_j_f_mabdn_01_r",
+    "MCH-track_j_f_mabdn_02out_r",
+    "MCH-track_j_f_mabup_03in_r",
+    "MCH-track_j_f_mabup_01_r",
+    "MCH-track_j_f_mabup_02out_r",
+]
 
 REGEX_CONSTRAINTS: dict[str, list[Constraint]] = {
     "^DEF-HAIR_(.+)$": [OffsetTransformConstraint(name="AetherBlend_OffsetTransform_Hair")],
