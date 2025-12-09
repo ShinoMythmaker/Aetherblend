@@ -560,6 +560,21 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
 }
 
+REST_POSE: list[str] = [
+    "MCH-track_j_f_mabdn_03in_l",
+    "MCH-track_j_f_mabdn_01_l",
+    "MCH-track_j_f_mabdn_02out_l",
+    "MCH-track_j_f_mabup_03in_l",
+    "MCH-track_j_f_mabup_01_l",
+    "MCH-track_j_f_mabup_02out_l",
+    "MCH-track_j_f_mabdn_03in_r",
+    "MCH-track_j_f_mabdn_01_r",
+    "MCH-track_j_f_mabdn_02out_r",
+    "MCH-track_j_f_mabup_03in_r",
+    "MCH-track_j_f_mabup_01_r",
+    "MCH-track_j_f_mabup_02out_r",
+]
+
 REGEX_CONSTRAINTS: dict[str, list[Constraint]] = {
     "^DEF-HAIR_(.+)$": [OffsetTransformConstraint(name="AetherBlend_OffsetTransform_Hair")],
     "^DEF-ACCESSORY_(.+)$": [OffsetTransformConstraint(name="AetherBlend_OffsetTransform_Accessory")],
