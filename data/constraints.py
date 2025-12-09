@@ -7,8 +7,8 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_sebo_a", src_bone_name="j_sebo_a", parent_bone_name="DEF-spine.01"),
     copyBone(bone_name="MCH-j_sebo_b", src_bone_name="j_sebo_b", parent_bone_name="DEF-spine.02"),
     copyBone(bone_name="MCH-j_sebo_c", src_bone_name="j_sebo_c", parent_bone_name="DEF-spine.03"),
-    copyBone(bone_name="MCH-j_sako_l", src_bone_name="j_sako_l", parent_bone_name="shoulder.L"),
-    copyBone(bone_name="MCH-j_sako_r", src_bone_name="j_sako_r", parent_bone_name="shoulder.R"),
+    copyBone(bone_name="MCH-j_sako_l", src_bone_name="j_sako_l", parent_bone_name="clavicle.L"),
+    copyBone(bone_name="MCH-j_sako_r", src_bone_name="j_sako_r", parent_bone_name="clavicle.R"),
     
     # Chest
     copyBone(bone_name="MCH-j_mune_l", src_bone_name="j_mune_l", parent_bone_name="DEF-Chest.L"),

@@ -105,16 +105,16 @@ SPINE: list[GenerativeBone] = [
     #Shoulder Bones
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="shoulder.L", bone_a="j_sako_l", bone_b="j_ude_a_l", parent="spine.03"),
+        data=ConnectBone(name="clavicle.L", bone_a="j_sako_l", bone_b="j_ude_a_l", parent="spine.03"),
         req_bones=["j_sako_l", "j_ude_a_l"],
-        settings=RigifySettings(bone_name="shoulder.L", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
+        settings=RigifySettings(bone_name="clavicle.L", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
         b_collection="Torso",
     ),
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="shoulder.R", bone_a="j_sako_r", bone_b="j_ude_a_r", parent="spine.03"),
+        data=ConnectBone(name="clavicle.R", bone_a="j_sako_r", bone_b="j_ude_a_r", parent="spine.03"),
         req_bones=["j_sako_r", "j_ude_a_r"],
-        settings=RigifySettings(bone_name="shoulder.R", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
+        settings=RigifySettings(bone_name="clavicle.R", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
         b_collection="Torso",
     ),
 
@@ -142,7 +142,7 @@ ARM_L:list[GenerativeBone] = [
     # Left Arm
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="upper_arm.L", bone_a="j_ude_a_l", bone_b="j_ude_b_l", parent="shoulder.L"),
+        data=ConnectBone(name="upper_arm.L", bone_a="j_ude_a_l", bone_b="j_ude_b_l", parent="clavicle.L"),
         req_bones=["j_ude_a_l", "j_ude_b_l"],
         settings=RigifySettings(bone_name="upper_arm.L", rigify_type="limbs.arm", fk_coll="Arm.L (FK)", tweak_coll="Arm.L (Tweak)"),
         b_collection="Arm.L (IK)"
@@ -193,7 +193,7 @@ ARM_R:list[GenerativeBone] = [
     # Right Arm
     GenerativeBone(
         ref="src",
-        data=ConnectBone(name="upper_arm.R", bone_a="j_ude_a_r", bone_b="j_ude_b_r", parent="shoulder.R"),
+        data=ConnectBone(name="upper_arm.R", bone_a="j_ude_a_r", bone_b="j_ude_b_r", parent="clavicle.R"),
         req_bones=["j_ude_a_r", "j_ude_b_r"],
         settings=RigifySettings(bone_name="upper_arm.R", rigify_type="limbs.arm", fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"),
         b_collection="Arm.R (IK)"
