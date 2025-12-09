@@ -995,7 +995,14 @@ VIERA_EAR_L: list[GenerativeBone] = [
         # is_optional=True,
     ),
 
-
+        GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear_acc.L", bone_a="n_ear_a_l", parent="v_ear.L.001", is_connected=False, start="head", size_factor=(-4)),
+        req_bones=["v_ear.L.001", "n_ear_a_l"],
+        b_collection="Accessory",
+        settings=RigifySettings(bone_name="ear_acc.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
+        is_optional=True,
+    ),
 ]
 
 VIERA_EAR_R: list[GenerativeBone] = [
@@ -1015,6 +1022,15 @@ VIERA_EAR_R: list[GenerativeBone] = [
         b_collection="Face",
         # is_optional=True,
     ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear_acc.R", bone_a="n_ear_a_r", parent="v_ear.R.001", is_connected=False, start="head", size_factor=(-4)),
+        req_bones=["v_ear.R.001", "n_ear_a_r"],
+        b_collection="Accessory",
+        settings=RigifySettings(bone_name="ear_acc.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
+        is_optional=True,
+    ),
 ]
 
 EAR_L: list[GenerativeBone] = [
@@ -1025,6 +1041,15 @@ EAR_L: list[GenerativeBone] = [
         b_collection="Face",
         settings=RigifySettings(bone_name="ear.L", rigify_type="basic.super_copy", super_copy_widget_type="bone")
     ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear_acc.L", bone_a="n_ear_a_l", parent="ear.L", is_connected=False, start="head", size_factor=(-4)),
+        req_bones=["ear.L", "n_ear_a_l"],
+        b_collection="Accessory",
+        settings=RigifySettings(bone_name="ear_acc.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
+        is_optional=True,
+    ),
 ]
 
 EAR_R: list[GenerativeBone] = [
@@ -1034,6 +1059,15 @@ EAR_R: list[GenerativeBone] = [
         req_bones=["j_mimi_r"],
         b_collection="Face",
         settings=RigifySettings(bone_name="ear.R", rigify_type="basic.super_copy", super_copy_widget_type="bone")
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear_acc.R", bone_a="n_ear_a_r", parent="ear.R", is_connected=False, start="head", size_factor=(-4)),
+        req_bones=["ear.R", "n_ear_a_r"],
+        b_collection="Accessory",
+        settings=RigifySettings(bone_name="ear_acc.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
+        is_optional=True,
     ),
 ]
 

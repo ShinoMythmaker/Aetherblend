@@ -294,6 +294,12 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
 
     "j_mimi_l": [CopyTransformsConstraint(target_bone="MCH-j_mimi_l", target_space="WORLD", owner_space="WORLD")],
     "j_mimi_r": [CopyTransformsConstraint(target_bone="MCH-j_mimi_r", target_space="WORLD", owner_space="WORLD")],
+
+    "n_ear_a_l": [CopyLocationConstraint(target_bone="ear_acc.L", target_space="WORLD", owner_space="WORLD")],
+    "n_ear_a_r": [CopyLocationConstraint(target_bone="ear_acc.R", target_space="WORLD", owner_space="WORLD")],
+    "n_ear_b_l": [CopyRotationConstraint(target_bone="ear_acc.L")],
+    "n_ear_b_r": [CopyRotationConstraint(target_bone="ear_acc.R")],
+
     "j_zerd_a_l": [CopyTransformsConstraint(target_bone="MCH-j_zerd_a_l", target_space="WORLD", owner_space="WORLD")],
     "j_zerd_b_l": [CopyTransformsConstraint(target_bone="MCH-j_zerd_b_l", target_space="WORLD", owner_space="WORLD")],
     "j_zerd_a_r": [CopyTransformsConstraint(target_bone="MCH-j_zerd_a_r", target_space="WORLD", owner_space="WORLD")],
