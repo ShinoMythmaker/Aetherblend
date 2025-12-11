@@ -108,14 +108,14 @@ SPINE: list[GenerativeBone] = [
         data=ConnectBone(name="clavicle.L", bone_a="j_sako_l", bone_b="j_ude_a_l", parent="spine.03"),
         req_bones=["j_sako_l", "j_ude_a_l"],
         settings=RigifySettings(bone_name="clavicle.L", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
-        b_collection="Torso",
+        b_collection="Arm.L (FK)",
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="clavicle.R", bone_a="j_sako_r", bone_b="j_ude_a_r", parent="spine.03"),
         req_bones=["j_sako_r", "j_ude_a_r"],
         settings=RigifySettings(bone_name="clavicle.R", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
-        b_collection="Torso",
+        b_collection="Arm.R (FK)",
     ),
 
 ]
@@ -983,21 +983,22 @@ VIERA_EAR_L: list[GenerativeBone] = [
         data=ConnectBone(name="v_ear.L", bone_a="j_zerd_a_l", bone_b="j_zerd_b_l", parent="head", is_connected=False),
         req_bones=["j_zerd_a_l", "j_zerd_b_l"],
         b_collection="Face",
-        settings=RigifySettings(bone_name="v_ear.L", rigify_type="skin.basic_chain"),
+        settings=RigifySettings(bone_name="v_ear.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
         # is_optional=True,
     ),
 
     GenerativeBone(
         ref="tgt",
-        data=ExtensionBone(name="v_ear.L.001", bone_a="v_ear.L", parent="v_ear.L", is_connected=True, axis_type="local", axis="Y"),
+        data=ExtensionBone(name="v_ear.L.001", bone_a="v_ear.L", parent="v_ear.L", is_connected=False, axis_type="local", axis="Y"),
         req_bones=["v_ear.L"],
         b_collection="Face",
+        settings=RigifySettings(bone_name="v_ear.L.001", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
         # is_optional=True,
     ),
 
         GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="ear_acc.L", bone_a="n_ear_a_l", parent="v_ear.L.001", is_connected=False, start="head", size_factor=(-4)),
+        data=ExtensionBone(name="ear_acc.L", bone_a="n_ear_a_l", parent="v_ear.L", is_connected=False, start="head", size_factor=(-4)),
         req_bones=["v_ear.L.001", "n_ear_a_l"],
         b_collection="Accessory",
         settings=RigifySettings(bone_name="ear_acc.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
@@ -1011,21 +1012,22 @@ VIERA_EAR_R: list[GenerativeBone] = [
         data=ConnectBone(name="v_ear.R", bone_a="j_zerd_a_r", bone_b="j_zerd_b_r", parent="head", is_connected=False),
         req_bones=["j_zerd_a_r", "j_zerd_b_r"],
         b_collection="Face",
-        settings=RigifySettings(bone_name="v_ear.R", rigify_type="skin.basic_chain"),
+        settings=RigifySettings(bone_name="v_ear.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
         # is_optional=True,
     ),
 
     GenerativeBone(
         ref="tgt",
-        data=ExtensionBone(name="v_ear.R.001", bone_a="v_ear.R", parent="v_ear.R", is_connected=True, axis_type="local", axis="Y"),
+        data=ExtensionBone(name="v_ear.R.001", bone_a="v_ear.R", parent="v_ear.R", is_connected=False, axis_type="local", axis="Y"),
         req_bones=["v_ear.R"],
         b_collection="Face",
+        settings=RigifySettings(bone_name="v_ear.R.001", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
         # is_optional=True,
     ),
 
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="ear_acc.R", bone_a="n_ear_a_r", parent="v_ear.R.001", is_connected=False, start="head", size_factor=(-4)),
+        data=ExtensionBone(name="ear_acc.R", bone_a="n_ear_a_r", parent="v_ear.R", is_connected=False, start="head", size_factor=(-4)),
         req_bones=["v_ear.R.001", "n_ear_a_r"],
         b_collection="Accessory",
         settings=RigifySettings(bone_name="ear_acc.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),

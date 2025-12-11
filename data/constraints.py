@@ -471,9 +471,6 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "lid.T.L.002": [CopyLocationConstraint(target_bone="lid.B.L.002", name="eye_lid_close.L", influence=0)],
     "lid.T.R.002": [CopyLocationConstraint(target_bone="lid.B.R.002", name="eye_lid_close.R", influence=0)],
 
-    "v_ear.L": [AssignCollection()],
-    "v_ear.R": [AssignCollection()],
-
     ## MCH Bones 
 
     "MCH-n_root": [AssignCollection(collection_name="MCH")],
@@ -493,6 +490,8 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     # Twist
     "MCH-n_hhiji_r": [AssignCollection(collection_name="MCH")],
     "MCH-n_hhiji_l": [AssignCollection(collection_name="MCH")],
+
+    # Viera Ears
 
     "MCH-j_zera_a_l": [AssignCollection(collection_name="MCH")],
     "MCH-j_zera_b_l": [AssignCollection(collection_name="MCH")],
