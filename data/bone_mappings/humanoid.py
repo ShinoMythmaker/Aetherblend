@@ -1004,6 +1004,14 @@ VIERA_EAR_L: list[GenerativeBone] = [
         settings=RigifySettings(bone_name="ear_acc.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
         is_optional=True,
     ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear.L", bone_a="j_mimi_l", parent="head", is_connected=False, axis_type="local", axis="X", start="head"),
+        req_bones=["j_mimi_l"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="ear.L", rigify_type="basic.super_copy", super_copy_widget_type="bone")
+    ),
 ]
 
 VIERA_EAR_R: list[GenerativeBone] = [
@@ -1032,6 +1040,14 @@ VIERA_EAR_R: list[GenerativeBone] = [
         b_collection="Accessory",
         settings=RigifySettings(bone_name="ear_acc.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
         is_optional=True,
+    ),
+
+    GenerativeBone(
+        ref="src",
+        data=ExtensionBone(name="ear.R", bone_a="j_mimi_r", parent="head", is_connected=False, axis_type="local", axis="X", start="head"),
+        req_bones=["j_mimi_r"],
+        b_collection="Face",
+        settings=RigifySettings(bone_name="ear.R", rigify_type="basic.super_copy", super_copy_widget_type="bone")
     ),
 ]
 

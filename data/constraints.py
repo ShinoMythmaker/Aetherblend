@@ -37,6 +37,11 @@ LINK_EDIT_OPERATIONS = [
     copyBone(bone_name="MCH-j_zerd_a_r", src_bone_name="j_zerd_a_r", parent_bone_name="DEF-v_ear.R"),
     copyBone(bone_name="MCH-j_zerd_b_r", src_bone_name="j_zerd_b_r", parent_bone_name="DEF-v_ear.R.001"),
 
+    copyBone(bone_name="MCH-j_zerb_a_l", src_bone_name="j_zerb_a_l", parent_bone_name="DEF-v_ear.L"),
+    copyBone(bone_name="MCH-j_zerb_b_l", src_bone_name="j_zerb_b_l", parent_bone_name="DEF-v_ear.L.001"),
+    copyBone(bone_name="MCH-j_zerb_a_r", src_bone_name="j_zerb_a_r", parent_bone_name="DEF-v_ear.R"),
+    copyBone(bone_name="MCH-j_zerb_b_r", src_bone_name="j_zerb_b_r", parent_bone_name="DEF-v_ear.R.001"),
+
 
 
     # Hands
@@ -312,6 +317,10 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "j_zera_b_l": [CopyTransformsConstraint(target_bone="MCH-j_zera_b_l", target_space="WORLD", owner_space="WORLD")],
     "j_zera_a_r": [CopyTransformsConstraint(target_bone="MCH-j_zera_a_r", target_space="WORLD", owner_space="WORLD")],
     "j_zera_b_r": [CopyTransformsConstraint(target_bone="MCH-j_zera_b_r", target_space="WORLD", owner_space="WORLD")],
+    "j_zerb_a_l": [CopyTransformsConstraint(target_bone="MCH-j_zerb_a_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zerb_b_l": [CopyTransformsConstraint(target_bone="MCH-j_zerb_b_l", target_space="WORLD", owner_space="WORLD")],
+    "j_zerb_a_r": [CopyTransformsConstraint(target_bone="MCH-j_zerb_a_r", target_space="WORLD", owner_space="WORLD")],
+    "j_zerb_b_r": [CopyTransformsConstraint(target_bone="MCH-j_zerb_b_r", target_space="WORLD", owner_space="WORLD")],
 
     # Right Cheek
 
@@ -499,6 +508,8 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "MCH-j_zerc_b_l": [AssignCollection(collection_name="MCH")],
     "MCH-j_zerd_a_l": [AssignCollection(collection_name="MCH")],
     "MCH-j_zerd_b_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerb_a_l": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerb_b_l": [AssignCollection(collection_name="MCH")],
 
     "MCH-j_zera_a_r": [AssignCollection(collection_name="MCH")],
     "MCH-j_zera_b_r": [AssignCollection(collection_name="MCH")],
@@ -506,6 +517,8 @@ LINK_POSE_OPERATIONS: dict[str, list[Constraint]] = {
     "MCH-j_zerc_b_r": [AssignCollection(collection_name="MCH")],
     "MCH-j_zerd_a_r": [AssignCollection(collection_name="MCH")],
     "MCH-j_zerd_b_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerb_a_r": [AssignCollection(collection_name="MCH")],
+    "MCH-j_zerb_b_r": [AssignCollection(collection_name="MCH")],
     
     # Head
     "MCH-j_kubi": [AssignCollection(collection_name="MCH")],
