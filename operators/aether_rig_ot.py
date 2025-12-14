@@ -461,11 +461,6 @@ class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
         bpy.context.view_layer.objects.active = armature
 
         bpy.ops.object.mode_set(mode='POSE')
-
-        bpy.ops.pose.select_all(action="SELECT")
-        bpy.ops.pose.transforms_clear()
-        bpy.ops.pose.select_all(action='DESELECT')
-
         ffxiv_collection = armature.data.collections.get("FFXIV")
         ffxiv_ref_collection = armature.data.collections.get("FFXIV-REF")
 
