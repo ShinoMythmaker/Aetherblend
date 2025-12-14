@@ -135,7 +135,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             if self.s_apply_pose_track:
                 apply_pose_to_rest_pose(armature)
 
-            remove_action(armature, action_name="pose")
+            clear_animation_data(armature)
             utils.armature.reset_transforms(armature)
 
             bpy.context.view_layer.objects.active = armature
@@ -206,6 +206,18 @@ def remove_action(armature: bpy.types.Object, action_name: str) -> None:
         print(f"[AetherBlend] Deleted pose track '{action_name}'")
     except Exception as e:
         print(f"[AetherBlend] Warning: Could not delete pose track '{action_name}': {e}")
+
+def clear_animation_data(armature: bpy.types.Armature) -> None:
+    anim_data = armature.animation_data
+    if not anim_data:
+        print(f"[AetherBlend] Armature {armature.name} has no animation data.")
+        return      
+    
+    try:
+        armature.animation_data_clear()    
+    except Exception as e:
+        print(f"[AetherBlend] Warning: Could not clear '{armature.name}''s animation_data: {e}")
+
 
 def register():
     bpy.utils.register_class(AETHER_OT_Character_Import)
