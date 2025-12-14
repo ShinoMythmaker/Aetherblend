@@ -63,10 +63,9 @@ def reset_transforms(armature):
     bpy.context.view_layer.objects.active = armature
 
     bpy.ops.object.mode_set(mode='POSE')
-    for bone in armature.pose.bones:
-        bone.location = (0.0, 0.0, 0.0)
-        bone.rotation_euler = (0.0, 0.0, 0.0)
-        bone.scale = (1.0, 1.0, 1.0)
+    bpy.ops.pose.select_all(action='SELECT')
+    bpy.ops.pose.transforms_clear()
+    bpy.ops.pose.select_all(action='DESELECT')
 
     bpy.ops.object.mode_set(mode=original_mode)
     print(f"[AetherBlend] Transforms of armature '{armature.name}' reset to default.")
