@@ -5,7 +5,7 @@
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
     <img src="https://img.shields.io/badge/Blender-4.5%2B-orange">
-    <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/Mythmaker-Sponsor-pink?style=flat"></a>
+    <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
 </p>
 
 Aetherblend is a Blender plugin designed to help you import characters and animate with ease. Aetherblend determines what bones are present in the vanilla armature and generates a rigify rig to the exact proportions of your character, including NPCs and monsters. 
