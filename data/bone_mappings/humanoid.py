@@ -963,7 +963,7 @@ NOSE: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="Nose.L.glue.001", bone_a="j_f_dmiken_l", bone_b="j_f_miken_02_l", parent="head", is_connected=False),
-        req_bones=["j_f_dmiken_l", "j_f_uhana"],
+        req_bones=["j_f_dmiken_l", "j_f_miken_02_l"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="Nose.L.glue.001", rigify_type="skin.glue", relink_constraints=True, skin_glue_use_tail=True, skin_glue_tail_reparent=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
     ),
@@ -971,7 +971,7 @@ NOSE: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="Nose.R.glue.001", bone_a="j_f_dmiken_r", bone_b="j_f_miken_02_r", parent="head", is_connected=False),
-        req_bones=["j_f_dmiken_r", "j_f_uhana"],
+        req_bones=["j_f_dmiken_r", "j_f_miken_02_r"],
         b_collection="Face (Secondary)",
         settings=RigifySettings(bone_name="Nose.R.glue.001", rigify_type="skin.glue", relink_constraints=True, skin_glue_use_tail=True, skin_glue_tail_reparent=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
     ),
