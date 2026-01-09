@@ -108,14 +108,14 @@ SPINE: list[GenerativeBone] = [
         data=ConnectBone(name="clavicle.L", bone_a="j_sako_l", bone_b="j_ude_a_l", parent="spine.03"),
         req_bones=["j_sako_l", "j_ude_a_l"],
         settings=RigifySettings(bone_name="clavicle.L", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
-        b_collection="Arm.L (FK)",
+        b_collection="Torso",
     ),
     GenerativeBone(
         ref="src",
         data=ConnectBone(name="clavicle.R", bone_a="j_sako_r", bone_b="j_ude_a_r", parent="spine.03"),
         req_bones=["j_sako_r", "j_ude_a_r"],
         settings=RigifySettings(bone_name="clavicle.R", rigify_type="basic.super_copy", super_copy_widget_type="shoulder"),
-        b_collection="Arm.R (FK)",
+        b_collection="Torso",
     ),
 
 ]
@@ -123,7 +123,7 @@ SPINE: list[GenerativeBone] = [
 CHEST: list[GenerativeBone] = [
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=0, size_factor=1.5),
+        data=ExtensionBone(name="Chest.L", bone_a="j_mune_l", axis_type="local", axis="Y", start="head", parent="spine.03", is_connected=False, roll=42, size_factor=1.5),
         req_bones=["j_mune_l"],
         b_collection="Torso",
         settings=RigifySettings(bone_name="Chest.L", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
@@ -131,7 +131,7 @@ CHEST: list[GenerativeBone] = [
 
     GenerativeBone(
         ref="src",
-        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="X", start="head", parent="spine.03", is_connected=False, roll=0, size_factor=1.5),
+        data=ExtensionBone(name="Chest.R", bone_a="j_mune_r", axis_type="local", axis="Y", start="head", parent="spine.03", is_connected=False, roll=-42, size_factor=1.5),
         req_bones=["j_mune_r"],
         b_collection="Torso",
         settings=RigifySettings(bone_name="Chest.R", rigify_type="basic.super_copy", super_copy_widget_type="bone"),
