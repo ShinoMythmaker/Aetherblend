@@ -23,6 +23,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
     s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
+
+    s_temperence: BoolProperty(name="Temperence Mode", description="Imports with temperence mode enabled", default=False)  # type: ignore
     
     
     def invoke(self, context, event):
@@ -98,6 +100,10 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         split = col.split(factor=indent)  
         split.label(text=" ")
         split.prop(self, "s_apply_pose_track")
+
+        split = col.split(factor=indent)  
+        split.label(text=" ")
+        split.prop(self, "s_temperence")
  
     def execute(self, context):  
         bpy.context.window.cursor_set('WAIT')   
@@ -107,7 +113,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             return {'CANCELLED'}   
 
         # Import the model
-        imported_objects = utils.import_export.import_model(self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices)
+        imported_objects = utils.import_export.import_model(self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices, self.s_temperence)
 
         # Process the imported objects with settings in mind
         if self.s_import_collection:
