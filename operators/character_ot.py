@@ -213,7 +213,7 @@ def remove_action(armature: bpy.types.Object, action_name: str) -> None:
     except Exception as e:
         print(f"[AetherBlend] Warning: Could not delete pose track '{action_name}': {e}")
 
-def clear_animation_data(armature: bpy.types.Armature) -> None:
+def clear_animation_data(armature: bpy.types.Object) -> None:
     anim_data = armature.animation_data
     if not anim_data:
         print(f"[AetherBlend] Armature {armature.name} has no animation data.")

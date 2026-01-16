@@ -182,7 +182,7 @@ def restore_bone_parenting(armature: bpy.types.Object, parent_map: dict) -> None
             bone.parent = edit_bones.get(parent_name) if parent_name else None
     bpy.ops.object.mode_set(mode=original_mode)
 
-def create(location: tuple, armature_name: str) -> bpy.types.Armature:
+def create(location: tuple, armature_name: str) -> bpy.types.Object:
     """Create the base meta rig armature."""
     original_mode = bpy.context.object.mode if bpy.context.object else 'OBJECT'
 
@@ -198,3 +198,28 @@ def create(location: tuple, armature_name: str) -> bpy.types.Armature:
 
     bpy.ops.object.mode_set(mode=original_mode)
     return armature
+
+def duplicate(armature: bpy.types.Object) -> bpy.types.Object:
+    """Duplicates the given armature object."""
+    bpy.ops.object.select_all(action='DESELECT')
+    armature.select_set(True)
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.duplicate_move()
+    duplicated_armature = bpy.context.active_object
+    return duplicated_armature
+
+def add_bone_prefix(armature: bpy.types.Object, prefix: str) -> None:
+    """Adds a prefix to all bone names in the armature."""
+    original_mode = armature.mode
+    bpy.ops.object.mode_set(mode='EDIT')
+    for bone in armature.data.edit_bones:
+        bone.name = f"{prefix}{bone.name}"
+    bpy.ops.object.mode_set(mode=original_mode)
+
+def join(src: bpy.types.Object, target: bpy.types.Object) -> None:
+    """Joins the source armature into the target armature."""
+    bpy.ops.object.select_all(action='DESELECT')
+    src.select_set(True)
+    target.select_set(True)
+    bpy.context.view_layer.objects.active = target
+    bpy.ops.object.join()

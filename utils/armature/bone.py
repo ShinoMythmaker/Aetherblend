@@ -11,51 +11,51 @@ def _select_pose_bone(pose_bone: bpy.types.PoseBone, state: bool = True) -> None
     except AttributeError:
         pose_bone.bone.select = state
 
-def add_constraint_track_to_after_original(armature: bpy.types.Armature, bone_map: list[TrackToBone]) -> list[bpy.types.Constraint]:
-    """Adds a track to constraint to a bone in an armature, applied after the original rotation."""
-    original_mode = armature.mode
-    constraints = []
-    for track in bone_map:
-        bpy.ops.object.mode_set(mode='EDIT')
-        edit_bones = armature.data.edit_bones
+# def add_constraint_track_to_after_original(armature: bpy.types.Object, bone_map: list[TrackToBone]) -> list[bpy.types.Constraint]:
+#     """Adds a track to constraint to a bone in an armature, applied after the original rotation."""
+#     original_mode = armature.mode
+#     constraints = []
+#     for track in bone_map:
+#         bpy.ops.object.mode_set(mode='EDIT')
+#         edit_bones = armature.data.edit_bones
 
-        origin_bone = edit_bones.get(track.origin_name)
-        parent_bone = edit_bones.get(track.parent_name)
-        target_bone = edit_bones.get(track.target_name)
+#         origin_bone = edit_bones.get(track.origin_name)
+#         parent_bone = edit_bones.get(track.parent_name)
+#         target_bone = edit_bones.get(track.target_name)
 
-        if not origin_bone or not parent_bone or not target_bone:
-            print(f"[AetherBlend] Required Bones not found in armature '{armature.name}'.")
-            bpy.ops.object.mode_set(mode=original_mode)
-            return
+#         if not origin_bone or not parent_bone or not target_bone:
+#             print(f"[AetherBlend] Required Bones not found in armature '{armature.name}'.")
+#             bpy.ops.object.mode_set(mode=original_mode)
+#             return
 
-        track_bone_name = "TRACK_" + track.origin_name
+#         track_bone_name = "TRACK_" + track.origin_name
 
-        track_bone = edit_bones.new(track_bone_name)
-        track_bone.name = track_bone_name
-        track_bone.head = origin_bone.head.copy()
-        track_bone.tail = target_bone.head.copy()
-        track_bone.roll = 0.0
-        track_bone.parent = parent_bone
+#         track_bone = edit_bones.new(track_bone_name)
+#         track_bone.name = track_bone_name
+#         track_bone.head = origin_bone.head.copy()
+#         track_bone.tail = target_bone.head.copy()
+#         track_bone.roll = 0.0
+#         track_bone.parent = parent_bone
 
-        org_collection = armature.data.collections.get("ORG")
-        org_collection.assign(track_bone)
-        org_collection.is_visible = True    
+#         org_collection = armature.data.collections.get("ORG")
+#         org_collection.assign(track_bone)
+#         org_collection.is_visible = True    
 
-        target_bone_name = target_bone.name
-        origin_bone_name = origin_bone.name
-        track_bone_name = track_bone.name
-        track_to = add_constraint_track_to(armature, {track_bone_name: [target_bone_name]}, overwrite=False, custom_space=track.custom_space)
-        copy_rot = add_constraint_copy_rotation(armature, {origin_bone_name: [track_bone_name]}, overwrite=False)
+#         target_bone_name = target_bone.name
+#         origin_bone_name = origin_bone.name
+#         track_bone_name = track_bone.name
+#         track_to = add_constraint_track_to(armature, {track_bone_name: [target_bone_name]}, overwrite=False, custom_space=track.custom_space)
+#         copy_rot = add_constraint_copy_rotation(armature, {origin_bone_name: [track_bone_name]}, overwrite=False)
 
-        constraints.append(track_to)
-        constraints.append(copy_rot)
+#         constraints.append(track_to)
+#         constraints.append(copy_rot)
 
-        org_collection.is_visible = False
+#         org_collection.is_visible = False
 
-    bpy.ops.object.mode_set(mode=original_mode)
-    return constraints
+#     bpy.ops.object.mode_set(mode=original_mode)
+#     return constraints
 
-def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False, custom_space: str | None = None) -> list[bpy.types.Constraint]:
+def add_constraint_track_to(armature: bpy.types.Object, bone_map: dict[str, list[str]], overwrite: bool = False, custom_space: str | None = None) -> list[bpy.types.Constraint]:
     """Adds Track To constraints to specified bones in an armature."""
     original_mode = armature.mode
 
@@ -103,7 +103,7 @@ def add_constraint_track_to(armature: bpy.types.Armature, bone_map: dict[str, li
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
 
-def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
+def add_constraint_copy_rotation(armature: bpy.types.Object, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
     """Adds Copy Rotation constraints to specified bones in an armature."""
     original_mode = armature.mode
 
@@ -139,7 +139,7 @@ def add_constraint_copy_rotation(armature: bpy.types.Armature, bone_map: dict[st
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
 
-def add_constraint_copy_location(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
+def add_constraint_copy_location(armature: bpy.types.Object, bone_map: dict[str, list[str]], overwrite: bool = False) -> list[bpy.types.Constraint]:
     """Adds Copy Location constraints to specified bones in an armature."""
     original_mode = armature.mode
 
@@ -170,7 +170,7 @@ def add_constraint_copy_location(armature: bpy.types.Armature, bone_map: dict[st
     bpy.ops.object.mode_set(mode=original_mode)
     return constraints
 
-def add_constraint_child_of(armature: bpy.types.Armature, bone_map: dict[str, list[str]], overwrite: bool = False, inverse: bool = False, location: bool = True, rotation: bool = True, scale: bool = True) -> list[bpy.types.Constraint]:
+def add_constraint_child_of(armature: bpy.types.Object, bone_map: dict[str, list[str]], overwrite: bool = False, inverse: bool = False, location: bool = True, rotation: bool = True, scale: bool = True) -> list[bpy.types.Constraint]:
     """Adds Child Of constraints to specified bones in an armature."""
     original_mode = armature.mode
 
@@ -227,7 +227,7 @@ def remove_copy_rotation_constraints(armature, bone_names):
                 if con.type == 'COPY_ROTATION':
                     pb.constraints.remove(con)
 
-def remove_constraint_by_name_contains(armature: bpy.types.Armature, bone_name: str, substring: str) -> None:
+def remove_constraint_by_name_contains(armature: bpy.types.Object, bone_name: str, substring: str) -> None:
     """Removes a specific constraint that contains name from a given bone in the armature."""
     original_mode = armature.mode
 
@@ -326,7 +326,7 @@ def restore_visibility(armature, original_visibility):
         if pb:
             pb.bone.hide = was_hidden
 
-def copy_to(src_armature: bpy.types.Armature, target_armature: bpy.types.Armature, bone_name: str, new_bone_name: str) -> str | None:
+def copy_to(src_armature: bpy.types.Object, target_armature: bpy.types.Object, bone_name: str, new_bone_name: str) -> str | None:
     """Copy a bone from src_armature to target_armature."""
     
     src_bones = src_armature.data.bones
@@ -349,7 +349,7 @@ def get_roll(bone: bpy.types.Bone) -> float:
     axis, roll = bone.AxisRollFromMatrix(bone.matrix, axis=bone.y_axis)
     return roll
 
-def set_parent(armature: bpy.types.Armature, bone_name: str, parent_bone_name: str) -> None:
+def set_parent(armature: bpy.types.Object, bone_name: str, parent_bone_name: str) -> None:
     """Sets the parent of a bone in the armature."""
     bpy.ops.object.mode_set(mode='EDIT')
     edit_bones = armature.data.edit_bones

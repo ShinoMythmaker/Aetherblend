@@ -57,6 +57,7 @@ def unregister():
                     except Exception as e:
                         print(f"[AetherBlend] Failed to unregister {full_module_name}: {e}")
     
+    
     preferences.unregister()
 
     

@@ -39,7 +39,7 @@ def assign_bones(armature, bone_names, collection_name) -> None:
 
     bpy.ops.object.mode_set(mode=original_mode)
 
-def delete_with_bones(armature: bpy.types.Armature, collection_name: str) -> None:
+def delete_with_bones(armature: bpy.types.Object, collection_name: str) -> None:
     """Deletes the specified collection and all bones contained within it from the armature."""
     bpy.context.view_layer.objects.active = armature
     bpy.ops.object.mode_set(mode='POSE')
