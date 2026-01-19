@@ -28,6 +28,7 @@ class rigify_type:
 class limbs_leg(rigify_type):
     """Rigify type: limbs.leg - Used for leg rigs."""
     fk_coll: str = None
+    tweak_coll: str = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         armature.data.bones.active = pose_bone.bone
@@ -44,6 +45,17 @@ class limbs_leg(rigify_type):
                         fk_ref.name = self.fk_coll
         except Exception as e:
             print(f"[AetherBlend] Error setting FK collection: {e}")
+        try:
+            if self.tweak_coll:
+                rigify_params.tweak_coll_refs.clear()
+                if self.tweak_coll in armature.data.collections:
+                    bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
+                    if len(rigify_params.tweak_coll_refs) > 0:
+                        tweak_ref = rigify_params.tweak_coll_refs[-1]
+                        tweak_ref.name = self.tweak_coll
+        except Exception as e:
+            print(f"[AetherBlend] Error setting Tweak collection: {e}")
+        
 
 @dataclass
 class limbs_arm(rigify_type):

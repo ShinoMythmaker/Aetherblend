@@ -9,6 +9,7 @@ ARM_R = BoneGroup(
             link(target="DEF-upper_arm.R", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
             link(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
             link(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
+            link(target="DEF-forearm.R.001", bone="n_hte_r")
             ],
         bones = [
             #Right Clavicle
@@ -60,58 +61,17 @@ ARM_R = BoneGroup(
                     b_collection="Arm.R (IK)"
                 )
             ),
-            ExtensionBone(
-                name="wrist.R", 
-                bone_a="n_hte_r", 
-                size_factor=1, 
-                axis_type="local", 
-                axis="Y", 
-                start="head", 
-                parent="hand.R", 
-                is_connected=False, 
-                req_bones=["n_hte_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
-                    b_collection="Arm.R (Tweak)"
-                )
-            ),
-            ExtensionBone(
-                name="elbow.R", 
-                bone_a="n_hhiji_r", 
-                axis_type="local", 
-                axis="Y", 
-                start="head", 
-                parent="forearm.R", 
-                is_connected=False, 
-                size_factor=0.5, 
-                roll=45,
-                req_bones=["n_hhiji_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
-                    b_collection="Arm.R (Tweak)"
-                )
-            ),
-            ExtensionBone(
-                name="shoulder_tweak.R", 
-                bone_a="n_hkata_r", 
-                axis_type="local", 
-                axis="Y", 
-                start="head", 
-                parent="upper_arm.R", 
-                is_connected=False, 
-                size_factor=0.5, 
-                roll=45,
-                req_bones=["n_hkata_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
-                    b_collection="Arm.R (Tweak)"
-                )
-            ),
         ]
     )
 
 ARM_L = BoneGroup(
         name="Left Arm",
+        linking= [
+            link(target="DEF-upper_arm.L", bone="j_ude_a_l", retarget="FK-upper_arm.L"),
+            link(target="DEF-forearm.L", bone="j_ude_b_l", retarget="FK-forearm.L"),
+            link(target="DEF-hand.L", bone="j_te_l", retarget="FK-hand.L"),
+            link(target="DEF-forearm.L.001", bone="n_hte_l")
+            ],
         bones = [
             #Left Clavicle
             ConnectBone(
@@ -162,59 +122,18 @@ ARM_L = BoneGroup(
                     b_collection="Arm.L (IK)"
                 )
             ),
-            ExtensionBone(
-                name="wrist.L", 
-                bone_a="n_hte_l", 
-                size_factor=1, 
-                axis_type="local", 
-                axis="Y", 
-                start="head", 
-                parent="hand.L", 
-                is_connected=False, 
-                req_bones=["n_hte_l"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
-                    b_collection="Arm.L (Tweak)"
-                )
-            ),
-            ExtensionBone(
-                name="elbow.L", 
-                bone_a="n_hhiji_l", 
-                axis_type="local", 
-                axis="Y", 
-				start = "head",
-				parent = "forearm.L",
-				is_connected = False,
-				size_factor = 0.5,
-				roll = 45,
-				req_bones = ["n_hhiji_l"],
-				pose_operations = PoseOperations(
-					rigify_settings = rigify.types.basic_super_copy(widget_type = "sphere"),
-					b_collection = "Arm.L (Tweak)"
-				)
-			),
-			ExtensionBone(
-				name = "shoulder_tweak.L",
-				bone_a = "n_hkata_l",
-				axis_type = "local",
-				axis = "Y",
-				start = "head",
-				parent = "upper_arm.L",
-				is_connected = False,
-				size_factor = 0.5,
-				roll = 45,
-				req_bones = ["n_hkata_l"],
-				pose_operations = PoseOperations(
-					rigify_settings = rigify.types.basic_super_copy(widget_type ="sphere"),
-					b_collection ="Arm.L (Tweak)"
-				)
-			),
         ],
-        description ="Left arm bones including the clavicle, upper arm, forearm, hand, and tweak bones"
+        description ="Left arm bones including the clavicle, upper arm, forearm, and hand bones."
     )
 
 SPINE = BoneGroup(
         name="Spine",
+        linking= [
+            link(target="DEF-Spine.001", bone="j_kosi", retarget="FK-Spine.001"),
+            link(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
+            link(target="DEF-Spine.003", bone="j_sebo_b", retarget="FK-Spine.003"),
+            link(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
+        ],
         bones = [
             #Spine
             ConnectBone(
@@ -227,7 +146,7 @@ SPINE = BoneGroup(
                 is_connected=True,
                 req_bones=["j_kosi"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.spines_basic_spine(fk_coll="Spine (FK)", tweak_coll="Spine (Tweak)", pivot_pos=1),
+                    rigify_settings=rigify.types.spines_basic_spine(fk_coll="Torso (Tweak)", tweak_coll="Torso (Tweak)", pivot_pos=1),
                     b_collection="Torso"
                 )
             ),
@@ -269,6 +188,12 @@ SPINE = BoneGroup(
 
 LEG_R = BoneGroup(
         name="Right Leg",
+        linking= [
+            link(target="DEF-thigh.R", bone="j_asi_a_r", retarget="FK-upper_leg.R"),
+            link(target="DEF-shin.R", bone="j_asi_c_r", retarget="FK-lower_leg.R"),
+            link(target="DEF-foot.R", bone="j_asi_d_r", retarget="FK-foot.R"),
+            link(target="DEF-toe.R", bone="j_asi_e_r", retarget="FK-toe.R"),
+            ],
         bones = [
             # Right Leg
             ConnectBone(
@@ -278,7 +203,7 @@ LEG_R = BoneGroup(
                 parent="Spine.001",
                 req_bones=["j_asi_a_r", "j_asi_c_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_leg(),
+                    rigify_settings=rigify.types.limbs_leg(fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)"),
                     b_collection="Leg.R (IK)"
                 )
             ),
@@ -349,6 +274,12 @@ LEG_R = BoneGroup(
 
 LEG_L = BoneGroup(
         name="Left Leg",
+        linking= [
+            link(target="DEF-thigh.L", bone="j_asi_a_l", retarget="FK-upper_leg.L"),
+            link(target="DEF-shin.L", bone="j_asi_c_l", retarget="FK-lower_leg.L"),
+            link(target="DEF-foot.L", bone="j_asi_d_l", retarget="FK-foot.L"),
+            link(target="DEF-toe.L", bone="j_asi_e_l", retarget="FK-toe.L"),
+            ],
         bones = [
             # Left Leg
             ConnectBone(
@@ -358,7 +289,7 @@ LEG_L = BoneGroup(
                 parent="Spine.001",
                 req_bones=["j_asi_a_l", "j_asi_c_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_leg(),
+                    rigify_settings=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)"),
                     b_collection="Leg.L (IK)"
                 )
             ),
