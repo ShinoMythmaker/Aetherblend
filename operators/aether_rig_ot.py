@@ -73,6 +73,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     
     def execute(self, context):
         bpy.context.window.cursor_set('WAIT') 
+        bpy.ops.object.mode_set(mode='OBJECT')
 
         # Get Active Armature
         armature = context.active_object
@@ -106,7 +107,17 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         meta_rig = utils.armature.duplicate(armature)
         meta_rig.name = f"META_{armature.name}"
 
+        ## This is prelimnary and should be moved to the pose operations later on
+        context.view_layer.objects.active = meta_rig
+        bpy.ops.object.mode_set(mode='POSE')
+        for pose_bone in meta_rig.pose.bones:
+            rigify.types.basic_raw_copy(True).apply(pose_bone, meta_rig)
+            CopyTransformsConstraint(f"MCH-{pose_bone.name}", name=f"AetherBlend-CopyTransform@MCH-{pose_bone.name}").apply(pose_bone, meta_rig)
+        #########################################################################
+
         # Preliminary MCH bone generation and joining
+
+        bpy.ops.object.mode_set(mode='OBJECT')
         mch_rig = utils.armature.duplicate(armature)
         utils.armature.add_bone_prefix(mch_rig, "MCH-")
 
@@ -166,9 +177,10 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         # Now apply all operations per bone
         bpy.ops.object.mode_set(mode='POSE')
         for bone_name, ops_list in all_pose_operations.items():
+            pose_bone = meta_rig.pose.bones.get(bone_name)
             for ops in ops_list:
                 if ops.rigify_settings:
-                    ops.rigify_settings.apply(meta_rig)
+                    ops.rigify_settings.apply(pose_bone, meta_rig)
                 if ops.b_collection:
                     utils.armature.b_collection.assign_bones(meta_rig, [bone_name], ops.b_collection)
             

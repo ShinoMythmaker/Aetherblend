@@ -15,7 +15,7 @@ ARM_R = BoneGroup(
                 parent="clavicle.R",
                 req_bones=["j_ude_a_r", "j_ude_b_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_arm(bone_name="upper_arm.R", fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"), 
+                    rigify_settings=rigify.types.limbs_arm(fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"), 
                     b_collection="Arm.R (IK)"  #b_collection should be a class
                 )
             ),
@@ -54,7 +54,7 @@ ARM_R = BoneGroup(
                 is_connected=False, 
                 req_bones=["n_hte_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="wrist.R", widget_type="sphere"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
                     b_collection="Arm.R (Tweak)"
                 )
             ),
@@ -70,7 +70,7 @@ ARM_R = BoneGroup(
                 roll=45,
                 req_bones=["n_hhiji_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="elbow.R", widget_type="sphere"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
                     b_collection="Arm.R (Tweak)"
                 )
             ),
@@ -86,7 +86,7 @@ ARM_R = BoneGroup(
                 roll=45,
                 req_bones=["n_hkata_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="shoulder_tweak.R", widget_type="sphere"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
                     b_collection="Arm.R (Tweak)"
                 )
             ),
