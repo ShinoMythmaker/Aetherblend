@@ -6,10 +6,6 @@ import re
 
 import bpy
 
-from .. import utils
-from . import rigify
-from .bone_gen import BoneGenerator, BoneGroup, ConnectBone, ExtensionBone, CopyBone, PoseOperations
-
 @dataclass(frozen=True)
 class MetaRigCollectionInfo:
     name: str

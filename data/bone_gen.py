@@ -7,12 +7,32 @@ from abc import ABC, abstractmethod
 
 from .. import utils
 from . import rigify
+from .schemas import Constraint, CopyTransformsConstraint
 
 @dataclass
 class PoseOperations:
     """Groups all pose mode operations for a single bone."""
     rigify_settings: rigify.types.rigify_type | None = None
+    constraints: list[Constraint] | None = None
     b_collection: str | None = None
+
+    def execute(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object):
+        """Executes all pose operations on the given pose bone."""
+        if self.rigify_settings:
+            self.rigify_settings.apply(pose_bone, armature)
+        
+        if self.constraints:
+            for constraint in self.constraints:
+                constraint.apply(pose_bone, armature)
+        
+        if self.b_collection:
+            utils.armature.b_collection.assign_bones(armature, [pose_bone.name], self.b_collection)
+
+@dataclass
+class link:
+    target: str
+    bone: str
+    retarget: str | None = None
 
 class BoneGenerator(ABC):
     """Base interface for all bone generation types."""
@@ -34,8 +54,10 @@ class BoneGenerator(ABC):
 class BoneGroup:
     """A group of bone generators that can be executed together."""
     name: str
-    bones: list[BoneGenerator]
     description: str = ""
+    linking : list[link] | None = None
+    bones: list[BoneGenerator] | None = None
+    
     
     def check(self, armature: bpy.types.Object) -> bool:
         """Check if all required bones exist in the armature for this bone group."""
@@ -83,6 +105,26 @@ class BoneGroup:
         
         # Collect pose operations by bone name (allowing multiple operations per bone)
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
+
+        for link in self.linking or []:
+            ff_bone = link.bone
+            mch_bone = f"MCH-{ff_bone}"
+            if ff_bone not in pose_operations_dict:
+                pose_operations_dict[ff_bone] = []
+            pose_operations_dict[ff_bone].append(
+                PoseOperations(
+                    rigify_settings=rigify.types.basic_raw_copy(True),
+                    constraints=[CopyTransformsConstraint(f"MCH-{ff_bone}", name=f"AetherBlend-CopyTransform@MCH-{ff_bone}")]
+                )
+            )
+
+            if mch_bone not in pose_operations_dict:
+                pose_operations_dict[mch_bone] = []
+            pose_operations_dict[mch_bone].append(
+                PoseOperations(
+                    rigify_settings=rigify.types.basic_raw_copy(True, link.target)
+                )
+            )
         
         for bone_gen in self.bones:
             # Only add to dict if there are operations to perform

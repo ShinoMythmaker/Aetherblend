@@ -365,7 +365,7 @@ class basic_raw_copy(rigify_type):
             if self.relink_constraints:
                 rigify_params.relink_constraints = self.relink_constraints
                 if self.parent:
-                    rigify_params.parent = self.parent
+                    rigify_params.parent_bone = self.parent
             if self.widget_type:
                 rigify_params.raw_copy_widget_type = self.widget_type
         except Exception as e:

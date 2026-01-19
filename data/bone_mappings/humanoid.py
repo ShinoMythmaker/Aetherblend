@@ -1,11 +1,15 @@
-from ..bone_gen import ConnectBone, ExtensionBone, PoseOperations, BoneGroup
+from ..bone_gen import ConnectBone, ExtensionBone, PoseOperations, BoneGroup, link
 from .. import rigify
 
 # Individual bone list (for backwards compatibility and direct access)
 ARM_R = BoneGroup(
         name="Right Arm",
         description="Right arm bones including upper arm, forearm, hand, and tweak bones",
-        #linking = link(target="DEF-upper_arm.R", bone="MCH-j_ude_a_r", retarget="FK-upper_arm.R"),
+        linking = [
+            link(target="DEF-upper_arm.R", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
+            link(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
+            link(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
+            ],
         bones = [
             # Right Arm
             ConnectBone(
