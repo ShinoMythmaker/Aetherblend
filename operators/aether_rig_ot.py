@@ -83,13 +83,11 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         armature.hide_set(False)
 
-        # Check if rig is Linked
-        if armature.aether_rig.rigify_linked:
-            bpy.ops.aether.unlink_rigify_rig()
+        # Cleanup Before Meta Rig Generation
+        bpy.ops.aether.clean_up_rig()
         
         # Remove Existing Rigs
         existing_meta_rig = armature.aether_rig.meta_rig
-        existing_rigify_rig = armature.aether_rig.rigify_rig
         
         if existing_meta_rig:
             if hasattr(existing_meta_rig.data, 'rigify_rig_ui') and existing_meta_rig.data.rigify_rig_ui:
@@ -97,10 +95,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 if script and script.name in bpy.data.texts:
                     bpy.data.texts.remove(script)
             bpy.data.objects.remove(existing_meta_rig, do_unlink=True)
-        
-        if existing_rigify_rig:
-            bpy.data.objects.remove(existing_rigify_rig, do_unlink=True)
-            armature.aether_rig.rigify_rig = None
 
 
         # Meta Rig Base Generation
@@ -129,6 +123,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         meta_rig.show_in_front = True 
         bpy.ops.armature.rigify_use_standard_colors()
         bpy.ops.armature.rigify_add_color_sets()
+        meta_rig.data.rigify_target_rig = armature
         
         armature_collection = utils.collection.get_collection(armature)
         if armature_collection:
@@ -206,20 +201,47 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
+        bpy.context.window.cursor_set('WAIT') 
+
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return {'CANCELLED'}
+        
+        if not armature.aether_rig.meta_rig:
+            self.report({'ERROR'}, "No meta rig found. Generate a meta rig first.")
+            return {'CANCELLED'}
+
+        # Make sure Meta Rig is available
+        meta_rig = armature.aether_rig.meta_rig
+        meta_rig.hide_set(False)
+        meta_rig.hide_viewport = False
+
+        bpy.context.view_layer.objects.active = meta_rig
+        bpy.ops.object.select_all(action='DESELECT')
+        meta_rig.select_set(True)
+    
+        result = bpy.ops.pose.rigify_generate()
+
+        if result == {"FINISHED"}:
+
+            ## Execute Post Generation Steps
+            ffxiv_data_bones = utils.armature.b_collection.get_bones(armature, "FFXIV")
+            for bone in ffxiv_data_bones.values():
+                if bone:
+                    bone.use_deform = True
+            
+            armature.aether_rig.rigified = True
+        
+        meta_rig.hide_set(True)
+        meta_rig.hide_viewport = True
+
+        bpy.context.window.cursor_set('DEFAULT') 
         return {'FINISHED'}
             
-class AETHER_OT_Link_Rigify_Rig(bpy.types.Operator):
-    bl_idname = "aether.link_rigify_rig"
-    bl_label = "Link Rigify Rig"
-    bl_description = ("Link the Rigify Rig to the FFXIV Rig by merging control bones and setting up constraints")
-    bl_options = {'REGISTER', 'UNDO'}
     
-    def execute(self, context):
-        return {'FINISHED'}
-    
-class AETHER_OT_Unlink_Rigify_Rig(bpy.types.Operator):
-    bl_idname = "aether.unlink_rigify_rig"
-    bl_label = "Unlink Rigify Rig"
+class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
+    bl_idname = "aether.clean_up_rig"
+    bl_label = "Clean Up Rig"
     bl_description = ("Unlink the Rigify Rig from the FFXIV Rig by restoring from backup")
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -238,13 +260,11 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Rigify_Rig)
-    bpy.utils.register_class(AETHER_OT_Link_Rigify_Rig)
-    bpy.utils.register_class(AETHER_OT_Unlink_Rigify_Rig)
+    bpy.utils.register_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Full_Rig)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Rigify_Rig)
-    bpy.utils.unregister_class(AETHER_OT_Link_Rigify_Rig)
-    bpy.utils.unregister_class(AETHER_OT_Unlink_Rigify_Rig)
+    bpy.utils.unregister_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Full_Rig)
