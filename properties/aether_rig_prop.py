@@ -8,24 +8,11 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         poll=lambda self, obj: obj.type == 'ARMATURE'
     ) # type: ignore
     
-    rigify_rig : bpy.props.PointerProperty(
-        name="Control Rig",
-        type=bpy.types.Object,
-        description="Reference to the Rigify-Rig for this armature",
-        poll=lambda self, obj: obj.type == 'ARMATURE'
-    ) # type: ignore
     
-    rigify_linked : bpy.props.BoolProperty(
-        name="Control Linked",
-        description="Whether the Rigify-Rig is linked to this armature",
+    rigified : bpy.props.BoolProperty(
+        name="Rigified",
+        description="Whether the armature went through generation process or not",
         default=False
-    ) # type: ignore
-    
-    ffxiv_backup : bpy.props.PointerProperty(
-        name="FFXIV Backup",
-        type=bpy.types.Object,
-        description="Backup of the FFXIV armature before linking (used for restoration)",
-        poll=lambda self, obj: obj.type == 'ARMATURE'
     ) # type: ignore
 
 

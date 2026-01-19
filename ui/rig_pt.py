@@ -50,69 +50,31 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         
         meta_col = row.column(align=True)
         meta_col.scale_x = 2.0
-        if aether_rig.meta_rig:
-            meta_col.operator("aether.generate_meta_rig", text="Meta", icon="FILE_REFRESH")
-        else:
-            meta_col.operator("aether.generate_meta_rig", text="Meta", icon="ARMATURE_DATA")
+        meta_col.operator("aether.generate_meta_rig", text="Meta", icon="FILE_REFRESH")
         
-        arrow_col = row.column(align=True)
-        arrow_col.scale_x = 0.3
-        arrow_col.label(text="→")
-
-        control_col = row.column(align=True)
-        control_col.scale_x = 2.0
-        control_col.enabled = bool(aether_rig.meta_rig)
         if aether_rig.meta_rig:
+            arrow_col = row.column(align=True)
+            arrow_col.scale_x = 0.3
+            arrow_col.label(text="→")
+
+            control_col = row.column(align=True)
+            control_col.scale_x = 2.0
+            control_col.enabled = bool(aether_rig.meta_rig)
+            
             control_col.operator("aether.generate_rigify_rig", text="Control", icon="FILE_REFRESH")
-        else:
-            control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
 
-        arrow_col2 = row.column(align=True)
-        arrow_col2.scale_x = 0.3
-        arrow_col2.label(text="→")
-        
-        link_col = row.column(align=True)
-        link_col.scale_x = 2.0
-        link_col.enabled = bool(aether_rig.rigify_rig)
-        if aether_rig.rigify_linked:
-            link_col.operator("aether.unlink_rigify_rig", text="Unlink", icon="UNLINKED")
-        else:
-            link_col.operator("aether.link_rigify_rig", text="Link", icon="LINKED")
 
-        status_row = col.row(align=True)
-        
-        meta_status = status_row.column(align=True)
-        meta_status.scale_x = 2.0
-        if aether_rig.meta_rig:
-            meta_status.label(text="Good", icon='STRIP_COLOR_04')
-        else:
-            meta_status.label(text="Ready", icon='STRIP_COLOR_02')
-        
-        status_spacer = status_row.column(align=True)
-        status_spacer.scale_x = 0.3
-        status_spacer.label(text="")
-        
-        control_status = status_row.column(align=True)
-        control_status.scale_x = 2.0
-        if aether_rig.rigify_rig:
-            control_status.label(text="Good", icon='STRIP_COLOR_04')
-        elif aether_rig.meta_rig:
-            control_status.label(text="Ready", icon='STRIP_COLOR_02')
-        else:
-            control_status.label(text="Missing", icon='STRIP_COLOR_01')
-        
-        status_spacer2 = status_row.column(align=True)
-        status_spacer2.scale_x = 0.3
-        status_spacer2.label(text="")
-        
-        link_status = status_row.column(align=True)
-        link_status.scale_x = 2.0
-        if aether_rig.rigify_linked:
-            link_status.label(text="Good", icon='STRIP_COLOR_04')
-        elif aether_rig.rigify_rig:
-            link_status.label(text="Ready", icon='STRIP_COLOR_02')
-        else:
-            link_status.label(text="Missing", icon='STRIP_COLOR_01')
+
+        if aether_rig.rigified:
+            arrow_col2 = row.column(align=True)
+            arrow_col2.scale_x = 0.3
+            arrow_col2.label(text="→")
+            
+            link_col = row.column(align=True)
+            link_col.scale_x = 2.0
+            link_col.enabled = bool(aether_rig.rigified)
+            
+            link_col.operator("aether.clean_up_rig", text="Cleanup", icon="UNLINKED")
 
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
