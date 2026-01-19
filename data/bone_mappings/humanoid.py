@@ -1,4 +1,4 @@
-from .. generate import ConnectBone, ExtensionBone, PoseOperations, BoneGroup
+from ..bone_gen import ConnectBone, ExtensionBone, PoseOperations, BoneGroup
 from .. import rigify
 
 # Individual bone list (for backwards compatibility and direct access)

@@ -8,7 +8,7 @@ import bpy
 
 from .. import utils
 from . import rigify
-from .generate import BoneGenerator, BoneGroup, ConnectBone, ExtensionBone, CopyBone, PoseOperations
+from .bone_gen import BoneGenerator, BoneGroup, ConnectBone, ExtensionBone, CopyBone, PoseOperations
 
 @dataclass(frozen=True)
 class MetaRigCollectionInfo:

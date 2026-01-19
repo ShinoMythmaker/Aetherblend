@@ -30,7 +30,6 @@ class BoneGenerator(ABC):
         """Generates the bone and returns the created bone name(s)."""
         pass
 
-
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
@@ -94,7 +93,6 @@ class BoneGroup:
         
         return generated_bones, pose_operations_dict
 
-
 @dataclass(frozen=True)
 class ConnectBone(BoneGenerator):
     """Creates a bone connecting point A to point B."""
@@ -153,7 +151,6 @@ class ConnectBone(BoneGenerator):
         created_name = new_bone.name
         
         return [created_name]
-
 
 @dataclass(frozen=True)
 class ExtensionBone(BoneGenerator):
@@ -254,7 +251,6 @@ class ExtensionBone(BoneGenerator):
             utils.armature.b_collection.assign_bones(armature, [created_name], self.pose_operations.b_collection)
         
         return [created_name]
-
 
 @dataclass(frozen=True)
 class CopyBone(BoneGenerator):

@@ -32,7 +32,6 @@ class limbs_leg(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply leg rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
 
@@ -53,8 +52,6 @@ class limbs_leg(rigify_type):
                             fk_ref.name = self.fk_coll
                 except Exception as e:
                     print(f"[AetherBlend] Error setting FK collection: {e}")
-        
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class limbs_arm(rigify_type):
@@ -100,7 +97,6 @@ class limbs_arm(rigify_type):
                 except Exception as e:
                     print(f"[AetherBlend] Error setting tweak collection: {e}")
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class limbs_super_finger(rigify_type):
@@ -112,7 +108,6 @@ class limbs_super_finger(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply super finger rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -138,7 +133,6 @@ class limbs_super_finger(rigify_type):
                 except Exception as e:
                     print(f"[AetherBlend] Error setting make_extra_ik_control: {e}")
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class spines_basic_spine(rigify_type):
@@ -151,7 +145,6 @@ class spines_basic_spine(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply basic spine rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -190,7 +183,6 @@ class spines_basic_spine(rigify_type):
                 except Exception as e:
                     print(f"[AetherBlend] Error setting pivot_pos: {e}")
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class spines_super_head(rigify_type):
@@ -201,7 +193,6 @@ class spines_super_head(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply super head rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -220,7 +211,6 @@ class spines_super_head(rigify_type):
                 except Exception as e:
                     print(f"[AetherBlend] Error setting tweak collection: {e}")
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class spines_basic_tail(rigify_type):
@@ -233,7 +223,6 @@ class spines_basic_tail(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply basic tail rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -247,7 +236,6 @@ class spines_basic_tail(rigify_type):
             except Exception as e:
                 print(f"[AetherBlend] Error setting copy rotation axes: {e}")
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class basic_super_copy(rigify_type):
@@ -258,7 +246,6 @@ class basic_super_copy(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply super copy rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -271,7 +258,6 @@ class basic_super_copy(rigify_type):
                 except Exception as e:
                     print(f"[AetherBlend] Error setting widget type: {e}")
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class skin_stretchy_chain(rigify_type):
@@ -290,7 +276,6 @@ class skin_stretchy_chain(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply stretchy chain rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -331,7 +316,6 @@ class skin_stretchy_chain(rigify_type):
                         skin_ref = rigify_params.skin_secondary_coll_refs[-1]
                         skin_ref.name = self.secondary_layer_extra
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class skin_basic_chain(rigify_type):
@@ -342,7 +326,6 @@ class skin_basic_chain(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply basic chain rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -352,7 +335,6 @@ class skin_basic_chain(rigify_type):
                 rigify_params = pose_bone.rigify_parameters
                 rigify_params.skin_chain_priority = self.skin_chain_priority
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class skin_glue(rigify_type):
@@ -367,7 +349,6 @@ class skin_glue(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply glue rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -386,7 +367,6 @@ class skin_glue(rigify_type):
             if self.skin_glue_add_constraint_influence is not None:
                 rigify_params.skin_glue_add_constraint_influence = self.skin_glue_add_constraint_influence
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class skin_anchor(rigify_type):
@@ -397,7 +377,6 @@ class skin_anchor(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply anchor rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -407,7 +386,6 @@ class skin_anchor(rigify_type):
                 rigify_params = pose_bone.rigify_parameters
                 rigify_params.pivot_master_widget_type = self.pivot_master_widget_type
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class face_skin_eye(rigify_type):
@@ -417,13 +395,11 @@ class face_skin_eye(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply skin eye rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
             pose_bone.rigify_type = "face.skin_eye"
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class face_skin_jaw(rigify_type):
@@ -434,7 +410,6 @@ class face_skin_jaw(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply jaw rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -444,7 +419,6 @@ class face_skin_jaw(rigify_type):
                 rigify_params = pose_bone.rigify_parameters
                 rigify_params.jaw_mouth_influence = self.jaw_mouth_influence
         
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 @dataclass
 class face_basic_tongue(rigify_type):
@@ -455,7 +429,6 @@ class face_basic_tongue(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply basic tongue rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
         if pose_bone:
@@ -473,8 +446,29 @@ class face_basic_tongue(rigify_type):
                             tweak_ref.name = self.tweak_coll
                 except Exception as e:
                     print(f"[AetherBlend] Error setting tweak collection: {e}")
+
+@dataclass
+class basic_raw_copy(rigify_type):
+    """Rigify type: basic.raw_copy - Used for raw copy bones."""
+    bone_name: str = None
+    relink_constraints: bool = None
+    parent: str = None
+    widget_type: str = None
+    
+    def apply(self, armature: bpy.types.Object) -> None:
+        bpy.context.view_layer.objects.active = armature
         
-        bpy.ops.object.mode_set(mode='OBJECT')
+        pose_bone = armature.pose.bones.get(self.bone_name)
+        if pose_bone:
+            pose_bone.rigify_type = "basic.raw_copy"
+
+            rigify_params = pose_bone.rigify_parameters
+            if self.relink_constraints:
+                rigify_params.relink_constraints = self.relink_constraints
+                if self.parent:
+                    rigify_params.parent = self.parent
+            if self.widget_type:
+                rigify_params.raw_copy_widget_type = self.widget_type
 
 # Registry mapping rigify type strings to their classes
 RIGIFY_TYPE_REGISTRY = {
@@ -492,6 +486,7 @@ RIGIFY_TYPE_REGISTRY = {
     "face.skin_eye": face_skin_eye,
     "face.skin_jaw": face_skin_jaw,
     "face.basic_tongue": face_basic_tongue,
+    "basic.raw_copy": basic_raw_copy,
 }
 
 def get_rigify_type_class(rigify_type_name: str):
