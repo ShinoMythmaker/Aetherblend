@@ -35,6 +35,9 @@ class limbs_leg(rigify_type):
         bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
+
+        armature.data.bones.active = pose_bone.bone
+        
         if pose_bone:
             pose_bone.rigify_type = "limbs.leg"
             
@@ -63,9 +66,11 @@ class limbs_arm(rigify_type):
     def apply(self, armature: bpy.types.Object) -> None:
         """Apply arm rig settings."""
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
         
         pose_bone = armature.pose.bones.get(self.bone_name)
+    
+        armature.data.bones.active = pose_bone.bone
+
         if pose_bone:
             pose_bone.rigify_type = "limbs.arm"
             

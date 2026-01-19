@@ -79,7 +79,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
             return {'CANCELLED'}
-
+        
         armature.hide_set(False)
 
         # Check if rig is Linked

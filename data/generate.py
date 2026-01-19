@@ -220,13 +220,10 @@ class ExtensionBone(BoneGenerator):
             print(f"[AetherBlend] Invalid axis configuration for ExtensionBone '{self.name}': axis_type='{self.axis_type}', axis='{self.axis}'.")
             return None
         
-        print(f"[DEBUG] direction_vector: {direction_vector}")
-        
         ref_bone_length = bone_a_ref.length if bone_a_ref.length > 0 else 1.0
         extension_length = ref_bone_length * self.size_factor
         tail_pos = start_pos + direction_vector.normalized() * extension_length
         
-        print(f"[DEBUG] Creating bone with head={start_pos}, tail={tail_pos}, roll={self.roll}")
         
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
@@ -235,8 +232,6 @@ class ExtensionBone(BoneGenerator):
         new_bone.head = start_pos
         new_bone.tail = tail_pos
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
-
-        print(f"[DEBUG] Bone created successfully, setting parent to '{self.parent}'")
 
         if self.parent:
             if isinstance(self.parent, list):

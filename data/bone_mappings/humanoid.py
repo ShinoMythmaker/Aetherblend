@@ -4,6 +4,8 @@ from .. import rigify
 # Individual bone list (for backwards compatibility and direct access)
 ARM_R = BoneGroup(
         name="Right Arm",
+        description="Right arm bones including upper arm, forearm, hand, and tweak bones",
+        #linking = link(target="DEF-upper_arm.R", bone="MCH-j_ude_a_r", retarget="FK-upper_arm.R"),
         bones = [
             # Right Arm
             ConnectBone(
@@ -13,8 +15,8 @@ ARM_R = BoneGroup(
                 parent="clavicle.R",
                 req_bones=["j_ude_a_r", "j_ude_b_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_arm(bone_name="upper_arm.R", fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"),
-                    b_collection="Arm.R (IK)"
+                    rigify_settings=rigify.types.limbs_arm(bone_name="upper_arm.R", fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"), 
+                    b_collection="Arm.R (IK)"  #b_collection should be a class
                 )
             ),
             ConnectBone(
@@ -88,7 +90,6 @@ ARM_R = BoneGroup(
                     b_collection="Arm.R (Tweak)"
                 )
             ),
-        ],
-        description="Right arm bones including upper arm, forearm, hand, and tweak bones"
+        ]
     )
 
