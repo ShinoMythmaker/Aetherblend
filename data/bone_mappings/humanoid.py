@@ -20,7 +20,7 @@ ARM_R = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sako_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="clavicle.R", widget_type="shoulder"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="shoulder"),
                     b_collection="Torso"
                 )
             ),
@@ -122,7 +122,7 @@ ARM_L = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sako_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="clavicle.L", widget_type="shoulder"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="shoulder"),
                     b_collection="Torso"
                 )
             ),
@@ -134,7 +134,7 @@ ARM_L = BoneGroup(
                 parent="clavicle.L",
                 req_bones=["j_ude_a_l", "j_ude_b_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_arm(bone_name="upper_arm.L", fk_coll="Arm.L (FK)", tweak_coll="Arm.L (Tweak)"),
+                    rigify_settings=rigify.types.limbs_arm(fk_coll="Arm.L (FK)", tweak_coll="Arm.L (Tweak)"),
                     b_collection="Arm.L (IK)"
                 )
             ),
@@ -173,7 +173,7 @@ ARM_L = BoneGroup(
                 is_connected=False, 
                 req_bones=["n_hte_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="wrist.L", widget_type="sphere"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
                     b_collection="Arm.L (Tweak)"
                 )
             ),
@@ -189,7 +189,7 @@ ARM_L = BoneGroup(
 				roll = 45,
 				req_bones = ["n_hhiji_l"],
 				pose_operations = PoseOperations(
-					rigify_settings = rigify.types.basic_super_copy(bone_name = "elbow.L" , widget_type = "sphere"),
+					rigify_settings = rigify.types.basic_super_copy(widget_type = "sphere"),
 					b_collection = "Arm.L (Tweak)"
 				)
 			),
@@ -205,7 +205,7 @@ ARM_L = BoneGroup(
 				roll = 45,
 				req_bones = ["n_hkata_l"],
 				pose_operations = PoseOperations(
-					rigify_settings = rigify.types.basic_super_copy(bone_name ="shoulder_tweak.L" , widget_type ="sphere"),
+					rigify_settings = rigify.types.basic_super_copy(widget_type ="sphere"),
 					b_collection ="Arm.L (Tweak)"
 				)
 			),
@@ -227,7 +227,7 @@ SPINE = BoneGroup(
                 is_connected=True,
                 req_bones=["j_kosi"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.spines_basic_spine(bone_name="Spine.001", fk_coll="Spine (FK)", tweak_coll="Spine (Tweak)", pivot_pos=1),
+                    rigify_settings=rigify.types.spines_basic_spine(fk_coll="Spine (FK)", tweak_coll="Spine (Tweak)", pivot_pos=1),
                     b_collection="Torso"
                 )
             ),
@@ -278,7 +278,7 @@ LEG_R = BoneGroup(
                 parent="Spine.001",
                 req_bones=["j_asi_a_r", "j_asi_c_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_leg(bone_name="thigh.R"),
+                    rigify_settings=rigify.types.limbs_leg(),
                     b_collection="Leg.R (IK)"
                 )
             ),
@@ -358,7 +358,7 @@ LEG_L = BoneGroup(
                 parent="Spine.001",
                 req_bones=["j_asi_a_l", "j_asi_c_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_leg(bone_name="thigh.L"),
+                    rigify_settings=rigify.types.limbs_leg(),
                     b_collection="Leg.L (IK)"
                 )
             ),
@@ -438,7 +438,7 @@ SKIRT_R = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(bone_name="Skirt_Front.R", skin_chain_pivot_pos=1),
+                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=1),
                     b_collection="Skirt"
                 )
             ),
