@@ -1,9 +1,15 @@
-from .. generate import ConnectBone, ExtensionBone, PoseOperations, BoneGroup
+from ..bone_gen import ConnectBone, ExtensionBone, PoseOperations, BoneGroup, link
 from .. import rigify
 
 # Individual bone list (for backwards compatibility and direct access)
 ARM_R = BoneGroup(
         name="Right Arm",
+        description="Right arm bones including upper arm, forearm, hand, and tweak bones",
+        linking = [
+            link(target="DEF-upper_arm.R", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
+            link(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
+            link(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
+            ],
         bones = [
             #Right Clavicle
             ConnectBone(
@@ -26,8 +32,8 @@ ARM_R = BoneGroup(
                 parent="clavicle.R",
                 req_bones=["j_ude_a_r", "j_ude_b_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_arm(bone_name="upper_arm.R", fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"),
-                    b_collection="Arm.R (IK)"
+                    rigify_settings=rigify.types.limbs_arm(fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"), 
+                    b_collection="Arm.R (IK)"  #b_collection should be a class
                 )
             ),
             ConnectBone(
@@ -65,7 +71,7 @@ ARM_R = BoneGroup(
                 is_connected=False, 
                 req_bones=["n_hte_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="wrist.R", widget_type="sphere"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
                     b_collection="Arm.R (Tweak)"
                 )
             ),
@@ -81,7 +87,7 @@ ARM_R = BoneGroup(
                 roll=45,
                 req_bones=["n_hhiji_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="elbow.R", widget_type="sphere"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
                     b_collection="Arm.R (Tweak)"
                 )
             ),
@@ -97,12 +103,11 @@ ARM_R = BoneGroup(
                 roll=45,
                 req_bones=["n_hkata_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(bone_name="shoulder_tweak.R", widget_type="sphere"),
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="sphere"),
                     b_collection="Arm.R (Tweak)"
                 )
             ),
-        ],
-        description="Right arm bones including the clavicle, upper arm, forearm, hand and tweak bones"
+        ]
     )
 
 ARM_L = BoneGroup(

@@ -6,10 +6,6 @@ import re
 
 import bpy
 
-from .. import utils
-from . import rigify
-from .generate import BoneGenerator, BoneGroup, ConnectBone, ExtensionBone, CopyBone, PoseOperations
-
 @dataclass(frozen=True)
 class MetaRigCollectionInfo:
     name: str
@@ -137,8 +133,8 @@ class CopyTransformsConstraint(Constraint):
     head_tail: float = 0.0
     remove_target_shear: bool = False
     mix_mode: str = "REPLACE"
-    target_space: str = "LOCAL_OWNER_ORIENT"
-    owner_space: str = "LOCAL_WITH_PARENT"
+    target_space: str = "WORLD"
+    owner_space: str = "WORLD"
     influence: float = 1.0
     name: str = "AetherBlend_CopyTransform"
 

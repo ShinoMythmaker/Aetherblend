@@ -1,5 +1,5 @@
 from .humanoid import *
-from .. generate import BoneGroup
+from ..bone_gen import BoneGroup
 
 HUMAN: list[list[BoneGroup]] = [
     [SPINE],

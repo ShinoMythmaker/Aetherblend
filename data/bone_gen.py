@@ -7,12 +7,32 @@ from abc import ABC, abstractmethod
 
 from .. import utils
 from . import rigify
+from .schemas import Constraint, CopyTransformsConstraint
 
 @dataclass
 class PoseOperations:
     """Groups all pose mode operations for a single bone."""
     rigify_settings: rigify.types.rigify_type | None = None
+    constraints: list[Constraint] | None = None
     b_collection: str | None = None
+
+    def execute(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object):
+        """Executes all pose operations on the given pose bone."""
+        if self.rigify_settings:
+            self.rigify_settings.apply(pose_bone, armature)
+        
+        if self.constraints:
+            for constraint in self.constraints:
+                constraint.apply(pose_bone, armature)
+        
+        if self.b_collection:
+            utils.armature.b_collection.assign_bones(armature, [pose_bone.name], self.b_collection)
+
+@dataclass
+class link:
+    target: str
+    bone: str
+    retarget: str | None = None
 
 class BoneGenerator(ABC):
     """Base interface for all bone generation types."""
@@ -30,13 +50,14 @@ class BoneGenerator(ABC):
         """Generates the bone and returns the created bone name(s)."""
         pass
 
-
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
     name: str
-    bones: list[BoneGenerator]
     description: str = ""
+    linking : list[link] | None = None
+    bones: list[BoneGenerator] | None = None
+    
     
     def check(self, armature: bpy.types.Object) -> bool:
         """Check if all required bones exist in the armature for this bone group."""
@@ -84,6 +105,26 @@ class BoneGroup:
         
         # Collect pose operations by bone name (allowing multiple operations per bone)
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
+
+        for link in self.linking or []:
+            ff_bone = link.bone
+            mch_bone = f"MCH-{ff_bone}"
+            if ff_bone not in pose_operations_dict:
+                pose_operations_dict[ff_bone] = []
+            pose_operations_dict[ff_bone].append(
+                PoseOperations(
+                    rigify_settings=rigify.types.basic_raw_copy(True),
+                    constraints=[CopyTransformsConstraint(f"MCH-{ff_bone}", name=f"AetherBlend-CopyTransform@MCH-{ff_bone}")]
+                )
+            )
+
+            if mch_bone not in pose_operations_dict:
+                pose_operations_dict[mch_bone] = []
+            pose_operations_dict[mch_bone].append(
+                PoseOperations(
+                    rigify_settings=rigify.types.basic_raw_copy(True, link.target)
+                )
+            )
         
         for bone_gen in self.bones:
             # Only add to dict if there are operations to perform
@@ -93,7 +134,6 @@ class BoneGroup:
                 pose_operations_dict[bone_gen.name].append(bone_gen.pose_operations)
         
         return generated_bones, pose_operations_dict
-
 
 @dataclass(frozen=True)
 class ConnectBone(BoneGenerator):
@@ -153,7 +193,6 @@ class ConnectBone(BoneGenerator):
         created_name = new_bone.name
         
         return [created_name]
-
 
 @dataclass(frozen=True)
 class ExtensionBone(BoneGenerator):
@@ -220,13 +259,10 @@ class ExtensionBone(BoneGenerator):
             print(f"[AetherBlend] Invalid axis configuration for ExtensionBone '{self.name}': axis_type='{self.axis_type}', axis='{self.axis}'.")
             return None
         
-        print(f"[DEBUG] direction_vector: {direction_vector}")
-        
         ref_bone_length = bone_a_ref.length if bone_a_ref.length > 0 else 1.0
         extension_length = ref_bone_length * self.size_factor
         tail_pos = start_pos + direction_vector.normalized() * extension_length
         
-        print(f"[DEBUG] Creating bone with head={start_pos}, tail={tail_pos}, roll={self.roll}")
         
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
@@ -235,8 +271,6 @@ class ExtensionBone(BoneGenerator):
         new_bone.head = start_pos
         new_bone.tail = tail_pos
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
-
-        print(f"[DEBUG] Bone created successfully, setting parent to '{self.parent}'")
 
         if self.parent:
             if isinstance(self.parent, list):
@@ -259,7 +293,6 @@ class ExtensionBone(BoneGenerator):
             utils.armature.b_collection.assign_bones(armature, [created_name], self.pose_operations.b_collection)
         
         return [created_name]
-
 
 @dataclass(frozen=True)
 class CopyBone(BoneGenerator):

@@ -73,13 +73,14 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     
     def execute(self, context):
         bpy.context.window.cursor_set('WAIT') 
+        bpy.ops.object.mode_set(mode='OBJECT')
 
         # Get Active Armature
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
             return {'CANCELLED'}
-
+        
         armature.hide_set(False)
 
         # Check if rig is Linked
@@ -105,6 +106,16 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         # Meta Rig Base Generation
         meta_rig = utils.armature.duplicate(armature)
         meta_rig.name = f"META_{armature.name}"
+
+        ## This will make sure all FF bones will carry over to the rigify rig
+        all_pose_operations: dict[str, list[PoseOperations]] = {}
+        for bone in meta_rig.data.bones:
+            ops_list = [
+                PoseOperations(
+                    rigify_settings=rigify.types.basic_raw_copy(True)
+                )
+            ]    
+            all_pose_operations[bone.name] = ops_list
 
         # Preliminary MCH bone generation and joining
         mch_rig = utils.armature.duplicate(armature)
@@ -144,8 +155,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if len(data) == 0:
             data = None
 
-        all_pose_operations: dict[str, list[PoseOperations]] = {}
-
         # Loop through all bone groups
         for bone_group_handler in HUMAN:
             for bone_group in bone_group_handler:
@@ -166,13 +175,10 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         # Now apply all operations per bone
         bpy.ops.object.mode_set(mode='POSE')
         for bone_name, ops_list in all_pose_operations.items():
+            bone = meta_rig.pose.bones.get(bone_name)
             for ops in ops_list:
-                if ops.rigify_settings:
-                    ops.rigify_settings.apply(meta_rig)
-                if ops.b_collection:
-                    utils.armature.b_collection.assign_bones(meta_rig, [bone_name], ops.b_collection)
-            
-
+                ops.execute(bone, meta_rig)
+                
         for hide_coll in hide_collections:
             hide_coll.is_visible = False
 
