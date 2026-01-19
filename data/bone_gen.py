@@ -113,8 +113,8 @@ class BoneGroup:
                 pose_operations_dict[ff_bone] = []
             pose_operations_dict[ff_bone].append(
                 PoseOperations(
-                    rigify_settings=rigify.types.basic_raw_copy(True),
-                    constraints=[CopyTransformsConstraint(f"MCH-{ff_bone}", name=f"AetherBlend-CopyTransform@MCH-{ff_bone}")]
+                    # rigify_settings=rigify.types.basic_raw_copy(True),
+                    constraints=[CopyTransformsConstraint(mch_bone, name=f"AetherBlend-CopyTransform@MCH-{ff_bone}")]
                 )
             )
 
