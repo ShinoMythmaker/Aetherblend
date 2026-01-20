@@ -34,7 +34,7 @@ META_RIG_COLLECTIONS_INFO: list[MetaRigCollectionInfo] = [
     # MetaRigCollectionInfo(name="Tail (Tweak)", color_type="Tweak", row_index=20, title="Tweaks", visible=False),
 
     MetaRigCollectionInfo(name="Skirt", color_type="Special", row_index=22, title="Skirt", visible=False),
-    MetaRigCollectionInfo(name="Skirt (Tweak)", color_type="Tweak", row_index=23, title="Tweak", visible=False),
+    MetaRigCollectionInfo(name="Skirt (Tweak)", color_type="Tweak", row_index=23, title="Skirt (Tweak)", visible=False),
 
     # MetaRigCollectionInfo(name="Genitals (Male)", color_type="FK", row_index=25, title="Genitals (Male)", visible=False),
     # MetaRigCollectionInfo(name="Tweak (Male)", color_type="Tweak", row_index=26, title="Tweak (Male)", visible=False),

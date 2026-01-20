@@ -8,4 +8,11 @@ HUMAN: list[list[BoneGroup]] = [
     [LEG_R],
     [LEG_L],
     [SKIRT_R],
+    [SKIRT_R_MCH],
+    [SKIRT_L],
+    [SKIRT_L_MCH],
+    [HAND_R],
+    [HAND_L],
+    [TAIL],
+    [HEAD],
 ]

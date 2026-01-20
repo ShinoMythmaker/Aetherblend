@@ -214,6 +214,7 @@ class skin_stretchy_chain(rigify_type):
     skin_chain_use_scale: list = None
     primary_layer_extra: str = None
     secondary_layer_extra: str = None
+    skin_control_orientation_bone: str = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         armature.data.bones.active = pose_bone.bone
@@ -235,6 +236,8 @@ class skin_stretchy_chain(rigify_type):
                 rigify_params.skin_chain_priority = self.skin_chain_priority
             if self.skin_chain_use_scale:
                 rigify_params.skin_chain_use_scale = self.skin_chain_use_scale
+            if self.skin_control_orientation_bone:
+                rigify_params.skin_control_orientation_bone = self.skin_control_orientation_bone
             
             if self.primary_layer_extra:
                 rigify_params.skin_primary_layers_extra = True
@@ -260,6 +263,7 @@ class skin_stretchy_chain(rigify_type):
 class skin_basic_chain(rigify_type):
     """Rigify type: skin.basic_chain - Used for basic skin chains."""
     skin_chain_priority: int = None
+    skin_control_orientation_bone: str = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         armature.data.bones.active = pose_bone.bone
@@ -269,6 +273,8 @@ class skin_basic_chain(rigify_type):
         try:
             if self.skin_chain_priority is not None:
                 rigify_params.skin_chain_priority = self.skin_chain_priority
+            if self.skin_control_orientation_bone:
+                rigify_params.skin_control_orientation_bone = self.skin_control_orientation_bone
         except Exception as e:
             print(f"[AetherBlend] Error setting basic chain priority: {e}")
 
@@ -304,6 +310,7 @@ class skin_glue(rigify_type):
 class skin_anchor(rigify_type):
     """Rigify type: skin.anchor - Used for anchor bones in facial rigs."""
     pivot_master_widget_type: str = None
+    skin_anchor_hide: bool = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         armature.data.bones.active = pose_bone.bone
@@ -313,6 +320,8 @@ class skin_anchor(rigify_type):
         try:
             if self.pivot_master_widget_type:
                 rigify_params.pivot_master_widget_type = self.pivot_master_widget_type
+            if self.skin_anchor_hide is not None:
+                rigify_params.skin_anchor_hide = self.skin_anchor_hide
         except Exception as e:
             print(f"[AetherBlend] Error setting pivot master widget type: {e}")
 
@@ -382,6 +391,26 @@ class basic_raw_copy(rigify_type):
                 rigify_params.raw_copy_widget_type = self.widget_type
         except Exception as e:
             print(f"[AetherBlend] Error setting raw copy parameters: {e}")
+
+
+@dataclass
+class basic_copy_chain(rigify_type):
+    """Rigify type: basic.copy_chain - Used for copy chain bones."""
+    make_deforms: bool = None
+    make_controls: bool = None
+
+    def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+        armature.data.bones.active = pose_bone.bone
+        pose_bone.rigify_type = "basic.copy_chain"
+        rigify_params = pose_bone.rigify_parameters
+        
+        try:
+            if self.make_deforms is not None:
+                rigify_params.make_deforms = self.make_deforms
+            if self.make_controls is not None:
+                rigify_params.make_controls = self.make_controls
+        except Exception as e:
+            print(f"[AetherBlend] Error setting copy chain parameters: {e}")
 
 # Registry mapping rigify type strings to their classes
 RIGIFY_TYPE_REGISTRY = {

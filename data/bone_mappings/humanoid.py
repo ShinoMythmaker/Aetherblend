@@ -364,8 +364,15 @@ SKIRT_R = BoneGroup(
             link(target="DEF-Skirt_Front.R", bone="j_sk_f_a_r"),
             link(target="DEF-Skirt_Front.R.001", bone="j_sk_f_b_r"),
             link(target="DEF-Skirt_Front.R.002", bone="j_sk_f_c_r"),
+            link(target="DEF-Skirt_Side.R", bone="j_sk_s_a_r"),
+            link(target="DEF-Skirt_Side.R.001", bone="j_sk_s_b_r"),
+            link(target="DEF-Skirt_Side.R.002", bone="j_sk_s_c_r"),
+            link(target="DEF-Skirt_Back.R", bone="j_sk_b_a_r"),
+            link(target="DEF-Skirt_Back.R.001", bone="j_sk_b_b_r"),
+            link(target="DEF-Skirt_Back.R.002", bone="j_sk_b_c_r"),
             ],
         bones = [
+            #Front
             ConnectBone(
                 name="Skirt_Front.R",
                 bone_a="j_sk_f_a_r",
@@ -374,8 +381,8 @@ SKIRT_R = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=1),
-                    b_collection="Skirt"
+                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    b_collection="Skirt (Tweak)"
                 )
             ),
             ConnectBone(
@@ -402,6 +409,762 @@ SKIRT_R = BoneGroup(
                     b_collection="Skirt"
                 )
             ),
+            #Side
+            ConnectBone(
+                name="Skirt_Side.R",
+                bone_a="j_sk_s_a_r",
+                bone_b="j_sk_s_b_r",
+                parent="Spine.001",
+                is_connected=False,
+                req_bones=["j_sk_s_a_r", "j_sk_s_b_r"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    b_collection="Skirt (Tweak)"
+                )
+            ),
+            ConnectBone(
+                name="Skirt_Side.R.001",
+                bone_a="j_sk_s_b_r",
+                bone_b="j_sk_s_c_r",
+                parent="Skirt_Side.R",
+                is_connected=True,
+                req_bones=["j_sk_s_b_r", "j_sk_s_c_r"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            ExtensionBone(
+                name="Skirt_Side.R.002",
+                bone_a="j_sk_s_c_r",
+                parent="Skirt_Side.R.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                req_bones=["j_sk_s_c_r"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            #Back
+            ConnectBone(
+                name="Skirt_Back.R",
+                bone_a="j_sk_b_a_r",
+                bone_b="j_sk_b_b_r",
+                parent="Spine.001",
+                is_connected=False,
+                req_bones=["j_sk_b_a_r", "j_sk_b_b_r"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    b_collection="Skirt (Tweak)"
+                )
+            ),
+            ConnectBone(
+                name="Skirt_Back.R.001",
+                bone_a="j_sk_b_b_r",
+                bone_b="j_sk_b_c_r",
+                parent="Skirt_Back.R",
+                is_connected=True,
+                req_bones=["j_sk_b_b_r", "j_sk_b_c_r"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            ExtensionBone(
+                name="Skirt_Back.R.002",
+                bone_a="j_sk_b_c_r",
+                parent="Skirt_Back.R.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                req_bones=["j_sk_b_c_r"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
         ],
 )
             
+SKIRT_R_MCH = BoneGroup(
+        name="Skirt Right MCH",
+        bones= [
+            #Front
+            ConnectBone(
+                name="Skirt_Front.R.mch",
+                bone_a="shin.R",
+                bone_b="Skirt_Front.R.002",
+                parent="shin.R",
+                is_connected=False,
+                end="tail",
+                req_bones=["shin.R", "Skirt_Front.R.002"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Front.R.002"),
+                    b_collection="Skirt MCH"
+                )
+            ),
+            #Side
+            ConnectBone(
+                name="Skirt_Side.R.mch",
+                bone_a="shin.R",
+                bone_b="Skirt_Side.R.002",
+                parent="shin.R",
+                is_connected=False,
+                end="tail",
+                req_bones=["shin.R", "Skirt_Side.R.002"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Side.R.002"),
+                    b_collection="Skirt MCH"
+                )
+            ),
+            #Back
+            ConnectBone(
+                name="Skirt_Back.R.mch",
+                bone_a="shin.R",
+                bone_b="Skirt_Back.R.002",
+                parent="shin.R",
+                is_connected=False,
+                end="tail",
+                req_bones=["shin.R", "Skirt_Back.R.002"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Back.R.002"),
+                    b_collection="Skirt MCH"
+                )
+            ),
+        ],
+)
+
+SKIRT_L = BoneGroup(
+        name="Skirt Left",
+        linking= [
+            link(target="DEF-Skirt_Front.L", bone="j_sk_f_a_l"),
+            link(target="DEF-Skirt_Front.L.001", bone="j_sk_f_b_l"),
+            link(target="DEF-Skirt_Front.L.002", bone="j_sk_f_c_l"),
+            link(target="DEF-Skirt_Side.L", bone="j_sk_s_a_l"),
+            link(target="DEF-Skirt_Side.L.001", bone="j_sk_s_b_l"),
+            link(target="DEF-Skirt_Side.L.002", bone="j_sk_s_c_l"),
+            link(target="DEF-Skirt_Back.L", bone="j_sk_b_a_l"),
+            link(target="DEF-Skirt_Back.L.001", bone="j_sk_b_b_l"),
+            link(target="DEF-Skirt_Back.L.002", bone="j_sk_b_c_l"),
+            ],
+        bones = [
+            #Front
+            ConnectBone(
+                name="Skirt_Front.L",
+                bone_a="j_sk_f_a_l",
+                bone_b="j_sk_f_b_l",
+                parent="Spine.001",
+                is_connected=False,
+                req_bones=["j_sk_f_a_l", "j_sk_f_b_l"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    b_collection="Skirt (Tweak)"
+                )
+            ),
+            ConnectBone(
+                name="Skirt_Front.L.001",
+                bone_a="j_sk_f_b_l",
+                bone_b="j_sk_f_c_l",
+                parent="Skirt_Front.L",
+                is_connected=True,
+                req_bones=["j_sk_f_b_l", "j_sk_f_c_l"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            ExtensionBone(
+                name="Skirt_Front.L.002",
+                bone_a="j_sk_f_c_l",
+                parent="Skirt_Front.L.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="tail",
+                req_bones=["j_sk_f_c_l"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            #Side
+            ConnectBone(
+                name="Skirt_Side.L",
+                bone_a="j_sk_s_a_l",
+                bone_b="j_sk_s_b_l",
+                parent="Spine.001",
+                is_connected=False,
+                req_bones=["j_sk_s_a_l", "j_sk_s_b_l"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    b_collection="Skirt (Tweak)"
+                )
+            ),
+            ConnectBone(
+                name="Skirt_Side.L.001",
+                bone_a="j_sk_s_b_l",
+                bone_b="j_sk_s_c_l",
+                parent="Skirt_Side.L",
+                is_connected=True,
+                req_bones=["j_sk_s_b_l", "j_sk_s_c_l"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            ExtensionBone(
+                name="Skirt_Side.L.002",
+                bone_a="j_sk_s_c_l",
+                parent="Skirt_Side.L.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                req_bones=["j_sk_s_c_l"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            #Back
+            ConnectBone(
+                name="Skirt_Back.L",
+                bone_a="j_sk_b_a_l",
+                bone_b="j_sk_b_b_l",
+                parent="Spine.001",
+                is_connected=False,
+                req_bones=["j_sk_b_a_l", "j_sk_b_b_l"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    b_collection="Skirt (Tweak)"
+                )
+            ),
+            ConnectBone(
+                name="Skirt_Back.L.001",
+                bone_a="j_sk_b_b_l",
+                bone_b="j_sk_b_c_l",
+                parent="Skirt_Back.L",
+                is_connected=True,
+                req_bones=["j_sk_b_b_l", "j_sk_b_c_l"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+            ExtensionBone(
+                name="Skirt_Back.L.002",
+                bone_a="j_sk_b_c_l",
+                parent="Skirt_Back.L.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                req_bones=["j_sk_b_c_l"],
+                pose_operations=PoseOperations(
+                    b_collection="Skirt"
+                )
+            ),
+        ],
+)
+
+SKIRT_L_MCH = BoneGroup(
+        name="Skirt Left MCH",
+        bones= [
+            #Front
+            ConnectBone(
+                name="Skirt_Front.L.mch",
+                bone_a="shin.L",
+                bone_b="Skirt_Front.L.002",
+                parent="shin.L",
+                is_connected=False,
+                end="tail",
+                req_bones=["shin.L", "Skirt_Front.L.002"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Front.L.002"),
+                    b_collection="Skirt MCH"
+                )
+            ),
+            #Side
+            ConnectBone(
+                name="Skirt_Side.L.mch",
+                bone_a="shin.L",
+                bone_b="Skirt_Side.L.002",
+                parent="shin.L",
+                is_connected=False,
+                end="tail",
+                req_bones=["shin.L", "Skirt_Side.L.002"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Side.L.002"),
+                    b_collection="Skirt MCH"
+                )
+            ),
+            #Back
+            ConnectBone(
+                name="Skirt_Back.L.mch",
+                bone_a="shin.L",
+                bone_b="Skirt_Back.L.002",
+                parent="shin.L",
+                is_connected=False,
+                end="tail",
+                req_bones=["shin.L", "Skirt_Back.L.002"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Back.L.002"),
+                    b_collection="Skirt MCH"
+                )
+            ),
+        ],
+)
+
+HAND_R = BoneGroup(
+    name="Right Hand",
+    linking= [
+        link(target="DEF-thumb.R", bone="j_oya_a_r"),
+        link(target="DEF-thumb.R.001", bone="j_oya_b_r"),
+        link(target="DEF-index.R", bone="j_hito_a_r"),
+        link(target="DEF-index.R.001", bone="j_hito_b_r"),
+        link(target="DEF-middle.R", bone="j_naka_a_r"),
+        link(target="DEF-middle.R.001", bone="j_naka_b_r"),
+        link(target="DEF-ring.R", bone="j_kusu_a_r"),
+        link(target="DEF-ring.R.001", bone="j_kusu_b_r"),
+        link(target="DEF-pinky.R", bone="j_ko_a_r"),
+        link(target="DEF-pinky.R.001", bone="j_ko_b_r"),
+    ],
+    bones=[
+        #Thumb
+        ConnectBone(
+            name="thumb.R",
+            bone_a="j_oya_a_r",
+            bone_b="j_oya_b_r",
+            parent="hand.R",
+            roll=15,
+            is_connected=False,
+            req_bones=["j_oya_a_r", "j_oya_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="thumb.R.001",
+            bone_a="j_oya_b_r",
+            parent="thumb.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            size_factor=0.2,
+            req_bones=["j_oya_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Index
+        ConnectBone(
+            name="index.R",
+            bone_a="j_hito_a_r",
+            bone_b="j_hito_b_r",
+            parent="hand.R",
+            roll=135,
+            is_connected=False,
+            req_bones=["j_hito_a_r", "j_hito_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="index.R.001",
+            bone_a="j_hito_b_r",
+            parent="index.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_hito_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Middle
+        ConnectBone(
+            name="middle.R",
+            bone_a="j_naka_a_r",
+            bone_b="j_naka_b_r",
+            parent="hand.R",
+            roll=135,
+            is_connected=False,
+            req_bones=["j_naka_a_r", "j_naka_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="middle.R.001",
+            bone_a="j_naka_b_r",
+            parent="middle.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_naka_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Ring
+        ConnectBone(
+            name="ring.R",
+            bone_a="j_kusu_a_r",
+            bone_b="j_kusu_b_r",
+            parent="hand.R",
+            roll=135,
+            is_connected=False,
+            req_bones=["j_kusu_a_r", "j_kusu_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="ring.R.001",
+            bone_a="j_kusu_b_r",
+            parent="ring.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_kusu_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Pinky
+        ConnectBone(
+            name="pinky.R",
+            bone_a="j_ko_a_r",
+            bone_b="j_ko_b_r",
+            parent="hand.R",
+            roll=135,
+            is_connected=False,
+            req_bones=["j_ko_a_r", "j_ko_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="pinky.R.001",
+            bone_a="j_ko_b_r",
+            parent="pinky.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_ko_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+    ],
+)
+
+HAND_L = BoneGroup(
+    name="Left Hand",
+    linking= [
+        link(target="DEF-thumb.L", bone="j_oya_a_l"),
+        link(target="DEF-thumb.L.001", bone="j_oya_b_l"),
+        link(target="DEF-index.L", bone="j_hito_a_l"),
+        link(target="DEF-index.L.001", bone="j_hito_b_l"),
+        link(target="DEF-middle.L", bone="j_naka_a_l"),
+        link(target="DEF-middle.L.001", bone="j_naka_b_l"),
+        link(target="DEF-ring.L", bone="j_kusu_a_l"),
+        link(target="DEF-ring.L.001", bone="j_kusu_b_l"),
+        link(target="DEF-pinky.L", bone="j_ko_a_l"),
+        link(target="DEF-pinky.L.001", bone="j_ko_b_l"),
+    ],
+    bones=[
+        #Thumb
+        ConnectBone(
+            name="thumb.L",
+            bone_a="j_oya_a_l",
+            bone_b="j_oya_b_l",
+            parent="hand.L",
+            is_connected=False,
+            roll=-15,
+            req_bones=["j_oya_a_l", "j_oya_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="thumb.L.001",
+            bone_a="j_oya_b_l",
+            parent="thumb.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            size_factor=0.2,
+            req_bones=["j_oya_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Index
+        ConnectBone(
+            name="index.L",
+            bone_a="j_hito_a_l",
+            bone_b="j_hito_b_l",
+            parent="hand.L",
+            roll=-135,
+            is_connected=False,
+            req_bones=["j_hito_a_l", "j_hito_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="index.L.001",
+            bone_a="j_hito_b_l",
+            parent="index.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_hito_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Middle
+        ConnectBone(
+            name="middle.L",
+            bone_a="j_naka_a_l",
+            bone_b="j_naka_b_l",
+            parent="hand.L",
+            roll=-135,
+            is_connected=False,
+            req_bones=["j_naka_a_l", "j_naka_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="middle.L.001",
+            bone_a="j_naka_b_l",
+            parent="middle.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_naka_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Ring
+        ConnectBone(
+            name="ring.L",
+            bone_a="j_kusu_a_l",
+            bone_b="j_kusu_b_l",
+            parent="hand.L",
+            roll=-135,
+            is_connected=False,
+            req_bones=["j_kusu_a_l", "j_kusu_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="ring.L.001",
+            bone_a="j_kusu_b_l",
+            parent="ring.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_kusu_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+        #Pinky
+        ConnectBone(
+            name="pinky.L",
+            bone_a="j_ko_a_l",
+            bone_b="j_ko_b_l",
+            parent="hand.L",
+            roll=-135,
+            is_connected=False,
+            req_bones=["j_ko_a_l", "j_ko_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Fingers",
+            )
+        ),
+        ExtensionBone(
+            name="pinky.L.001",
+            bone_a="j_ko_b_l",
+            parent="pinky.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_ko_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers",
+            )
+        ),
+    ],
+)
+
+TAIL = BoneGroup(
+    name="Tail",
+    linking= [
+        link(target="DEF-Tail", bone="n_sippo_a"),
+        link(target="DEF-Tail.001", bone="n_sippo_b"),
+        link(target="DEF-Tail.002", bone="n_sippo_c"),
+        link(target="DEF-Tail.003", bone="n_sippo_d"),
+    ],
+    bones=[
+        ConnectBone(
+            name="Tail",
+            bone_a="n_sippo_a",
+            bone_b="n_sippo_b",
+            parent="Spine.001",
+            is_connected=False,
+            req_bones=["n_sippo_a", "n_sippo_b"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.basic_copy_chain(),
+                b_collection="Tail"
+            )
+        ),
+        ConnectBone(
+            name="Tail.001",
+            bone_a="n_sippo_b",
+            bone_b="n_sippo_c",
+            parent="Tail",
+            is_connected=True,
+            req_bones=["n_sippo_b", "n_sippo_c"],
+            pose_operations=PoseOperations(
+                b_collection="Tail"
+            )
+        ),
+        ConnectBone(
+            name="Tail.002",
+            bone_a="n_sippo_c",
+            bone_b="n_sippo_d",
+            parent="Tail.001",
+            is_connected=True,
+            req_bones=["n_sippo_c", "n_sippo_d"],
+            pose_operations=PoseOperations(
+                b_collection="Tail"
+            )
+        ),
+        ConnectBone(
+            name="Tail.003",
+            bone_a="n_sippo_d",
+            bone_b="n_sippo_e",
+            parent="Tail.002",
+            is_connected=True,
+            req_bones=["n_sippo_d", "n_sippo_e"],
+            pose_operations=PoseOperations(
+                b_collection="Tail"
+            )
+        ),
+    ]
+)
+
+HEAD = BoneGroup(
+    name="Head",
+    linking= [
+        link(target="DEF-Neck", bone="j_kubi"),
+        link(target="DEF-Head", bone="j_kao"),
+        link(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
+        link(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
+        link(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
+        link(target="DEF-Cheek.T.R.001", bone="j_f_dmemoto_r"),
+    ],
+    bones=[
+        ConnectBone(
+            name="Neck",
+            bone_a="j_kubi",
+            bone_b="j_kao",
+            parent="Spine.004",
+            is_connected=False,
+            req_bones=["j_kubi", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.spines_super_head(),
+                b_collection="Face"
+            )
+        ),
+        ExtensionBone(
+            name="Head",
+            bone_a="j_kao",
+            parent="Neck",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            size_factor=20.0,
+            req_bones=["j_kao"],
+            pose_operations=PoseOperations(
+                b_collection="Face"
+            )
+        ),
+        #Cheek Right
+        ConnectBone(
+            name="Cheek.B.R",
+            bone_a="j_f_shoho_r",
+            bone_b="j_f_dhoho_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_shoho_r", "j_f_dhoho_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Primary)"
+            )
+        ),
+        ConnectBone(
+            name="Cheek.B.R.001",
+            bone_a="j_f_dhoho_r",
+            bone_b="j_f_hoho_r",
+            parent="Cheek.B.R",
+            is_connected=True,
+            req_bones=["j_f_dhoho_r", "j_f_hoho_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ConnectBone(
+            name="Cheek.T.R",
+            bone_a="j_f_hoho_r",
+            bone_b="j_f_dmemoto_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hoho_r", "j_f_dmemoto_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ConnectBone(
+            name="Cheek.T.R.001",
+            bone_a="j_f_dmemoto_r",
+            bone_b="j_f_dmiken_r",
+            parent="Cheek.T.R",
+            is_connected=True,
+            req_bones=["j_f_dmemoto_r", "j_f_dmiken_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+    ]
+            
+)
+
+                
+        
+    
+
+
+
