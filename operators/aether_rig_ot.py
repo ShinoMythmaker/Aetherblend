@@ -73,7 +73,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
+        time_start = time.time()
         bpy.context.window.cursor_set('WAIT') 
+    
         bpy.ops.object.mode_set(mode='OBJECT')
 
         # Get Active Armature
@@ -83,6 +85,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             return {'CANCELLED'}
         
         armature.hide_set(False)
+        bpy.ops.object.select_all(action='DESELECT')
+        armature.select_set(True)
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
         # Cleanup Before Meta Rig Generation
         bpy.ops.aether.clean_up_rig()
@@ -189,16 +194,18 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         armature.select_set(True)
 
         bpy.context.window.cursor_set('DEFAULT')
+
+        print(f"[AetherBlend] Meta rig generation: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
 
 class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
-
     bl_idname = "aether.generate_rigify_rig"
     bl_label = "Generate Rigify Rig"
     bl_description = ("Generate the rigify control rig from the meta rig")
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
+        time_start = time.time()
         bpy.context.window.cursor_set('WAIT') 
 
         armature = context.active_object
@@ -234,16 +241,18 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         meta_rig.hide_viewport = True
 
         bpy.context.window.cursor_set('DEFAULT') 
+        print(f"[AetherBlend] Rigify rig generation: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
             
     
 class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
     bl_idname = "aether.clean_up_rig"
-    bl_label = "Clean Up Rig"
-    bl_description = ("Unlink the Rigify Rig from the FFXIV Rig by restoring from backup")
+    bl_label = "Remove Rigify Rig"
+    bl_description = ("Removes Rigify Control bones while preserving FFXIV animation Data")
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        time_start = time.time()
         bpy.context.window.cursor_set('WAIT') 
 
         armature = context.active_object
@@ -265,7 +274,14 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
         if "rig_id" in armature.data:
             del armature.data["rig_id"]
 
-        ## Cleanup Bones
+        ## Delete Drivers 
+        try:
+            for fc in armature.data.animation_data.drivers:
+                armature.data.driver_remove(fc.data_path, fc.array_index)
+        except:
+            pass
+        
+        # Cleanup Bones
         coll_to_delete = []
         bpy.ops.object.mode_set(mode='EDIT')
         for collection in armature.data.collections_all:
@@ -280,16 +296,29 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
         bpy.ops.armature.select_all(action='SELECT')
         bpy.ops.armature.delete()
 
+        ## Deep Cleanup
+        root_level_bones = [bone for bone in armature.data.edit_bones if bone.parent is None]
+        for root_bone in root_level_bones:
+            if root_bone.name != "n_root":      ## whack
+                for child_bone in root_bone.children_recursive:
+                    armature.data.edit_bones.remove(child_bone)
+
+                armature.data.edit_bones.remove(root_bone)
+
+        # Cleanup Collections
         for coll_name in coll_to_delete:
             coll = armature.data.collections.get(coll_name)
             if coll:
                 armature.data.collections.remove(coll)
+
+        bpy.ops.armature.collection_remove_unused()
 
         armature.aether_rig.rigified = False
 
         ff_coll = armature.data.collections["FFXIV"]
         ff_coll.is_visible = True
 
+        ## Cleanup Rigify Settings and Constrains
         for pose_bone in armature.pose.bones:
             pose_bone.rigify_type = " "
             for constraint in pose_bone.constraints:
@@ -297,7 +326,32 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
 
         bpy.ops.object.mode_set(mode='OBJECT')
 
-        # Delete all bones from the armature except for the FFXIV collection
+        print(f"[AetherBlend] Clean Up rig: {time.time() - time_start:.3f}s")
+        return {'FINISHED'}
+    
+
+class AETHER_OT_Reset_Rig(bpy.types.Operator):
+    bl_idname = "aether.reset_rig"
+    bl_label = "Reset FFXIV Rig"
+    bl_description = ("Resets the armature to its original state (removes animation data)")
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return {'CANCELLED'}
+        
+        result = bpy.ops.aether.clean_up_rig()
+        if result != {'FINISHED'}:
+            self.report({'ERROR'}, "Clean Up process Failed")
+            return {'CANCELLED'}
+        
+        # Remove all animation data
+        if armature.animation_data:
+            armature.animation_data_clear()
+    
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
         return {'FINISHED'}
 
 class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
@@ -307,16 +361,35 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        time_start = time.time()
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature object")
+            return {'CANCELLED'}
+        
+        result = bpy.ops.aether.generate_meta_rig()
+        if result != {'FINISHED'}:
+            self.report({'ERROR'}, "Meta rig generation failed")
+            return {'CANCELLED'}
+        
+        result = bpy.ops.aether.generate_rigify_rig()
+        if result != {'FINISHED'}:
+            self.report({'ERROR'}, "Rigify rig generation failed")
+            return {'CANCELLED'}
+        
+        print(f"[AetherBlend] Full rig generation: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
     
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Rigify_Rig)
     bpy.utils.register_class(AETHER_OT_Clean_Up_Rig)
+    bpy.utils.register_class(AETHER_OT_Reset_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Full_Rig)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Rigify_Rig)
     bpy.utils.unregister_class(AETHER_OT_Clean_Up_Rig)
+    bpy.utils.unregister_class(AETHER_OT_Reset_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Full_Rig)

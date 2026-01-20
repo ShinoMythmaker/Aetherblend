@@ -41,8 +41,20 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         col = layout.column(align=True)
         
         full_rig_button = col.row(align=True)
-        full_rig_button.scale_y = 1.5
-        full_rig_button.operator("aether.generate_full_rig", text="Generate Full Rig", icon="PLAY")
+        full_rig_button.scale_y = 1.3
+        if aether_rig.rigified:
+            full_rig_button.operator("aether.generate_full_rig", text="Regenerate", icon="FILE_REFRESH")
+        else:
+            full_rig_button.operator("aether.generate_full_rig", text="Generate Rig", icon="PLAY")
+
+        unlink = full_rig_button.column(align=False)
+        unlink.scale_x = 1.3
+        unlink.operator("aether.clean_up_rig", text="", icon="UNLINKED")
+
+
+        reset = full_rig_button.column(align=False)
+        reset.scale_x = 1.3
+        reset.operator("aether.reset_rig", text="", icon="RESTRICT_INSTANCED_ON")
         
         col.separator()
         
@@ -56,9 +68,6 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         control_col.enabled = bool(aether_rig.meta_rig)
         
         control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
-        
-        link_col = row.column(align=False)
-        link_col.operator("aether.clean_up_rig", text="", icon="TRASH")
 
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
