@@ -50,7 +50,7 @@ ARM_R = BoneGroup(
             ),
             ExtensionBone(
                 name="hand.R", 
-                bone_a="forearm.R", 
+                bone_a="j_te_r", 
                 size_factor=0.6, 
                 axis_type="local", 
                 axis="Y", 
@@ -111,7 +111,7 @@ ARM_L = BoneGroup(
             ),
             ExtensionBone(
                 name="hand.L", 
-                bone_a="forearm.L", 
+                bone_a="j_te_l", 
                 size_factor=0.6, 
                 axis_type="local", 
                 axis="Y", 
@@ -189,8 +189,8 @@ SPINE = BoneGroup(
 LEG_R = BoneGroup(
         name="Right Leg",
         linking= [
-            link(target="DEF-thigh.R", bone="j_asi_a_r", retarget="FK-upper_leg.R"),
-            link(target="DEF-shin.R", bone="j_asi_c_r", retarget="FK-lower_leg.R"),
+            link(target="DEF-thigh.R.001", bone="j_asi_a_r", retarget="FK-upper_leg.R"),
+            link(target="DEF-shin.R.001", bone="j_asi_c_r", retarget="FK-lower_leg.R"),
             link(target="DEF-foot.R", bone="j_asi_d_r", retarget="FK-foot.R"),
             link(target="DEF-toe.R", bone="j_asi_e_r", retarget="FK-toe.R"),
             ],
@@ -275,8 +275,8 @@ LEG_R = BoneGroup(
 LEG_L = BoneGroup(
         name="Left Leg",
         linking= [
-            link(target="DEF-thigh.L", bone="j_asi_a_l", retarget="FK-upper_leg.L"),
-            link(target="DEF-shin.L", bone="j_asi_c_l", retarget="FK-lower_leg.L"),
+            link(target="DEF-thigh.L.001", bone="j_asi_a_l", retarget="FK-upper_leg.L"),
+            link(target="DEF-shin.L.001", bone="j_asi_c_l", retarget="FK-lower_leg.L"),
             link(target="DEF-foot.L", bone="j_asi_d_l", retarget="FK-foot.L"),
             link(target="DEF-toe.L", bone="j_asi_e_l", retarget="FK-toe.L"),
             ],
@@ -360,6 +360,11 @@ LEG_L = BoneGroup(
 
 SKIRT_R = BoneGroup(
         name="Skirt Right",
+        linking= [
+            link(target="DEF-Skirt_Front.R", bone="j_sk_f_a_r"),
+            link(target="DEF-Skirt_Front.R.001", bone="j_sk_f_b_r"),
+            link(target="DEF-Skirt_Front.R.002", bone="j_sk_f_c_r"),
+            ],
         bones = [
             ConnectBone(
                 name="Skirt_Front.R",
