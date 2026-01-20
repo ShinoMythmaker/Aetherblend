@@ -1,6 +1,7 @@
 import bpy
 import time
 from bpy.props import IntProperty
+
 from .. import utils
 from ..data import *
 from ..preferences import get_preferences
@@ -85,18 +86,11 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         # Cleanup Before Meta Rig Generation
         bpy.ops.aether.clean_up_rig()
-        
-        # Remove Existing Rigs
-        existing_meta_rig = armature.aether_rig.meta_rig
-        
-        if existing_meta_rig:
-            if hasattr(existing_meta_rig.data, 'rigify_rig_ui') and existing_meta_rig.data.rigify_rig_ui:
-                script = existing_meta_rig.data.rigify_rig_ui
-                if script and script.name in bpy.data.texts:
-                    bpy.data.texts.remove(script)
-            bpy.data.objects.remove(existing_meta_rig, do_unlink=True)
 
-
+        if armature.aether_rig.rigified:
+            self.report({'ERROR'}, "Cannot generate meta rig on an armature that is already rigified.")
+            return {'CANCELLED'}
+        
         # Meta Rig Base Generation
         meta_rig = utils.armature.duplicate(armature)
         meta_rig.name = f"META_{armature.name}"
@@ -114,6 +108,10 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         # Preliminary MCH bone generation and joining
         mch_rig = utils.armature.duplicate(armature)
         utils.armature.add_bone_prefix(mch_rig, "MCH-")
+        mch_ffxiv_coll = mch_rig.data.collections.get("FFXIV")
+        if mch_ffxiv_coll:
+            mch_rig.data.collections.remove(mch_rig.data.collections["FFXIV"])
+        utils.armature.b_collection.assign_bones(mch_rig, list(mch_rig.data.bones.keys()), "MCH")
 
         utils.armature.join(src=mch_rig, target=meta_rig)
 
@@ -246,6 +244,60 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.context.window.cursor_set('WAIT') 
+
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return {'CANCELLED'}
+        
+
+        ## Delete Meta Rig and Scripts
+        existing_meta_rig = armature.aether_rig.meta_rig
+        
+        if existing_meta_rig:
+            if hasattr(existing_meta_rig.data, 'rigify_rig_ui') and existing_meta_rig.data.rigify_rig_ui:
+                script = existing_meta_rig.data.rigify_rig_ui
+                if script and script.name in bpy.data.texts:
+                    bpy.data.texts.remove(script)
+            bpy.data.objects.remove(existing_meta_rig, do_unlink=True)
+        
+        ## Cleanup Rigify ID
+        if "rig_id" in armature.data:
+            del armature.data["rig_id"]
+
+        ## Cleanup Bones
+        coll_to_delete = []
+        bpy.ops.object.mode_set(mode='EDIT')
+        for collection in armature.data.collections_all:
+            if collection.name == "FFXIV":
+                collection.is_visible = False
+            else:
+                collection.is_visible = True
+                coll_to_delete.append(collection.name)
+
+        bpy.ops.armature.select_all(action='DESELECT')
+        bpy.ops.armature.reveal()
+        bpy.ops.armature.select_all(action='SELECT')
+        bpy.ops.armature.delete()
+
+        for coll_name in coll_to_delete:
+            coll = armature.data.collections.get(coll_name)
+            if coll:
+                armature.data.collections.remove(coll)
+
+        armature.aether_rig.rigified = False
+
+        ff_coll = armature.data.collections["FFXIV"]
+        ff_coll.is_visible = True
+
+        for pose_bone in armature.pose.bones:
+            pose_bone.rigify_type = " "
+            for constraint in pose_bone.constraints:
+                pose_bone.constraints.remove(constraint)
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        # Delete all bones from the armature except for the FFXIV collection
         return {'FINISHED'}
 
 class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):

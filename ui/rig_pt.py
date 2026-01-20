@@ -49,32 +49,16 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         row = col.row(align=True)
         
         meta_col = row.column(align=True)
-        meta_col.scale_x = 2.0
-        meta_col.operator("aether.generate_meta_rig", text="Meta", icon="FILE_REFRESH")
+        meta_col.operator("aether.generate_meta_rig", text="Meta", icon="OUTLINER_DATA_ARMATURE")
         
-        if aether_rig.meta_rig:
-            arrow_col = row.column(align=True)
-            arrow_col.scale_x = 0.3
-            arrow_col.label(text="→")
 
-            control_col = row.column(align=True)
-            control_col.scale_x = 2.0
-            control_col.enabled = bool(aether_rig.meta_rig)
-            
-            control_col.operator("aether.generate_rigify_rig", text="Control", icon="FILE_REFRESH")
-
-
-
-        if aether_rig.rigified:
-            arrow_col2 = row.column(align=True)
-            arrow_col2.scale_x = 0.3
-            arrow_col2.label(text="→")
-            
-            link_col = row.column(align=True)
-            link_col.scale_x = 2.0
-            link_col.enabled = bool(aether_rig.rigified)
-            
-            link_col.operator("aether.clean_up_rig", text="Cleanup", icon="UNLINKED")
+        control_col = row.column(align=True)
+        control_col.enabled = bool(aether_rig.meta_rig)
+        
+        control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
+        
+        link_col = row.column(align=False)
+        link_col.operator("aether.clean_up_rig", text="", icon="TRASH")
 
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
