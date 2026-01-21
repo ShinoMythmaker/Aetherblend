@@ -1,7 +1,11 @@
+"""Character import operators."""
+
 import bpy
-from .. import utils
 from bpy.props import BoolProperty, StringProperty
-from ..preferences import get_preferences
+
+from ... import utils
+from ...preferences import get_preferences
+
 
 class AETHER_OT_Character_Import(bpy.types.Operator):
     """Import a character model into Blender with various options."""
@@ -157,7 +161,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
-    
+
+
 def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
     """Apply a pose track to rest pose, similar to C+ quick apply process."""
     if not armature or armature.type != "ARMATURE":
@@ -171,29 +176,8 @@ def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.view_layer.objects.active = armature
     
-    # parent_map = utils.armature.snapshot_parenting(armature)
-    
-    # utils.armature.unparent_all_bones(armature)
-    
-    # # Parent all bones to n_root if it exists
-    # bpy.ops.object.mode_set(mode='EDIT')
-    # edit_bones = armature.data.edit_bones
-    # n_root = edit_bones.get('n_root')
-    
-    # if n_root:
-    #     for bone in edit_bones:
-    #         if bone != n_root and bone.parent is None:
-    #             bone.parent = n_root
-    #             bone.use_connect = False
-    #     print(f"[AetherBlend] Parented all bones to n_root")
-    
-    bpy.ops.object.mode_set(mode='OBJECT')
-    
     utils.armature.apply_all_as_shapekey(armature, shapekey_name=f"ImportedPose")
-    
     utils.armature.new_rest_pose(armature)
-    
-    # utils.armature.restore_bone_parenting(armature, parent_map)
     
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
@@ -201,19 +185,9 @@ def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
     
     print(f"[AetherBlend] Applied pose to rest pose successfully.")
 
-def remove_action(armature: bpy.types.Object, action_name: str) -> None:
-    action = bpy.data.actions.get(action_name)
-    if not action:
-        print(f"[AetherBlend] Pose track '{action_name}' not found.")
-        return
-    
-    try:
-        bpy.data.actions.remove(action)
-        print(f"[AetherBlend] Deleted pose track '{action_name}'")
-    except Exception as e:
-        print(f"[AetherBlend] Warning: Could not delete pose track '{action_name}': {e}")
 
 def clear_animation_data(armature: bpy.types.Object) -> None:
+    """Clear animation data from armature."""
     anim_data = armature.animation_data
     if not anim_data:
         print(f"[AetherBlend] Armature {armature.name} has no animation data.")
@@ -228,6 +202,6 @@ def clear_animation_data(armature: bpy.types.Object) -> None:
 def register():
     bpy.utils.register_class(AETHER_OT_Character_Import)
 
+
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Character_Import)
-

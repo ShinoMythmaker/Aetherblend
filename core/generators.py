@@ -1,12 +1,15 @@
 import bpy
 import math
-import mathutils # type: ignore
+import mathutils  # type: ignore
 
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .shared import PoseOperations
 
 from .. import utils
-from .constraints import *
 
 
 class BoneGenerator(ABC):
@@ -17,13 +20,14 @@ class BoneGenerator(ABC):
     is_connected: bool = False
     roll: float = 0.0
     req_bones: list[str] | None = None
-    pose_operations: PoseOperations | None = None
+    pose_operations: 'PoseOperations | None' = None
     is_optional: bool = False
     
     @abstractmethod
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the bone and returns the created bone name(s)."""
         pass
+
 
 @dataclass(frozen=True)
 class ConnectBone(BoneGenerator):
@@ -37,7 +41,7 @@ class ConnectBone(BoneGenerator):
     is_connected: bool = False
     roll: float = 0.0
     req_bones: list[str] | None = None
-    pose_operations: PoseOperations | None = None
+    pose_operations: 'PoseOperations | None' = None
     is_optional: bool = False
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
@@ -84,6 +88,7 @@ class ConnectBone(BoneGenerator):
         
         return [created_name]
 
+
 @dataclass(frozen=True)
 class ExtensionBone(BoneGenerator):
     """Creates a bone extending from a source bone in a given direction."""
@@ -97,7 +102,7 @@ class ExtensionBone(BoneGenerator):
     is_connected: bool = False
     roll: float = 0.0
     req_bones: list[str] | None = None
-    pose_operations: PoseOperations | None = None
+    pose_operations: 'PoseOperations | None' = None
     is_optional: bool = False
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
@@ -168,7 +173,7 @@ class ExtensionBone(BoneGenerator):
                     parent_bone = edit_bones.get(bone_name)
                     if parent_bone and parent_bone != new_bone:
                         break
-            else :
+            else:
                 parent_bone = edit_bones.get(self.parent)
 
             if parent_bone:
@@ -184,6 +189,7 @@ class ExtensionBone(BoneGenerator):
         
         return [created_name]
 
+
 @dataclass(frozen=True)
 class CopyBone(BoneGenerator):
     """Creates a bone by copying the transform of an existing bone."""
@@ -193,7 +199,7 @@ class CopyBone(BoneGenerator):
     is_connected: bool = False
     roll: float = 0.0
     req_bones: list[str] | None = None
-    pose_operations: PoseOperations | None = None
+    pose_operations: 'PoseOperations | None' = None
     is_optional: bool = False
     
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:

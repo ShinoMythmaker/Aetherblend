@@ -1,6 +1,6 @@
 import bpy
 import addon_utils
-from ..preferences import get_preferences
+from ...preferences import get_preferences
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"

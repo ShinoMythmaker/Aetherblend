@@ -1,6 +1,6 @@
-from ...core.generators import ConnectBone, ExtensionBone
-from ...core.shared import PoseOperations, BoneGroup, link
-from ...core import rigify
+from ....core.generators import ConnectBone, ExtensionBone
+from ....core.shared import PoseOperations, BoneGroup, link
+from ....core import rigify
 
 # Individual bone list (for backwards compatibility and direct access)
 ARM_R = BoneGroup(
@@ -1104,8 +1104,8 @@ HEAD = BoneGroup(
             bone_a="j_kao",
             parent="Neck",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
+            axis_type="armature",
+            axis="Z",
             size_factor=20.0,
             req_bones=["j_kao"],
             pose_operations=PoseOperations(

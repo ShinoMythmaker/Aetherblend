@@ -5,7 +5,7 @@ import re
 from bpy.types import Operator
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper  
-from ..preferences import get_preferences
+from ...preferences import get_preferences
 
 
 class AETHER_OT_PoseExport(Operator, ExportHelper):

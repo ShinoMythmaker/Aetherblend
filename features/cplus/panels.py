@@ -1,5 +1,5 @@
 import bpy
-from ..preferences import get_preferences
+from ...preferences import get_preferences
 
 class AETHER_PT_CustomizePlus(bpy.types.Panel):
     bl_label = "Customize Plus"

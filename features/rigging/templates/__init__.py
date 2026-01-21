@@ -1,7 +1,6 @@
-
 from .human import *
-from ...generator import AetherRigGenerator
-from ...rigify import *
+from ....core.shared import AetherRigGenerator
+from ....core.rigify import *
 
 HUMAN = AetherRigGenerator (
     name = "Human Rig",

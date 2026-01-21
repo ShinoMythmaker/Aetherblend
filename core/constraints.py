@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from abc import ABC, abstractmethod
-
 import bpy
+
 
 class Constraint(ABC):
     """Abstract base class for all bone constraints."""
@@ -10,6 +10,7 @@ class Constraint(ABC):
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         """Applies the constraint to the given bone."""
         pass
+
 
 @dataclass(frozen=True)
 class CopyScaleConstraint(Constraint):
@@ -30,7 +31,7 @@ class CopyScaleConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object '{self.target_object}' not found for Copy Scale constraint.")
+            print(f"[AetherBlend] Target object not found for Copy Scale constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -43,6 +44,7 @@ class CopyScaleConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
+
 
 @dataclass(frozen=True)
 class CopyLocationConstraint(Constraint):
@@ -62,7 +64,7 @@ class CopyLocationConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object '{self.target_object}' not found for Copy Location constraint.")
+            print(f"[AetherBlend] Target object not found for Copy Location constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -77,6 +79,7 @@ class CopyLocationConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
+
 
 @dataclass(frozen=True)
 class CopyRotationConstraint(Constraint):
@@ -96,7 +99,7 @@ class CopyRotationConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object '{self.target_object}' not found for Copy Rotation constraint.")
+            print(f"[AetherBlend] Target object not found for Copy Rotation constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -111,6 +114,7 @@ class CopyRotationConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
+
 
 @dataclass(frozen=True)
 class CopyTransformsConstraint(Constraint):
@@ -129,7 +133,7 @@ class CopyTransformsConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object '{self.target_object}' not found for Copy Transforms constraint.")
+            print(f"[AetherBlend] Target object not found for Copy Transforms constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -139,6 +143,7 @@ class CopyTransformsConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
+
 
 @dataclass(frozen=True)
 class TrackToConstraint(Constraint):
@@ -159,7 +164,7 @@ class TrackToConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object '{self.target_object}' not found for Track To constraint.")
+            print(f"[AetherBlend] Target object not found for Track To constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -177,8 +182,3 @@ class TrackToConstraint(Constraint):
             else:
                 print(f"[AetherBlend] Warning: Space object '{self.space_object}' not found for Track To constraint.")
         constraint.influence = self.influence
-
-        # utils.armature.rigify._select_pose_bone(bone, True)
-        # bpy.ops.pose.armature_apply(selected=True)
-        # utils.armature.rigify._select_pose_bone(bone, False)
-

@@ -2,10 +2,11 @@ import bpy
 import time
 from bpy.props import IntProperty
 
-from .. import utils
-from ..data.rig_data import HUMAN
-from ..core.shared import PoseOperations
-from ..preferences import get_preferences
+from ... import utils
+from .templates import HUMAN
+from ...core.shared import PoseOperations
+from ...core import rigify
+from ...preferences import get_preferences
 
 def _find_objects_with_armature_and_material_property(armature: bpy.types.Object, property_name: str, property_value=None) -> list[bpy.types.Object]:
     """Find all objects that have the specified armature as a constraint target and have materials with a specific custom property.
