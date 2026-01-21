@@ -1,14 +1,5 @@
-"""
-Rigify type classes for AetherBlend.
-
-This module defines classes for commonly used rigify types with their specific
-parameter application methods. Each class inherits from the base rigify_type class.
-Each rigify type stores its own parameters and can be instantiated directly.
-"""
-
 import bpy
-from dataclasses import dataclass, field
-
+from dataclasses import dataclass
 
 class rigify_type:
     """Base class for rigify types."""

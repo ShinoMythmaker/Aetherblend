@@ -1,7 +1,6 @@
 import bpy
 import addon_utils
 from ..preferences import get_preferences
-from ..data.ui_data import UI_CONTROLLER_MAPPING
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -165,25 +164,25 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         
         if panel_class and hasattr(panel_class, 'draw'):
 
-            layout = self.layout
+            # layout = self.layout
             
-            selected_bones = {bone.name for bone in context.selected_pose_bones or []}
+            # selected_bones = {bone.name for bone in context.selected_pose_bones or []}
             
-            controllers_to_show = []
-            for bone_name in selected_bones:
-                if bone_name in UI_CONTROLLER_MAPPING:
-                    controllers_to_show.extend(UI_CONTROLLER_MAPPING[bone_name])
+            # controllers_to_show = []
+            # for bone_name in selected_bones:
+            #     if bone_name in UI_CONTROLLER_MAPPING:
+            #         controllers_to_show.extend(UI_CONTROLLER_MAPPING[bone_name])
             
-            seen = set()
-            unique_controllers = []
-            for controller in controllers_to_show:
-                if controller.name not in seen:
-                    seen.add(controller.name)
-                    unique_controllers.append(controller)
+            # seen = set()
+            # unique_controllers = []
+            # for controller in controllers_to_show:
+            #     if controller.name not in seen:
+            #         seen.add(controller.name)
+            #         unique_controllers.append(controller)
             
-            if unique_controllers:
-                for controller in unique_controllers:
-                    controller.create_ui(layout, armature)
+            # if unique_controllers:
+            #     for controller in unique_controllers:
+            #         controller.create_ui(layout, armature)
 
             panel_class.draw(self, context)
         else:

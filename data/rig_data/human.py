@@ -34,7 +34,7 @@ ARM_R = BoneGroup(
                 req_bones=["j_ude_a_r", "j_ude_b_r"],
                 pose_operations=PoseOperations(
                     rigify_settings=rigify.types.limbs_arm(fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)"), 
-                    b_collection="Arm.R (IK)"  #b_collection should be a class
+                    b_collection="Arm.R (IK)" 
                 )
             ),
             ConnectBone(

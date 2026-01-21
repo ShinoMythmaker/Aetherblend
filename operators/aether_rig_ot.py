@@ -96,6 +96,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             self.report({'ERROR'}, "Cannot generate meta rig on an armature that is already rigified.")
             return {'CANCELLED'}
         
+        # Get Generator Data 
+        aether_rig_generator = HUMAN
+        
         # Meta Rig Base Generation
         meta_rig = utils.armature.duplicate(armature)
         meta_rig.name = f"META_{armature.name}"
@@ -124,25 +127,23 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         # Rigify Settings and Collections
         bpy.context.view_layer.objects.active = meta_rig
         meta_rig.show_in_front = True 
-        bpy.ops.armature.rigify_use_standard_colors()
-        bpy.ops.armature.rigify_add_color_sets()
         meta_rig.data.rigify_target_rig = armature
         
         armature_collection = utils.collection.get_collection(armature)
         if armature_collection:
             utils.collection.link_to_collection([meta_rig], armature_collection)
-        
+
+        ## Add Color Sets
+        for color_set in aether_rig_generator.color_sets:
+            color_set.add(meta_rig)
+
+        ## Add Bone Collections UI
         hide_collections = []
-        for collection in META_RIG_COLLECTIONS_INFO:
-            coll = meta_rig.data.collections.new(collection.name)
-            if coll:
-                coll.rigify_color_set_name = collection.color_type
-                coll.rigify_ui_row = collection.row_index
-                coll.rigify_ui_title = collection.title
-                if not collection.visible:
-                    hide_collections.append(coll)
+        for coll in aether_rig_generator.b_collections:
+            coll.create(meta_rig)
+            coll.create_ui(meta_rig)
 
-
+        
         # Populate Data needed for generation
         eye_occlusion_object = _find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
 
@@ -154,7 +155,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             data = None
 
         # Loop through all bone groups
-        for bone_group_handler in HUMAN:
+        for bone_group_handler in aether_rig_generator.bone_groups:
             for bone_group in bone_group_handler:
                 bones, pose_ops = bone_group.execute(meta_rig, data)
 
