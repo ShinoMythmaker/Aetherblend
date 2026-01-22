@@ -1,4 +1,7 @@
-from ....core.generators import ConnectBone, ExtensionBone
+import bpy
+import mathutils
+
+from ....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone
 from ....core.shared import PoseOperations, BoneGroup, link
 from ....core import rigify
 
@@ -1159,13 +1162,118 @@ HEAD = BoneGroup(
                 b_collection="Face (Secondary)"
             )
         ),
-    ]
-            
+    ]          
 )
 
-                
-        
-    
+EYES = BoneGroup(
+    name="Eyes",
+    linking= [],
+    bones=[
+        SkinBone(
+            name="lid.T.L", 
+            bone_a="j_f_mabup_02out_l", 
+            mesh_restriction="eye_occlusion",
+            req_bones=["j_f_mabup_02out_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head"), 
+                b_collection="Face (Secondary)"
+                )
+        ),
+        SkinBone(
+            name="lid.T.L.002", 
+            bone_a="j_f_mabup_01_l", 
+            mesh_restriction="eye_occlusion",
+            req_bones=["j_f_mabup_01_l"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+                )
+        ),
+        SkinBone(
+            name="lid.B.L", 
+            bone_a="j_f_mabdn_03in_l", 
+            mesh_restriction="eye_occlusion", 
+            req_bones=["j_f_mabdn_03in_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head"), 
+                b_collection="Face (Secondary)"
+                )
+        ),
+        SkinBone(
+            name="lid.B.L.002", 
+            bone_a="j_f_mabdn_01_l", 
+            mesh_restriction="eye_occlusion",
+            req_bones=["j_f_mabdn_01_l"], 
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head"), 
+                b_collection="Face (Secondary)"
+                )
+        ),
+
+        CenterBone(
+            name="eye.L",
+            ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
+            parent="head",
+            axis="Y",
+            inverted=True,
+            req_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.face_skin_eye(),
+                b_collection="Face"
+            )
+        ),
+
+        BridgeBone(
+            name="lid.T.L.001",
+            bone_a="lid.T.L",
+            bone_b="lid.T.L.002",
+            offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
+            is_connected=True,  
+            parent="eye.L",
+            req_bones=["lid.T.L", "lid.T.L.002"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ), 
+
+        BridgeBone(
+            name="lid.T.L.003", 
+            bone_a="lid.T.L.002",
+            bone_b="lid.B.L",
+            offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
+            is_connected=False,
+            req_bones=["lid.T.L.002", "lid.B.L"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        BridgeBone(
+            name="lid.B.L.001",
+            bone_a="lid.B.L",
+            bone_b="lid.B.L.002",
+            offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)),
+            is_connected=True,
+            parent="eye.L",
+            req_bones=["lid.B.L", "lid.B.L.002"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+
+        BridgeBone(
+            name="lid.B.L.003",
+            bone_a="lid.B.L.002",
+            bone_b="lid.T.L",
+            offset_factor=mathutils.Vector((0.003, -0.001, -0.003)),
+            is_connected=False,
+            req_bones=["lid.B.L.002", "lid.T.L"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ]
+)  
+
+
 
 
 

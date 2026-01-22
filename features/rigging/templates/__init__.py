@@ -34,13 +34,13 @@ HUMAN = AetherRigGenerator (
 
                 BoneCollection(name="Leg.L (IK)", ui=True, color_set="IK", row_index=15, title="Leg IK.L"),
                 BoneCollection(name="Leg.L (FK)", ui=True, color_set="FK", row_index=16, title="FK.L", visible=False),
-                # BoneCollection(name="Leg.L (Tweak)", ui=True, color_set="Tweak", row_index=17, title="Tweak.L", visible=False), Nothing in here right now - Oats
+                BoneCollection(name="Leg.L (Tweak)", ui=True, color_set="Tweak", row_index=17, title="Tweak.L", visible=False),
                 BoneCollection(name="Leg.R (IK)", ui=True, color_set="IK", row_index=15, title="Leg IK.R"),
                 BoneCollection(name="Leg.R (FK)", ui=True, color_set="FK", row_index=16, title="FK.R", visible=False),
-                # BoneCollection(name="Leg.R (Tweak)", ui=True, color_set="Tweak", row_index=17, title="Tweak.R", visible=False),
+                BoneCollection(name="Leg.R (Tweak)", ui=True, color_set="Tweak", row_index=17, title="Tweak.R", visible=False),
 
                 BoneCollection(name="Tail", ui=True, color_set="Special", row_index=19, title="Tail"),
-                # BoneCollection(name="Tail (Tweak)", ui=True, color_set="Tweak", row_index=20, title="Tweaks", visible=False),
+                BoneCollection(name="Tail (Tweak)", ui=True, color_set="Tweak", row_index=20, title="Tweaks", visible=False),
 
                 BoneCollection(name="Skirt", ui=True, color_set="Special", row_index=22, title="Skirt", visible=False),
                 BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Tweak", row_index=23, title="Tweak", visible=False),
@@ -63,6 +63,7 @@ HUMAN = AetherRigGenerator (
             [HAND_R],
             [HAND_L],
             [TAIL],
-            [HEAD]
+            [HEAD],
+            [EYES]
         ]
 )

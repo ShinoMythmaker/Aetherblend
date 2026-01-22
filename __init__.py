@@ -3,7 +3,6 @@ from . import features
 from . import ui
 from .properties import tab_prop
 
-
 def register():
     """Register all addon components."""
     preferences.register()

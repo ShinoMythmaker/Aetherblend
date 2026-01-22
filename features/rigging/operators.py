@@ -1,72 +1,10 @@
 import bpy
 import time
-from bpy.props import IntProperty
 
 from ... import utils
 from .templates import HUMAN
 from ...core.shared import PoseOperations
 from ...core import rigify
-from ...preferences import get_preferences
-
-def _find_objects_with_armature_and_material_property(armature: bpy.types.Object, property_name: str, property_value=None) -> list[bpy.types.Object]:
-    """Find all objects that have the specified armature as a constraint target and have materials with a specific custom property.
-    
-    Args:
-        armature: The armature object to search for in constraints
-        property_name: The name of the custom property to look for in materials
-        property_value: Optional specific value the property should have. If None, just checks for property existence
-        
-    Returns:
-        List of objects that meet both criteria
-    """
-    matching_objects = []
-    
-    for obj in bpy.data.objects:
-        # Check if object has the armature as a constraint target
-        has_armature_constraint = False
-        
-        # Check object-level constraints
-        for constraint in obj.constraints:
-            if hasattr(constraint, 'target') and constraint.target == armature:
-                has_armature_constraint = True
-                break
-        
-        # If not found in object constraints, check modifiers (like Armature modifier)
-        if not has_armature_constraint:
-            for modifier in obj.modifiers:
-                if modifier.type == 'ARMATURE' and modifier.object == armature:
-                    has_armature_constraint = True
-                    break
-        
-        # If not found yet, check bone constraints (if object has pose bones)
-        if not has_armature_constraint and obj.type == 'ARMATURE' and obj.pose:
-            for pose_bone in obj.pose.bones:
-                for constraint in pose_bone.constraints:
-                    if hasattr(constraint, 'target') and constraint.target == armature:
-                        has_armature_constraint = True
-                        break
-                if has_armature_constraint:
-                    break
-        
-        # If object has armature constraint, check materials for custom property
-        if has_armature_constraint and obj.data and hasattr(obj.data, 'materials'):
-            for material_slot in obj.material_slots:
-                if material_slot.material:
-                    material = material_slot.material
-                    
-                    # Check if material has the custom property
-                    if property_name in material:
-                        # If specific value is required, check it matches
-                        if property_value is not None:
-                            if material[property_name] == property_value:
-                                matching_objects.append(obj)
-                                break
-                        else:
-                            # Just checking for property existence
-                            matching_objects.append(obj)
-                            break
-    
-    return matching_objects
 
 class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_idname = "aether.generate_meta_rig"
@@ -147,11 +85,12 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         
         # Populate Data needed for generation
-        eye_occlusion_object = _find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
+        eye_occlusion_object = self._find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
 
         data = {}
         if eye_occlusion_object:
             data["eye_occlusion"] = eye_occlusion_object[0]
+            data["ffxiv_armature"] = armature
 
         if len(data) == 0:
             data = None
@@ -200,6 +139,58 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         print(f"[AetherBlend] Meta rig generation: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
+    
+    def _find_objects_with_armature_and_material_property(self, armature: bpy.types.Object, property_name: str, property_value=None) -> list[bpy.types.Object]:
+        """Find all objects that have the specified armature as a constraint target and have materials with a specific custom property."""
+        matching_objects = []
+        
+        for obj in bpy.data.objects:
+            # Check if object has the armature as a constraint target
+            has_armature_constraint = False
+            
+            # Check object-level constraints
+            for constraint in obj.constraints:
+                if hasattr(constraint, 'target') and constraint.target == armature:
+                    has_armature_constraint = True
+                    break
+            
+            # If not found in object constraints, check modifiers (like Armature modifier)
+            if not has_armature_constraint: 
+                for modifier in obj.modifiers:
+                    if modifier.type == 'ARMATURE' and modifier.object == armature:
+                        has_armature_constraint = True
+                        break
+            
+            # If not found yet, check bone constraints (if object has pose bones)
+            if not has_armature_constraint and obj.type == 'ARMATURE' and obj.pose:
+                for pose_bone in obj.pose.bones:
+                    for constraint in pose_bone.constraints:
+                        if hasattr(constraint, 'target') and constraint.target == armature:
+                            has_armature_constraint = True
+                            break
+                    if has_armature_constraint:
+                        break
+            
+            # If object has armature constraint, check materials for custom property
+            if has_armature_constraint and obj.data and hasattr(obj.data, 'materials'):
+                for material_slot in obj.material_slots:
+                    if material_slot.material:
+                        material = material_slot.material
+                        
+                        # Check if material has the custom property
+                        if property_name in material:
+                            # If specific value is required, check it matches
+                            if property_value is not None:
+                                if material[property_name] == property_value:
+                                    matching_objects.append(obj)
+                                    break
+                            else:
+                                # Just checking for property existence
+                                matching_objects.append(obj)
+                                break
+        
+        return matching_objects
+
 
 class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
     bl_idname = "aether.generate_rigify_rig"
