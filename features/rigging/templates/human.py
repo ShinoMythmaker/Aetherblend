@@ -1,7 +1,7 @@
 import bpy
 import mathutils
 
-from ....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone
+from ....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone
 from ....core.shared import PoseOperations, BoneGroup, link
 from ....core import rigify
 
@@ -1387,17 +1387,27 @@ HEAD = BoneGroup(
     ]          
 )
 
-EYES = BoneGroup(
+LEFT_EYE = BoneGroup(
     name="Eyes",
-    linking= [],
+    linking= [
+        link(target="lid.B.L.001", bone="j_f_mabdn_03in_l"),
+        link(target="lid.B.L.002", bone="j_f_mabdn_01_l"),
+        link(target="lid.B.L.003", bone="j_f_mabdn_02out_l"),
+        link(target="lid.T.L.001", bone="j_f_mabup_02out_l"),
+        link(target="lid.T.L.002", bone="j_f_mabup_01_l"),
+        link(target="lid.T.L.003", bone="j_f_mabup_03in_l"),
+        link(target="MCH-Eye.L", bone="j_f_eyepuru_l"),
+    ],
     bones=[
+
+        ## Skin Bone, Basicly Corner Bones for the eyes
         SkinBone(
             name="lid.T.L", 
             bone_a="j_f_mabup_02out_l", 
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_02out_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head"), 
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, True, False], skin_chain_falloff=[0.0, -2.0, 0.0], skin_chain_falloff_length=True), 
                 b_collection="Face (Secondary)"
                 )
         ),
@@ -1430,18 +1440,30 @@ EYES = BoneGroup(
                 )
         ),
 
-        CenterBone(
-            name="eye.L",
-            ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
-            parent="head",
-            axis="Y",
-            inverted=True,
-            req_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
+
+        CopyBone(
+            name="Eye.L",
+            source_bone="j_f_eyepuru_l",
+            req_bones=["j_f_eyepuru_l"],
+            parent="Head",
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.face_skin_eye(),
                 b_collection="Face"
             )
         ),
+
+        # CenterBone(
+        #     name="Eye.L",
+        #     ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
+        #     parent="Head",
+        #     axis="Y",
+        #     inverted=True,
+        #     req_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
+        #     pose_operations=PoseOperations(
+        #         rigify_settings=rigify.types.face_skin_eye(),
+        #         b_collection="Face"
+        #     )
+        # ),
 
         BridgeBone(
             name="lid.T.L.001",
@@ -1449,7 +1471,7 @@ EYES = BoneGroup(
             bone_b="lid.T.L.002",
             offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
             is_connected=True,  
-            parent="eye.L",
+            parent="Eye.L",
             req_bones=["lid.T.L", "lid.T.L.002"],
             pose_operations=PoseOperations(
                 b_collection="Face (Secondary)"
@@ -1473,7 +1495,7 @@ EYES = BoneGroup(
             bone_b="lid.B.L.002",
             offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)),
             is_connected=True,
-            parent="eye.L",
+            parent="Eye.L",
             req_bones=["lid.B.L", "lid.B.L.002"],
             pose_operations=PoseOperations(
                 b_collection="Face (Secondary)"
@@ -1491,10 +1513,267 @@ EYES = BoneGroup(
                 b_collection="Face (Secondary)"
             )
         ),
+
+
+        ConnectBone(
+            name="eye_tracker.B.L.001",
+            bone_a="j_f_mabdn_03in_l",
+            bone_b="lid.B.L.001",
+            parent="Eye.L",
+            is_connected=False,
+            req_bones=["j_f_mabdn_03in_l", "j_f_eye_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+
+        ConnectBone(
+            name="eye_tracker.B.L.002",
+            bone_a="j_f_mabdn_01_l",
+            bone_b="lid.B.L.002",
+            parent="Eye.L",
+            is_connected=False,
+            req_bones=["j_f_mabdn_01_l", "j_f_eye_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+
+        ConnectBone(
+            name="eye_tracker.B.L.003",
+            bone_a="j_f_mabdn_02out_l",
+            bone_b="lid.B.L.003",
+            parent="Eye.L",
+            is_connected=False,
+            req_bones=["j_f_mabdn_02out_l", "j_f_eye_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+
+        ConnectBone(
+            name="eye_tracker.T.L.001",
+            bone_a="j_f_mabup_02out_l",
+            bone_b="lid.T.L.001",
+            parent="Eye.L",
+            is_connected=False,
+            req_bones=["j_f_mabup_02out_l", "j_f_eye_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+
+        ConnectBone(
+            name="eye_tracker.T.L.002",
+            bone_a="j_f_mabup_01_l",
+            bone_b="lid.T.L.002",
+            parent="Eye.L",
+            is_connected=False,
+            req_bones=["j_f_mabup_01_l", "j_f_eye_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+
+        ConnectBone(
+            name="eye_tracker.T.L.003",
+            bone_a="j_f_mabup_03in_l",
+            bone_b="lid.T.L.003",
+            parent="Eye.L",
+            is_connected=False,
+            req_bones=["j_f_mabup_03in_l", "j_f_eye_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
         ]
 )  
 
+RIGHT_EYE = BoneGroup(
+    name="Eyes",
+    linking= [
+        link(target="lid.B.R.001", bone="j_f_mabdn_03in_r"),
+        link(target="lid.B.R.002", bone="j_f_mabdn_01_r"),
+        link(target="lid.B.R.003", bone="j_f_mabdn_02out_r"),
+        link(target="lid.T.R.001", bone="j_f_mabup_02out_r"),
+        link(target="lid.T.R.002", bone="j_f_mabup_01_r"),
+        link(target="lid.T.R.003", bone="j_f_mabup_03in_r"),
+        link(target="MCH-Eye.R", bone="j_f_eyepuru_r"),
+    ],
+    bones=[
+        ## Skin Bone, Basicly Corner Bones for the eyes
+        SkinBone(
+            name="lid.T.R", 
+            bone_a="j_f_mabup_02out_r", 
+            mesh_restriction="eye_occlusion",
+            req_bones=["j_f_mabup_02out_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, True, False], skin_chain_falloff=[0.0, -2.0, 0.0], skin_chain_falloff_length=True), 
+                b_collection="Face (Secondary)"
+                )
+        ),
+        SkinBone(
+            name="lid.T.R.002", 
+            bone_a="j_f_mabup_01_r", 
+            mesh_restriction="eye_occlusion",
+            req_bones=["j_f_mabup_01_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+                )
+        ),
+        SkinBone(
+            name="lid.B.R", 
+            bone_a="j_f_mabdn_03in_r", 
+            mesh_restriction="eye_occlusion", 
+            req_bones=["j_f_mabdn_03in_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head"), 
+                b_collection="Face (Secondary)"
+                )
+        ),
+        SkinBone(
+            name="lid.B.R.002",
+            bone_a="j_f_mabdn_01_r",
+            mesh_restriction="eye_occlusion",
+            req_bones=["j_f_mabdn_01_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+                )
+        ),
+        CopyBone(
+            name="Eye.R",
+            source_bone="j_f_eyepuru_r",
+            req_bones=["j_f_eyepuru_r"],
+            parent="Head",
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.face_skin_eye(),
+                b_collection="Face"
+                )
+        ),
+        BridgeBone(
+            name="lid.T.R.001",
+            bone_a="lid.T.R",
+            bone_b="lid.T.R.002",
+            offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
+            is_connected=True,  
+            parent="Eye.R",
+            req_bones=["lid.T.R", "lid.T.R.002"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        BridgeBone(
+            name="lid.T.R.003", 
+            bone_a="lid.T.R.002",
+            bone_b="lid.B.R",
+            offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
+            is_connected=False,
+            req_bones=["lid.T.R.002", "lid.B.R"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        BridgeBone(
+            name="lid.B.R.001",
+            bone_a="lid.B.R",
+            bone_b="lid.B.R.002",
+            offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)),
+            is_connected=True,
+            parent="Eye.R",
+            req_bones=["lid.B.R", "lid.B.R.002"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        BridgeBone(
+            name="lid.B.R.003",
+            bone_a="lid.B.R.002",
+            bone_b="lid.T.R",
+            offset_factor=mathutils.Vector((0.003, -0.001, -0.003)),
+            is_connected=False,
+            req_bones=["lid.B.R.002", "lid.T.R"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
 
-
-
-
+        ConnectBone(
+            name="eye_tracker.B.R.001",
+            bone_a="j_f_mabdn_03in_r",
+            bone_b="lid.B.R.001",
+            parent="Eye.R",
+            is_connected=False,
+            req_bones=["j_f_mabdn_03in_r", "j_f_eye_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="eye_tracker.B.R.002",
+            bone_a="j_f_mabdn_01_r",
+            bone_b="lid.B.R.002",
+            parent="Eye.R",
+            is_connected=False,
+            req_bones=["j_f_mabdn_01_r", "j_f_eye_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="eye_tracker.B.R.003",
+            bone_a="j_f_mabdn_02out_r",
+            bone_b="lid.B.R.003",
+            parent="Eye.R",
+            is_connected=False,
+            req_bones=["j_f_mabdn_02out_r", "j_f_eye_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="eye_tracker.T.R.001",
+            bone_a="j_f_mabup_02out_r",
+            bone_b="lid.T.R.001",
+            parent="Eye.R",
+            is_connected=False,
+            req_bones=["j_f_mabup_02out_r", "j_f_eye_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="eye_tracker.T.R.002",
+            bone_a="j_f_mabup_01_r",
+            bone_b="lid.T.R.002",
+            parent="Eye.R",
+            is_connected=False,
+            req_bones=["j_f_mabup_01_r", "j_f_eye_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="eye_tracker.T.R.003",
+            bone_a="j_f_mabup_03in_r",
+            bone_b="lid.T.R.003",
+            parent="Eye.R",
+            is_connected=False,
+            req_bones=["j_f_mabup_03in_r", "j_f_eye_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+    ]
+)
