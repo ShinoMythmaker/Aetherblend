@@ -1169,13 +1169,15 @@ EYES = BoneGroup(
     name="Eyes",
     linking= [],
     bones=[
+
+        ## Skin Bone, Basicly Corner Bones for the eyes
         SkinBone(
             name="lid.T.L", 
             bone_a="j_f_mabup_02out_l", 
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_02out_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head"), 
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, True, False], skin_chain_falloff=[0.0, -2.0, 0.0], skin_chain_falloff_length=True), 
                 b_collection="Face (Secondary)"
                 )
         ),
@@ -1194,7 +1196,7 @@ EYES = BoneGroup(
             mesh_restriction="eye_occlusion", 
             req_bones=["j_f_mabdn_03in_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head"), 
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head"), 
                 b_collection="Face (Secondary)"
                 )
         ),
@@ -1204,15 +1206,19 @@ EYES = BoneGroup(
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabdn_01_l"], 
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="head"), 
                 b_collection="Face (Secondary)"
                 )
         ),
 
+        ## These will be the trackers that will transfer the positons. 
+
+
+
+
         CenterBone(
-            name="eye.L",
+            name="Eye.L",
             ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
-            parent="head",
+            parent="Head",
             axis="Y",
             inverted=True,
             req_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
@@ -1228,7 +1234,7 @@ EYES = BoneGroup(
             bone_b="lid.T.L.002",
             offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
             is_connected=True,  
-            parent="eye.L",
+            parent="Eye.L",
             req_bones=["lid.T.L", "lid.T.L.002"],
             pose_operations=PoseOperations(
                 b_collection="Face (Secondary)"
@@ -1252,7 +1258,7 @@ EYES = BoneGroup(
             bone_b="lid.B.L.002",
             offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)),
             is_connected=True,
-            parent="eye.L",
+            parent="Eye.L",
             req_bones=["lid.B.L", "lid.B.L.002"],
             pose_operations=PoseOperations(
                 b_collection="Face (Secondary)"
