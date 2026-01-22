@@ -62,9 +62,9 @@ class ColorSet:
         color_set = armature.data.rigify_colors[-1]
 
         color_set.name = self.name
-        color_set.color_normal = self._hex_to_rgb(self.normal)
-        color_set.color_select = self._hex_to_rgb(self.select)
-        color_set.color_active = self._hex_to_rgb(self.active)
+        color_set.normal = self._hex_to_rgb(self.normal)
+        color_set.select = self._hex_to_rgb(self.select)
+        color_set.active = self._hex_to_rgb(self.active)
 
     def _hex_to_rgb(self, hex_color: str) -> tuple[float, float, float]:
         """Converts a hex color string to an RGB tuple."""

@@ -737,7 +737,7 @@ HAND_R = BoneGroup(
             req_bones=["j_oya_a_r", "j_oya_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         ExtensionBone(
@@ -751,7 +751,7 @@ HAND_R = BoneGroup(
             size_factor=0.2,
             req_bones=["j_oya_b_r"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         #Index
@@ -765,7 +765,7 @@ HAND_R = BoneGroup(
             req_bones=["j_hito_a_r", "j_hito_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         ExtensionBone(
@@ -778,7 +778,7 @@ HAND_R = BoneGroup(
             start="head",
             req_bones=["j_hito_b_r"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         #Middle
@@ -792,7 +792,7 @@ HAND_R = BoneGroup(
             req_bones=["j_naka_a_r", "j_naka_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         ExtensionBone(
@@ -805,7 +805,7 @@ HAND_R = BoneGroup(
             start="head",
             req_bones=["j_naka_b_r"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         #Ring
@@ -819,7 +819,7 @@ HAND_R = BoneGroup(
             req_bones=["j_kusu_a_r", "j_kusu_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         ExtensionBone(
@@ -832,7 +832,7 @@ HAND_R = BoneGroup(
             start="head",
             req_bones=["j_kusu_b_r"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         #Pinky
@@ -846,7 +846,7 @@ HAND_R = BoneGroup(
             req_bones=["j_ko_a_r", "j_ko_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
         ExtensionBone(
@@ -859,7 +859,7 @@ HAND_R = BoneGroup(
             start="head",
             req_bones=["j_ko_b_r"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.R",
             )
         ),
     ],
@@ -891,7 +891,7 @@ HAND_L = BoneGroup(
             req_bones=["j_oya_a_l", "j_oya_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         ExtensionBone(
@@ -905,7 +905,7 @@ HAND_L = BoneGroup(
             size_factor=0.2,
             req_bones=["j_oya_b_l"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         #Index
@@ -919,7 +919,7 @@ HAND_L = BoneGroup(
             req_bones=["j_hito_a_l", "j_hito_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         ExtensionBone(
@@ -932,7 +932,7 @@ HAND_L = BoneGroup(
             start="head",
             req_bones=["j_hito_b_l"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         #Middle
@@ -946,7 +946,7 @@ HAND_L = BoneGroup(
             req_bones=["j_naka_a_l", "j_naka_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         ExtensionBone(
@@ -959,7 +959,7 @@ HAND_L = BoneGroup(
             start="head",
             req_bones=["j_naka_b_l"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         #Ring
@@ -973,7 +973,7 @@ HAND_L = BoneGroup(
             req_bones=["j_kusu_a_l", "j_kusu_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         ExtensionBone(
@@ -986,7 +986,7 @@ HAND_L = BoneGroup(
             start="head",
             req_bones=["j_kusu_b_l"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         #Pinky
@@ -1000,7 +1000,7 @@ HAND_L = BoneGroup(
             req_bones=["j_ko_a_l", "j_ko_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
         ExtensionBone(
@@ -1013,7 +1013,7 @@ HAND_L = BoneGroup(
             start="head",
             req_bones=["j_ko_b_l"],
             pose_operations=PoseOperations(
-                b_collection="Fingers",
+                b_collection="Fingers.L",
             )
         ),
     ],
@@ -1084,7 +1084,13 @@ HEAD = BoneGroup(
         link(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
         link(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
         link(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
-        link(target="DEF-Cheek.T.R.001", bone="j_f_dmemoto_r"),
+        link(target="DEF-Cheek.B.L", bone="j_f_shoho_l"),
+        link(target="DEF-Cheek.B.L.001", bone="j_f_dhoho_l"),
+        link(target="DEF-Cheek.T.L", bone="j_f_hoho_l"),
+        link(target="DEF-Lip.T.R", bone="j_f_ulip_01_r"),
+        link(target="DEF-Lip.T.R.001", bone="j_f_umlip_01_r"),
+        link(target="DEF-Lip.B.R", bone="j_f_dlip_01_r"),
+        link(target="DEF-Lip.B.R.001", bone="j_f_dmlip_01_r"),
     ],
     bones=[
         ConnectBone(
@@ -1116,47 +1122,146 @@ HEAD = BoneGroup(
         ConnectBone(
             name="Cheek.B.R",
             bone_a="j_f_shoho_r",
-            bone_b="j_f_dhoho_r",
+            bone_b="j_kao",
             parent="Head",
             is_connected=False,
-            req_bones=["j_f_shoho_r", "j_f_dhoho_r"],
+            req_bones=["j_f_shoho_r", "j_kao"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
-                b_collection="Face (Primary)"
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
             )
         ),
         ConnectBone(
             name="Cheek.B.R.001",
             bone_a="j_f_dhoho_r",
-            bone_b="j_f_hoho_r",
-            parent="Cheek.B.R",
-            is_connected=True,
-            req_bones=["j_f_dhoho_r", "j_f_hoho_r"],
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_dhoho_r", "j_kao"],
             pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
             )
         ),
         ConnectBone(
             name="Cheek.T.R",
             bone_a="j_f_hoho_r",
-            bone_b="j_f_dmemoto_r",
+            bone_b="j_kao",
             parent="Head",
             is_connected=False,
-            req_bones=["j_f_hoho_r", "j_f_dmemoto_r"],
+            req_bones=["j_f_hoho_r", "j_kao"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Head"),
-                b_collection="Face (Secondary)"
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        #Cheek Left
+        ConnectBone(
+            name="Cheek.B.L",
+            bone_a="j_f_shoho_l",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_shoho_l", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
             )
         ),
         ConnectBone(
-            name="Cheek.T.R.001",
-            bone_a="j_f_dmemoto_r",
-            bone_b="j_f_dmiken_r",
-            parent="Cheek.T.R",
-            is_connected=True,
-            req_bones=["j_f_dmemoto_r", "j_f_dmiken_r"],
+            name="Cheek.B.L.001",
+            bone_a="j_f_dhoho_l",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_dhoho_l", "j_kao"],
             pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="Cheek.T.L",
+            bone_a="j_f_hoho_l",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hoho_l", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(),
+                b_collection="Face"
+            )
+        ),
+        #Anchor
+        ExtensionBone(
+
+            name="Face.Suppressor",
+            bone_a="j_kao",
+            parent="j_kao",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            size_factor=1.0,
+            req_bones=["j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_anchor(skin_anchor_hide=True),
+                b_collection="Face"
+            )
+        ),
+        #Mouth Right
+        ConnectBone(
+            name="Lip.T.R",
+            bone_a="j_f_ulip_01_r",
+            bone_b="j_f_umlip_01_r",
+            parent="jaw_master",
+            is_connected=False,
+            start="tail",
+            end="tail",
+            req_bones=["j_f_ulip_01_r", "j_f_umlip_01_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="Lip.T.R.001",
+            bone_a="j_f_umlip_01_r",
+            bone_b="j_f_uslip_r",
+            parent="Lip.T.R",
+            is_connected=True,
+            start="tail",
+            end="head",
+            req_bones=["j_f_umlip_01_r", "j_f_uslip_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="Lip.B.R",
+            bone_a="j_f_dlip_01_r",
+            bone_b="j_f_dmlip_01_r",
+            parent="jaw_master",
+            is_connected=False,
+            start="tail",
+            end="tail",
+            req_bones=["j_f_dlip_01_r", "j_f_dmlip_01_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face"
+            )
+        ),
+        ConnectBone(
+            name="Lip.B.R.001",
+            bone_a="j_f_dmlip_01_r",
+            bone_b="j_f_dslip_r",
+            parent="Lip.B.R",
+            is_connected=True,
+            start="tail",
+            end="head",
+            req_bones=["j_f_dmlip_01_r", "j_f_dslip_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face"
             )
         ),
     ]
