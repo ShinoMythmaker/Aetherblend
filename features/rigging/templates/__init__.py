@@ -71,6 +71,7 @@ HUMAN = AetherRigGenerator (
             [HAND_L],
             [TAIL],
             [HEAD],
-            [EYES]
+            [LEFT_EYE],
+            [RIGHT_EYE]
         ]
 )
