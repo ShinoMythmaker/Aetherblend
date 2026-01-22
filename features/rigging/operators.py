@@ -305,12 +305,16 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
             if coll:
                 armature.data.collections.remove(coll)
 
-        bpy.ops.armature.collection_remove_unused()
+        try:
+            bpy.ops.armature.collection_remove_unused()
+        except RuntimeError:
+            pass
 
         armature.aether_rig.rigified = False
 
-        ff_coll = armature.data.collections["FFXIV"]
-        ff_coll.is_visible = True
+        for coll in armature.data.collections:
+            if coll.name == "FFXIV":
+                coll.is_visible = True
 
         ## Cleanup Rigify Settings and Constrains
         for pose_bone in armature.pose.bones:
@@ -374,12 +378,54 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
         print(f"[AetherBlend] Full rig generation: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
     
+
+
+
+class AETHER_OT_Transfer_Constraints(bpy.types.Operator):
+    bl_idname = "aether.transfer_constraints"
+    bl_label = "Transfer Constraints"
+
+    def execute(self, context):
+        ## Creates Copy Tranfsorms for each bone of the active armature to copy from a selected armature
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature object")
+            return {'CANCELLED'}
+        
+        source_armature = None
+        for obj in context.selected_objects:
+            if obj != armature and obj.type == 'ARMATURE':
+                source_armature = obj
+                break
+
+        if not source_armature:
+            self.report({'ERROR'}, "Select a source armature object")
+            return {'CANCELLED'}
+        
+        bpy.ops.object.mode_set(mode='POSE')
+        for bone in armature.pose.bones:
+            source_bone_name = bone.name
+            source_bone = source_armature.pose.bones.get(source_bone_name)
+            if source_bone:
+                # Add child off constraint
+                constraint = bone.constraints.new(type='CHILD_OF')
+                constraint.name = f"AetherBlend-ChildOf@{source_bone_name}"
+                constraint.target = source_armature
+                constraint.subtarget = source_bone_name
+                constraint.inverse_matrix = source_bone.matrix.inverted()
+
+        return {"FINISHED"}
+
+
+
+    
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Rigify_Rig)
     bpy.utils.register_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.register_class(AETHER_OT_Reset_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Full_Rig)
+    bpy.utils.register_class(AETHER_OT_Transfer_Constraints)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Generate_Meta_Rig)
@@ -387,3 +433,4 @@ def unregister():
     bpy.utils.unregister_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.unregister_class(AETHER_OT_Reset_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Full_Rig)
+    bpy.utils.unregister_class(AETHER_OT_Transfer_Constraints)
