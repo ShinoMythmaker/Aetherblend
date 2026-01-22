@@ -27,15 +27,18 @@ class PoseOperations:
 
     def execute(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object):
         """Executes all pose operations on the given pose bone."""
-        if self.rigify_settings:
-            self.rigify_settings.apply(pose_bone, armature)
-        
-        if self.constraints:
-            for constraint in self.constraints:
-                constraint.apply(pose_bone, armature)
-        
-        if self.b_collection:
-            utils.armature.b_collection.assign_bones(armature, [pose_bone.name], self.b_collection)
+        try:
+            if self.rigify_settings:
+                self.rigify_settings.apply(pose_bone, armature)
+            
+            if self.constraints:
+                for constraint in self.constraints:
+                    constraint.apply(pose_bone, armature)
+            
+            if self.b_collection:
+                utils.armature.b_collection.assign_bones(armature, [pose_bone.name], self.b_collection)
+        except Exception as e:
+            print(f"[AetherBlend] Error executing PoseOperations for bone: {e}")
 
 
 @dataclass
