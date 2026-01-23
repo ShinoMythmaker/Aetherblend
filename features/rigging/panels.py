@@ -69,11 +69,6 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
 
 
-        row = col.row(align=True)
-        transfer_col = row.column(align=True)
-        transfer_col.operator("aether.transfer_constraints", text="Deform", icon="MOD_ARMATURE")
-
-
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
     bl_label = "Rig Layers"
     bl_idname = "AETHER_PT_rig_layers"

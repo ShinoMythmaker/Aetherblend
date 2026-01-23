@@ -1,7 +1,8 @@
 """Character import operators."""
 
 import bpy
-from bpy.props import BoolProperty, StringProperty
+from bpy.props import BoolProperty, StringProperty, EnumProperty
+from bpy_extras.io_utils import axis_conversion
 
 from ... import utils
 from ...preferences import get_preferences
@@ -29,6 +30,41 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
 
     s_temperence: BoolProperty(name="Temperence Mode", description="Imports with temperence mode enabled", default=False)  # type: ignore
+    
+    # Bone Axis Orientation (FBX-style)
+    primary_bone_axis: EnumProperty(
+        name="Primary Bone Axis",
+        description="Primary axis for bone orientation (the bone's length direction). For FFXIV characters from Meddle, use -Z",
+        items=(
+            ('X', "X Axis", ""),
+            ('Y', "Y Axis", ""),
+            ('Z', "Z Axis", ""),
+            ('-X', "-X Axis", ""),
+            ('-Y', "-Y Axis", ""),
+            ('-Z', "-Z Axis", ""),
+        ),
+        default='X',
+    )  # type: ignore
+    
+    secondary_bone_axis: EnumProperty(
+        name="Secondary Bone Axis",
+        description="Secondary axis for bone orientation (determines bone roll). For FFXIV characters from Meddle, use Y",
+        items=(
+            ('X', "X Axis", ""),
+            ('Y', "Y Axis", ""),
+            ('Z', "Z Axis", ""),
+            ('-X', "-X Axis", ""),
+            ('-Y', "-Y Axis", ""),
+            ('-Z', "-Z Axis", ""),
+        ),
+        default='Y',
+    )  # type: ignore
+    
+    use_bone_axis_conversion: BoolProperty(
+        name="Use Bone Axis Conversion",
+        description="Apply bone axis conversion (similar to FBX import). Required for FFXIV characters from Meddle",
+        default=True
+    )  # type: ignore
     
     
     def invoke(self, context, event):
@@ -108,6 +144,25 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         split = col.split(factor=indent)  
         split.label(text=" ")
         split.prop(self, "s_temperence")
+
+        # Bone Orientation Section
+        box = layout.box()
+        row = box.row()
+        row.label(text="Bone Orientation", icon="BONE_DATA")
+
+        col = box.column(align=True)
+        split = col.split(factor=indent)  
+        split.label(text=" ")
+        split.prop(self, "use_bone_axis_conversion")
+
+        if self.use_bone_axis_conversion:
+            split = col.split(factor=indent)  
+            split.label(text=" ")
+            split.prop(self, "primary_bone_axis", text="Primary")
+
+            split = col.split(factor=indent)  
+            split.label(text=" ")
+            split.prop(self, "secondary_bone_axis", text="Secondary")
  
     def execute(self, context):  
         bpy.context.window.cursor_set('WAIT')   
@@ -142,6 +197,10 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
 
         armature = utils.armature.find_armature_in_objects(imported_objects)
         if armature:
+            # Apply bone axis conversion if enabled
+            if self.use_bone_axis_conversion:
+                apply_bone_axis_conversion(armature, self.primary_bone_axis, self.secondary_bone_axis)
+            
             if self.s_apply_pose_track:
                 apply_pose_to_rest_pose(armature)
 
@@ -161,6 +220,39 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
+
+
+def apply_bone_axis_conversion(armature: bpy.types.Object, primary_axis: str, secondary_axis: str) -> None:
+    if not armature or armature.type != 'ARMATURE':
+        print(f"[AetherBlend] Invalid armature provided for bone axis conversion.")
+        return
+    
+    if (primary_axis, secondary_axis) == ('Y', 'X'):
+        print(f"[AetherBlend] Bone axis conversion skipped (already Y=primary, X=secondary).")
+        return
+    
+    bone_correction_matrix = axis_conversion(
+        from_forward='X',
+        from_up='Y',
+        to_forward=secondary_axis,
+        to_up=primary_axis,
+    ).to_4x4()
+
+    previous_mode = armature.mode if hasattr(armature, 'mode') else 'OBJECT'
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    try:
+        edit_bones = armature.data.edit_bones
+        for bone in edit_bones:
+            bone_matrix = bone.matrix.copy()
+            
+            corrected_matrix = bone_matrix @ bone_correction_matrix
+    
+            bone.matrix = corrected_matrix
+        
+    finally:
+        bpy.ops.object.mode_set(mode=previous_mode)
 
 
 def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
