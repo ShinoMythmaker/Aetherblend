@@ -305,12 +305,16 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
             if coll:
                 armature.data.collections.remove(coll)
 
-        bpy.ops.armature.collection_remove_unused()
+        try:
+            bpy.ops.armature.collection_remove_unused()
+        except RuntimeError:
+            pass
 
         armature.aether_rig.rigified = False
 
-        ff_coll = armature.data.collections["FFXIV"]
-        ff_coll.is_visible = True
+        for coll in armature.data.collections:
+            if coll.name == "FFXIV":
+                coll.is_visible = True
 
         ## Cleanup Rigify Settings and Constrains
         for pose_bone in armature.pose.bones:
@@ -373,6 +377,10 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
         
         print(f"[AetherBlend] Full rig generation: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
+    
+
+
+
     
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
