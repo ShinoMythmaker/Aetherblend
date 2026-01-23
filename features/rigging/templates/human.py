@@ -2,18 +2,18 @@ import bpy
 import mathutils
 
 from ....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone
-from ....core.shared import PoseOperations, BoneGroup, link
+from ....core.shared import PoseOperations, BoneGroup, TransformLink
 from ....core import rigify
 
 # Individual bone list (for backwards compatibility and direct access)
 ARM_R = BoneGroup(
         name="Right Arm",
         description="Right arm bones including upper arm, forearm, hand, and tweak bones",
-        linking = [
-            link(target="DEF-upper_arm.R", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
-            link(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
-            link(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
-            link(target="DEF-forearm.R.001", bone="n_hte_r")
+        transform_link = [
+            TransformLink(target="DEF-upper_arm.R", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
+            TransformLink(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
+            TransformLink(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
+            TransformLink(target="DEF-forearm.R.001", bone="n_hte_r")
             ],
         bones = [
             #Right Clavicle
@@ -70,11 +70,11 @@ ARM_R = BoneGroup(
 
 ARM_L = BoneGroup(
         name="Left Arm",
-        linking= [
-            link(target="DEF-upper_arm.L", bone="j_ude_a_l", retarget="FK-upper_arm.L"),
-            link(target="DEF-forearm.L", bone="j_ude_b_l", retarget="FK-forearm.L"),
-            link(target="DEF-hand.L", bone="j_te_l", retarget="FK-hand.L"),
-            link(target="DEF-forearm.L.001", bone="n_hte_l")
+        transform_link= [
+            TransformLink(target="DEF-upper_arm.L", bone="j_ude_a_l", retarget="FK-upper_arm.L"),
+            TransformLink(target="DEF-forearm.L", bone="j_ude_b_l", retarget="FK-forearm.L"),
+            TransformLink(target="DEF-hand.L", bone="j_te_l", retarget="FK-hand.L"),
+            TransformLink(target="DEF-forearm.L.001", bone="n_hte_l")
             ],
         bones = [
             #Left Clavicle
@@ -132,11 +132,11 @@ ARM_L = BoneGroup(
 
 SPINE = BoneGroup(
         name="Spine",
-        linking= [
-            link(target="DEF-Spine.001", bone="j_kosi", retarget="FK-Spine.001"),
-            link(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
-            link(target="DEF-Spine.003", bone="j_sebo_b", retarget="FK-Spine.003"),
-            link(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
+        transform_link= [
+            TransformLink(target="DEF-Spine.001", bone="j_kosi", retarget="FK-Spine.001"),
+            TransformLink(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
+            TransformLink(target="DEF-Spine.003", bone="j_sebo_b", retarget="FK-Spine.003"),
+            TransformLink(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
         ],
         bones = [
             #Spine
@@ -192,11 +192,11 @@ SPINE = BoneGroup(
 
 LEG_R = BoneGroup(
         name="Right Leg",
-        linking= [
-            link(target="DEF-thigh.R.001", bone="j_asi_a_r", retarget="FK-upper_leg.R"),
-            link(target="DEF-shin.R.001", bone="j_asi_c_r", retarget="FK-lower_leg.R"),
-            link(target="DEF-foot.R", bone="j_asi_d_r", retarget="FK-foot.R"),
-            link(target="DEF-toe.R", bone="j_asi_e_r", retarget="FK-toe.R"),
+        transform_link= [
+            TransformLink(target="DEF-thigh.R.001", bone="j_asi_a_r", retarget="FK-upper_leg.R"),
+            TransformLink(target="DEF-shin.R.001", bone="j_asi_c_r", retarget="FK-lower_leg.R"),
+            TransformLink(target="DEF-foot.R", bone="j_asi_d_r", retarget="FK-foot.R"),
+            TransformLink(target="DEF-toe.R", bone="j_asi_e_r", retarget="FK-toe.R"),
             ],
         bones = [
             # Right Leg
@@ -278,11 +278,11 @@ LEG_R = BoneGroup(
 
 LEG_L = BoneGroup(
         name="Left Leg",
-        linking= [
-            link(target="DEF-thigh.L.001", bone="j_asi_a_l", retarget="FK-upper_leg.L"),
-            link(target="DEF-shin.L.001", bone="j_asi_c_l", retarget="FK-lower_leg.L"),
-            link(target="DEF-foot.L", bone="j_asi_d_l", retarget="FK-foot.L"),
-            link(target="DEF-toe.L", bone="j_asi_e_l", retarget="FK-toe.L"),
+        transform_link= [
+            TransformLink(target="DEF-thigh.L.001", bone="j_asi_a_l", retarget="FK-upper_leg.L"),
+            TransformLink(target="DEF-shin.L.001", bone="j_asi_c_l", retarget="FK-lower_leg.L"),
+            TransformLink(target="DEF-foot.L", bone="j_asi_d_l", retarget="FK-foot.L"),
+            TransformLink(target="DEF-toe.L", bone="j_asi_e_l", retarget="FK-toe.L"),
             ],
         bones = [
             # Left Leg
@@ -364,16 +364,16 @@ LEG_L = BoneGroup(
 
 SKIRT_R = BoneGroup(
         name="Skirt Right",
-        linking= [
-            link(target="DEF-Skirt_Front.R", bone="j_sk_f_a_r"),
-            link(target="DEF-Skirt_Front.R.001", bone="j_sk_f_b_r"),
-            link(target="DEF-Skirt_Front.R.002", bone="j_sk_f_c_r"),
-            link(target="DEF-Skirt_Side.R", bone="j_sk_s_a_r"),
-            link(target="DEF-Skirt_Side.R.001", bone="j_sk_s_b_r"),
-            link(target="DEF-Skirt_Side.R.002", bone="j_sk_s_c_r"),
-            link(target="DEF-Skirt_Back.R", bone="j_sk_b_a_r"),
-            link(target="DEF-Skirt_Back.R.001", bone="j_sk_b_b_r"),
-            link(target="DEF-Skirt_Back.R.002", bone="j_sk_b_c_r"),
+        transform_link= [
+            TransformLink(target="DEF-Skirt_Front.R", bone="j_sk_f_a_r"),
+            TransformLink(target="DEF-Skirt_Front.R.001", bone="j_sk_f_b_r"),
+            TransformLink(target="DEF-Skirt_Front.R.002", bone="j_sk_f_c_r"),
+            TransformLink(target="DEF-Skirt_Side.R", bone="j_sk_s_a_r"),
+            TransformLink(target="DEF-Skirt_Side.R.001", bone="j_sk_s_b_r"),
+            TransformLink(target="DEF-Skirt_Side.R.002", bone="j_sk_s_c_r"),
+            TransformLink(target="DEF-Skirt_Back.R", bone="j_sk_b_a_r"),
+            TransformLink(target="DEF-Skirt_Back.R.001", bone="j_sk_b_b_r"),
+            TransformLink(target="DEF-Skirt_Back.R.002", bone="j_sk_b_c_r"),
             ],
         bones = [
             #Front
@@ -540,16 +540,16 @@ SKIRT_R_MCH = BoneGroup(
 
 SKIRT_L = BoneGroup(
         name="Skirt Left",
-        linking= [
-            link(target="DEF-Skirt_Front.L", bone="j_sk_f_a_l"),
-            link(target="DEF-Skirt_Front.L.001", bone="j_sk_f_b_l"),
-            link(target="DEF-Skirt_Front.L.002", bone="j_sk_f_c_l"),
-            link(target="DEF-Skirt_Side.L", bone="j_sk_s_a_l"),
-            link(target="DEF-Skirt_Side.L.001", bone="j_sk_s_b_l"),
-            link(target="DEF-Skirt_Side.L.002", bone="j_sk_s_c_l"),
-            link(target="DEF-Skirt_Back.L", bone="j_sk_b_a_l"),
-            link(target="DEF-Skirt_Back.L.001", bone="j_sk_b_b_l"),
-            link(target="DEF-Skirt_Back.L.002", bone="j_sk_b_c_l"),
+        transform_link= [
+            TransformLink(target="DEF-Skirt_Front.L", bone="j_sk_f_a_l"),
+            TransformLink(target="DEF-Skirt_Front.L.001", bone="j_sk_f_b_l"),
+            TransformLink(target="DEF-Skirt_Front.L.002", bone="j_sk_f_c_l"),
+            TransformLink(target="DEF-Skirt_Side.L", bone="j_sk_s_a_l"),
+            TransformLink(target="DEF-Skirt_Side.L.001", bone="j_sk_s_b_l"),
+            TransformLink(target="DEF-Skirt_Side.L.002", bone="j_sk_s_c_l"),
+            TransformLink(target="DEF-Skirt_Back.L", bone="j_sk_b_a_l"),
+            TransformLink(target="DEF-Skirt_Back.L.001", bone="j_sk_b_b_l"),
+            TransformLink(target="DEF-Skirt_Back.L.002", bone="j_sk_b_c_l"),
             ],
         bones = [
             #Front
@@ -716,17 +716,17 @@ SKIRT_L_MCH = BoneGroup(
 
 HAND_R = BoneGroup(
     name="Right Hand",
-    linking= [
-        link(target="DEF-thumb.R", bone="j_oya_a_r"),
-        link(target="DEF-thumb.R.001", bone="j_oya_b_r"),
-        link(target="DEF-index.R", bone="j_hito_a_r"),
-        link(target="DEF-index.R.001", bone="j_hito_b_r"),
-        link(target="DEF-middle.R", bone="j_naka_a_r"),
-        link(target="DEF-middle.R.001", bone="j_naka_b_r"),
-        link(target="DEF-ring.R", bone="j_kusu_a_r"),
-        link(target="DEF-ring.R.001", bone="j_kusu_b_r"),
-        link(target="DEF-pinky.R", bone="j_ko_a_r"),
-        link(target="DEF-pinky.R.001", bone="j_ko_b_r"),
+    transform_link= [
+        TransformLink(target="DEF-thumb.R", bone="j_oya_a_r"),
+        TransformLink(target="DEF-thumb.R.001", bone="j_oya_b_r"),
+        TransformLink(target="DEF-index.R", bone="j_hito_a_r"),
+        TransformLink(target="DEF-index.R.001", bone="j_hito_b_r"),
+        TransformLink(target="DEF-middle.R", bone="j_naka_a_r"),
+        TransformLink(target="DEF-middle.R.001", bone="j_naka_b_r"),
+        TransformLink(target="DEF-ring.R", bone="j_kusu_a_r"),
+        TransformLink(target="DEF-ring.R.001", bone="j_kusu_b_r"),
+        TransformLink(target="DEF-pinky.R", bone="j_ko_a_r"),
+        TransformLink(target="DEF-pinky.R.001", bone="j_ko_b_r"),
     ],
     bones=[
         #Thumb
@@ -870,17 +870,17 @@ HAND_R = BoneGroup(
 
 HAND_L = BoneGroup(
     name="Left Hand",
-    linking= [
-        link(target="DEF-thumb.L", bone="j_oya_a_l"),
-        link(target="DEF-thumb.L.001", bone="j_oya_b_l"),
-        link(target="DEF-index.L", bone="j_hito_a_l"),
-        link(target="DEF-index.L.001", bone="j_hito_b_l"),
-        link(target="DEF-middle.L", bone="j_naka_a_l"),
-        link(target="DEF-middle.L.001", bone="j_naka_b_l"),
-        link(target="DEF-ring.L", bone="j_kusu_a_l"),
-        link(target="DEF-ring.L.001", bone="j_kusu_b_l"),
-        link(target="DEF-pinky.L", bone="j_ko_a_l"),
-        link(target="DEF-pinky.L.001", bone="j_ko_b_l"),
+    transform_link= [
+        TransformLink(target="DEF-thumb.L", bone="j_oya_a_l"),
+        TransformLink(target="DEF-thumb.L.001", bone="j_oya_b_l"),
+        TransformLink(target="DEF-index.L", bone="j_hito_a_l"),
+        TransformLink(target="DEF-index.L.001", bone="j_hito_b_l"),
+        TransformLink(target="DEF-middle.L", bone="j_naka_a_l"),
+        TransformLink(target="DEF-middle.L.001", bone="j_naka_b_l"),
+        TransformLink(target="DEF-ring.L", bone="j_kusu_a_l"),
+        TransformLink(target="DEF-ring.L.001", bone="j_kusu_b_l"),
+        TransformLink(target="DEF-pinky.L", bone="j_ko_a_l"),
+        TransformLink(target="DEF-pinky.L.001", bone="j_ko_b_l"),
     ],
     bones=[
         #Thumb
@@ -1024,11 +1024,11 @@ HAND_L = BoneGroup(
 
 TAIL = BoneGroup(
     name="Tail",
-    linking= [
-        link(target="DEF-Tail", bone="n_sippo_a"),
-        link(target="DEF-Tail.001", bone="n_sippo_b"),
-        link(target="DEF-Tail.002", bone="n_sippo_c"),
-        link(target="DEF-Tail.003", bone="n_sippo_d"),
+    transform_link= [
+        TransformLink(target="DEF-Tail", bone="n_sippo_a"),
+        TransformLink(target="DEF-Tail.001", bone="n_sippo_b"),
+        TransformLink(target="DEF-Tail.002", bone="n_sippo_c"),
+        TransformLink(target="DEF-Tail.003", bone="n_sippo_d"),
     ],
     bones=[
         ConnectBone(
@@ -1081,28 +1081,28 @@ TAIL = BoneGroup(
 
 HEAD = BoneGroup(
     name="Head",
-    linking= [
-        link(target="DEF-Neck", bone="j_kubi"),
-        link(target="DEF-Head", bone="j_kao"),
-        link(target="DEF-jaw_master", bone="j_f_ago"),
-        link(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
-        link(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
-        link(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
-        link(target="DEF-Cheek.B.L", bone="j_f_shoho_l"),
-        link(target="DEF-Cheek.B.L.001", bone="j_f_dhoho_l"),
-        link(target="DEF-Cheek.T.L", bone="j_f_hoho_l"),
-        link(target="DEF-Lip.T.R", bone="j_f_ulip_01_r"),
-        link(target="DEF-Lip.T.R.001", bone="j_f_umlip_01_r"),
-        link(target="DEF-Lip.T.R.002", bone="j_f_uslip_r"),
-        link(target="DEF-Lip.B.R", bone="j_f_dlip_01_r"),
-        link(target="DEF-Lip.B.R.001", bone="j_f_dmlip_01_r"),
-        link(target="DEF-Lip.B.R.002", bone="j_f_dslip_r"),
-        link(target="DEF-Lip.T.L", bone="j_f_ulip_01_l"),
-        link(target="DEF-Lip.T.L.001", bone="j_f_umlip_01_l"),
-        link(target="DEF-Lip.T.L.002", bone="j_f_uslip_l"),
-        link(target="DEF-Lip.B.L", bone="j_f_dlip_01_l"),
-        link(target="DEF-Lip.B.L.001", bone="j_f_dmlip_01_l"),
-        link(target="DEF-Lip.B.L.002", bone="j_f_dslip_l"),
+    transform_link= [
+        TransformLink(target="DEF-Neck", bone="j_kubi"),
+        TransformLink(target="DEF-Head", bone="j_kao"),
+        TransformLink(target="DEF-jaw_master", bone="j_f_ago"),
+        TransformLink(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
+        TransformLink(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
+        TransformLink(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
+        TransformLink(target="DEF-Cheek.B.L", bone="j_f_shoho_l"),
+        TransformLink(target="DEF-Cheek.B.L.001", bone="j_f_dhoho_l"),
+        TransformLink(target="DEF-Cheek.T.L", bone="j_f_hoho_l"),
+        TransformLink(target="DEF-Lip.T.R", bone="j_f_ulip_01_r"),
+        TransformLink(target="DEF-Lip.T.R.001", bone="j_f_umlip_01_r"),
+        TransformLink(target="DEF-Lip.T.R.002", bone="j_f_uslip_r"),
+        TransformLink(target="DEF-Lip.B.R", bone="j_f_dlip_01_r"),
+        TransformLink(target="DEF-Lip.B.R.001", bone="j_f_dmlip_01_r"),
+        TransformLink(target="DEF-Lip.B.R.002", bone="j_f_dslip_r"),
+        TransformLink(target="DEF-Lip.T.L", bone="j_f_ulip_01_l"),
+        TransformLink(target="DEF-Lip.T.L.001", bone="j_f_umlip_01_l"),
+        TransformLink(target="DEF-Lip.T.L.002", bone="j_f_uslip_l"),
+        TransformLink(target="DEF-Lip.B.L", bone="j_f_dlip_01_l"),
+        TransformLink(target="DEF-Lip.B.L.001", bone="j_f_dmlip_01_l"),
+        TransformLink(target="DEF-Lip.B.L.002", bone="j_f_dslip_l"),
     ],
     bones=[
         ConnectBone(
@@ -1470,14 +1470,14 @@ HEAD = BoneGroup(
 
 LEFT_EYE = BoneGroup(
     name="Eyes",
-    linking= [
-        link(target="lid.B.L.001", bone="j_f_mabdn_03in_l"),
-        link(target="lid.B.L.002", bone="j_f_mabdn_01_l"),
-        link(target="lid.B.L.003", bone="j_f_mabdn_02out_l"),
-        link(target="lid.T.L.001", bone="j_f_mabup_02out_l"),
-        link(target="lid.T.L.002", bone="j_f_mabup_01_l"),
-        link(target="lid.T.L.003", bone="j_f_mabup_03in_l"),
-        link(target="MCH-Eye.L", bone="j_f_eyepuru_l"),
+    transform_link= [
+        TransformLink(target="lid.B.L.001", bone="j_f_mabdn_03in_l"),
+        TransformLink(target="lid.B.L.002", bone="j_f_mabdn_01_l"),
+        TransformLink(target="lid.B.L.003", bone="j_f_mabdn_02out_l"),
+        TransformLink(target="lid.T.L.001", bone="j_f_mabup_02out_l"),
+        TransformLink(target="lid.T.L.002", bone="j_f_mabup_01_l"),
+        TransformLink(target="lid.T.L.003", bone="j_f_mabup_03in_l"),
+        TransformLink(target="MCH-Eye.L", bone="j_f_eyepuru_l"),
     ],
     bones=[
 
@@ -1678,14 +1678,14 @@ LEFT_EYE = BoneGroup(
 
 RIGHT_EYE = BoneGroup(
     name="Eyes",
-    linking= [
-        link(target="lid.B.R.001", bone="j_f_mabdn_03in_r"),
-        link(target="lid.B.R.002", bone="j_f_mabdn_01_r"),
-        link(target="lid.B.R.003", bone="j_f_mabdn_02out_r"),
-        link(target="lid.T.R.001", bone="j_f_mabup_02out_r"),
-        link(target="lid.T.R.002", bone="j_f_mabup_01_r"),
-        link(target="lid.T.R.003", bone="j_f_mabup_03in_r"),
-        link(target="MCH-Eye.R", bone="j_f_eyepuru_r"),
+    transform_link= [
+        TransformLink(target="lid.B.R.001", bone="j_f_mabdn_03in_r"),
+        TransformLink(target="lid.B.R.002", bone="j_f_mabdn_01_r"),
+        TransformLink(target="lid.B.R.003", bone="j_f_mabdn_02out_r"),
+        TransformLink(target="lid.T.R.001", bone="j_f_mabup_02out_r"),
+        TransformLink(target="lid.T.R.002", bone="j_f_mabup_01_r"),
+        TransformLink(target="lid.T.R.003", bone="j_f_mabup_03in_r"),
+        TransformLink(target="MCH-Eye.R", bone="j_f_eyepuru_r"),
     ],
     bones=[
         ## Skin Bone, Basicly Corner Bones for the eyes
