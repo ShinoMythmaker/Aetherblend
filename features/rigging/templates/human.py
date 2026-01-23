@@ -2,7 +2,7 @@ import bpy
 import mathutils
 
 from ....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone
-from ....core.shared import PoseOperations, BoneGroup, TransformLink
+from ....core.shared import PoseOperations, BoneGroup, TransformLink, WidgetOverride
 from ....core import rigify
 
 # Individual bone list (for backwards compatibility and direct access)

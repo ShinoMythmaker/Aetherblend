@@ -22,13 +22,13 @@ class BoneCollection:
         
         return coll
 
-    def create_ui(self, armature: bpy.types.Object) -> type[tuple[bpy.types.BoneCollection | None, list[bpy.types.BoneCollection] | None]]:
+    def create_ui(self, armature: bpy.types.Object) -> type[tuple[bpy.types.BoneCollection | None, bool]]:
         """Creates the bone collection UI in the armature."""
         if not armature or armature.type != 'ARMATURE':
-            return None, []
+            return None, False
         
         coll = armature.data.collections.get(self.name)
-        hide_collections = []
+        hide_collections = False
         if coll:
             if self.ui:
                 coll.rigify_color_set_name = self.color_set
@@ -36,10 +36,10 @@ class BoneCollection:
                 coll.rigify_ui_title = self.title
 
             if not self.visible:
-                hide_collections.append(coll)
+                hide_collections = True
 
             return coll,  hide_collections
-        return None, []
+        return None, False
     
 @dataclass(frozen=True)
 class ColorSet:

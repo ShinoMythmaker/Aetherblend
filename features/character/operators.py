@@ -7,7 +7,6 @@ from bpy_extras.io_utils import axis_conversion
 from ... import utils
 from ...preferences import get_preferences
 
-
 class AETHER_OT_Character_Import(bpy.types.Operator):
     """Import a character model into Blender with various options."""
     bl_idname = "aether.character_import"
@@ -28,8 +27,6 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
     s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
-
-    s_temperence: BoolProperty(name="Temperence Mode", description="Imports with temperence mode enabled", default=False)  # type: ignore
     
     # Bone Axis Orientation (FBX-style)
     primary_bone_axis: EnumProperty(
@@ -141,10 +138,6 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         split.label(text=" ")
         split.prop(self, "s_apply_pose_track")
 
-        split = col.split(factor=indent)  
-        split.label(text=" ")
-        split.prop(self, "s_temperence")
-
         # Bone Orientation Section
         box = layout.box()
         row = box.row()
@@ -172,7 +165,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             return {'CANCELLED'}   
 
         # Import the model
-        imported_objects = utils.import_export.import_model(self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices, self.s_temperence)
+        imported_objects = utils.import_export.import_model(self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices)
 
         # Process the imported objects with settings in mind
         if self.s_import_collection:

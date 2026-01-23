@@ -79,9 +79,11 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         ## Add Bone Collections UI
         hide_collections = []
-        for coll in aether_rig_generator.b_collections:
+        for coll in aether_rig_generator.ui_collections:
             coll.create(meta_rig)
-            coll.create_ui(meta_rig)
+            coll, hide = coll.create_ui(meta_rig)
+            if hide and coll:
+                hide_collections.append(coll)
 
         
         # Populate Data needed for generation
@@ -229,11 +231,15 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
             for bone in ffxiv_data_bones.values():
                 if bone:
                     bone.use_deform = True
+
+            ## Widget Overrides
+            bpy.ops.object.mode_set(mode='POSE')
+            for widget in aether_rig_generator.widget_overrides:
+                widget.execute(armature)
             
+            bpy.ops.object.mode_set(mode='OBJECT')
             armature.aether_rig.rigified = True
 
-            
-        
         meta_rig.hide_set(True)
         meta_rig.hide_viewport = True
 

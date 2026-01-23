@@ -1,11 +1,9 @@
 import os
 import bpy
 
-def import_model(filepath: str, pack_images=True, disable_bone_shape=False, merge_vertices=False, temperance=False):
+def import_model(filepath: str, pack_images=True, disable_bone_shape=False, merge_vertices=False):
     """Imports GLTF or FBX. Returns list of imported objects."""
     bone_heuristic = "BLENDER" 
-    if temperance:
-        bone_heuristic = "TEMPERANCE"
         
     scene_objects = set(bpy.context.scene.objects)
     ext = os.path.splitext(filepath)[1].lower()

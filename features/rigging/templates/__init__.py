@@ -9,7 +9,13 @@ from .human import *
 HUMAN = AetherRigGenerator (
     name = "Human Rig",
     color_sets=AETHER_BLEND,
-    b_collections=HUMAN_SFW,  
+    ui_collections=HUMAN_SFW,  
+    widget_overrides=[
+        WidgetOverride(
+            bone="Cheek.T.L",
+            scale_factor=0.5,
+            )
+    ],
     bone_groups = [
             [SPINE],
             [ARM_R],

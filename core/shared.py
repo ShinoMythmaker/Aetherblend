@@ -62,6 +62,47 @@ class TransformLink:
             )
         )
         return pose_operations_dict
+    
+@dataclass
+class WidgetOverride:
+    """Overrides the widget of a bone."""
+    bone: str
+    custom_object: str | None = None
+    translation: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    rotation: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    scale: tuple[float, float, float] = (1.0, 1.0, 1.0)
+    scale_factor: float = 1.0
+    override_transform: str | None = None  # Bone Name
+    affect_gizmo: bool = False
+    use_as_pivot: bool = False
+    scale_to_bone_length: bool = True
+    wireframe: bool = False
+    wire_width: float = 1.0
+
+
+    def execute(self, armature: bpy.types.Object) -> None:
+        """Applies the widget override to the given pose bone."""
+        pose_bone = armature.pose.bones.get(self.bone)
+        if not pose_bone:
+            print(f"[AetherBlend] WidgetOverride bone '{self.bone}' not found in armature.")
+            return
+        
+        scale = (self.scale[0] * self.scale_factor, self.scale[1] * self.scale_factor, self.scale[2] * self.scale_factor)
+
+        try:
+            if self.custom_object:
+                pose_bone.custom_shape = self.custom_object
+            pose_bone.custom_shape_translation = self.translation
+            pose_bone.custom_shape_rotation_euler = self.rotation
+            pose_bone.custom_shape_scale_xyz = scale
+            pose_bone.custom_shape_transform = self.override_transform
+            pose_bone.use_transform_at_custom_shape = self.affect_gizmo      ## 5.0
+            pose_bone.use_transform_around_custom_shape = self.use_as_pivot  ## 5.0
+            pose_bone.use_custom_shape_bone_size = self.scale_to_bone_length
+            pose_bone.show_wire = self.wireframe
+            pose_bone.custom_shape_wire_width = self.wire_width
+        except Exception as e:
+            print(f"[AetherBlend] Error applying WidgetOverride for bone '{pose_bone.name}': {e}")
 
 @dataclass
 class BoneGroup:
@@ -136,16 +177,7 @@ class AetherRigGenerator:
     """Generates an armature based on defined bone groups."""
     name: str
     color_sets: 'list[rigify.ColorSet] | None' = None
-    b_collections: 'list[rigify.BoneCollection] | None' = None
+    ui_collections: 'list[rigify.BoneCollection] | None' = None
+    widget_overrides: 'list[WidgetOverride] | None' = None
     bone_groups: 'list[BoneGroup] | None' = None
-
-    def generate_meta_rig(self, armature: bpy.types.Object, data: dict | None = None) -> 'dict[str, list[PoseOperations]]':
-        """Generate the meta-rig for Rigify."""
-        # TODO: Implementation will be added
-        pass
-    
-    def generate_rigify_rig(self, armature: bpy.types.Object, data: dict | None = None) -> None:
-        """Generate the final Rigify rig."""
-        # TODO: Implementation will be added
-        pass
 
