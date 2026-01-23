@@ -223,7 +223,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
 
         if result == {"FINISHED"}:
             aether_rig_generator = HUMAN
-            
+
             ## Execute Post Generation Steps
             ffxiv_data_bones = utils.armature.b_collection.get_bones(armature, "FFXIV")
             for bone in ffxiv_data_bones.values():
@@ -231,6 +231,8 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
                     bone.use_deform = True
             
             armature.aether_rig.rigified = True
+
+            
         
         meta_rig.hide_set(True)
         meta_rig.hide_viewport = True
