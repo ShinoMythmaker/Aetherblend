@@ -1,5 +1,3 @@
-""" Provides utility functions for decoding and processing C+ strings. """
-
 import base64
 import json
 import zlib

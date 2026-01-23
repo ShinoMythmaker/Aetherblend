@@ -2,7 +2,7 @@ import bpy
 import os
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper  
-from ..preferences import get_preferences
+from ...preferences import get_preferences
 
 class AETHER_OT_VFXExport(Operator, ExportHelper):
     bl_idname = "aether.vfx_export"

@@ -1,5 +1,7 @@
 import bpy
-from .. import utils
+
+from ... import utils
+from . import decoder
 
 
 class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
@@ -19,14 +21,14 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
             self.report({'ERROR'}, "Please select a valid armature.")
             return {'CANCELLED'}
 
-        version, cplus_dict = utils.c_plus.translate_hash(cplus_string)
+        version, cplus_dict = decoder.translate_hash(cplus_string)
         if not cplus_dict or version not in [4, 5]:
             self.report({'ERROR'}, "Invalid or unsupported C+ string (must be version 4 or 5).")
             return {'CANCELLED'}
 
-        scale_dict = utils.c_plus.get_bone_values(cplus_dict, 'Scaling')
-        rot_dict = utils.c_plus.get_bone_values(cplus_dict, 'Rotation')
-        pos_dict = utils.c_plus.get_bone_values(cplus_dict, 'Translation')
+        scale_dict = decoder.get_bone_values(cplus_dict, 'Scaling')
+        rot_dict = decoder.get_bone_values(cplus_dict, 'Rotation')
+        pos_dict = decoder.get_bone_values(cplus_dict, 'Translation')
 
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.context.view_layer.objects.active = armature
@@ -35,7 +37,7 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         utils.armature.unparent_all_bones(armature)
 
         ffxiv_bones =utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
-        utils.c_plus.apply_transforms(armature, scale_dict, rot_dict, pos_dict, ffxiv_bones)
+        decoder.apply_transforms(armature, scale_dict, rot_dict, pos_dict, ffxiv_bones)
 
         utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
 

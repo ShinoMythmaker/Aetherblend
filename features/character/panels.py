@@ -1,6 +1,6 @@
 import bpy
 import addon_utils
-from ..preferences import get_preferences
+from ...preferences import get_preferences
 
 def check_for_meddle():
     """Check if Meddle Tools addon is installed and enabled"""
