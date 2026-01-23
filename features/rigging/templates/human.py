@@ -239,7 +239,7 @@ LEG_R = BoneGroup(
                 parent="foot.R",
                 is_connected=True,
                 axis_type="local",
-                axis="X",
+                axis="Y",
                 start="head",
                 req_bones=["j_asi_e_r"],
                 pose_operations=PoseOperations(
@@ -252,9 +252,9 @@ LEG_R = BoneGroup(
                 parent="shin.R",
                 is_connected=False,
                 axis_type="local",
-                axis="X",
+                axis="Y",
                 start="head",
-                size_factor=-4.0,
+                size_factor=-0.8,
                 req_bones=["j_asi_e_r"],
                 pose_operations=PoseOperations(
                     b_collection="Leg.R (IK)"
@@ -325,7 +325,7 @@ LEG_L = BoneGroup(
                 parent="foot.L",
                 is_connected=True,
                 axis_type="local",
-                axis="Z",
+                axis="Y",
                 start="head",
                 req_bones=["j_asi_e_l"],
                 pose_operations=PoseOperations(
@@ -338,9 +338,9 @@ LEG_L = BoneGroup(
                 parent="shin.L",
                 is_connected=False,
                 axis_type="local",
-                axis="Z",
+                axis="Y",
                 start="head",
-                size_factor=-4.0,
+                size_factor=-0.8,
                 req_bones=["j_asi_e_l"],
                 pose_operations=PoseOperations(
                     b_collection="Leg.L (IK)"
@@ -1431,7 +1431,7 @@ HEAD = BoneGroup(
                b_collection = "Face"
            )
        ),
-       ConnectBone(
+        ConnectBone(
            name = "Lip.T.L.003",
            bone_a = "j_f_uslip_l",
            bone_b = "Corner.L",
@@ -1442,7 +1442,7 @@ HEAD = BoneGroup(
                b_collection = "Face"
           )
        ),
-       ConnectBone(
+        ConnectBone(
            name = "Lip.B.L.002",
            bone_a = "j_f_dmlip_01_l",
            bone_b = "j_f_dslip_l",
@@ -1464,6 +1464,7 @@ HEAD = BoneGroup(
                b_collection = "Face"
           )
        ),
+        
     ]
 )
 
