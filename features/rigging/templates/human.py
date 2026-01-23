@@ -1242,7 +1242,7 @@ HEAD = BoneGroup(
             req_bones=["j_f_ago", "jaw_master_ref"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.face_skin_jaw(jaw_mouth_influence=1.0),
-                b_collection="Face"
+                b_collection="Face (Primary)"
             )
         ),
         #Mouth Center Reference
@@ -1528,7 +1528,7 @@ LEFT_EYE = BoneGroup(
             parent="Head",
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.face_skin_eye(),
-                b_collection="Face"
+                b_collection="Face (Primary)"
             )
         ),
 
@@ -1733,7 +1733,7 @@ RIGHT_EYE = BoneGroup(
             parent="Head",
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.face_skin_eye(),
-                b_collection="Face"
+                b_collection="Face (Primary)"
                 )
         ),
         BridgeBone(
