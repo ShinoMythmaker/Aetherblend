@@ -11,14 +11,6 @@ from .. import utils
 
 
 @dataclass
-class link:
-    """Links a bone to a target for rigging purposes."""
-    target: str
-    bone: str
-    retarget: str | None = None
-
-
-@dataclass
 class PoseOperations:
     """Groups all pose mode operations for a single bone."""
     rigify_settings: 'rigify.types.rigify_type | None' = None
@@ -40,13 +32,43 @@ class PoseOperations:
         except Exception as e:
             print(f"[AetherBlend] Error executing PoseOperations for bone: {e}")
 
+@dataclass
+class TransformLink:
+    """Links a bone to a target for rigging purposes."""
+    target: str
+    bone: str
+    retarget: str | None = None
+
+    def to_pose_operations(self) -> dict[str, list[PoseOperations]]:
+        """Convert this TransformLink to PoseOperations."""
+        pose_operations_dict: dict[str, list[PoseOperations]] = {}
+
+        ff_bone = self.bone
+        mch_bone = f"MCH-{ff_bone}"
+        if ff_bone not in pose_operations_dict:
+            pose_operations_dict[ff_bone] = []
+        pose_operations_dict[ff_bone].append(
+            PoseOperations(
+                # rigify_settings=rigify.types.basic_raw_copy(True),
+                constraints=[CopyTransformsConstraint(mch_bone, name=f"AetherBlend-CopyTransform@MCH-{ff_bone}")]
+            )
+        )
+
+        if mch_bone not in pose_operations_dict:
+            pose_operations_dict[mch_bone] = []
+        pose_operations_dict[mch_bone].append(
+            PoseOperations(
+                rigify_settings=rigify.types.basic_raw_copy(True, self.target)
+            )
+        )
+        return pose_operations_dict
 
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
     name: str
     description: str = ""
-    linking: list[link] | None = None
+    transform_link: list[TransformLink] | None = None
     bones: 'list[BoneGenerator] | None' = None
     
     def check(self, armature: bpy.types.Object) -> bool:
@@ -80,44 +102,28 @@ class BoneGroup:
     
     def execute(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], dict[str, list[PoseOperations]]]:
         """Execute the full generation process for this bone group."""
-        # Check if all required bones exist
+        # Check if bone group can theoriticlly be generated
         if not self.check(armature):
             print(f"[AetherBlend] BoneGroup '{self.name}' check failed - missing required bones")
             return [], {}
         
-        # Switch to edit mode if needed
-        current_mode = bpy.context.object.mode if bpy.context.object else None
-        if current_mode != 'EDIT':
-            bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode='EDIT')
         
         # Generate bones
         generated_bones = self.generate(armature, data=data)
         
-        # Collect pose operations by bone name (allowing multiple operations per bone)
+        # Collect Pose Operations
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
 
-        for link_item in self.linking or []:
-            ff_bone = link_item.bone
-            mch_bone = f"MCH-{ff_bone}"
-            if ff_bone not in pose_operations_dict:
-                pose_operations_dict[ff_bone] = []
-            pose_operations_dict[ff_bone].append(
-                PoseOperations(
-                    # rigify_settings=rigify.types.basic_raw_copy(True),
-                    constraints=[CopyTransformsConstraint(mch_bone, name=f"AetherBlend-CopyTransform@MCH-{ff_bone}")]
-                )
-            )
-
-            if mch_bone not in pose_operations_dict:
-                pose_operations_dict[mch_bone] = []
-            pose_operations_dict[mch_bone].append(
-                PoseOperations(
-                    rigify_settings=rigify.types.basic_raw_copy(True, link_item.target)
-                )
-            )
+        # Add TransformLink operations
+        for link_item in self.transform_link or []:
+            for bone_name, operations in link_item.to_pose_operations().items():
+                if bone_name not in pose_operations_dict:
+                    pose_operations_dict[bone_name] = []
+                pose_operations_dict[bone_name].extend(operations)
         
+        # Add BoneGenerator pose operations
         for bone_gen in self.bones:
-            # Only add to dict if there are operations to perform
             if bone_gen.pose_operations:
                 if bone_gen.name not in pose_operations_dict:
                     pose_operations_dict[bone_gen.name] = []

@@ -222,7 +222,8 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         result = bpy.ops.pose.rigify_generate()
 
         if result == {"FINISHED"}:
-
+            aether_rig_generator = HUMAN
+            
             ## Execute Post Generation Steps
             ffxiv_data_bones = utils.armature.b_collection.get_bones(armature, "FFXIV")
             for bone in ffxiv_data_bones.values():
