@@ -254,7 +254,7 @@ LEG_R = BoneGroup(
                 axis_type="local",
                 axis="Y",
                 start="head",
-                size_factor=-0.8,
+                size_factor=-4.0,
                 req_bones=["j_asi_e_r"],
                 pose_operations=PoseOperations(
                     b_collection="Leg.R (IK)"
@@ -340,7 +340,7 @@ LEG_L = BoneGroup(
                 axis_type="local",
                 axis="Y",
                 start="head",
-                size_factor=-0.8,
+                size_factor=-4.0,
                 req_bones=["j_asi_e_l"],
                 pose_operations=PoseOperations(
                     b_collection="Leg.L (IK)"
@@ -1088,21 +1088,36 @@ HEAD = BoneGroup(
         TransformLink(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
         TransformLink(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
         TransformLink(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
+        TransformLink(target="DEF-Cheek.T.R.001", bone="j_f_dmemoto_r"),
         TransformLink(target="DEF-Cheek.B.L", bone="j_f_shoho_l"),
         TransformLink(target="DEF-Cheek.B.L.001", bone="j_f_dhoho_l"),
         TransformLink(target="DEF-Cheek.T.L", bone="j_f_hoho_l"),
-        TransformLink(target="DEF-Lip.T.R", bone="j_f_ulip_01_r"),
-        TransformLink(target="DEF-Lip.T.R.001", bone="j_f_umlip_01_r"),
-        TransformLink(target="DEF-Lip.T.R.002", bone="j_f_uslip_r"),
-        TransformLink(target="DEF-Lip.B.R", bone="j_f_dlip_01_r"),
-        TransformLink(target="DEF-Lip.B.R.001", bone="j_f_dmlip_01_r"),
-        TransformLink(target="DEF-Lip.B.R.002", bone="j_f_dslip_r"),
-        TransformLink(target="DEF-Lip.T.L", bone="j_f_ulip_01_l"),
-        TransformLink(target="DEF-Lip.T.L.001", bone="j_f_umlip_01_l"),
-        TransformLink(target="DEF-Lip.T.L.002", bone="j_f_uslip_l"),
-        TransformLink(target="DEF-Lip.B.L", bone="j_f_dlip_01_l"),
-        TransformLink(target="DEF-Lip.B.L.001", bone="j_f_dmlip_01_l"),
-        TransformLink(target="DEF-Lip.B.L.002", bone="j_f_dslip_l"),
+        TransformLink(target="DEF-Cheek.T.L.001", bone="j_f_dmemoto_l"),
+        TransformLink(target="DEF-Nose", bone="j_f_uhana"),
+        TransformLink(target="DEF-Nose.R", bone="j_f_dmiken_r"),
+        TransformLink(target="DEF-Nostril.R", bone="j_f_hana_r"),
+        TransformLink(target="DEF-Nose.L", bone="j_f_dmiken_l"),
+        TransformLink(target="DEF-Nostril.L", bone="j_f_hana_l"),
+        TransformLink(target="DEF-Lip.T.R.001", bone="j_f_ulip_01_r"),
+        TransformLink(target="DEF-Lip.T.R.002", bone="j_f_umlip_01_r"),
+        TransformLink(target="DEF-Lip.T.R.003", bone="j_f_uslip_r"),
+        TransformLink(target="DEF-Lip.B.R.001", bone="j_f_dlip_01_r"),
+        TransformLink(target="DEF-Lip.B.R.002", bone="j_f_dmlip_01_r"),
+        TransformLink(target="DEF-Lip.B.R.003", bone="j_f_dslip_r"),
+        TransformLink(target="DEF-Lip.T.L.001", bone="j_f_ulip_01_l"),
+        TransformLink(target="DEF-Lip.T.L.002", bone="j_f_umlip_01_l"),
+        TransformLink(target="DEF-Lip.T.L.003", bone="j_f_uslip_l"),
+        TransformLink(target="DEF-Lip.B.L.001", bone="j_f_dlip_01_l"),
+        TransformLink(target="DEF-Lip.B.L.002", bone="j_f_dmlip_01_l"),
+        TransformLink(target="DEF-Lip.B.L.003", bone="j_f_dslip_l"),
+        TransformLink(target="Lip.T.L.001", bone="j_f_ulip_02_l"),
+        TransformLink(target="Lip.T.L.002", bone="j_f_umlip_02_l"),
+        TransformLink(target="Lip.T.R.001", bone="j_f_ulip_02_r"),
+        TransformLink(target="Lip.T.R.002", bone="j_f_umlip_02_r"),
+        TransformLink(target="Lip.B.L.001", bone="j_f_dlip_02_l"),
+        TransformLink(target="Lip.B.L.002", bone="j_f_dmlip_02_l"),
+        TransformLink(target="Lip.B.R.001", bone="j_f_dlip_02_r"),
+        TransformLink(target="Lip.B.R.002", bone="j_f_dmlip_02_r"),
     ],
     bones=[
         ConnectBone(
@@ -1167,6 +1182,18 @@ HEAD = BoneGroup(
                 b_collection="Face (Primary)"
             )
         ),
+        ConnectBone(
+            name="Cheek.T.R.001",
+            bone_a="j_f_dmemoto_r",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_dmemoto_r", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
+            )
+        ),
         #Cheek Left
         ConnectBone(
             name="Cheek.B.L",
@@ -1202,6 +1229,81 @@ HEAD = BoneGroup(
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
                 b_collection="Face (Primary)"
+            )
+        ),
+        ConnectBone(
+            name="Cheek.T.L.001",
+            bone_a="j_f_dmemoto_l",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_dmemoto_l", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        #Nose Centre
+        ConnectBone(
+            name="Nose",
+            bone_a="j_f_uhana",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_uhana", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        #Nose Right
+        ConnectBone(
+            name="Nose.R",
+            bone_a="j_f_dmiken_r",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_dmiken_r", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ConnectBone(
+            name="Nostril.R",
+            bone_a="j_f_hana_r",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_r", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        #Nose Left
+        ConnectBone(
+            name="Nose.L",
+            bone_a="j_f_dmiken_l",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_dmiken_l", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ConnectBone(
+            name="Nostril.L",
+            bone_a="j_f_hana_l",
+            bone_b="j_kao",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_l", "j_kao"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head"),
+                b_collection="Face (Secondary)"
             )
         ),
         #Anchor
@@ -1488,7 +1590,7 @@ LEFT_EYE = BoneGroup(
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_02out_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, True, False], skin_chain_falloff=[0.0, -2.0, 0.0], skin_chain_falloff_length=True), 
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True), 
                 b_collection="Face (Secondary)"
                 )
         ),
@@ -1695,7 +1797,7 @@ RIGHT_EYE = BoneGroup(
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_02out_r"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, True, False], skin_chain_falloff=[0.0, -2.0, 0.0], skin_chain_falloff_length=True), 
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True), 
                 b_collection="Face (Secondary)"
                 )
         ),
