@@ -1,7 +1,7 @@
 from ....core.shared import AetherRigGenerator
 from ....core.rigify import *
 
-from .b_collections import *
+from .ui_collections import *
 from .colorsets import *
 from .human import *
 

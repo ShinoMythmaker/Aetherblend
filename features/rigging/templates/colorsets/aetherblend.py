@@ -1,4 +1,4 @@
-from core.rigify.settings import ColorSet
+from .....core.rigify.settings import ColorSet
 
 AETHER_BLEND = [
         ColorSet(name="IK_Right", normal="#4CFF88", select="#FFFFFF", active="#FFFF70"),

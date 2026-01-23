@@ -1,4 +1,4 @@
-from core.rigify.settings import BoneCollection
+from .....core.rigify.settings import BoneCollection
 
 HUMAN_SFW = [
                 BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
