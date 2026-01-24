@@ -13,8 +13,58 @@ HUMAN = AetherRigGenerator (
     widget_overrides=[
         WidgetOverride(
             bone="Cheek.T.L",
-            scale_factor=0.5,
-            )
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Cheek.T.L.001",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Cheek.B.L.001",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Cheek.B.L",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Nose.L",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Nostril.L",
+            scale_factor=0.2,
+        ),
+        WidgetOverride(
+            bone="Nose",
+            scale_factor=0.2,
+        ),
+        #Right Face
+         WidgetOverride(
+            bone="Cheek.T.R",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Cheek.T.R.001",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Cheek.B.R.001",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Cheek.B.R",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Nose.R",
+            scale_factor=0.3,
+        ),
+        WidgetOverride(
+            bone="Nostril.R",
+            scale_factor=0.2,
+        ),
+        #Mouth
     ],
     bone_groups = [
             [SPINE],
