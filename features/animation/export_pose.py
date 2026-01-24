@@ -2,10 +2,11 @@ import bpy
 import json
 import os
 import re
+import math
 from bpy.types import Operator
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper, axis_conversion
-from mathutils import Matrix
+from mathutils import Matrix, Euler
 from ...preferences import get_preferences
 
 
@@ -42,10 +43,9 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             self.report({'ERROR'}, "No armature selected")
             return {'CANCELLED'}
         
-        # Get pose export properties
         export_props = context.scene.aether_animation_export
         
-        # Build axis conversion matrix if enabled
+        # Build axis conversion
         pose_correction_matrix = Matrix.Identity(4)
         if export_props.use_pose_axis_conversion:
             pose_correction_matrix = axis_conversion(
@@ -54,6 +54,8 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
                 to_up='Y',                                      ## Target Primary
                 to_forward='X',                                 ## Target Secondary
             ).to_4x4()
+        
+        x_rotation = Matrix.Rotation(math.radians(-90), 4, 'X')
         
         skeleton_data = {
             "FileExtension": ".pose",
@@ -72,12 +74,15 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             clean_bone_name = re.sub(r"\.\d+$", "", bone_name)
             bone = armature.pose.bones.get(bone_name)
             if bone:
-                # Get bone matrix in world space (relative to scene origin)
+                # Get bone matrix in world space
                 bone_matrix_world = armature.matrix_world @ bone.matrix
                 
-                # Apply axis conversion if enabled
+                # Apply axis conversion
                 if export_props.use_pose_axis_conversion:
                     bone_matrix_world = bone_matrix_world @ pose_correction_matrix
+                
+                # Flip for FFXIV
+                bone_matrix_world = x_rotation @ bone_matrix_world
                 
                 bone_data = {}
                 bone_data["Position"] = f"{bone_matrix_world.translation.x:.6f}, {bone_matrix_world.translation.y:.6f}, {bone_matrix_world.translation.z:.6f}"
