@@ -1,8 +1,9 @@
 from . import export_anim
 from . import export_pose
 from . import panels
+from . import properties
 
-modules = (export_anim, export_pose, panels)
+modules = (properties, export_anim, export_pose, panels)
 
 def register():
     for mod in modules:

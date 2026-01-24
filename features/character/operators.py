@@ -225,10 +225,10 @@ def apply_bone_axis_conversion(armature: bpy.types.Object, primary_axis: str, se
         return
     
     bone_correction_matrix = axis_conversion(
-        from_forward='X',
         from_up='Y',
-        to_forward=secondary_axis,
+        from_forward='X',
         to_up=primary_axis,
+        to_forward=secondary_axis,
     ).to_4x4()
 
     previous_mode = armature.mode if hasattr(armature, 'mode') else 'OBJECT'
