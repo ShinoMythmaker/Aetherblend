@@ -116,6 +116,27 @@ class limbs_super_finger(rigify_type):
             print(f"[AetherBlend] Error setting super finger parameters: {e}")
 
 @dataclass
+class limbs_super_palm(rigify_type):
+    """Rigify type: limbs.super_palm - Palm rig"""
+    palm_both_sides: bool = None
+
+    def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+        if pose_bone is None:
+            print(f"[AetherBlend] Warning: pose_bone is None")
+            return
+        
+        armature.data.bones.active = pose_bone.bone
+        pose_bone.rigify_type = "limbs.super_palm"
+        rigify_params = pose_bone.rigify_parameters
+
+        try:
+            if self.palm_both_sides:
+                rigify_params.palm_both_sides = self.palm_both_sides
+        except Exception as e:
+            print(f"[AetherBlend] Error setting super palm parameters: {e}")
+
+
+@dataclass
 class spines_basic_spine(rigify_type):
     """Rigify type: spines.basic_spine - Used for spine rigs."""
     fk_coll: str = None
