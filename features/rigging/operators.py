@@ -74,12 +74,12 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             utils.collection.link_to_collection([meta_rig], armature_collection)
 
         ## Add Color Sets
-        for color_set in aether_rig_generator.color_sets:
+        for color_set in aether_rig_generator.getColorSets().values():
             color_set.add(meta_rig)
 
         ## Add Bone Collections UI
         hide_collections = []
-        for coll in aether_rig_generator.ui_collections:
+        for coll in aether_rig_generator.getUICollections().values():
             coll.create(meta_rig)
             coll, hide = coll.create_ui(meta_rig)
             if hide and coll:
@@ -98,7 +98,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             data = None
 
         # Loop through all bone groups
-        for bone_group_handler in aether_rig_generator.bone_groups:
+        for bone_group_handler in aether_rig_generator.getBoneGroups().values():
             for bone_group in bone_group_handler:
                 bones, pose_ops = bone_group.execute(meta_rig, data)
 
@@ -234,7 +234,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
 
             ## Widget Overrides
             bpy.ops.object.mode_set(mode='POSE')
-            for widget in aether_rig_generator.widget_overrides:
+            for widget in aether_rig_generator.getWidgetOverrides().values():
                 widget.execute(armature)
             
             bpy.ops.object.mode_set(mode='OBJECT')
