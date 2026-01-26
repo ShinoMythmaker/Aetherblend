@@ -1,9 +1,6 @@
 import bpy
 import addon_utils
 
-from . import module_manager
-from ...preferences import get_preferences
-
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
     bl_idname = "AETHER_PT_rig_creation_panel"
@@ -70,21 +67,8 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         
         control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
 
+        row = col.row(align=True)
 
-class AETHER_PT_RigModuleSelection(bpy.types.Panel):
-    bl_label = "Rig Configuration"
-    bl_idname = "AETHER_PT_rig_module_selection"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
-    bl_parent_id = "AETHER_PT_rig_creation_panel"
-    bl_options = {'DEFAULT_CLOSED'}
-
-    def draw(self, context):
-        layout = self.layout
-        armature = context.active_object
-        aether_rig = armature.aether_rig
-        
         # Template selection
         row = layout.row(align=True)
         row.label(text="Template", icon='PRESET')
@@ -271,14 +255,12 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(AETHER_PT_RigCreation)
-    bpy.utils.register_class(AETHER_PT_RigModuleSelection)
     bpy.utils.register_class(AETHER_PT_RigLayersPanel)
     bpy.utils.register_class(AETHER_PT_RigUIPanel)
     bpy.utils.register_class(AETHER_PT_RigBakeSettingsPanel)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_RigCreation)
-    bpy.utils.unregister_class(AETHER_PT_RigModuleSelection)
     bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
     bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
     bpy.utils.unregister_class(AETHER_PT_RigBakeSettingsPanel)

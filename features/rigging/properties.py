@@ -1,6 +1,5 @@
 import bpy
 
-# Import module configuration
 from . import module_manager
 
 
@@ -12,14 +11,12 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         poll=lambda self, obj: obj.type == 'ARMATURE'
     ) # type: ignore
     
-    
     rigified : bpy.props.BoolProperty(
         name="Rigified",
         description="Whether the armature went through generation process or not",
         default=False
     ) # type: ignore
     
-    # Template selection
     selected_template : bpy.props.EnumProperty(
         name="Template",
         description="Select a rig template",
@@ -27,7 +24,6 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         default=0
     ) # type: ignore
     
-    # Colorset override (single selection, replaces template default)
     selected_colorset : bpy.props.EnumProperty(
         name="Colorset",
         description="Select a colorset (replaces template default)",
