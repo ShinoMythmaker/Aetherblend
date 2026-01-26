@@ -11,6 +11,11 @@ HUMAN = AetherRigGenerator (
     color_sets=AETHER_BLEND,
     ui_collections=HUMAN_SFW,  
     widget_overrides=[
+        #Root
+        WidgetOverride(
+            bone="root",
+            scale_factor=0.2,
+        ),
         WidgetOverride(
             bone="Cheek.T.L",
             scale_factor=0.3,
@@ -65,6 +70,22 @@ HUMAN = AetherRigGenerator (
             scale_factor=0.2,
         ),
         #Mouth
+        WidgetOverride(
+            bone="jaw_master_mouth",
+            scale=[0.8, 1.0, 0.5]
+        ),
+        WidgetOverride(
+            bone="Teeth.T",
+            scale_factor=1.7,
+            translation=[0.0, 0.003, 0.0],
+            rotation=[0.0, 0.0, 3.1415],
+        ),
+        WidgetOverride(
+            bone="Teeth.B",
+            scale_factor=1.7,
+            translation=[0.0, 0.003, 0.0],
+            rotation=[0.0, 0.0, 3.1415],
+        )
     ],
     bone_groups = [
             [SPINE],
@@ -81,6 +102,7 @@ HUMAN = AetherRigGenerator (
             [TAIL],
             [HEAD],
             [LEFT_EYE],
-            [RIGHT_EYE]
+            [RIGHT_EYE],
+            [BROW],
         ]
 )

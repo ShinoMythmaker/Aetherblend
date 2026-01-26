@@ -14,4 +14,6 @@ AETHER_BLEND = [
         ColorSet(name="Head", normal="#64FFEA", select="#FFFFFF", active="#FFFF70"),
         ColorSet(name="Face_Primary", normal="#64FF92", select="#FFFFFF", active="#FFFF70"),
         ColorSet(name="Face_Secondary", normal="#7AAFFF", select="#FFFFFF", active="#FFFF70"),
+        ColorSet(name="Tail", normal="#FF9558", select="#FFFFFF", active="#FFFF70"), 
+        ColorSet(name="Skirt", normal="#FF547F", select="#FFFFFF", active="#FFFF70"),
     ]

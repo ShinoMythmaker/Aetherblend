@@ -29,11 +29,11 @@ HUMAN_SFW = [
                 BoneCollection(name="Leg.R (FK)", ui=True, color_set="FK_Right", row_index=16, title="FK.R", visible=False),
                 BoneCollection(name="Leg.R (Tweak)", ui=True, color_set="Tweak_Right", row_index=17, title="Tweak.R", visible=False),
 
-                BoneCollection(name="Tail", ui=True, color_set="Special", row_index=19, title="Tail"),
-                BoneCollection(name="Tail (Tweak)", ui=True, color_set="Tweak", row_index=20, title="Tweaks", visible=False),
+                BoneCollection(name="Tail", ui=True, color_set="Tail", row_index=19, title="Tail"),
+                # BoneCollection(name="Tail (Tweak)", ui=True, color_set="Tweak", row_index=20, title="Tweaks", visible=False),
 
-                BoneCollection(name="Skirt", ui=True, color_set="Special", row_index=22, title="Skirt", visible=False),
-                BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Tweak", row_index=23, title="Tweak", visible=False),
+                BoneCollection(name="Skirt", ui=True, color_set="Skirt", row_index=22, title="Skirt", visible=False),
+                BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Skirt", row_index=23, title="Tweak", visible=False),
 
                 # BoneCollection(name="Genitals (Male)", ui=True, color_set="FK", row_index=25, title="Genitals (Male)", visible=False),
                 # BoneCollection(name="Tweak (Male)", ui=True, color_set="Tweak", row_index=26, title="Tweak (Male)", visible=False),

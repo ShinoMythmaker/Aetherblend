@@ -729,6 +729,64 @@ HAND_R = BoneGroup(
         TransformLink(target="DEF-pinky.R.001", bone="j_ko_b_r"),
     ],
     bones=[
+        #Palm Control - Very cool stuff, thank you rigify - Oats
+        ExtensionBone(
+            name="palm.01.R",
+            bone_a="j_hito_a_r",
+            parent="hand.R",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=135,
+            req_bones=["j_hito_a_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_palm(palm_both_sides=True),
+                b_collection="Fingers.R"
+            )
+        ),
+        ExtensionBone(
+            name="palm.02.R",
+            bone_a="j_naka_a_r",
+            parent="hand.R",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=135,
+            req_bones=["j_naka_a_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers.R"
+            )
+        ),
+        ExtensionBone(
+            name="palm.03.R",
+            bone_a="j_kusu_a_r",
+            parent="hand.R",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=135,
+            req_bones=["j_kusu_a_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers.R"
+            )
+        ),
+        ExtensionBone(
+            name="palm.04.R",
+            bone_a="j_ko_a_r",
+            parent="hand.R",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=135,
+            req_bones=["j_ko_a_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers.R"
+            )
+        ),
         #Thumb
         ConnectBone(
             name="thumb.R",
@@ -762,7 +820,7 @@ HAND_R = BoneGroup(
             name="index.R",
             bone_a="j_hito_a_r",
             bone_b="j_hito_b_r",
-            parent="hand.R",
+            parent="palm.01.R",
             roll=135,
             is_connected=False,
             req_bones=["j_hito_a_r", "j_hito_b_r"],
@@ -789,7 +847,7 @@ HAND_R = BoneGroup(
             name="middle.R",
             bone_a="j_naka_a_r",
             bone_b="j_naka_b_r",
-            parent="hand.R",
+            parent="palm.02.R",
             roll=135,
             is_connected=False,
             req_bones=["j_naka_a_r", "j_naka_b_r"],
@@ -816,7 +874,7 @@ HAND_R = BoneGroup(
             name="ring.R",
             bone_a="j_kusu_a_r",
             bone_b="j_kusu_b_r",
-            parent="hand.R",
+            parent="palm.03.R",
             roll=135,
             is_connected=False,
             req_bones=["j_kusu_a_r", "j_kusu_b_r"],
@@ -843,7 +901,7 @@ HAND_R = BoneGroup(
             name="pinky.R",
             bone_a="j_ko_a_r",
             bone_b="j_ko_b_r",
-            parent="hand.R",
+            parent="palm.04.R",
             roll=135,
             is_connected=False,
             req_bones=["j_ko_a_r", "j_ko_b_r"],
@@ -865,6 +923,7 @@ HAND_R = BoneGroup(
                 b_collection="Fingers.R",
             )
         ),
+        
     ],
 )
 
@@ -883,6 +942,64 @@ HAND_L = BoneGroup(
         TransformLink(target="DEF-pinky.L.001", bone="j_ko_b_l"),
     ],
     bones=[
+        #Palm Control - Very cool stuff, thank you rigify - Oats
+        ExtensionBone(
+            name="palm.01.L",
+            bone_a="j_hito_a_l",
+            parent="hand.L",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=-135,
+            req_bones=["j_hito_a_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_palm(palm_both_sides=True),
+                b_collection="Fingers.L"
+            )
+        ),
+        ExtensionBone(
+            name="palm.02.L",
+            bone_a="j_naka_a_l",
+            parent="hand.L",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=-135,
+            req_bones=["j_naka_a_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers.L"
+            )
+        ),
+        ExtensionBone(
+            name="palm.03.L",
+            bone_a="j_kusu_a_l",
+            parent="hand.L",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=-135,
+            req_bones=["j_kusu_a_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers.L"
+            )
+        ),
+        ExtensionBone(
+            name="palm.04.L",
+            bone_a="j_ko_a_l",
+            parent="hand.L",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            roll=-135,
+            req_bones=["j_ko_a_l"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers.L"
+            )
+        ),
         #Thumb
         ConnectBone(
             name="thumb.L",
@@ -916,7 +1033,7 @@ HAND_L = BoneGroup(
             name="index.L",
             bone_a="j_hito_a_l",
             bone_b="j_hito_b_l",
-            parent="hand.L",
+            parent="palm.01.L",
             roll=-135,
             is_connected=False,
             req_bones=["j_hito_a_l", "j_hito_b_l"],
@@ -943,7 +1060,7 @@ HAND_L = BoneGroup(
             name="middle.L",
             bone_a="j_naka_a_l",
             bone_b="j_naka_b_l",
-            parent="hand.L",
+            parent="palm.02.L",
             roll=-135,
             is_connected=False,
             req_bones=["j_naka_a_l", "j_naka_b_l"],
@@ -970,7 +1087,7 @@ HAND_L = BoneGroup(
             name="ring.L",
             bone_a="j_kusu_a_l",
             bone_b="j_kusu_b_l",
-            parent="hand.L",
+            parent="palm.03.L",
             roll=-135,
             is_connected=False,
             req_bones=["j_kusu_a_l", "j_kusu_b_l"],
@@ -997,7 +1114,7 @@ HAND_L = BoneGroup(
             name="pinky.L",
             bone_a="j_ko_a_l",
             bone_b="j_ko_b_l",
-            parent="hand.L",
+            parent="palm.04.L",
             roll=-135,
             is_connected=False,
             req_bones=["j_ko_a_l", "j_ko_b_l"],
@@ -1118,6 +1235,11 @@ HEAD = BoneGroup(
         TransformLink(target="Lip.B.L.002", bone="j_f_dmlip_02_l"),
         TransformLink(target="Lip.B.R.001", bone="j_f_dlip_02_r"),
         TransformLink(target="Lip.B.R.002", bone="j_f_dmlip_02_r"),
+        TransformLink(target="DEF-Teeth.T", bone="j_f_hagukiup"),
+        TransformLink(target="DEF-Teeth.B", bone="j_f_hagukidn"),
+        TransformLink(target="DEF-Tongue", bone="j_f_bero_03"),
+        TransformLink(target="DEF-Tongue.001", bone="j_f_bero_02"),
+        TransformLink(target="DEF-Tongue.002", bone="j_f_bero_01")
     ],
     bones=[
         ConnectBone(
@@ -1306,6 +1428,7 @@ HEAD = BoneGroup(
                 b_collection="Face (Secondary)"
             )
         ),
+        
         #Anchor
         ExtensionBone(
 
@@ -1406,6 +1529,7 @@ HEAD = BoneGroup(
                 b_collection="Face"
             )
         ),
+        
         #This is a reference point for the last bone in the chain
         CenterBone(
             name="Corner.R",
@@ -1566,7 +1690,377 @@ HEAD = BoneGroup(
                b_collection = "Face"
           )
        ),
-        
+        #Teeth
+        ExtensionBone(
+            name="Teeth.T",
+            bone_a="j_f_hagukiup",
+            size_factor=1,
+            axis_type="local",
+            axis="Y",
+            parent="Head",
+            start="head",
+            is_connected=False,
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.basic_super_copy(widget_type="teeth"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ExtensionBone(
+            name="Teeth.B",
+            bone_a="j_f_hagukidn",
+            size_factor=1,
+            axis_type="local",
+            axis="Y",
+            parent="jaw_master",
+            start="head",
+            is_connected=False,
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.basic_super_copy(widget_type="teeth"),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        #Tongue
+        ConnectBone(
+            name="Tongue",
+            bone_a="j_f_bero_03",
+            bone_b="j_f_bero_02",
+            parent="jaw_master",
+            is_connected=False,
+            req_bones=["j_f_bero_03", "j_f_bero_02"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.face_basic_tongue(),
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ConnectBone(
+            name="Tongue.001",
+            bone_a="j_f_bero_02",
+            bone_b="j_f_bero_01",
+            parent="Tongue",
+            is_connected=True,
+            req_bones=["j_f_bero_02", "j_f_bero_01"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        ExtensionBone(
+            name="Tongue.002",
+            bone_a="Tongue.001",
+            parent="Tongue.001",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["Tongue.001"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Secondary)"
+            )
+        ),
+        #Nose Glue
+        ConnectBone(
+            name="Nostril.Glue.R",
+            bone_a="j_f_hana_r",
+            bone_b="j_f_uhana",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_r", "j_f_uhana"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Nostril.Glue.L",
+            bone_a="j_f_hana_l",
+            bone_b="j_f_uhana",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_l", "j_f_uhana"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Nostril.Glue.R.001",
+            bone_a="Cheek.T.R.001", 
+            bone_b="Nostril.R",
+            parent="Head",
+            is_connected=False,
+            req_bones=["Cheek.T.R.001", "Nostril.R"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            ),
+        ),
+        ConnectBone(
+            name="Nostril.Glue.L.001",
+            bone_a="Cheek.T.L.001", 
+            bone_b="Nostril.L",
+            parent="Head",
+            is_connected=False,
+            req_bones=["Cheek.T.L.001", "Nostril.L"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            ),
+        ),
+        #Cheek Glue Bones Right
+        ConnectBone(
+            name="Cheek.B.R.glue",
+            bone_a="j_f_dhoho_r",
+            bone_b="j_f_shoho_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_shoho_r", "j_f_dhoho_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Cheek.T.R.glue",
+            bone_a="j_f_dhoho_r",
+            bone_b="j_f_hoho_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hoho_r", "j_f_dhoho_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        #Cheek Glue Bones Left
+        ConnectBone(
+            name="Cheek.B.L.glue",
+            bone_a="j_f_dhoho_l",
+            bone_b="j_f_shoho_l",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_shoho_l", "j_f_dhoho_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Cheek.T.L.glue",
+            bone_a="j_f_dhoho_l",
+            bone_b="j_f_hoho_l",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hoho_l", "j_f_dhoho_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        #Nostril Glue Bones
+        ConnectBone(
+            name="Nostril.Glue.R",
+            bone_a="j_f_hana_r",
+            bone_b="j_f_uhana",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_r", "j_f_uhana"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Nostril.Glue.L",
+            bone_a="j_f_hana_l",
+            bone_b="j_f_uhana",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_l", "j_f_uhana"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Nostril.Glue.R.001",
+            bone_a="Cheek.T.R.001", 
+            bone_b="Nostril.R",
+            parent="Head",
+            is_connected=False,
+            req_bones=["Cheek.T.R.001", "Nostril.R"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            ),
+        ),
+        ConnectBone(
+            name="Nostril.Glue.L.001",
+            bone_a="Cheek.T.L.001", 
+            bone_b="Nostril.L",
+            parent="Head",
+            is_connected=False,
+            req_bones=["Cheek.T.L.001", "Nostril.L"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5),
+                b_collection="MCH"
+            ),
+        ),
+        #Lip Glue Bones
+        ConnectBone(
+            name="Lip.T.R.001.glue",
+            bone_a="j_f_hana_r",
+            bone_b="j_f_ulip_01_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_r", "j_f_ulip_01_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Lip.T.L.001.glue",
+            bone_a="j_f_hana_l",
+            bone_b="j_f_ulip_01_l",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hana_l", "j_f_ulip_01_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True),
+                b_collection="MCH"
+            )
+        ),
+        #Mouth Corner Glue Bones
+        ConnectBone(
+            name="Mouth.Corner.glue.L",
+            bone_a="j_f_shoho_l",
+            bone_b="Corner.L",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_shoho_l", "Corner.L"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Mouth.Corner.glue.R",
+            bone_a="j_f_shoho_r",
+            bone_b="Corner.R",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_shoho_r", "Corner.R"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True),
+                b_collection="MCH"
+            )
+        ),
+    ]
+)
+
+BROW = BoneGroup(
+    name="Brow",
+    transform_link=[
+        TransformLink(target="DEF-Brow.R", bone="j_f_mayu_r"),
+        TransformLink(target="DEF-Brow.R.001", bone="j_f_mmayu_r"),
+        TransformLink(target="DEF-Brow.R.002", bone="j_f_miken_01_r"),
+        TransformLink(target="DEF-Brow.R.003", bone="j_f_miken_02_r"),
+        TransformLink(target="DEF-Brow.L", bone="j_f_mayu_l"),
+        TransformLink(target="DEF-Brow.L.001", bone="j_f_mmayu_l"),
+        TransformLink(target="DEF-Brow.L.002", bone="j_f_miken_01_l"),
+        TransformLink(target="DEF-Brow.L.003", bone="j_f_miken_02_l")
+    ],
+    bones=[
+        ConnectBone(
+            name="Brow.R",
+            bone_a="j_f_mayu_r",
+            bone_b="j_f_mmayu_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_mayu_r", "j_f_mmayu_r",],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, skin_control_orientation_bone="Head", skin_chain_falloff_length=True, primary_layer_extra="Face (Primary)"),
+                b_collection="Face (Secondary)",
+            )
+        ),
+        ConnectBone(
+            name="Brow.R.001",
+            bone_a="j_f_mmayu_r",
+            bone_b="j_f_miken_01_r",
+            parent="Brow.R",
+            is_connected=True,
+            req_bones=["j_f_mmayu_r", "j_f_miken_01_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Primary)",
+            )
+        ),
+         ConnectBone(
+            name="Brow.R.002",
+            bone_a="j_f_miken_01_r",
+            bone_b="j_f_miken_02_r",
+            parent="Brow.R.001",
+            is_connected=True,
+            req_bones=["j_f_miken_01_r", "j_f_miken_02_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Primary)",
+            )
+        ),
+        ExtensionBone(
+            name="Brow.R.003",
+            bone_a="Brow.R.002",
+            parent="Brow.R.002",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["j_f_miken_02_r"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Primary)"
+            )
+        ),
+        ConnectBone(
+            name="Brow.L",
+            bone_a="j_f_mayu_l",
+            bone_b="j_f_mmayu_l",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_mayu_l", "j_f_mmayu_l",],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, skin_control_orientation_bone="Head", skin_chain_falloff_length=True, primary_layer_extra="Face (Primary)"),
+                b_collection="Face (Secondary)",
+            )
+        ),
+        ConnectBone(
+            name="Brow.L.001",
+            bone_a="j_f_mmayu_l",
+            bone_b="j_f_miken_01_l",
+            parent="Brow.L",
+            is_connected=True,
+            req_bones=["j_f_mmayu_l", "j_f_miken_01_l"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Primary)",
+            )
+        ),
+         ConnectBone(
+            name="Brow.L.002",
+            bone_a="j_f_miken_01_l",
+            bone_b="j_f_miken_02_l",
+            parent="Brow.L.001",
+            is_connected=True,
+            req_bones=["j_f_miken_01_l", "j_f_miken_02_l"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Primary)",
+            )
+        ),
+        ExtensionBone(
+            name="Brow.L.003",
+            bone_a="Brow.L.002",
+            parent="Brow.L.002",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["j_f_miken_02_l"],
+            pose_operations=PoseOperations(
+                b_collection="Face (Primary)"
+            )
+        )
     ]
 )
 
@@ -1775,7 +2269,32 @@ LEFT_EYE = BoneGroup(
                 b_collection="Face"
             )
         ),
-        ]
+        #Glue Bones
+        ConnectBone(
+            name="Lower.Lid.L.Glue",
+            bone_a="lid.B.L.002",
+            bone_b="j_f_hoho_l",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hoho_l", "lid.B.L.002"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Upper.Lid.L.Glue",
+            bone_a="lid.T.L.002",
+            bone_b="j_f_miken_02_l",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_miken_02_l", "lid.T.L.002"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
+                b_collection="MCH"
+            )
+        ),
+    ]
 )  
 
 RIGHT_EYE = BoneGroup(
@@ -1878,7 +2397,7 @@ RIGHT_EYE = BoneGroup(
             name="lid.B.R.003",
             bone_a="lid.B.R.002",
             bone_b="lid.T.R",
-            offset_factor=mathutils.Vector((0.003, -0.001, -0.003)),
+            offset_factor=mathutils.Vector((-0.003, -0.001, -0.003)),
             is_connected=False,
             req_bones=["lid.B.R.002", "lid.T.R"],
             pose_operations=PoseOperations(
@@ -1956,6 +2475,31 @@ RIGHT_EYE = BoneGroup(
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.skin_basic_chain(),
                 b_collection="Face"
+            )
+        ),
+        #Glue Bones
+        ConnectBone(
+            name="Lower.Lid.R.Glue",
+            bone_a="lid.B.R.002",
+            bone_b="j_f_hoho_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_hoho_r", "lid.B.R.002"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
+                b_collection="MCH"
+            )
+        ),
+        ConnectBone(
+            name="Upper.Lid.R.Glue",
+            bone_a="lid.T.R.002",
+            bone_b="j_f_miken_02_r",
+            parent="Head",
+            is_connected=False,
+            req_bones=["j_f_miken_02_r", "lid.T.R.002"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
+                b_collection="MCH"
             )
         ),
     ]
