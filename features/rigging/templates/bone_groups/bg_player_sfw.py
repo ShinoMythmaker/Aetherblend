@@ -747,6 +747,7 @@ IV_HAND_R = BoneGroup(
         TransformLink(target="DEF-ring.R.001", bone="j_kusu_b_r"),
         TransformLink(target="DEF-pinky.R", bone="j_ko_a_r"),
         TransformLink(target="DEF-pinky.R.001", bone="j_ko_b_r"),
+        TransformLink(target="DEF-index.R.002", bone="iv_hito_c_r"),
     ],
     bones=[
         #Palm Control - Very cool stuff, thank you rigify - Oats
@@ -849,15 +850,13 @@ IV_HAND_R = BoneGroup(
                 b_collection="Fingers.R",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="index.R.001",
             bone_a="j_hito_b_r",
+            bone_b="iv_hito_c_r",
             parent="index.R",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["j_hito_b_r"],
+            req_bones=["j_hito_b_r", "iv_hito_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
@@ -870,7 +869,7 @@ IV_HAND_R = BoneGroup(
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["iv_hito_c_r"],
+            req_bones=["j_hito_b_r", "iv_hito_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
@@ -897,7 +896,7 @@ IV_HAND_R = BoneGroup(
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_naka_b_r"],
+            req_bones=["iv_naka_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
@@ -1737,7 +1736,6 @@ HAND_L = BoneGroup(
         ),
     ],
 ),
-
 
 TAIL = BoneGroup(
     name="Tail",
