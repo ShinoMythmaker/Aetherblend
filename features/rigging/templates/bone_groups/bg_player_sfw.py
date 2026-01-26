@@ -1,9 +1,10 @@
 import bpy
 import mathutils
 
-from ....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone
-from ....core.shared import PoseOperations, BoneGroup, TransformLink, WidgetOverride
-from ....core import rigify
+from .....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone
+from .....core.shared import PoseOperations, BoneGroup, TransformLink, WidgetOverride
+from .....core import rigify
+
 
 # Individual bone list (for backwards compatibility and direct access)
 ARM_R = BoneGroup(
@@ -2504,3 +2505,22 @@ RIGHT_EYE = BoneGroup(
         ),
     ]
 )
+
+
+BG_PLAYER_SFW = {
+            "spine": [SPINE],
+            "arm_r": [ARM_R],
+            "arm_l": [ARM_L],
+            "leg_r": [LEG_R],
+            "leg_l": [LEG_L],
+            "skirt_r": [SKIRT_R],
+            "skirt_r_mch": [SKIRT_R_MCH],
+            "skirt_l": [SKIRT_L],
+            "skirt_l_mch": [SKIRT_L_MCH],
+            "hand_r": [HAND_R],
+            "hand_l": [HAND_L],
+            "tail": [TAIL],
+            "head": [HEAD],
+            "left_eye": [LEFT_EYE],
+            "right_eye": [RIGHT_EYE]
+        }

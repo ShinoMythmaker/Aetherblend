@@ -49,10 +49,10 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
         pose_correction_matrix = Matrix.Identity(4)
         if export_props.use_pose_axis_conversion:
             pose_correction_matrix = axis_conversion(
-                from_up=export_props.pose_primary_axis,         ## Primary
-                from_forward=export_props.pose_secondary_axis,  ## Secondary
-                to_up='Y',                                      ## Target Primary
-                to_forward='X',                                 ## Target Secondary
+                from_up=export_props.pose_primary_axis,         # Primary
+                from_forward=export_props.pose_secondary_axis,  # Secondary
+                to_up='Y',                                      # Target Primary
+                to_forward='X',                                 # Target Secondary
             ).to_4x4()
         
         x_rotation = Matrix.Rotation(math.radians(-90), 4, 'X')

@@ -1,3 +1,3 @@
-from .human_sfw import HUMAN_SFW
+from .ui_player_sfw import UI_PLAYER_SFW
 
-__all__ = ['HUMAN_SFW']
+__all__ = ['UI_PLAYER_SFW']

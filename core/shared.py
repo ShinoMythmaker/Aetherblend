@@ -172,12 +172,40 @@ class BoneGroup:
         
         return generated_bones, pose_operations_dict
     
-@dataclass
+@dataclass(frozen=True)
 class AetherRigGenerator:
     """Generates an armature based on defined bone groups."""
     name: str
-    color_sets: 'list[rigify.ColorSet] | None' = None
-    ui_collections: 'list[rigify.BoneCollection] | None' = None
-    widget_overrides: 'list[WidgetOverride] | None' = None
-    bone_groups: 'list[BoneGroup] | None' = None
+    color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None
+    ui_collections: 'list[dict[str, rigify.BoneCollection]] | None' = None
+    widget_overrides: 'list[dict[str, WidgetOverride]] | None' = None
+    bone_groups: 'list[dict[str, list[BoneGroup]]] | None' = None
+
+    def getColorSets(self) -> dict[str, rigify.ColorSet]:
+        """Combine all color sets into a single dictionary."""
+        combined: dict[str, rigify.ColorSet] = {}
+        for cs_dict in self.color_sets or []:
+            combined.update(cs_dict)
+        return combined
+    
+    def getUICollections(self) -> dict[str, rigify.BoneCollection]:
+        """Combine all UI collections into a single dictionary."""
+        combined: dict[str, rigify.BoneCollection] = {}
+        for ui_dict in self.ui_collections or []:
+            combined.update(ui_dict)
+        return combined
+    
+    def getWidgetOverrides(self) -> dict[str, WidgetOverride]:
+        """Combine all widget overrides into a single dictionary."""
+        combined: dict[str, WidgetOverride] = {}
+        for wo_dict in self.widget_overrides or []:
+            combined.update(wo_dict)
+        return combined
+    
+    def getBoneGroups(self) -> dict[str, list[BoneGroup]]:
+        """Combine all bone groups into a single dictionary."""
+        combined: dict[str, list[BoneGroup]] = {}
+        for bg_dict in self.bone_groups or []:
+            combined.update(bg_dict)
+        return combined
 
