@@ -1,30 +1,24 @@
 import bpy
 
-def get_available_modules(module_type):
-    """Dynamically get available modules for dropdown"""
-    from .templates import CS_COLORSETS, UI_COLLECTIONS, WO_OVERRIDES, BG_GROUPS
-    
-    module_map = {
-        'colorset': CS_COLORSETS,
-        'ui_collection': UI_COLLECTIONS,
-        'widget_override': WO_OVERRIDES,
-        'bone_group': BG_GROUPS
-    }
-    
-    modules = module_map.get(module_type, {})
-    return [(key, key, "") for key in modules.keys()]
-
 def get_colorset_items(self, context):
-    return get_available_modules('colorset')
+    from . import module_manager
+    config = module_manager.get_module_config('colorset')
+    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
 
 def get_ui_collection_items(self, context):
-    return get_available_modules('ui_collection')
+    from . import module_manager
+    config = module_manager.get_module_config('ui_collection')
+    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
 
 def get_widget_override_items(self, context):
-    return get_available_modules('widget_override')
+    from . import module_manager
+    config = module_manager.get_module_config('widget_override')
+    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
 
 def get_bone_group_items(self, context):
-    return get_available_modules('bone_group')
+    from . import module_manager
+    config = module_manager.get_module_config('bone_group')
+    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
 
 class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     meta_rig : bpy.props.PointerProperty(

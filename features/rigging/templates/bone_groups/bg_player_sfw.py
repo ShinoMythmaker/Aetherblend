@@ -1993,7 +1993,7 @@ BROW = BoneGroup(
                 b_collection="Face (Primary)",
             )
         ),
-         ConnectBone(
+        ConnectBone(
             name="Brow.R.002",
             bone_a="j_f_miken_01_r",
             bone_b="j_f_miken_02_r",
@@ -2039,7 +2039,7 @@ BROW = BoneGroup(
                 b_collection="Face (Primary)",
             )
         ),
-         ConnectBone(
+        ConnectBone(
             name="Brow.L.002",
             bone_a="j_f_miken_01_l",
             bone_b="j_f_miken_02_l",
@@ -2522,5 +2522,6 @@ BG_PLAYER_SFW = {
             "tail": [TAIL],
             "head": [HEAD],
             "left_eye": [LEFT_EYE],
-            "right_eye": [RIGHT_EYE]
+            "right_eye": [RIGHT_EYE],
+            "brow": [BROW]
         }

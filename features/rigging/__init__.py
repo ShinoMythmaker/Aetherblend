@@ -1,8 +1,9 @@
 from . import operators
 from . import properties
 from . import panels
+from . import module_manager
 
-modules = (properties, operators, panels)
+modules = (properties, module_manager, operators, panels)
 
 def register():
     for mod in modules:
