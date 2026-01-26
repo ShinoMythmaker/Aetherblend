@@ -69,6 +69,173 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
 
 
+class AETHER_PT_RigModuleSelection(bpy.types.Panel):
+    bl_label = "Rig Modules"
+    bl_idname = "AETHER_PT_rig_module_selection"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'AetherBlend'
+    bl_parent_id = "AETHER_PT_rig_creation_panel"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        layout = self.layout
+        armature = context.active_object
+        aether_rig = armature.aether_rig
+        
+        from .templates import CS_COLORSETS, UI_COLLECTIONS, WO_OVERRIDES, BG_GROUPS
+        
+        # Colorsets Section
+        box = layout.box()
+        row = box.row()
+        row.label(text="Colorsets", icon='COLOR')
+        
+        # Display selected colorsets
+        selected_colorsets = [m.strip() for m in aether_rig.selected_colorsets.split(",") if m.strip()]
+        for i, module_name in enumerate(selected_colorsets):
+            row = box.row(align=True)
+            row.label(text=module_name, icon='CHECKMARK')
+            
+            # Up button
+            up_col = row.column(align=True)
+            up_col.enabled = i > 0
+            up_op = up_col.operator("aether.move_module_up", text="", icon='TRIA_UP')
+            up_op.module_type = 'colorset'
+            up_op.module_name = module_name
+            
+            # Down button
+            down_col = row.column(align=True)
+            down_col.enabled = i < len(selected_colorsets) - 1
+            down_op = down_col.operator("aether.move_module_down", text="", icon='TRIA_DOWN')
+            down_op.module_type = 'colorset'
+            down_op.module_name = module_name
+            
+            # Remove button
+            op = row.operator("aether.remove_module_from_rig", text="", icon='X')
+            op.module_type = 'colorset'
+            op.module_name = module_name
+        
+        # Dropdown to add new colorset
+        available_colorsets = [key for key in CS_COLORSETS.keys() if key not in selected_colorsets]
+        if available_colorsets:
+            row = box.row(align=True)
+            row.prop(aether_rig, "dropdown_colorset", text="")
+            op = row.operator("aether.add_module_to_rig", text="", icon='ADD')
+            op.module_type = 'colorset'
+            op.module_name = aether_rig.dropdown_colorset
+        
+        # UI Collections Section
+        box = layout.box()
+        row = box.row()
+        row.label(text="UI Collections", icon='OUTLINER_COLLECTION')
+        
+        selected_ui = [m.strip() for m in aether_rig.selected_ui_collections.split(",") if m.strip()]
+        for i, module_name in enumerate(selected_ui):
+            row = box.row(align=True)
+            row.label(text=module_name, icon='CHECKMARK')
+            
+            # Up button
+            up_col = row.column(align=True)
+            up_col.enabled = i > 0
+            up_op = up_col.operator("aether.move_module_up", text="", icon='TRIA_UP')
+            up_op.module_type = 'ui_collection'
+            up_op.module_name = module_name
+            
+            # Down button
+            down_col = row.column(align=True)
+            down_col.enabled = i < len(selected_ui) - 1
+            down_op = down_col.operator("aether.move_module_down", text="", icon='TRIA_DOWN')
+            down_op.module_type = 'ui_collection'
+            down_op.module_name = module_name
+            
+            # Remove button
+            op = row.operator("aether.remove_module_from_rig", text="", icon='X')
+            op.module_type = 'ui_collection'
+            op.module_name = module_name
+        
+        available_ui = [key for key in UI_COLLECTIONS.keys() if key not in selected_ui]
+        if available_ui:
+            row = box.row(align=True)
+            row.prop(aether_rig, "dropdown_ui_collection", text="")
+            op = row.operator("aether.add_module_to_rig", text="", icon='ADD')
+            op.module_type = 'ui_collection'
+            op.module_name = aether_rig.dropdown_ui_collection
+        
+        # Widget Overrides Section
+        box = layout.box()
+        row = box.row()
+        row.label(text="Widget Overrides", icon='MESH_CUBE')
+        
+        selected_wo = [m.strip() for m in aether_rig.selected_widget_overrides.split(",") if m.strip()]
+        for i, module_name in enumerate(selected_wo):
+            row = box.row(align=True)
+            row.label(text=module_name, icon='CHECKMARK')
+            
+            # Up button
+            up_col = row.column(align=True)
+            up_col.enabled = i > 0
+            up_op = up_col.operator("aether.move_module_up", text="", icon='TRIA_UP')
+            up_op.module_type = 'widget_override'
+            up_op.module_name = module_name
+            
+            # Down button
+            down_col = row.column(align=True)
+            down_col.enabled = i < len(selected_wo) - 1
+            down_op = down_col.operator("aether.move_module_down", text="", icon='TRIA_DOWN')
+            down_op.module_type = 'widget_override'
+            down_op.module_name = module_name
+            
+            # Remove button
+            op = row.operator("aether.remove_module_from_rig", text="", icon='X')
+            op.module_type = 'widget_override'
+            op.module_name = module_name
+        
+        available_wo = [key for key in WO_OVERRIDES.keys() if key not in selected_wo]
+        if available_wo:
+            row = box.row(align=True)
+            row.prop(aether_rig, "dropdown_widget_override", text="")
+            op = row.operator("aether.add_module_to_rig", text="", icon='ADD')
+            op.module_type = 'widget_override'
+            op.module_name = aether_rig.dropdown_widget_override
+        
+        # Bone Groups Section
+        box = layout.box()
+        row = box.row()
+        row.label(text="Bone Groups", icon='GROUP_BONE')
+        
+        selected_bg = [m.strip() for m in aether_rig.selected_bone_groups.split(",") if m.strip()]
+        for i, module_name in enumerate(selected_bg):
+            row = box.row(align=True)
+            row.label(text=module_name, icon='CHECKMARK')
+            
+            # Up button
+            up_col = row.column(align=True)
+            up_col.enabled = i > 0
+            up_op = up_col.operator("aether.move_module_up", text="", icon='TRIA_UP')
+            up_op.module_type = 'bone_group'
+            up_op.module_name = module_name
+            
+            # Down button
+            down_col = row.column(align=True)
+            down_col.enabled = i < len(selected_bg) - 1
+            down_op = down_col.operator("aether.move_module_down", text="", icon='TRIA_DOWN')
+            down_op.module_type = 'bone_group'
+            down_op.module_name = module_name
+            
+            # Remove button
+            op = row.operator("aether.remove_module_from_rig", text="", icon='X')
+            op.module_type = 'bone_group'
+            op.module_name = module_name
+        
+        available_bg = [key for key in BG_GROUPS.keys() if key not in selected_bg]
+        if available_bg:
+            row = box.row(align=True)
+            row.prop(aether_rig, "dropdown_bone_group", text="")
+            op = row.operator("aether.add_module_to_rig", text="", icon='ADD')
+            op.module_type = 'bone_group'
+            op.module_name = aether_rig.dropdown_bone_group
+
+
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
     bl_label = "Rig Layers"
     bl_idname = "AETHER_PT_rig_layers"
@@ -244,12 +411,14 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(AETHER_PT_RigCreation)
+    bpy.utils.register_class(AETHER_PT_RigModuleSelection)
     bpy.utils.register_class(AETHER_PT_RigLayersPanel)
     bpy.utils.register_class(AETHER_PT_RigUIPanel)
     bpy.utils.register_class(AETHER_PT_RigBakeSettingsPanel)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_RigCreation)
+    bpy.utils.unregister_class(AETHER_PT_RigModuleSelection)
     bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
     bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
     bpy.utils.unregister_class(AETHER_PT_RigBakeSettingsPanel)

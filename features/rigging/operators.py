@@ -2,9 +2,35 @@ import bpy
 import time
 
 from ... import utils
-from .templates import HUMAN
-from ...core.shared import PoseOperations
+from .templates import HUMAN, CS_COLORSETS, UI_COLLECTIONS, WO_OVERRIDES, BG_GROUPS
+from ...core.shared import PoseOperations, AetherRigGenerator
 from ...core import rigify
+
+
+def get_dynamic_rig_generator(armature: bpy.types.Object) -> AetherRigGenerator:
+    """Create a dynamic AetherRigGenerator based on armature's selected modules."""
+    aether_rig = armature.aether_rig
+    
+    # Parse selected modules
+    selected_colorsets = [m.strip() for m in aether_rig.selected_colorsets.split(",") if m.strip()]
+    selected_ui = [m.strip() for m in aether_rig.selected_ui_collections.split(",") if m.strip()]
+    selected_wo = [m.strip() for m in aether_rig.selected_widget_overrides.split(",") if m.strip()]
+    selected_bg = [m.strip() for m in aether_rig.selected_bone_groups.split(",") if m.strip()]
+    
+    # Build lists of actual module objects
+    color_sets = [CS_COLORSETS[name] for name in selected_colorsets if name in CS_COLORSETS]
+    ui_collections = [UI_COLLECTIONS[name] for name in selected_ui if name in UI_COLLECTIONS]
+    widget_overrides = [WO_OVERRIDES[name] for name in selected_wo if name in WO_OVERRIDES]
+    bone_groups = [BG_GROUPS[name] for name in selected_bg if name in BG_GROUPS]
+    
+    # Create dynamic generator
+    return AetherRigGenerator(
+        name="Custom Rig",
+        color_sets=color_sets,
+        ui_collections=ui_collections,
+        widget_overrides=widget_overrides,
+        bone_groups=bone_groups
+    )
 
 class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_idname = "aether.generate_meta_rig"
@@ -36,8 +62,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             self.report({'ERROR'}, "Cannot generate meta rig on an armature that is already rigified.")
             return {'CANCELLED'}
         
-        # Get Generator Data 
-        aether_rig_generator = HUMAN
+        # Get Generator Data (use dynamic generator based on selected modules)
+        aether_rig_generator = get_dynamic_rig_generator(armature)
         
         # Meta Rig Base Generation
         meta_rig = utils.armature.duplicate(armature)
@@ -224,7 +250,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         result = bpy.ops.pose.rigify_generate()
 
         if result == {"FINISHED"}:
-            aether_rig_generator = HUMAN
+            aether_rig_generator = get_dynamic_rig_generator(armature)
 
             ## Execute Post Generation Steps
             ffxiv_data_bones = utils.armature.b_collection.get_bones(armature, "FFXIV")
@@ -388,6 +414,207 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
         return {'FINISHED'}
     
 
+class AETHER_OT_AddModuleToRig(bpy.types.Operator):
+    bl_idname = "aether.add_module_to_rig"
+    bl_label = "Add Module"
+    bl_description = "Add a module to the rig generator configuration"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    module_type: bpy.props.EnumProperty(
+        name="Module Type",
+        items=[
+            ('colorset', "Colorset", ""),
+            ('ui_collection', "UI Collection", ""),
+            ('widget_override', "Widget Override", ""),
+            ('bone_group', "Bone Group", "")
+        ]
+    ) # type: ignore
+    
+    module_name: bpy.props.StringProperty(name="Module Name") # type: ignore
+    
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "No armature selected")
+            return {'CANCELLED'}
+        
+        aether_rig = armature.aether_rig
+        
+        # Get the appropriate property based on module type
+        property_map = {
+            'colorset': 'selected_colorsets',
+            'ui_collection': 'selected_ui_collections',
+            'widget_override': 'selected_widget_overrides',
+            'bone_group': 'selected_bone_groups'
+        }
+        
+        prop_name = property_map.get(self.module_type)
+        if not prop_name:
+            return {'CANCELLED'}
+        
+        # Get current selection
+        current = getattr(aether_rig, prop_name, "")
+        current_list = [m.strip() for m in current.split(",") if m.strip()]
+        
+        # Add module if not already in list
+        if self.module_name not in current_list:
+            current_list.append(self.module_name)
+            setattr(aether_rig, prop_name, ", ".join(current_list))
+        
+        return {'FINISHED'}
+
+
+class AETHER_OT_RemoveModuleFromRig(bpy.types.Operator):
+    bl_idname = "aether.remove_module_from_rig"
+    bl_label = "Remove Module"
+    bl_description = "Remove a module from the rig generator configuration"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    module_type: bpy.props.EnumProperty(
+        name="Module Type",
+        items=[
+            ('colorset', "Colorset", ""),
+            ('ui_collection', "UI Collection", ""),
+            ('widget_override', "Widget Override", ""),
+            ('bone_group', "Bone Group", "")
+        ]
+    ) # type: ignore
+    
+    module_name: bpy.props.StringProperty(name="Module Name") # type: ignore
+    
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "No armature selected")
+            return {'CANCELLED'}
+        
+        aether_rig = armature.aether_rig
+        
+        # Get the appropriate property based on module type
+        property_map = {
+            'colorset': 'selected_colorsets',
+            'ui_collection': 'selected_ui_collections',
+            'widget_override': 'selected_widget_overrides',
+            'bone_group': 'selected_bone_groups'
+        }
+        
+        prop_name = property_map.get(self.module_type)
+        if not prop_name:
+            return {'CANCELLED'}
+        
+        # Get current selection
+        current = getattr(aether_rig, prop_name, "")
+        current_list = [m.strip() for m in current.split(",") if m.strip()]
+        
+        # Remove module
+        if self.module_name in current_list:
+            current_list.remove(self.module_name)
+            setattr(aether_rig, prop_name, ", ".join(current_list))
+        
+        return {'FINISHED'}
+
+
+class AETHER_OT_MoveModuleUp(bpy.types.Operator):
+    bl_idname = "aether.move_module_up"
+    bl_label = "Move Module Up"
+    bl_description = "Move a module up in the list"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    module_type: bpy.props.EnumProperty(
+        name="Module Type",
+        items=[
+            ('colorset', "Colorset", ""),
+            ('ui_collection', "UI Collection", ""),
+            ('widget_override', "Widget Override", ""),
+            ('bone_group', "Bone Group", "")
+        ]
+    ) # type: ignore
+    
+    module_name: bpy.props.StringProperty(name="Module Name") # type: ignore
+    
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return {'CANCELLED'}
+        
+        aether_rig = armature.aether_rig
+        
+        # Get the appropriate property based on module type
+        property_map = {
+            'colorset': 'selected_colorsets',
+            'ui_collection': 'selected_ui_collections',
+            'widget_override': 'selected_widget_overrides',
+            'bone_group': 'selected_bone_groups'
+        }
+        
+        prop_name = property_map.get(self.module_type)
+        if not prop_name:
+            return {'CANCELLED'}
+        
+        # Get current selection
+        current = getattr(aether_rig, prop_name, "")
+        current_list = [m.strip() for m in current.split(",") if m.strip()]
+        
+        # Find index and move up
+        if self.module_name in current_list:
+            index = current_list.index(self.module_name)
+            if index > 0:
+                current_list[index], current_list[index - 1] = current_list[index - 1], current_list[index]
+                setattr(aether_rig, prop_name, ", ".join(current_list))
+        
+        return {'FINISHED'}
+
+
+class AETHER_OT_MoveModuleDown(bpy.types.Operator):
+    bl_idname = "aether.move_module_down"
+    bl_label = "Move Module Down"
+    bl_description = "Move a module down in the list"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    module_type: bpy.props.EnumProperty(
+        name="Module Type",
+        items=[
+            ('colorset', "Colorset", ""),
+            ('ui_collection', "UI Collection", ""),
+            ('widget_override', "Widget Override", ""),
+            ('bone_group', "Bone Group", "")
+        ]
+    ) # type: ignore
+    
+    module_name: bpy.props.StringProperty(name="Module Name") # type: ignore
+    
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return {'CANCELLED'}
+        
+        aether_rig = armature.aether_rig
+        
+        # Get the appropriate property based on module type
+        property_map = {
+            'colorset': 'selected_colorsets',
+            'ui_collection': 'selected_ui_collections',
+            'widget_override': 'selected_widget_overrides',
+            'bone_group': 'selected_bone_groups'
+        }
+        
+        prop_name = property_map.get(self.module_type)
+        if not prop_name:
+            return {'CANCELLED'}
+        
+        # Get current selection
+        current = getattr(aether_rig, prop_name, "")
+        current_list = [m.strip() for m in current.split(",") if m.strip()]
+        
+        # Find index and move down
+        if self.module_name in current_list:
+            index = current_list.index(self.module_name)
+            if index < len(current_list) - 1:
+                current_list[index], current_list[index + 1] = current_list[index + 1], current_list[index]
+                setattr(aether_rig, prop_name, ", ".join(current_list))
+        
+        return {'FINISHED'}
+
 
 
     
@@ -397,6 +624,10 @@ def register():
     bpy.utils.register_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.register_class(AETHER_OT_Reset_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Full_Rig)
+    bpy.utils.register_class(AETHER_OT_AddModuleToRig)
+    bpy.utils.register_class(AETHER_OT_RemoveModuleFromRig)
+    bpy.utils.register_class(AETHER_OT_MoveModuleUp)
+    bpy.utils.register_class(AETHER_OT_MoveModuleDown)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Generate_Meta_Rig)
@@ -404,3 +635,7 @@ def unregister():
     bpy.utils.unregister_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.unregister_class(AETHER_OT_Reset_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Full_Rig)
+    bpy.utils.unregister_class(AETHER_OT_AddModuleToRig)
+    bpy.utils.unregister_class(AETHER_OT_RemoveModuleFromRig)
+    bpy.utils.unregister_class(AETHER_OT_MoveModuleUp)
+    bpy.utils.unregister_class(AETHER_OT_MoveModuleDown)
