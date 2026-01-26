@@ -17,4 +17,7 @@ WO_DEFAULT = {
         "nose_r": WidgetOverride(bone="Nose.R",scale_factor=0.3,),
         "nostril_r": WidgetOverride(bone="Nostril.R",scale_factor=0.2,),
         #Mouth
+        "teeth.T": WidgetOverride(bone="Teeth.T", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
+        "teeth.B": WidgetOverride(bone="Teeth.B", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
+        "jaw_master_mouth": WidgetOverride(bone="jaw_master_mouth", scale=[0.6, 1, 0.3])
     }
