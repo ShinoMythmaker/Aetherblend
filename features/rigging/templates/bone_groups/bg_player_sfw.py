@@ -138,6 +138,8 @@ SPINE = BoneGroup(
             TransformLink(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
             TransformLink(target="DEF-Spine.003", bone="j_sebo_b", retarget="FK-Spine.003"),
             TransformLink(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
+            TransformLink(target="DEF-Chest.R", bone="j_mune_r"),
+            TransformLink(target="DEF-Chest.L", bone="j_mune_l"),
         ],
         bones = [
             #Spine
@@ -186,6 +188,37 @@ SPINE = BoneGroup(
                 req_bones=["j_sebo_c", "j_kubi"],
                 pose_operations=PoseOperations(
                     b_collection="Torso"
+                )
+            ),
+            #Chest
+            ExtensionBone(
+                name="Chest.R",
+                bone_a="j_mune_r",
+                parent="Spine.003",
+                is_connected=False,
+                start="head",
+                axis_type="local",
+                axis="Y",
+                roll=-48,
+                req_bones=["j_mune_r"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
+                    b_collection="Torso",
+                )
+            ),
+            ExtensionBone(
+                name="Chest.L",
+                bone_a="j_mune_l",
+                parent="Spine.003",
+                is_connected=False,
+                start="head",
+                axis_type="local",
+                axis="Y",
+                roll=-132,
+                req_bones=["j_mune_l"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
+                    b_collection="Torso",
                 )
             ),
         ],
@@ -488,13 +521,7 @@ SKIRT_R = BoneGroup(
                     b_collection="Skirt"
                 )
             ),
-        ],
-)
-            
-SKIRT_R_MCH = BoneGroup(
-        name="Skirt Right MCH",
-        bones= [
-            #Front
+             #Front
             ConnectBone(
                 name="Skirt_Front.R.mch",
                 bone_a="shin.R",
@@ -502,13 +529,12 @@ SKIRT_R_MCH = BoneGroup(
                 parent="shin.R",
                 is_connected=False,
                 end="tail",
-                req_bones=["shin.R", "Skirt_Front.R.002"],
+                req_bones=["Skirt_Front.R.002"],
                 pose_operations=PoseOperations(
                     rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Front.R.002"),
                     b_collection="Skirt MCH"
                 )
             ),
-            #Side
             ConnectBone(
                 name="Skirt_Side.R.mch",
                 bone_a="shin.R",
@@ -516,13 +542,12 @@ SKIRT_R_MCH = BoneGroup(
                 parent="shin.R",
                 is_connected=False,
                 end="tail",
-                req_bones=["shin.R", "Skirt_Side.R.002"],
+                req_bones=["Skirt_Side.R.002"],
                 pose_operations=PoseOperations(
                     rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Side.R.002"),
                     b_collection="Skirt MCH"
                 )
             ),
-            #Back
             ConnectBone(
                 name="Skirt_Back.R.mch",
                 bone_a="shin.R",
@@ -530,7 +555,7 @@ SKIRT_R_MCH = BoneGroup(
                 parent="shin.R",
                 is_connected=False,
                 end="tail",
-                req_bones=["shin.R", "Skirt_Back.R.002"],
+                req_bones=["Skirt_Back.R.002"],
                 pose_operations=PoseOperations(
                     rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Back.R.002"),
                     b_collection="Skirt MCH"
@@ -664,12 +689,6 @@ SKIRT_L = BoneGroup(
                     b_collection="Skirt"
                 )
             ),
-        ],
-)
-
-SKIRT_L_MCH = BoneGroup(
-        name="Skirt Left MCH",
-        bones= [
             #Front
             ConnectBone(
                 name="Skirt_Front.L.mch",
@@ -678,7 +697,7 @@ SKIRT_L_MCH = BoneGroup(
                 parent="shin.L",
                 is_connected=False,
                 end="tail",
-                req_bones=["shin.L", "Skirt_Front.L.002"],
+                req_bones=["Skirt_Front.L.002"],
                 pose_operations=PoseOperations(
                     rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Front.L.002"),
                     b_collection="Skirt MCH"
@@ -692,7 +711,7 @@ SKIRT_L_MCH = BoneGroup(
                 parent="shin.L",
                 is_connected=False,
                 end="tail",
-                req_bones=["shin.L", "Skirt_Side.L.002"],
+                req_bones=["Skirt_Side.L.002"],
                 pose_operations=PoseOperations(
                     rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Side.L.002"),
                     b_collection="Skirt MCH"
@@ -706,7 +725,7 @@ SKIRT_L_MCH = BoneGroup(
                 parent="shin.L",
                 is_connected=False,
                 end="tail",
-                req_bones=["shin.L", "Skirt_Back.L.002"],
+                req_bones=["Skirt_Back.L.002"],
                 pose_operations=PoseOperations(
                     rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Back.L.002"),
                     b_collection="Skirt MCH"
@@ -1240,7 +1259,9 @@ HEAD = BoneGroup(
         TransformLink(target="DEF-Teeth.B", bone="j_f_hagukidn"),
         TransformLink(target="DEF-Tongue", bone="j_f_bero_03"),
         TransformLink(target="DEF-Tongue.001", bone="j_f_bero_02"),
-        TransformLink(target="DEF-Tongue.002", bone="j_f_bero_01")
+        TransformLink(target="DEF-Tongue.002", bone="j_f_bero_01"),
+        TransformLink(target="DEF-Ear.R", bone="j_mimi_r"),
+        TransformLink(target="DEF-Ear.L", bone="j_mimi_l")
     ],
     bones=[
         ConnectBone(
@@ -1954,6 +1975,35 @@ HEAD = BoneGroup(
                 b_collection="MCH"
             )
         ),
+        #Ears
+        ExtensionBone(
+            name="Ear.R",
+            bone_a="j_mimi_r",
+            parent="Head",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_mimi_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
+                b_collection="Head",
+            )
+        ),
+        ExtensionBone(
+            name="Ear.L",
+            bone_a="j_mimi_l",
+            parent="Head",
+            is_connected=False,
+            axis_type="local",
+            axis="Y",
+            start="head",
+            req_bones=["j_mimi_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
+                b_collection="Head",
+            )
+        )    
     ]
 )
 
@@ -2513,10 +2563,8 @@ BG_PLAYER_SFW = {
             "arm_l": [ARM_L],
             "leg_r": [LEG_R],
             "leg_l": [LEG_L],
-            "skirt_r": [SKIRT_R],
-            "skirt_r_mch": [SKIRT_R_MCH],
+            "skirt_r": [SKIRT_R],   
             "skirt_l": [SKIRT_L],
-            "skirt_l_mch": [SKIRT_L_MCH],
             "hand_r": [HAND_R],
             "hand_l": [HAND_L],
             "tail": [TAIL],
