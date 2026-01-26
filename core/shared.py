@@ -165,6 +165,22 @@ class BoneGroup:
         
         # Add BoneGenerator pose operations
         for bone_gen in self.bones:
+            # Collect dynamic pose operations (empty dict for most generators)
+            dynamic_ops = bone_gen.get_dynamic_pose_operations()
+            for bone_name, operations in dynamic_ops.items():
+                if bone_name not in pose_operations_dict:
+                    pose_operations_dict[bone_name] = []
+                pose_operations_dict[bone_name].extend(operations)
+            
+            # Collect dynamic transform links (empty list for most generators)
+            dynamic_links = bone_gen.get_dynamic_transform_links()
+            for link_item in dynamic_links:
+                for bone_name, operations in link_item.to_pose_operations().items():
+                    if bone_name not in pose_operations_dict:
+                        pose_operations_dict[bone_name] = []
+                    pose_operations_dict[bone_name].extend(operations)
+            
+            # Add static pose operations from the generator
             if bone_gen.pose_operations:
                 if bone_gen.name not in pose_operations_dict:
                     pose_operations_dict[bone_gen.name] = []

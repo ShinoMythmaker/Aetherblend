@@ -5,12 +5,15 @@ UI_PLAYER_SFW = {
                 "face_primary": BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=2, title="Primary", visible=False),
                 "face_secondary": BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=2, title="Secondary", visible=False),
                 "mouth": BoneCollection(name="Mouth", ui=True, color_set="Torso", row_index=3, title="Mouth", visible=False),
-                # BoneCollection(name="Hair", ui=True, color_set="Head", row_index=3, title="Hair", visible=False),
-                # BoneCollection(name="Accessory", ui=True, color_set="Head", row_index=3, title="Accessory", visible=False),
-                "torso": BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=5, title="Torso"),
-                "torso_tweak": BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=6, title="Tweak", visible=False),
-                "fingers_left": BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=8, title="Fingers.L"),
-                "fingers_right": BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=8, title="Fingers.R"),
+
+
+                "hair": BoneCollection(name="Hair", ui=True, color_set="Head", row_index=4, title="Hair", visible=False),
+                "accessory": BoneCollection(name="Accessory", ui=True, color_set="Head", row_index=4, title="Accessory", visible=False),
+
+                "torso": BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=6, title="Torso"),
+                "torso_tweak": BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=7, title="Tweak", visible=False),
+                "fingers_left": BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=9, title="Fingers.L"),
+                "fingers_right": BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=9, title="Fingers.R"),
                 # BoneCollection(name="Fingers (Details)", ui=True, color_set="FK", row_index=9, title="(Details)", visible=False),
                 # BoneCollection(name="Toes", ui=True, color_set="Extra", row_index=8, title="Toes"),
                 # BoneCollection(name="Toes (Details)", ui=True, color_set="FK", row_index=9, title="(Details)", visible=False),

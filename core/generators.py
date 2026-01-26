@@ -1,14 +1,17 @@
 import bpy
 import math
-import mathutils  # type: ignore
+import mathutils 
+import re
 
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .shared import PoseOperations
+    from .shared import PoseOperations, TransformLink
 
+from . import rigify
+from .shared import PoseOperations, TransformLink
 from .. import utils
 
 
@@ -27,6 +30,158 @@ class BoneGenerator(ABC):
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the bone and returns the created bone name(s)."""
         pass
+    
+    def get_dynamic_pose_operations(self) -> dict[str, list['PoseOperations']]:
+        """Returns dynamically generated pose operations. Override in subclasses that need this."""
+        return {}
+    
+    def get_dynamic_transform_links(self) -> list['TransformLink']:
+        """Returns dynamically generated transform links. Override in subclasses that need this."""
+        return []
+
+@dataclass(frozen=True)
+class RegexBoneGroup(BoneGenerator):
+    name: str
+    pattern: str
+    prefix: str = "HAIR"
+    extension_size_factor: float = 1.0
+    extension_axis_type: str = "local"  # e.g., "global", "local", "armature"
+    extension_axis: str  = "Y"  # e.g., "X", "Y", "Z"
+    parent: str | None = None
+    is_connected: bool = False
+    b_collection: str | None = None  # Bone collection to assign generated bones to
+    
+    req_bones: list[str] | None = None
+    pose_operations: 'PoseOperations | None' = None
+    is_optional: bool = False
+    
+    # These are populated after generate() is called
+    _dynamic_pose_operations: dict[str, list['PoseOperations']] | None = None
+    _dynamic_transform_links: list['TransformLink'] | None = None
+
+    def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
+        """Generates bone chains for pattern-matched bones in the target armature."""
+
+        if not armature:
+            print(f"[AetherBlend] Invalid armatures provided for RegexBoneGroup with pattern '{self.pattern}'.")
+            return None
+        
+        # Initialize dynamic tracking (work around frozen=True)
+        object.__setattr__(self, '_dynamic_pose_operations', {})
+        object.__setattr__(self, '_dynamic_transform_links', [])
+        
+        ref_bones = armature.data.bones
+        matched_bones = [bone for bone in ref_bones if re.match(self.pattern, bone.name)]
+
+        created_bones = []
+        processed_bones = set()
+
+        for bone in matched_bones:
+            if bone.name in processed_bones:
+                continue
+
+            children = [child for child in bone.children if re.match(self.pattern, child.name)]
+
+            if not children:
+                # Single bone without children - create extension bone
+                bone_name = f"{self.prefix}_{bone.name}"
+                extension_bone = ExtensionBone(
+                    name=bone_name,
+                    bone_a=bone.name,
+                    size_factor=self.extension_size_factor,
+                    axis_type=self.extension_axis_type,
+                    axis=self.extension_axis,
+                    parent=self.parent,
+                    is_connected=self.is_connected,
+                    start="head"
+                )
+                result = extension_bone.generate(armature, data)
+                if result:
+                    created_bones.extend(result)
+                    # Add pose operations and transform link
+                    self._dynamic_pose_operations[bone_name] = [
+                        PoseOperations(
+                            rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
+                            b_collection=self.b_collection
+                        )
+                    ]
+                    self._dynamic_transform_links.append(
+                        TransformLink(target=f"DEF-{bone_name}", bone=bone.name)
+                    )
+                
+                processed_bones.add(bone.name)
+            else:
+                # Chain of bones - create connect bones for each
+                chain_bones = self._build_chain(bone, ref_bones)
+                processed_bones.update(chain_bones)
+                
+                # Create ConnectBones for all bones in chain including last
+                for i in range(len(chain_bones)):
+                    source_bone_name = chain_bones[i]
+                    connect_bone_name = f"{self.prefix}_{source_bone_name}"
+                    
+                    if i < len(chain_bones) - 1:
+                        # Connect to next bone in chain
+                        connect_bone = ConnectBone(
+                            name=connect_bone_name,
+                            bone_a=chain_bones[i],
+                            bone_b=chain_bones[i+1],
+                            parent=self.parent if i == 0 else created_bones[-1],
+                            start="head",
+                            end="head",
+                            is_connected=self.is_connected if i == 0 else True
+                        )
+                    else:
+                        # Last bone - extend from its own tail
+                        connect_bone = ExtensionBone(
+                            name=connect_bone_name,
+                            bone_a=chain_bones[i],
+                            size_factor=1.0,
+                            axis_type="local",
+                            axis="Y",
+                            parent=created_bones[-1] if created_bones else self.parent,
+                            is_connected=True,
+                            start="head"
+                        )
+                    
+                    result = connect_bone.generate(armature, data)
+                    if result:
+                        created_bones.extend(result)
+                        # Add pose operations and transform link for this bone
+                        self._dynamic_pose_operations[connect_bone_name] = [
+                            PoseOperations(
+                                rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
+                                b_collection=self.b_collection
+                            )
+                        ]
+                        self._dynamic_transform_links.append(
+                            TransformLink(target=f"DEF-{connect_bone_name}", bone=source_bone_name)
+                        )
+                        
+        return created_bones if created_bones else None
+    
+    def _build_chain(self, start_bone, ref_bones) -> list[str]:
+        """Build a chain of bones starting from start_bone following the pattern."""
+        chain = [start_bone.name]
+        current = start_bone
+        
+        while True:
+            children = [child for child in current.children if re.match(self.pattern, child.name)]
+            if not children:
+                break
+            # Follow the first matching child
+            current = children[0]
+            chain.append(current.name)
+        
+        return chain
+    
+    def get_dynamic_pose_operations(self) -> dict[str, list['PoseOperations']]:
+        """Returns the dynamically generated pose operations after generate() is called."""
+        return self._dynamic_pose_operations if self._dynamic_pose_operations else {}
+    
+    def get_dynamic_transform_links(self) -> list['TransformLink']:
+        """Returns the dynamically generated transform links after generate() is called."""
+        return self._dynamic_transform_links if self._dynamic_transform_links else []
 
 
 @dataclass(frozen=True)
@@ -242,7 +397,7 @@ class CopyBone(BoneGenerator):
         return [created_name]
     
 @dataclass(frozen=True)
-class SkinBone:
+class SkinBone(BoneGenerator):
     name: str
     bone_a: str
     parent: str | None = None
@@ -391,7 +546,7 @@ class SkinBone:
         return (best_world_co, best_weight)
     
 @dataclass(frozen=True)
-class BridgeBone:
+class BridgeBone(BoneGenerator):
     name: str
     bone_a: str
     bone_b: str
@@ -463,7 +618,7 @@ class BridgeBone:
 
 
 @dataclass(frozen=True)
-class CenterBone:
+class CenterBone(BoneGenerator):
     name: str
     ref_bones: list[str]
     size_factor: float = 1.0
