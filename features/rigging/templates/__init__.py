@@ -7,11 +7,8 @@ from .ui_collections import *
 from .widget_overrides import *
 from .bone_groups import *
 
-## UI Selections
-UI_COLLECTIONS = {"Player SFW": UI_PLAYER_SFW}
-WO_OVERRIDES = {"Default": WO_DEFAULT}
-BG_GROUPS = {"Player SFW": BG_PLAYER_SFW}
 
+## Templates
 
 HUMAN = AetherRigGenerator (
     name = "Human Rig",
