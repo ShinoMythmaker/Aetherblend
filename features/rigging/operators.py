@@ -7,42 +7,6 @@ from ...core import rigify
 from . import module_manager
 
 
-def _get_dynamic_rig_generator(armature: bpy.types.Object) -> AetherRigGenerator:
-    """Create a dynamic AetherRigGenerator based on armature's selected modules."""
-    aether_rig = armature.aether_rig
-    
-    # Get selected modules for each type
-    color_sets = []
-    ui_collections = []
-    widget_overrides = []
-    bone_groups = []
-    
-    for module_type, config in module_manager.MODULE_TYPE_CONFIG.items():
-        selected = module_manager.get_selected_modules(aether_rig, module_type)
-        available = config['available_modules']
-        
-        # Build list of actual module objects
-        modules = [available[name] for name in selected if name in available]
-        
-        # Assign to appropriate list based on type
-        if module_type == 'colorset':
-            color_sets = modules
-        elif module_type == 'ui_collection':
-            ui_collections = modules
-        elif module_type == 'widget_override':
-            widget_overrides = modules
-        elif module_type == 'bone_group':
-            bone_groups = modules
-    
-    # Create dynamic generator
-    return AetherRigGenerator(
-        name="Custom Rig",
-        color_sets=color_sets,
-        ui_collections=ui_collections,
-        widget_overrides=widget_overrides,
-        bone_groups=bone_groups
-    )
-
 class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_idname = "aether.generate_meta_rig"
     bl_label = "Generate Meta Rig"
@@ -73,8 +37,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             self.report({'ERROR'}, "Cannot generate meta rig on an armature that is already rigified.")
             return {'CANCELLED'}
         
-        # Get Generator Data (use dynamic generator based on selected modules)
-        aether_rig_generator = _get_dynamic_rig_generator(armature)
+        # Get Generator Data
+        aether_rig_generator = module_manager.get_rig_generator(armature.aether_rig)
         
         # Meta Rig Base Generation
         meta_rig = utils.armature.duplicate(armature)
@@ -261,7 +225,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         result = bpy.ops.pose.rigify_generate()
 
         if result == {"FINISHED"}:
-            aether_rig_generator = _get_dynamic_rig_generator(armature)
+            aether_rig_generator = module_manager.get_rig_generator(armature.aether_rig)
 
             ## Execute Post Generation Steps
             ffxiv_data_bones = utils.armature.b_collection.get_bones(armature, "FFXIV")

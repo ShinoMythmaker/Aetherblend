@@ -12,9 +12,9 @@ from .bone_groups import *
 TEMPLATES = {
     'Player SFW':   AetherRigGenerator (
         name = "Player SFW",
-        color_sets=['Aether Blend', 'Rigify'],
-        ui_collections=['Player SFW'],  
-        widget_overrides=['Default'],
-        bone_groups = ['Player SFW']
+        color_sets=[CS_AETHER_BLEND],
+        ui_collections=[UI_PLAYER_SFW],  
+        widget_overrides=[WO_DEFAULT],
+        bone_groups = [BG_PLAYER_SFW]
     )
 }

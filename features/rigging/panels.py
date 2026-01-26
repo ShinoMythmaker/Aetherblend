@@ -72,7 +72,7 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
 
 
 class AETHER_PT_RigModuleSelection(bpy.types.Panel):
-    bl_label = "Rig Modules"
+    bl_label = "Rig Configuration"
     bl_idname = "AETHER_PT_rig_module_selection"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -85,55 +85,15 @@ class AETHER_PT_RigModuleSelection(bpy.types.Panel):
         armature = context.active_object
         aether_rig = armature.aether_rig
         
-        # Template selection at the top
-        box = layout.box()
-        row = box.row(align=True)
-        row.label(text="Template:", icon='PRESET')
-        row.prop(aether_rig, "template_dropdown", text="")
-        load_op = row.operator("aether.load_template", text="", icon='IMPORT')
-        load_op.template_name = aether_rig.template_dropdown
+        # Template selection
+        row = layout.row(align=True)
+        row.label(text="Template", icon='PRESET')
+        row.prop(aether_rig, "selected_template", text="")
         
-        layout.separator()
-        
-        # Iterate through all module types
-        for module_type, config in module_manager.MODULE_TYPE_CONFIG.items():
-            box = layout.box()
-            row = box.row()
-            row.label(text=config['label'], icon=config['icon'])
-            
-            # Display selected modules
-            selected_modules = module_manager.get_selected_modules(aether_rig, module_type)
-            for i, module_name in enumerate(selected_modules):
-                row = box.row(align=True)
-                row.label(text=module_name, icon='CHECKMARK')
-                
-                # Up button
-                up_col = row.column(align=True)
-                up_col.enabled = i > 0
-                up_op = up_col.operator("aether.move_module_up", text="", icon='TRIA_UP')
-                up_op.module_type = module_type
-                up_op.module_name = module_name
-                
-                # Down button
-                down_col = row.column(align=True)
-                down_col.enabled = i < len(selected_modules) - 1
-                down_op = down_col.operator("aether.move_module_down", text="", icon='TRIA_DOWN')
-                down_op.module_type = module_type
-                down_op.module_name = module_name
-                
-                # Remove button
-                remove_op = row.operator("aether.remove_module_from_rig", text="", icon='X')
-                remove_op.module_type = module_type
-                remove_op.module_name = module_name
-            
-            # Dropdown to add new module
-            available_modules = [key for key in config['available_modules'].keys() if key not in selected_modules]
-            if available_modules:
-                row = box.row(align=True)
-                row.prop(aether_rig, config['dropdown_property'], text="")
-                add_op = row.operator("aether.add_module_to_rig", text="", icon='ADD')
-                add_op.module_type = module_type
-                add_op.module_name = getattr(aether_rig, config['dropdown_property'])
+        # Colorset override
+        row = layout.row(align=True)
+        row.label(text="Colorset", icon='COLOR')
+        row.prop(aether_rig, "selected_colorset", text="")
 
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
