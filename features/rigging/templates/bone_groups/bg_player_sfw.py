@@ -1703,7 +1703,7 @@ HEAD = BoneGroup(
             is_connected=False,
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.basic_super_copy(widget_type="teeth"),
-                b_collection="Face (Secondary)"
+                b_collection="Mouth"
             )
         ),
         ExtensionBone(
@@ -1717,7 +1717,7 @@ HEAD = BoneGroup(
             is_connected=False,
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.basic_super_copy(widget_type="teeth"),
-                b_collection="Face (Secondary)"
+                b_collection="Mouth"
             )
         ),
         #Tongue
@@ -1730,7 +1730,7 @@ HEAD = BoneGroup(
             req_bones=["j_f_bero_03", "j_f_bero_02"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.face_basic_tongue(),
-                b_collection="Face (Secondary)"
+                b_collection="Mouth"
             )
         ),
         ConnectBone(
@@ -1741,7 +1741,7 @@ HEAD = BoneGroup(
             is_connected=True,
             req_bones=["j_f_bero_02", "j_f_bero_01"],
             pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
+                b_collection="Mouth"
             )
         ),
         ExtensionBone(
@@ -1753,7 +1753,7 @@ HEAD = BoneGroup(
             axis="Y",
             req_bones=["Tongue.001"],
             pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
+                b_collection="Mouth"
             )
         ),
         #Nose Glue
@@ -1913,7 +1913,7 @@ HEAD = BoneGroup(
             is_connected=False,
             req_bones=["j_f_hana_r", "j_f_ulip_01_r"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True),
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2, skin_glue_tail_reparent=True),
                 b_collection="MCH"
             )
         ),
@@ -1925,7 +1925,7 @@ HEAD = BoneGroup(
             is_connected=False,
             req_bones=["j_f_hana_l", "j_f_ulip_01_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True),
+                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2, skin_glue_tail_reparent=True),
                 b_collection="MCH"
             )
         ),
