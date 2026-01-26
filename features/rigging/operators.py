@@ -2,7 +2,6 @@ import bpy
 import time
 
 from ... import utils
-from .templates import HUMAN
 from ...core.shared import PoseOperations, AetherRigGenerator
 from ...core import rigify
 from . import module_manager

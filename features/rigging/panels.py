@@ -85,6 +85,16 @@ class AETHER_PT_RigModuleSelection(bpy.types.Panel):
         armature = context.active_object
         aether_rig = armature.aether_rig
         
+        # Template selection at the top
+        box = layout.box()
+        row = box.row(align=True)
+        row.label(text="Template:", icon='PRESET')
+        row.prop(aether_rig, "template_dropdown", text="")
+        load_op = row.operator("aether.load_template", text="", icon='IMPORT')
+        load_op.template_name = aether_rig.template_dropdown
+        
+        layout.separator()
+        
         # Iterate through all module types
         for module_type, config in module_manager.MODULE_TYPE_CONFIG.items():
             box = layout.box()

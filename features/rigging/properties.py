@@ -20,6 +20,15 @@ def get_bone_group_items(self, context):
     config = module_manager.get_module_config('bone_group')
     return [(key, key, "") for key in config.get('available_modules', {}).keys()]
 
+# Get defaults from module_manager config
+from . import module_manager
+_DEFAULTS = {
+    'colorset': module_manager.MODULE_TYPE_CONFIG['colorset']['default'],
+    'ui_collection': module_manager.MODULE_TYPE_CONFIG['ui_collection']['default'],
+    'widget_override': module_manager.MODULE_TYPE_CONFIG['widget_override']['default'],
+    'bone_group': module_manager.MODULE_TYPE_CONFIG['bone_group']['default']
+}
+
 class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     meta_rig : bpy.props.PointerProperty(
         name="Meta Rig",
@@ -35,29 +44,37 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         default=False
     ) # type: ignore
     
+    # Template selection
+    template_dropdown : bpy.props.EnumProperty(
+        name="Template",
+        description="Select a template to load",
+        items=module_manager.get_template_items,
+        default=0
+    ) # type: ignore
+    
     # Selected modules for rig generation
     selected_colorsets : bpy.props.StringProperty(
         name="Selected Colorsets",
         description="Comma-separated list of selected colorset module names",
-        default="Aether Blend"
+        default=_DEFAULTS['colorset']
     ) # type: ignore
     
     selected_ui_collections : bpy.props.StringProperty(
         name="Selected UI Collections",
         description="Comma-separated list of selected UI collection module names",
-        default="Player SFW"
+        default=_DEFAULTS['ui_collection']
     ) # type: ignore
     
     selected_widget_overrides : bpy.props.StringProperty(
         name="Selected Widget Overrides",
         description="Comma-separated list of selected widget override module names",
-        default="Default"
+        default=_DEFAULTS['widget_override']
     ) # type: ignore
     
     selected_bone_groups : bpy.props.StringProperty(
         name="Selected Bone Groups",
         description="Comma-separated list of selected bone group module names",
-        default="Player SFW"
+        default=_DEFAULTS['bone_group']
     ) # type: ignore
     
     # Dropdown selections for adding modules

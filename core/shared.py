@@ -99,7 +99,7 @@ class WidgetOverride:
             pose_bone.use_transform_at_custom_shape = self.affect_gizmo      ## 5.0
             pose_bone.use_transform_around_custom_shape = self.use_as_pivot  ## 5.0
             pose_bone.use_custom_shape_bone_size = self.scale_to_bone_length
-            pose_bone.show_wire = self.wireframe  ## 5.0
+            ##pose_bone.show_wire = self.wireframe  ## 5.0
             pose_bone.custom_shape_wire_width = self.wire_width
         except Exception as e:
             print(f"[AetherBlend] Error applying WidgetOverride for bone '{pose_bone.name}': {e}")
