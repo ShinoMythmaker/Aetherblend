@@ -3,8 +3,24 @@ Module management system for rig generation.
 Centralizes all module type definitions and operations.
 """
 import bpy
-from .templates import CS_COLORSETS, UI_COLLECTIONS, WO_OVERRIDES, BG_GROUPS
+from .templates import CS_COLORSETS, UI_COLLECTIONS, WO_OVERRIDES, BG_GROUPS, TEMPLATES
 
+
+def get_template_items(self, context):
+    """Get available templates for dropdown."""
+    return [(key, key, "") for key in TEMPLATES.keys()]
+
+
+def _normalize_default(default):
+    """Convert default value to comma-separated string."""
+    if isinstance(default, list):
+        return ", ".join(default)
+    return default
+
+
+# Get default template configuration
+DEFAULT_TEMPLATE_NAME = 'Player SFW'
+_default_template = TEMPLATES.get(DEFAULT_TEMPLATE_NAME)
 
 # Module type configuration - single source of truth
 MODULE_TYPE_CONFIG = {
@@ -14,7 +30,7 @@ MODULE_TYPE_CONFIG = {
         'property': 'selected_colorsets',
         'dropdown_property': 'dropdown_colorset',
         'available_modules': CS_COLORSETS,
-        'default': 'Aether Blend, Rigify'
+        'default': _default_template.color_sets if _default_template else []
     },
     'ui_collection': {
         'label': 'UI Collections',
@@ -22,7 +38,7 @@ MODULE_TYPE_CONFIG = {
         'property': 'selected_ui_collections',
         'dropdown_property': 'dropdown_ui_collection',
         'available_modules': UI_COLLECTIONS,
-        'default': 'Player SFW'
+        'default': _default_template.ui_collections if _default_template else []
     },
     'widget_override': {
         'label': 'Widget Overrides',
@@ -30,7 +46,7 @@ MODULE_TYPE_CONFIG = {
         'property': 'selected_widget_overrides',
         'dropdown_property': 'dropdown_widget_override',
         'available_modules': WO_OVERRIDES,
-        'default': 'Default'
+        'default': _default_template.widget_overrides if _default_template else []
     },
     'bone_group': {
         'label': 'Bone Groups',
@@ -38,9 +54,13 @@ MODULE_TYPE_CONFIG = {
         'property': 'selected_bone_groups',
         'dropdown_property': 'dropdown_bone_group',
         'available_modules': BG_GROUPS,
-        'default': 'Player SFW'
+        'default': _default_template.bone_groups if _default_template else []
     }
 }
+
+# Normalize all defaults to strings
+for config in MODULE_TYPE_CONFIG.values():
+    config['default'] = _normalize_default(config['default'])
 
 # Generate enum items for operators
 MODULE_TYPES = [(key, config['label'], "") for key, config in MODULE_TYPE_CONFIG.items()]
@@ -71,6 +91,46 @@ def set_selected_modules(aether_rig, module_type: str, modules: list[str]):
     prop_name = get_property_name(module_type)
     if prop_name:
         setattr(aether_rig, prop_name, ", ".join(modules))
+
+
+def load_template(aether_rig, template_name: str):
+    """Load a template and apply its module configuration."""
+    if template_name not in TEMPLATES:
+        return False
+    
+    template = TEMPLATES[template_name]
+    
+    # Set modules for each type based on template
+    set_selected_modules(aether_rig, 'colorset', template.color_sets or [])
+    set_selected_modules(aether_rig, 'ui_collection', template.ui_collections or [])
+    set_selected_modules(aether_rig, 'widget_override', template.widget_overrides or [])
+    set_selected_modules(aether_rig, 'bone_group', template.bone_groups or [])
+    
+    return True
+
+
+class AETHER_OT_LoadTemplate(bpy.types.Operator):
+    bl_idname = "aether.load_template"
+    bl_label = "Load Template"
+    bl_description = "Load a predefined template configuration"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    template_name: bpy.props.StringProperty(name="Template Name") # type: ignore
+    
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "No armature selected")
+            return {'CANCELLED'}
+        
+        aether_rig = armature.aether_rig
+        
+        if load_template(aether_rig, self.template_name):
+            self.report({'INFO'}, f"Loaded template: {self.template_name}")
+            return {'FINISHED'}
+        else:
+            self.report({'ERROR'}, f"Template not found: {self.template_name}")
+            return {'CANCELLED'}
 
 
 class AETHER_OT_AddModuleToRig(bpy.types.Operator):
@@ -196,6 +256,7 @@ class AETHER_OT_MoveModuleDown(bpy.types.Operator):
 
 
 def register():
+    bpy.utils.register_class(AETHER_OT_LoadTemplate)
     bpy.utils.register_class(AETHER_OT_AddModuleToRig)
     bpy.utils.register_class(AETHER_OT_RemoveModuleFromRig)
     bpy.utils.register_class(AETHER_OT_MoveModuleUp)
@@ -203,6 +264,7 @@ def register():
 
 
 def unregister():
+    bpy.utils.unregister_class(AETHER_OT_LoadTemplate)
     bpy.utils.unregister_class(AETHER_OT_AddModuleToRig)
     bpy.utils.unregister_class(AETHER_OT_RemoveModuleFromRig)
     bpy.utils.unregister_class(AETHER_OT_MoveModuleUp)
