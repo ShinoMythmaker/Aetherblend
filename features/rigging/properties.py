@@ -1,33 +1,8 @@
 import bpy
 
-def get_colorset_items(self, context):
-    from . import module_manager
-    config = module_manager.get_module_config('colorset')
-    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
-
-def get_ui_collection_items(self, context):
-    from . import module_manager
-    config = module_manager.get_module_config('ui_collection')
-    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
-
-def get_widget_override_items(self, context):
-    from . import module_manager
-    config = module_manager.get_module_config('widget_override')
-    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
-
-def get_bone_group_items(self, context):
-    from . import module_manager
-    config = module_manager.get_module_config('bone_group')
-    return [(key, key, "") for key in config.get('available_modules', {}).keys()]
-
-# Get defaults from module_manager config
+# Import module configuration
 from . import module_manager
-_DEFAULTS = {
-    'colorset': module_manager.MODULE_TYPE_CONFIG['colorset']['default'],
-    'ui_collection': module_manager.MODULE_TYPE_CONFIG['ui_collection']['default'],
-    'widget_override': module_manager.MODULE_TYPE_CONFIG['widget_override']['default'],
-    'bone_group': module_manager.MODULE_TYPE_CONFIG['bone_group']['default']
-}
+
 
 class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     meta_rig : bpy.props.PointerProperty(
@@ -45,61 +20,19 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     ) # type: ignore
     
     # Template selection
-    template_dropdown : bpy.props.EnumProperty(
+    selected_template : bpy.props.EnumProperty(
         name="Template",
-        description="Select a template to load",
+        description="Select a rig template",
         items=module_manager.get_template_items,
         default=0
     ) # type: ignore
     
-    # Selected modules for rig generation
-    selected_colorsets : bpy.props.StringProperty(
-        name="Selected Colorsets",
-        description="Comma-separated list of selected colorset module names",
-        default=_DEFAULTS['colorset']
-    ) # type: ignore
-    
-    selected_ui_collections : bpy.props.StringProperty(
-        name="Selected UI Collections",
-        description="Comma-separated list of selected UI collection module names",
-        default=_DEFAULTS['ui_collection']
-    ) # type: ignore
-    
-    selected_widget_overrides : bpy.props.StringProperty(
-        name="Selected Widget Overrides",
-        description="Comma-separated list of selected widget override module names",
-        default=_DEFAULTS['widget_override']
-    ) # type: ignore
-    
-    selected_bone_groups : bpy.props.StringProperty(
-        name="Selected Bone Groups",
-        description="Comma-separated list of selected bone group module names",
-        default=_DEFAULTS['bone_group']
-    ) # type: ignore
-    
-    # Dropdown selections for adding modules
-    dropdown_colorset : bpy.props.EnumProperty(
+    # Colorset override (single selection, replaces template default)
+    selected_colorset : bpy.props.EnumProperty(
         name="Colorset",
-        description="Select a colorset to add",
-        items=get_colorset_items
-    ) # type: ignore
-    
-    dropdown_ui_collection : bpy.props.EnumProperty(
-        name="UI Collection",
-        description="Select a UI collection to add",
-        items=get_ui_collection_items
-    ) # type: ignore
-    
-    dropdown_widget_override : bpy.props.EnumProperty(
-        name="Widget Override",
-        description="Select a widget override to add",
-        items=get_widget_override_items
-    ) # type: ignore
-    
-    dropdown_bone_group : bpy.props.EnumProperty(
-        name="Bone Group",
-        description="Select a bone group to add",
-        items=get_bone_group_items
+        description="Select a colorset (replaces template default)",
+        items=module_manager.get_colorset_items,
+        default=0
     ) # type: ignore
 
 
