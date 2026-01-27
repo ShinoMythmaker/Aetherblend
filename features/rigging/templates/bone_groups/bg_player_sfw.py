@@ -748,6 +748,9 @@ IV_HAND_R = BoneGroup(
         TransformLink(target="DEF-pinky.R", bone="j_ko_a_r"),
         TransformLink(target="DEF-pinky.R.001", bone="j_ko_b_r"),
         TransformLink(target="DEF-index.R.002", bone="iv_hito_c_r"),
+        TransformLink(target="DEF-middle.R.002", bone="iv_naka_c_r"),
+        TransformLink(target="DEF-ring.R.002", bone="iv_kusu_c_r"),
+        TransformLink(target="DEF-pinky.R.002", bone="iv_ko_c_r"),
     ],
     bones=[
         #Palm Control - Very cool stuff, thank you rigify - Oats
@@ -888,15 +891,13 @@ IV_HAND_R = BoneGroup(
                 b_collection="Fingers.R",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="middle.R.001",
             bone_a="j_naka_b_r",
+            bone_b="iv_naka_c_r",
             parent="middle.R",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["iv_naka_c_r"],
+            req_bones=["j_naka_b_r", "iv_naka_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
@@ -928,15 +929,13 @@ IV_HAND_R = BoneGroup(
                 b_collection="Fingers.R",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="ring.R.001",
             bone_a="j_kusu_b_r",
+            bone_b="iv_kusu_c_r",
             parent="ring.R",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["j_kusu_b_r"],
+            req_bones=["j_kusu_b_r", "iv_kusu_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
@@ -968,15 +967,13 @@ IV_HAND_R = BoneGroup(
                 b_collection="Fingers.R",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="pinky.R.001",
             bone_a="j_ko_b_r",
+            bone_b="iv_ko_c_r",
             parent="pinky.R",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["j_ko_b_r"],
+            req_bones=["j_ko_b_r", "iv_ko_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
@@ -1274,6 +1271,10 @@ IV_HAND_L = BoneGroup(
         TransformLink(target="DEF-ring.L.001", bone="j_kusu_b_l"),
         TransformLink(target="DEF-pinky.L", bone="j_ko_a_l"),
         TransformLink(target="DEF-pinky.L.001", bone="j_ko_b_l"),
+        TransformLink(target="DEF-index.L.002", bone="iv_hito_c_l"),
+        TransformLink(target="DEF-middle.L.002", bone="iv_naka_c_l"),
+        TransformLink(target="DEF-ring.L.002", bone="iv_kusu_c_l"),
+        TransformLink(target="DEF-pinky.L.002", bone="iv_ko_c_l"),
     ],
     bones=[
         #Palm Control - Very cool stuff, thank you rigify - Oats
@@ -1376,15 +1377,13 @@ IV_HAND_L = BoneGroup(
                 b_collection="Fingers.L",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="index.L.001",
             bone_a="j_hito_b_l",
+            bone_b="iv_hito_c_l",
             parent="index.L",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["j_hito_b_l"],
+            req_bones=["j_hito_b_l", "iv_hito_c_l"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.L",
             )
@@ -1416,15 +1415,13 @@ IV_HAND_L = BoneGroup(
                 b_collection="Fingers.L",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="middle.L.001",
             bone_a="j_naka_b_l",
+            bone_b="iv_naka_c_l",
             parent="middle.L",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["j_naka_b_l"],
+            req_bones=["j_naka_b_l", "iv_naka_c_l"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.L",
             )
@@ -1456,15 +1453,13 @@ IV_HAND_L = BoneGroup(
                 b_collection="Fingers.L",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="ring.L.001",
             bone_a="j_kusu_b_l",
+            bone_b="iv_kusu_c_l",
             parent="ring.L",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["j_kusu_b_l"],
+            req_bones=["j_kusu_b_l", "iv_kusu_c_l"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.L",
             )
@@ -1496,15 +1491,13 @@ IV_HAND_L = BoneGroup(
                 b_collection="Fingers.L",
             )
         ),
-        ExtensionBone(
+        ConnectBone(
             name="pinky.L.001",
             bone_a="j_ko_b_l",
+            bone_b="iv_ko_c_l",
             parent="pinky.L",
             is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["j_ko_b_l"],
+            req_bones=["j_ko_b_l", "iv_ko_c_l"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.L",
             )
@@ -1735,7 +1728,7 @@ HAND_L = BoneGroup(
             )
         ),
     ],
-),
+)
 
 TAIL = BoneGroup(
     name="Tail",
@@ -2562,6 +2555,7 @@ HEAD = BoneGroup(
             axis_type="local",
             axis="Y",
             start="head",
+            roll=150,
             req_bones=["j_mimi_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
@@ -2576,6 +2570,7 @@ HEAD = BoneGroup(
             axis_type="local",
             axis="Y",
             start="head",
+            roll=-150,
             req_bones=["j_mimi_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
@@ -2655,6 +2650,276 @@ VIERA_EARS = BoneGroup(
             req_bones=["j_zera_b_l", "j_zera_b_l"],
             pose_operations=PoseOperations(
                 b_collection="Head",
+            )
+        ),
+    ]
+)
+
+IV_TOES = BoneGroup(
+    name="IVCS Toes",
+    transform_link=[
+        TransformLink(target="DEF-Hallux_Toe.R", bone="iv_asi_oya_a_r"),
+        TransformLink(target="DEF-Hallux_Toe.R.001", bone="iv_asi_oya_b_r"),
+        TransformLink(target="DEF-Index_Toe.R", bone="iv_asi_hito_a_r"),
+        TransformLink(target="DEF-Index_Toe.R.001", bone="iv_asi_hito_b_r"),
+        TransformLink(target="DEF-Middle_Toe.R", bone="iv_asi_naka_a_r"),
+        TransformLink(target="DEF-Middle_Toe.R.001", bone="iv_asi_naka_b_r"),
+        TransformLink(target="DEF-Ring_Toe.R", bone="iv_asi_kusu_a_r"),
+        TransformLink(target="DEF-Ring_Toe.R.001", bone="iv_asi_kusu_b_r"),
+        TransformLink(target="DEF-Pinky_Toe.R", bone="iv_asi_ko_a_r"),
+        TransformLink(target="DEF-Pinky_Toe.R.001", bone="iv_asi_ko_b_r"),
+        TransformLink(target="DEF-Hallux_Toe.L", bone="iv_asi_oya_a_l"),
+        TransformLink(target="DEF-Hallux_Toe.L.001", bone="iv_asi_oya_b_l"),
+        TransformLink(target="DEF-Index_Toe.L", bone="iv_asi_hito_a_l"),
+        TransformLink(target="DEF-Index_Toe.L.001", bone="iv_asi_hito_b_l"),
+        TransformLink(target="DEF-Middle_Toe.L", bone="iv_asi_naka_a_l"),
+        TransformLink(target="DEF-Middle_Toe.L.001", bone="iv_asi_naka_b_l"),
+        TransformLink(target="DEF-Ring_Toe.L", bone="iv_asi_kusu_a_l"),
+        TransformLink(target="DEF-Ring_Toe.L.001", bone="iv_asi_kusu_b_l"),
+        TransformLink(target="DEF-Pinky_Toe.L", bone="iv_asi_ko_a_l"),
+        TransformLink(target="DEF-Pinky_Toe.L.001", bone="iv_asi_ko_b_l"),
+    ],
+    bones=[
+        #Toes Right
+        ConnectBone(
+            name="Hallux_Toe.R",
+            bone_a="iv_asi_oya_a_r",
+            bone_b="iv_asi_oya_b_r",
+            parent="j_asi_e_r",
+            is_connected=False,
+            req_bones=["iv_asi_oya_a_r", "iv_asi_oya_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.R",
+            )
+        ),
+        ExtensionBone(
+            name="Hallux_Toe.R.001",
+            bone_a="iv_asi_oya_b_r",
+            parent="Hallux_Toe.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_oya_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.R"
+            )
+        ),
+        ConnectBone(
+            name="Index_Toe.R",
+            bone_a="iv_asi_hito_a_r",
+            bone_b="iv_asi_hito_b_r",
+            parent="j_asi_e_r",
+            is_connected=False,
+            req_bones=["iv_asi_hito_a_r", "iv_asi_hito_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.R",
+            )
+        ),
+        ExtensionBone(
+            name="Index_Toe.R.001",
+            bone_a="iv_asi_hito_b_r",
+            parent="Index_Toe.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_hito_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.R"
+            )
+        ),
+        ConnectBone(
+            name="Middle_Toe.R",
+            bone_a="iv_asi_naka_a_r",
+            bone_b="iv_asi_naka_b_r",
+            parent="j_asi_e_r",
+            is_connected=False,
+            req_bones=["iv_asi_naka_a_r", "iv_asi_naka_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.R",
+            )
+        ),
+        ExtensionBone(
+            name="Middle_Toe.R.001",
+            bone_a="iv_asi_naka_b_r",
+            parent="Middle_Toe.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_naka_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.R"
+            )
+        ),
+        ConnectBone(
+            name="Ring_Toe.R",
+            bone_a="iv_asi_kusu_a_r",
+            bone_b="iv_asi_kusu_b_r",
+            parent="j_asi_e_r",
+            is_connected=False,
+            req_bones=["iv_asi_kusu_a_r", "iv_asi_kusu_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.R",
+            )
+        ),
+        ExtensionBone(
+            name="Ring_Toe.R.001",
+            bone_a="iv_asi_kusu_b_r",
+            parent="Ring_Toe.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_kusu_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.R"
+            )
+        ),
+        ConnectBone(
+            name="Pinky_Toe.R",
+            bone_a="iv_asi_ko_a_r",
+            bone_b="iv_asi_ko_b_r",
+            parent="j_asi_e_r",
+            is_connected=False,
+            req_bones=["iv_asi_ko_a_r", "iv_asi_ko_b_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.R",
+            )
+        ),
+        ExtensionBone(
+            name="Pinky_Toe.R.001",
+            bone_a="iv_asi_ko_b_r",
+            parent="Pinky_Toe.R",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_ko_b_r"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.R"
+            )
+        ),
+        #Toes Left
+        ConnectBone(
+            name="Hallux_Toe.L",
+            bone_a="iv_asi_oya_a_l",
+            bone_b="iv_asi_oya_b_l",
+            parent="j_asi_e_l",
+            is_connected=False,
+            req_bones=["iv_asi_oya_a_l", "iv_asi_oya_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.L",
+            )
+        ),
+        ExtensionBone(
+            name="Hallux_Toe.L.001",
+            bone_a="iv_asi_oya_b_l",
+            parent="Hallux_Toe.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_oya_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.L"
+            )
+        ),
+        ConnectBone(
+            name="Index_Toe.L",
+            bone_a="iv_asi_hito_a_l",
+            bone_b="iv_asi_hito_b_l",
+            parent="j_asi_e_l",
+            is_connected=False,
+            req_bones=["iv_asi_hito_a_l", "iv_asi_hito_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.L",
+            )
+        ),
+        ExtensionBone(
+            name="Index_Toe.L.001",
+            bone_a="iv_asi_hito_b_l",
+            parent="Index_Toe.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_hito_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.L"
+            )
+        ),
+        ConnectBone(
+            name="Middle_Toe.L",
+            bone_a="iv_asi_naka_a_l",
+            bone_b="iv_asi_naka_b_l",
+            parent="j_asi_e_l",
+            is_connected=False,
+            req_bones=["iv_asi_naka_a_l", "iv_asi_naka_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.L",
+            )
+        ),
+        ExtensionBone(
+            name="Middle_Toe.L.001",
+            bone_a="iv_asi_naka_b_l",
+            parent="Middle_Toe.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_naka_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.L"
+            )
+        ),
+        ConnectBone(
+            name="Ring_Toe.L",
+            bone_a="iv_asi_kusu_a_l",
+            bone_b="iv_asi_kusu_b_l",
+            parent="j_asi_e_l",
+            is_connected=False,
+            req_bones=["iv_asi_kusu_a_l", "iv_asi_kusu_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.L",
+            )
+        ),
+        ExtensionBone(
+            name="Ring_Toe.L.001",
+            bone_a="iv_asi_kusu_b_l",
+            parent="Ring_Toe.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_kusu_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.L"
+            )
+        ),
+        ConnectBone(
+            name="Pinky_Toe.L",
+            bone_a="iv_asi_ko_a_l",
+            bone_b="iv_asi_ko_b_l",
+            parent="j_asi_e_l",
+            is_connected=False,
+            req_bones=["iv_asi_ko_a_l", "iv_asi_ko_b_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.limbs_super_finger(),
+                b_collection="Toes.L",
+            )
+        ),
+        ExtensionBone(
+            name="Pinky_Toe.L.001",
+            bone_a="iv_asi_ko_b_l",
+            parent="Pinky_Toe.L",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            req_bones=["iv_asi_ko_b_l"],
+            pose_operations=PoseOperations(
+                b_collection="Toes.L"
             )
         ),
     ]
@@ -3254,6 +3519,7 @@ BG_PLAYER_SFW = {
             "skirt_l": [SKIRT_L],
             "hand_r": [IV_HAND_R, HAND_R],
             "hand_l": [IV_HAND_L, HAND_L],
+            "iv_toes": [IV_TOES],
             "tail": [TAIL],
             "head": [HEAD],
             "viera": [VIERA_EARS],
