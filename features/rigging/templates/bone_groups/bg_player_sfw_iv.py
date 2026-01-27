@@ -3525,7 +3525,7 @@ HAIR = BoneGroup(
 )
 
 
-BG_PLAYER_SFW = {
+BG_PLAYER_SFW_IV = {
             "spine": [SPINE],
             "arm_r": [ARM_R],
             "arm_l": [ARM_L],
@@ -3533,8 +3533,8 @@ BG_PLAYER_SFW = {
             "leg_l": [LEG_L],
             "skirt_r": [SKIRT_R],   
             "skirt_l": [SKIRT_L],
-            "hand_r": [HAND_R],
-            "hand_l": [HAND_L],
+            "hand_r": [IV_HAND_R, HAND_R],
+            "hand_l": [IV_HAND_L, HAND_L],
             "iv_toes": [IV_TOES],
             "tail": [TAIL],
             "head": [HEAD],

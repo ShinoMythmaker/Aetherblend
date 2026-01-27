@@ -14,4 +14,5 @@ CS_AETHER_BLEND = {
         "head": ColorSet(name="Head", normal="#64FFEA", select="#FFFFFF", active="#FFFF70"),
         "face_primary": ColorSet(name="Face_Primary", normal="#64FF92", select="#FFFFFF", active="#FFFF70"),
         "face_secondary": ColorSet(name="Face_Secondary", normal="#7AAFFF", select="#FFFFFF", active="#FFFF70"),
+        "ivcs": ColorSet(name="IVCS",  normal="#AD7AFF", select="#FFFFFF", active="#FFFF70"),
     }

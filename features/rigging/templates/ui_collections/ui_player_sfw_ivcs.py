@@ -1,6 +1,6 @@
 from .....core.rigify.settings import BoneCollection
 
-UI_PLAYER_SFW = {
+UI_PLAYER_SFW_IV = {
                 "head": BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
                 "face_primary": BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=2, title="Primary", visible=False),
                 "face_secondary": BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=2, title="Secondary", visible=False),
@@ -38,7 +38,7 @@ UI_PLAYER_SFW = {
 
                 "skirt": BoneCollection(name="Skirt", ui=True, color_set="Torso", row_index=22, title="Skirt", visible=False),
                 "skirt_tweak": BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Torso", row_index=23, title="Tweak", visible=False),
-                # "ivcs": BoneCollection(name="IVCS", ui=True, color_set="IVCS", row_index=25, title="IVCS", visible=False)
+                "ivcs": BoneCollection(name="IVCS", ui=True, color_set="IVCS", row_index=25, title="IVCS", visible=False)
                 # BoneCollection(name="Genitals (Male)", ui=True, color_set="FK", row_index=25, title="Genitals (Male)", visible=False),
                 # BoneCollection(name="Tweak (Male)", ui=True, color_set="Tweak", row_index=26, title="Tweak (Male)", visible=False),
                 # BoneCollection(name="Genitals (Female)", ui=True, color_set="FK", row_index=25, title="Genitals (Female)", visible=False),
