@@ -119,6 +119,18 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return
+        
+        layout = self.layout
+        
+        if context.mode == 'POSE':
+            any_soloed = any(collection.is_solo for collection in armature.data.collections)
+            
+            row = layout.row(align=True)
+            op = row.operator("aether.solo_bone_collections", 
+                             text="Unsolo All" if any_soloed else "Solo Selected", 
+                             icon='SOLO_ON' if any_soloed else 'SOLO_OFF',
+                             depress=any_soloed)
+            layout.separator()
             
         panel_name = "VIEW3D_PT_rig_layers_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
@@ -127,7 +139,6 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
             panel_class.draw(self, context)
         else:
             # Fallback to default behavior if panel not found
-            layout = self.layout
             layout.label(text=f"Rig layers panel not found for: {rig_id}")
 
 
