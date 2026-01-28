@@ -1124,19 +1124,6 @@ HAND_R = BoneGroup(
                 b_collection="Fingers.R",
             )
         ),
-        ExtensionBone(
-            name="index.R.002",
-            bone_a="iv_hito_c_r",
-            parent="index.R.001",
-            is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["iv_hito_c_r"],
-            pose_operations=PoseOperations(
-                b_collection="Fingers.R",
-            )
-        ),
         #Middle
         ConnectBone(
             name="middle.R",
@@ -1160,19 +1147,6 @@ HAND_R = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["j_naka_b_r"],
-            pose_operations=PoseOperations(
-                b_collection="Fingers.R",
-            )
-        ),
-        ExtensionBone(
-            name="middle.R.002",
-            bone_a="iv_naka_c_r",
-            parent="middle.R.001",
-            is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["iv_naka_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
@@ -1204,19 +1178,6 @@ HAND_R = BoneGroup(
                 b_collection="Fingers.R",
             )
         ),
-        ExtensionBone(
-            name="ring.R.002",
-            bone_a="iv_kusu_c_r",
-            parent="ring.R.001",
-            is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["iv_kusu_c_r"],
-            pose_operations=PoseOperations(
-                b_collection="Fingers.R",
-            )
-        ),
         #Pinky
         ConnectBone(
             name="pinky.R",
@@ -1240,19 +1201,6 @@ HAND_R = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["j_ko_b_r"],
-            pose_operations=PoseOperations(
-                b_collection="Fingers.R",
-            )
-        ),
-        ExtensionBone(
-            name="pinky.R.002",
-            bone_a="iv_ko_c_r",
-            parent="pinky.R.001",
-            is_connected=True,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            req_bones=["iv_ko_c_r"],
             pose_operations=PoseOperations(
                 b_collection="Fingers.R",
             )
