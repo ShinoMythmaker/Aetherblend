@@ -34,7 +34,7 @@ def get_rig_generator(aether_rig):
         name=template.name,
         color_sets=color_sets,
         ui_collections=template.ui_collections,
-        widget_overrides=template.widget_overrides,
+        overrides=template.overrides,
         bone_groups=template.bone_groups
     )
 

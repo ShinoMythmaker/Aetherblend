@@ -1,4 +1,6 @@
 import bpy
+
+from abc import ABC
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -63,8 +65,17 @@ class TransformLink:
         )
         return pose_operations_dict
     
+
+class Override(ABC):
+    """Overrides properties of a bone."""
+    bone: str
+
+    def execute(self, armature: bpy.types.Object) -> None:
+        """Applies the override to the given edit bone."""
+        pass
+
 @dataclass
-class WidgetOverride:
+class WidgetOverride(Override):
     """Overrides the widget of a bone."""
     bone: str
     custom_object: str | None = None
@@ -103,6 +114,26 @@ class WidgetOverride:
             pose_bone.custom_shape_wire_width = self.wire_width
         except Exception as e:
             print(f"[AetherBlend] Error applying WidgetOverride for bone '{pose_bone.name}': {e}")
+
+@dataclass
+class PropOverride(Override):
+    """Overrides a custom property of a bone."""
+    bone: str
+    property_name: str
+    value: float | int | str | bool
+
+    def execute(self, armature: bpy.types.Object) -> None:
+        """Applies the property override to the given pose bone."""
+        pose_bone = armature.pose.bones.get(self.bone)
+        if not pose_bone:
+            print(f"[AetherBlend] PropOverride bone '{self.bone}' not found in armature.")
+            return
+        
+        try:
+            pose_bone[self.property_name] = self.value
+        except Exception as e:
+            print(f"[AetherBlend] Error applying PropOverride for bone '{pose_bone.name}': {e}")
+
 
 @dataclass
 class BoneGroup:
@@ -194,7 +225,7 @@ class AetherRigGenerator:
     name: str
     color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None
     ui_collections: 'list[dict[str, rigify.BoneCollection]] | None' = None
-    widget_overrides: 'list[dict[str, WidgetOverride]] | None' = None
+    overrides: 'list[dict[str, Override]] | None' = None
     bone_groups: 'list[dict[str, list[BoneGroup]]] | None' = None
 
     def getColorSets(self) -> dict[str, rigify.ColorSet]:
@@ -211,11 +242,11 @@ class AetherRigGenerator:
             combined.update(ui_dict)
         return combined
     
-    def getWidgetOverrides(self) -> dict[str, WidgetOverride]:
+    def getOverrides(self) -> dict[str, Override]:
         """Combine all widget overrides into a single dictionary."""
-        combined: dict[str, WidgetOverride] = {}
-        for wo_dict in self.widget_overrides or []:
-            combined.update(wo_dict)
+        combined: dict[str, Override] = {}
+        for ov_dict in self.overrides or []:
+            combined.update(ov_dict)
         return combined
     
     def getBoneGroups(self) -> dict[str, list[BoneGroup]]:
