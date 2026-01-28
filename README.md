@@ -54,7 +54,7 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 - Make sure to submit [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on Github.
 - Check the [wiki](https://github.com/ShinoMythmaker/Aetherblend/wiki/Home) for useful information!
 - To stay up to date or find out more about development, join our [Discord](https://discord.gg/NEF7TdXGqH )!
-<p><a href=" https://discord.gg/NEF7TdXGqH"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
+<p><a href="https://discord.gg/NEF7TdXGqH"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
 </p>
 &nbsp;
 
