@@ -24,4 +24,11 @@ TEMPLATES = {
         overrides=[WO_DEFAULT, PO_DEFAULT],
         bone_groups = [BG_PLAYER_SFW_IV]
     ),
+    'Player NSFW (IVCS)': AetherRigGenerator(
+        name= "Player NSFW (IVCS)",
+        color_sets=[CS_AETHER_BLEND],
+        ui_collections=[UI_PLAYER_NSFW_IV],  
+        overrides=[WO_NSFW, PO_DEFAULT],
+        bone_groups = [BG_PLAYER_NSFW_IV]
+    ),
 }

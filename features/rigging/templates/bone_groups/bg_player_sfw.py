@@ -1792,9 +1792,9 @@ HEAD = BoneGroup(
         TransformLink(target="Lip.B.R.002", bone="j_f_dmlip_02_r"),
         TransformLink(target="DEF-Teeth.T", bone="j_f_hagukiup"),
         TransformLink(target="DEF-Teeth.B", bone="j_f_hagukidn"),
-        TransformLink(target="DEF-Tongue", bone="j_f_bero_03"),
+        TransformLink(target="DEF-Tongue", bone="j_f_bero_01"),
         TransformLink(target="DEF-Tongue.001", bone="j_f_bero_02"),
-        TransformLink(target="DEF-Tongue.002", bone="j_f_bero_01"),
+        TransformLink(target="DEF-Tongue.002", bone="j_f_bero_03"),
         TransformLink(target="DEF-Ear.R", bone="j_mimi_r"),
         TransformLink(target="DEF-Ear.L", bone="j_mimi_l")
     ],
@@ -2279,23 +2279,23 @@ HEAD = BoneGroup(
         #Tongue
         ConnectBone(
             name="Tongue",
-            bone_a="j_f_bero_03",
+            bone_a="j_f_bero_01",
             bone_b="j_f_bero_02",
             parent="jaw_master",
             is_connected=False,
-            req_bones=["j_f_bero_03", "j_f_bero_02"],
+            req_bones=["j_f_bero_01", "j_f_bero_02"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.face_basic_tongue(),
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head"),
                 b_collection="Mouth"
             )
         ),
         ConnectBone(
             name="Tongue.001",
             bone_a="j_f_bero_02",
-            bone_b="j_f_bero_01",
+            bone_b="j_f_bero_03",
             parent="Tongue",
             is_connected=True,
-            req_bones=["j_f_bero_02", "j_f_bero_01"],
+            req_bones=["j_f_bero_02", "j_f_bero_03"],
             pose_operations=PoseOperations(
                 b_collection="Mouth"
             )
@@ -3472,6 +3472,199 @@ HAIR = BoneGroup(
     ]
 )
 
+GENITALS_F = BoneGroup(
+    name="Female Genitals",
+    transform_link=[
+        TransformLink(target="DEF-Clitoris", bone="iv_kuritto"),
+        TransformLink(target="DEF-Vulva.R", bone="iv_inshin_r"),
+        TransformLink(target="DEF-Vulva.L", bone="iv_inshin_l"),
+        TransformLink(target="DEF-Vulva", bone="iv_omanko"),
+    ],
+    bones=[
+        ConnectBone(
+            name="Clitoris",
+            bone_a="iv_kuritto",
+            bone_b="j_kosi",
+            parent="Spine.001",
+            is_connected=False,
+            req_bones=["iv_kuritto", "j_kosi"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
+                b_collection="Genitals (Female)",
+            )
+        ),
+        ConnectBone(
+            name="Vulva.R",
+            bone_a="iv_inshin_r",
+            bone_b="j_kosi",
+            parent="Spine.001",
+            is_connected=False,
+            req_bones=["iv_inshin_r", "j_kosi"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
+                b_collection="Genitals (Female)",
+            )
+        ),
+        ConnectBone(
+            name="Vulva.L",
+            bone_a="iv_inshin_l",
+            bone_b="j_kosi",
+            parent="Spine.001",
+            is_connected=False,
+            req_bones=["iv_inshin_l", "j_kosi"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
+                b_collection="Genitals (Female)",
+            )
+        ),
+        ConnectBone(
+            name="Vulva",
+            bone_a="iv_omanko",
+            bone_b="j_kosi",
+            parent="Spine.001",
+            is_connected=False,
+            req_bones=["iv_omanko", "j_kosi"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
+                b_collection="Genitals (Female)",
+            )
+        ),
+        ExtensionBone(
+            name="Anchor_V",
+            bone_a="Clitoris",
+            parent="Spine.001",
+            is_connected=False,
+            start="tail",
+            req_bones=["Clitoris"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_anchor(skin_anchor_hide=True),
+                b_collection="MCH"
+            )
+        )
+    ]
+)
+
+GENITALS_M = BoneGroup(
+    name="Male Genitals",
+    transform_link=[
+        TransformLink(target="DEF-Penis", bone="iv_ochinko_a"),
+        TransformLink(target="DEF-Penis.001", bone="iv_ochinko_b"),
+        TransformLink(target="DEF-Penis.002", bone="iv_ochinko_c"),
+        TransformLink(target="DEF-Penis.003", bone="iv_ochinko_d"),
+        TransformLink(target="DEF-Penis.004", bone="iv_ochinko_e"),
+        TransformLink(target="DEF-Penis.005", bone="iv_ochinko_f")
+    ],
+    bones=[
+        ConnectBone(
+            name="Penis",
+            bone_a="iv_ochinko_a",
+            bone_b="iv_ochinko_b",
+            parent="Spine.001",
+            is_connected=False,
+            req_bones=["iv_ochinko_a", "iv_ochinko_b"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Spine.001"),
+                b_collection="Genitals (Male)"
+            )
+        ),
+        ConnectBone(
+            name="Penis.001",
+            bone_a="iv_ochinko_b",
+            bone_b="iv_ochinko_c",
+            parent="Penis",
+            is_connected=True,
+            req_bones=["iv_ochinko_b", "iv_ochinko_c"],
+            pose_operations=PoseOperations(
+                b_collection="Genitals (Male)"
+            )
+        ),
+        ConnectBone(
+            name="Penis.002",
+            bone_a="iv_ochinko_c",
+            bone_b="iv_ochinko_d",
+            parent="Penis.001",
+            is_connected=True,
+            req_bones=["iv_ochinko_c", "iv_ochinko_d"],
+            pose_operations=PoseOperations(
+                b_collection="Genitals (Male)"
+            )
+        ),
+        ConnectBone(
+            name="Penis.003",
+            bone_a="iv_ochinko_d",
+            bone_b="iv_ochinko_e",
+            parent="Penis.002",
+            is_connected=True,
+            req_bones=["iv_ochinko_d", "iv_ochinko_e"],
+            pose_operations=PoseOperations(
+                b_collection="Genitals (Male)"
+            )
+        ),
+        ConnectBone(
+            name="Penis.004",
+            bone_a="iv_ochinko_e",
+            bone_b="iv_ochinko_f",
+            parent="Penis.003",
+            is_connected=True,
+            req_bones=["iv_ochinko_e", "iv_ochinko_f"],
+            pose_operations=PoseOperations(
+                b_collection="Genitals (Male)"
+            )
+        ),
+        ExtensionBone(
+            name="Penis.005",
+            bone_a="iv_ochinko_f",
+            parent="Penis.004",
+            is_connected=True,
+            req_bones=["iv_ochinko_f"],
+            pose_operations=PoseOperations(
+                b_collection="Genitals (Male)"
+            )
+        )
+    ]
+)
+
+BG_PLAYER_SFW_IV = {
+            "spine": [SPINE],
+            "arm_r": [ARM_R],
+            "arm_l": [ARM_L],
+            "leg_r": [LEG_R],
+            "leg_l": [LEG_L],
+            "skirt_r": [SKIRT_R],   
+            "skirt_l": [SKIRT_L],
+            "hand_r": [IV_HAND_R, HAND_R],
+            "hand_l": [IV_HAND_L, HAND_L],
+            "iv_toes": [IV_TOES],
+            "tail": [TAIL],
+            "head": [HEAD],
+            "viera": [VIERA_EARS],
+            "left_eye": [LEFT_EYE],
+            "right_eye": [RIGHT_EYE],
+            "brow": [BROW],
+            "hair": [HAIR],
+        }
+
+BG_PLAYER_NSFW_IV = {
+            "spine": [SPINE],
+            "arm_r": [ARM_R],
+            "arm_l": [ARM_L],
+            "leg_r": [LEG_R],
+            "leg_l": [LEG_L],
+            "skirt_r": [SKIRT_R],   
+            "skirt_l": [SKIRT_L],
+            "hand_r": [IV_HAND_R, HAND_R],
+            "hand_l": [IV_HAND_L, HAND_L],
+            "iv_toes": [IV_TOES],
+            "tail": [TAIL],
+            "head": [HEAD],
+            "viera": [VIERA_EARS],
+            "left_eye": [LEFT_EYE],
+            "right_eye": [RIGHT_EYE],
+            "brow": [BROW],
+            "hair": [HAIR],
+            "genitalia_f": [GENITALS_F],
+            "genitalia_m": [GENITALS_M]
+        }
 
 BG_PLAYER_SFW = {
             "spine": [SPINE],
@@ -3483,7 +3676,6 @@ BG_PLAYER_SFW = {
             "skirt_l": [SKIRT_L],
             "hand_r": [HAND_R],
             "hand_l": [HAND_L],
-            "iv_toes": [IV_TOES],
             "tail": [TAIL],
             "head": [HEAD],
             "viera": [VIERA_EARS],
