@@ -7,6 +7,7 @@ from .....core import rigify
 
 
 # Individual bone list (for backwards compatibility and direct access)
+# I should probably rename this since it contains nsfw bones as well lmao -Oats
 ARM_R = BoneGroup(
         name="Right Arm",
         description="Right arm bones including upper arm, forearm, hand, and tweak bones",
@@ -3552,7 +3553,9 @@ GENITALS_M = BoneGroup(
         TransformLink(target="DEF-Penis.002", bone="iv_ochinko_c"),
         TransformLink(target="DEF-Penis.003", bone="iv_ochinko_d"),
         TransformLink(target="DEF-Penis.004", bone="iv_ochinko_e"),
-        TransformLink(target="DEF-Penis.005", bone="iv_ochinko_f")
+        TransformLink(target="DEF-Penis.005", bone="iv_ochinko_f"),
+        TransformLink(target="DEF-Testicle.R", bone="iv_kougan_r"),
+        TransformLink(target="DEF-Testicle.L", bone="iv_kougan_l")
     ],
     bones=[
         ConnectBone(
@@ -3618,6 +3621,32 @@ GENITALS_M = BoneGroup(
             is_connected=True,
             req_bones=["iv_ochinko_f"],
             pose_operations=PoseOperations(
+                b_collection="Genitals (Male)"
+            )
+        ),
+        ExtensionBone(
+            name="Testicle.R",
+            bone_a="iv_kougan_r",
+            parent="Spine.001",
+            is_connected=False,
+            start="head",
+            size_factor=0.5,
+            req_bones=["iv_kougan_r"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
+                b_collection="Genitals (Male)"
+            )
+        ),
+        ExtensionBone(
+            name="Testicle.L",
+            bone_a="iv_kougan_l",
+            parent="Spine.001",
+            is_connected=False,
+            start="head",
+            size_factor=0.5,
+            req_bones=["iv_kougan_l"],
+            pose_operations=PoseOperations(
+                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
                 b_collection="Genitals (Male)"
             )
         )
