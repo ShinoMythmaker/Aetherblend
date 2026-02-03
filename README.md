@@ -8,37 +8,28 @@
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/Mythmaker-Sponsor-pink?style=flat"></a>
 </p>
 
-Aetherblend is a Blender plugin designed to help you import characters and animate with ease. Aetherblend determines what bones are present in the vanilla armature and generates a rigify rig to the exact proportions of your character, including NPCs and monsters. 
+AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
 
-This add-on is multipurpose and can be used for gposing, modding or animating in Blender!
-
-<b>Note: Aetherblend is currently in early development and not complete.</b>
+<b>Note: AetherBlend is currently in beta and some features may not work as intended.</b>
 &nbsp;
 
 &nbsp;
 
-## Notable Features
-- Rigify compatibility
-- Customisation+ support
-- Pose/Animation export
-- Modding compatibility
-- IK/FK functionality
-  
-    And much more...
+## Features
+- IK/FK controls
+- Advanced face controls
+- Control automation
+- Dynamic rig generation based on character armature
 
 <p align="center">
-  <img width="50%" alt="Advanced Eye Controls" src="assets/demo/eyescontrols-min.gif" /><img width="50%" alt="Head and Shoulder follow" src="assets/demo/headshouldercontrols-min.gif" />
+  <img width="50%" alt="Advanced Face Controls" src="Gif showing off the eyes, mouth etc." /><img width="50%" alt="Control Automation" src="Gif showing off the wrist and shin automation, heel controls etc. I'd say show the skirt as well but I'm far from happy with it." />
 </p>
-<p align="center"><b>Advanced Eye Controls & Head and Shoulder Stabilisation</b></p>
+<p align="center"><b>Advanced Eye Controls & Control Automation</b></p> 
 &nbsp;
 
-## Limitations
-- Pose import is not supported
-- Animation import is not supported
-- Some NPCs may not generate rigs correctly
-- Monster rig generation is not yet supported
-
-<b>It is recommended you disable Customise+ when exporting your character. Instead, export with Reference Pose & Scale enabled and apply your C+ edits using Aetherblend's built in functions. Make sure Apply Pose Track is checked on import to Blender.</b>
+## Current Limitations
+- Pose and animation import is not currently functional
+- Rigs may not generate properly on some character models
 
 &nbsp;
 
@@ -61,13 +52,13 @@ This add-on is multipurpose and can be used for gposing, modding or animating in
 &nbsp;
 
 ## Acknowledgements
+💖 A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
+
 💖 [Zed](https://x.com/RoseHikari24) and [CC](https://x.com/CC_VibesXIV), two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!
 
 💖 [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. 
 
 💖 [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
-
-💖 [Oats](https://github.com/ExplosiveOats) for maintaining and building up the wiki as we go. Aswell as hearing me out yapping about issues ♥
 
 💖 Ofcourse everyone that showed interest in not only AetherBlend but also [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!
 
