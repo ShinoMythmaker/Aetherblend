@@ -38,6 +38,7 @@ UI_PLAYER_SFW = {
 
                 "skirt": BoneCollection(name="Skirt", ui=True, color_set="Torso", row_index=22, title="Skirt", visible=False),
                 "skirt_tweak": BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Torso", row_index=23, title="Tweak", visible=False),
+                "FFXIV": BoneCollection(name="FFXIV", ui=True, color_set="Torso_Tweak", row_index=25, title="XIV", visible=False)
                 # "ivcs": BoneCollection(name="IVCS", ui=True, color_set="IVCS", row_index=25, title="IVCS", visible=False)
                 # BoneCollection(name="Genitals (Male)", ui=True, color_set="FK", row_index=25, title="Genitals (Male)", visible=False),
                 # BoneCollection(name="Tweak (Male)", ui=True, color_set="Tweak", row_index=26, title="Tweak (Male)", visible=False),
@@ -83,7 +84,8 @@ UI_PLAYER_SFW_IV = {
 
                 "skirt": BoneCollection(name="Skirt", ui=True, color_set="Torso", row_index=22, title="Skirt", visible=False),
                 "skirt_tweak": BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Torso", row_index=23, title="Tweak", visible=False),
-                "ivcs": BoneCollection(name="IVCS", ui=True, color_set="IVCS", row_index=25, title="IVCS", visible=False)
+                "ivcs": BoneCollection(name="IVCS", ui=True, color_set="IVCS", row_index=25, title="IVCS", visible=False),
+                "FFXIV": BoneCollection(name="FFXIV", ui=True, color_set="Torso_Tweak", row_index=27, title="XIV", visible=False)
                 # BoneCollection(name="Genitals (Male)", ui=True, color_set="FK", row_index=25, title="Genitals (Male)", visible=False),
                 # BoneCollection(name="Tweak (Male)", ui=True, color_set="Tweak", row_index=26, title="Tweak (Male)", visible=False),
                 # BoneCollection(name="Genitals (Female)", ui=True, color_set="FK", row_index=25, title="Genitals (Female)", visible=False),
@@ -132,5 +134,6 @@ UI_PLAYER_NSFW_IV = {
                 "genitals_m": BoneCollection(name="Genitals (Male)", ui=True, color_set="IVCS", row_index=26, title="Genitals (Male)", visible=False),
                 # BoneCollection(name="Tweak (Male)", ui=True, color_set="Tweak", row_index=26, title="Tweak (Male)", visible=False),
                 "genitals_f": BoneCollection(name="Genitals (Female)", ui=True, color_set="IVCS", row_index=26, title="Genitals (Female)", visible=False),
+                "FFXIV": BoneCollection(name="FFXIV", ui=True, color_set="Torso_Tweak", row_index=28, title="XIV", visible=False)
                 # BoneCollection(name="Tweak (Female)", ui=True, color_set="Tweak", row_index=26, title="Tweak (Female)", visible=False),
         }
