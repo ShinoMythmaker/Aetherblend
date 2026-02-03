@@ -19,6 +19,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     
         bpy.ops.object.mode_set(mode='OBJECT')
 
+        print("[AetherBlend] Starting Meta Rig Generation")
+
         # Get Active Armature
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
@@ -122,8 +124,10 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             for ops in ops_list:
                 ops.execute(bone, meta_rig)
                 
+        print(hide_collections)
         for hide_coll in hide_collections:
             hide_coll.is_visible = False
+            print(f"[AetherBlend] Hiding collection '{hide_coll.name}' in meta rig")
 
         # Finalize Meta Rig Assignment
         armature.aether_rig.meta_rig = meta_rig
@@ -385,6 +389,7 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
             self.report({'ERROR'}, "Rigify rig generation failed")
             return {'CANCELLED'}
         
+        print(f"TEEEEEEEEEEEEEEEEEST")
         print(f"[AetherBlend] Full rig generation: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
 
