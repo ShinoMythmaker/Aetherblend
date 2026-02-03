@@ -238,6 +238,10 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
             for widget in aether_rig_generator.getOverrides().values():
                 widget.execute(armature)
             
+            ffxiv_coll = armature.data.collections.get("FFXIV")
+            if ffxiv_coll:
+                ffxiv_coll.is_visible = False
+                
             bpy.ops.object.mode_set(mode='OBJECT')
             armature.aether_rig.rigified = True
 

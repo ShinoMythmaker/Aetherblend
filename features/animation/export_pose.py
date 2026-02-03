@@ -20,6 +20,41 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
     filename_ext = '.pose'
     filter_glob: bpy.props.StringProperty(default='*.pose', options={'HIDDEN'}) # type: ignore
     
+    # Axis conversion properties
+    use_pose_axis_conversion: BoolProperty(
+        name="Use Axis Conversion",
+        description="Apply pose axis conversion to match character import settings",
+        default=True
+    ) # type: ignore
+    
+    pose_primary_axis: bpy.props.EnumProperty(
+        name="Primary Axis",
+        description="Primary axis for pose export orientation. For FFXIV characters from Meddle, use -Z",
+        items=(
+            ('X', "X Axis", ""),
+            ('Y', "Y Axis", ""),
+            ('Z', "Z Axis", ""),
+            ('-X', "-X Axis", ""),
+            ('-Y', "-Y Axis", ""),
+            ('-Z', "-Z Axis", ""),
+        ),
+        default='X',
+    ) # type: ignore
+    
+    pose_secondary_axis: bpy.props.EnumProperty(
+        name="Secondary Axis",
+        description="Secondary axis for pose export orientation. For FFXIV characters from Meddle, use Y",
+        items=(
+            ('X', "X Axis", ""),
+            ('Y', "Y Axis", ""),
+            ('Z', "Z Axis", ""),
+            ('-X', "-X Axis", ""),
+            ('-Y', "-Y Axis", ""),
+            ('-Z', "-Z Axis", ""),
+        ),
+        default='Y',
+    ) # type: ignore
+    
     
     def invoke(self, context, event):
         prefs = get_preferences()  
@@ -43,16 +78,14 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             self.report({'ERROR'}, "No armature selected")
             return {'CANCELLED'}
         
-        export_props = context.scene.aether_animation_export
-        
         # Build axis conversion
         pose_correction_matrix = Matrix.Identity(4)
-        if export_props.use_pose_axis_conversion:
+        if self.use_pose_axis_conversion:
             pose_correction_matrix = axis_conversion(
-                from_up=export_props.pose_primary_axis,         # Primary
-                from_forward=export_props.pose_secondary_axis,  # Secondary
-                to_up='Y',                                      # Target Primary
-                to_forward='X',                                 # Target Secondary
+                from_up=self.pose_primary_axis,         # Primary
+                from_forward=self.pose_secondary_axis,  # Secondary
+                to_up='Y',                              # Target Primary
+                to_forward='X',                         # Target Secondary
             ).to_4x4()
         
         x_rotation = Matrix.Rotation(math.radians(-90), 4, 'X')
@@ -78,7 +111,7 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
                 bone_matrix_world = armature.matrix_world @ bone.matrix
                 
                 # Apply axis conversion
-                if export_props.use_pose_axis_conversion:
+                if self.use_pose_axis_conversion:
                     bone_matrix_world = bone_matrix_world @ pose_correction_matrix
                 
                 # Flip for FFXIV

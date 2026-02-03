@@ -15,19 +15,6 @@ class AETHER_PT_ExportPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        export_props = context.scene.aether_animation_export
-
-        # Axis Export Section
-        box = layout.box()
-        row = box.row()
-        row.label(text="Axis Export Settings", icon="ARMATURE_DATA")
-        
-        col = box.column(align=True)
-        col.prop(export_props, "use_pose_axis_conversion", text="Use Axis Conversion")
-        
-        if export_props.use_pose_axis_conversion:
-            col.prop(export_props, "pose_primary_axis", text="Primary Axis")
-            col.prop(export_props, "pose_secondary_axis", text="Secondary Axis")
         
         # Export Operators
         row = layout.row(align=True)
