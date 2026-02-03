@@ -14,6 +14,7 @@ CS_RIGIFY = {
         "head": ColorSet(name="Head", normal="#FAE63D", select="#98E5FF", active="#C4FFFF"),
         "face_primary": ColorSet(name="Face_Primary", normal="#FAE63D", select="#98E5FF", active="#C4FFFF"),
         "face_secondary": ColorSet(name="Face_Secondary", normal="#387FC8", select="#98E5FF", active="#C4FFFF"),
+        "ivcs": ColorSet(name="IVCS",  normal="#387FC8", select="#98E5FF", active="#C4FFFF"),
     }
 
 

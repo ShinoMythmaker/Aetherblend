@@ -67,7 +67,15 @@ class ColorSet:
         color_set.active = self._hex_to_rgb(self.active)
 
     def _hex_to_rgb(self, hex_color: str) -> tuple[float, float, float]:
-        """Converts a hex color string to an RGB tuple."""
+        """Converts a hex color string to an RGB tuple with sRGB gamma correction."""
         hex_color = hex_color.lstrip('#')
         lv = len(hex_color)
-        return tuple(int(hex_color[i:i + lv // 3], 16) / 255.0 for i in range(0, lv, lv // 3))
+        
+        def srgb_to_linear(value: float) -> float:
+            """Convert sRGB to linear color space."""
+            value = value / 255.0
+            if value <= 0.04045:
+                return value / 12.92
+            return ((value + 0.055) / 1.055) ** 2.4
+        
+        return tuple(srgb_to_linear(int(hex_color[i:i + lv // 3], 16)) for i in range(0, lv, lv // 3))
