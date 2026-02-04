@@ -16,7 +16,8 @@ ARM_R = BoneGroup(
             TransformLink(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
             TransformLink(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
             TransformLink(target="DEF-clavicle.R", bone="j_sako_r"),
-            TransformLink(target="DEF-forearm.R.001", bone="n_hte_r")
+            TransformLink(target="DEF-forearm.R.001", bone="n_hte_r"),
+            TransformLink(target="DEF-elbow.R", bone="n_hhiji_r")
             ],
         bones = [
             #Right Clavicle
@@ -68,6 +69,21 @@ ARM_R = BoneGroup(
                     b_collection="Arm.R (IK)"
                 )
             ),
+            ExtensionBone(
+                name="elbow.R",
+                bone_a="n_hhiji_r",
+                size_factor=0.5,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                parent="forearm.R",
+                is_connected=False,
+                req_bones=["n_hhiji_r"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="pivot_cross"),
+                    b_collection="Arm.R (Tweak)"
+                )
+            )
         ]
     )
 
@@ -78,7 +94,8 @@ ARM_L = BoneGroup(
             TransformLink(target="DEF-forearm.L", bone="j_ude_b_l", retarget="FK-forearm.L"),
             TransformLink(target="DEF-hand.L", bone="j_te_l", retarget="FK-hand.L"),
             TransformLink(target="DEF-clavicle.L", bone="j_sako_l"),
-            TransformLink(target="DEF-forearm.L.001", bone="n_hte_l")
+            TransformLink(target="DEF-forearm.L.001", bone="n_hte_l"),
+            TransformLink(target="DEF-elbow.L", bone="n_hhiji_l")
             ],
         bones = [
             #Left Clavicle
@@ -130,12 +147,27 @@ ARM_L = BoneGroup(
                     b_collection="Arm.L (IK)"
                 )
             ),
+            ExtensionBone(
+                name="elbow.L",
+                bone_a="n_hhiji_l",
+                size_factor=0.5,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                parent="forearm.L",
+                is_connected=False,
+                req_bones=["n_hhiji_l"],
+                pose_operations=PoseOperations(
+                    rigify_settings=rigify.types.basic_super_copy(widget_type="pivot_cross"),
+                    b_collection="Arm.L (Tweak)"
+                )
+            )
         ],
         description ="Left arm bones including the clavicle, upper arm, forearm, and hand bones."
     )
 
 SPINE = BoneGroup(
-        name="Spine",
+        name="spine",
         transform_link= [
             TransformLink(target="DEF-Spine.001", bone="j_kosi", retarget="FK-Spine.001"),
             TransformLink(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
