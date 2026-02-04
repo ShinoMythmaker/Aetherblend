@@ -4,7 +4,7 @@ from . import properties
 from . import panels
 from . import editor_panel
 
-modules = (properties, operators, panels, editor_panel)
+modules = (properties, operators, panels)
 
 def register():
     for mod in modules:
