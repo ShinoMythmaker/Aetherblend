@@ -37,11 +37,32 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         utils.armature.unparent_all_bones(armature)
 
         ffxiv_bones =utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
-        decoder.apply_transforms(armature, scale_dict, rot_dict, pos_dict, ffxiv_bones)
+        
+        # Get stored bone orientation from import, or default to standard Y/X
+        primary_axis = settings.import_bone_primary_axis if settings.import_bone_primary_axis else 'Y'
+        secondary_axis = settings.import_bone_secondary_axis if settings.import_bone_secondary_axis else 'X'
+        
+        # Step 1 & 2: Revert bone orientation and apply C+ transforms
+        decoder.apply_transforms(
+            armature, 
+            scale_dict, 
+            rot_dict, 
+            pos_dict, 
+            ffxiv_bones,
+            primary_axis=primary_axis,
+            secondary_axis=secondary_axis,
+        )
 
         utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
 
         utils.armature.new_rest_pose(armature)
+        
+        # Step 3: Reapply bone orientation correction after rest pose is set
+        decoder.reapply_bone_orientation(
+            armature,
+            primary_axis=primary_axis,
+            secondary_axis=secondary_axis,
+        )
 
         utils.armature.restore_bone_parenting(armature, parent_map)
 
@@ -54,100 +75,145 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         self.report({'INFO'}, "C+ transforms applied, shapekeys baked, rest pose set, parenting and modifiers restored.")
         return {'FINISHED'}   
 
-class AETHER_OT_CreateREFCollection(bpy.types.Operator):
-    bl_label = "Create REF Collection"
-    bl_idname = "aether.create_ref_collection"
-    bl_description = "Creates the FFXIV-REF collection for storing reference bones."
+class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
+    bl_label = "Create Backup Armature"
+    bl_idname = "aether.create_backup_armature"
+    bl_description = "Creates a backup armature for C+ reversion."
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context) -> set[str]:
         armature = context.active_object
+        cplus = getattr(armature, 'aether_cplus', None)
+        
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select a valid armature object.")
             return {'CANCELLED'}
 
         bone_collections = armature.data.collections
         ffxiv_col = bone_collections.get('FFXIV')
-        ref_col = bone_collections.get('FFXIV-REF')
         if not ffxiv_col:
             self.report({'ERROR'}, "[AetherBlend] No FFXIV bone collection found.")
             return {'CANCELLED'}
 
-        if ref_col:
-            utils.armature.b_collection.delete_with_bones(armature, ref_col.name)
+        # Delete old backup if it exists
+        if cplus.backup_armature:
+            old_backup = cplus.backup_armature
+            old_backup.hide_set(False)
+            old_backup.hide_viewport = False
 
-        ref_col = bone_collections.new('FFXIV-REF')
+            bpy.data.objects.remove(old_backup, do_unlink=True)
+            cplus.backup_armature = None
 
-        bpy.ops.object.mode_set(mode='POSE')
-        utils.armature.bone.select_edit(armature, [b.name for b in ffxiv_col.bones])
+        # Create backup armature
+        backup = utils.armature.duplicate(armature)
+        backup.name = f"BACKUP_{armature.name}"
+        
+        # Parent backup to original armature
+        backup.parent = armature
+        backup.matrix_parent_inverse = armature.matrix_world.inverted()
+                
+        # Store reference
+        cplus.backup_armature = backup
+        
+        # Make sure it's in the same collection
+        armature_collection = utils.collection.get_collection(armature)
+        if armature_collection:
+            utils.collection.link_to_collection([backup], armature_collection)
 
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.armature.duplicate()
+        # Hide backup in viewport
+        backup.hide_set(True)
+        backup.hide_viewport = True
 
-        bpy.ops.armature.collection_assign(name=ref_col.name)
-        bpy.ops.armature.collection_unassign(name=ffxiv_col.name)
-
-
-        bpy.ops.object.mode_set(mode='POSE')
-        new_bones = []
-        for bone in ref_col.bones:
-            name = bone.name
-            if "." in name:
-                name = name.split(".")[0]
-            bone.name = f"REF-{name}"
-            new_bones.append(bone.name)
-            
+        bpy.context.view_layer.objects.active = armature
         bpy.ops.object.mode_set(mode='OBJECT')
 
-        self.report({'INFO'}, f"[AetherBlend] Created/updated FFXIV-REF collection with {len(new_bones)} bones.")
+        self.report({'INFO'}, f"[AetherBlend] Created backup armature '{backup.name}'.")
         return {'FINISHED'}
     
-class AETHER_OT_RevertToREF(bpy.types.Operator):
-    bl_label = "Revert to REF Collection"
-    bl_idname = "aether.revert_cplus_to_ref"
+class AETHER_OT_RevertToBackup(bpy.types.Operator):
+    bl_label = "Revert to Backup"
+    bl_idname = "aether.revert_cplus_to_backup"
     bl_description = (
-        "Reverts the armature to the FFXIV-REF collection."
+        "Reverts the armature to the backup armature state."
     )
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        ### This is WIP and just a dummy rn ###
         armature = context.active_object
         cplus = getattr(armature, 'aether_cplus', None)
-
-        ref_col = armature.data.collections.get('FFXIV-REF')
-        ref_bone_names = [b.name for b in ref_col.bones] if ref_col else []
-
-        bpy.ops.object.mode_set(mode='EDIT')
-        edit_bones = armature.data.edit_bones
-        for ref_name in ref_bone_names:
-            ref_edit = edit_bones.get(ref_name)
-            ffxiv_name = ref_name[4:] if ref_name.startswith('REF-') else ref_name
-            ffxiv_edit = edit_bones.get(ffxiv_name)
-            if ref_edit and ffxiv_edit:
-                ffxiv_edit.head = ref_edit.head.copy()
-                ffxiv_edit.tail = ref_edit.tail.copy()
-                ffxiv_edit.roll = ref_edit.roll
-
-        meshes = utils.armature.find_meshes(armature)
-
-        for mesh_obj in meshes:
-            utils.object.remove_shapekey(mesh_obj, "CPlus")
-
+        
+        if not cplus or not cplus.backup_armature:
+            self.report({'ERROR'}, "[AetherBlend] No backup armature found. Create a backup first.")
+            return {'CANCELLED'}
+        
+        backup = cplus.backup_armature
+        
+        # Make backup visible temporarily for data access
+        backup.hide_set(False)
+        backup.hide_viewport = False
+        
+        # Get FFXIV bones from both armatures
+        ffxiv_col = armature.data.collections.get('FFXIV')
+        if not ffxiv_col:
+            self.report({'ERROR'}, "[AetherBlend] No FFXIV bone collection found.")
+            backup.hide_set(True)
+            backup.hide_viewport = True 
+            return {'CANCELLED'}
+        
+        ffxiv_bone_names = [b.name for b in ffxiv_col.bones]
+        
+        # Copy bone transforms from backup to current armature
+        # First, enter edit mode on backup to get bone data
         bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.context.view_layer.objects.active = backup
+        bpy.ops.object.mode_set(mode='EDIT')
+        
+        # Store backup bone transforms
+        bone_data = {}
+        for bone_name in ffxiv_bone_names:
+            backup_bone = backup.data.edit_bones.get(bone_name)
+            if backup_bone:
+                bone_data[bone_name] = {
+                    'head': backup_bone.head.copy(),
+                    'tail': backup_bone.tail.copy(),
+                    'roll': backup_bone.roll
+                }
+        
+        # Switch to current armature and apply transforms
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='EDIT')
+        
+        for bone_name, data in bone_data.items():
+            current_bone = armature.data.edit_bones.get(bone_name)
+            if current_bone:
+                current_bone.head = data['head']
+                current_bone.tail = data['tail']
+                current_bone.roll = data['roll']
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
+        
+        # Remove CPlus shapekeys from meshes
+        meshes = utils.armature.find_meshes(armature)
+        for mesh_obj in meshes:
+            utils.object.remove_shapekey(mesh_obj, "CPlus", True, "ImportedPose")
+        
+        # Hide backup again
+        backup.hide_set(True)
+        backup.hide_viewport = True
         bpy.ops.object.select_all(action='DESELECT')
         bpy.context.view_layer.objects.active = armature
-
+        
         cplus.applied = False
-        self.report({'INFO'}, "Reverted CPlus changes to Reference Collection.")
+        self.report({'INFO'}, "Reverted CPlus changes to backup armature state.")
         return {'FINISHED'}
     
 def register():
     bpy.utils.register_class(AETHER_OT_QuickApplyCustomizePlus)
-    bpy.utils.register_class(AETHER_OT_CreateREFCollection)
-    bpy.utils.register_class(AETHER_OT_RevertToREF)
+    bpy.utils.register_class(AETHER_OT_CreateBackupArmature)
+    bpy.utils.register_class(AETHER_OT_RevertToBackup)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_QuickApplyCustomizePlus)
-    bpy.utils.unregister_class(AETHER_OT_CreateREFCollection)
-    bpy.utils.unregister_class(AETHER_OT_RevertToREF)
+    bpy.utils.unregister_class(AETHER_OT_CreateBackupArmature)
+    bpy.utils.unregister_class(AETHER_OT_RevertToBackup)

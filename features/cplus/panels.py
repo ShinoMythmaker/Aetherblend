@@ -60,16 +60,16 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
             col.separator()
 
             row = col.row(align=True)
-            if aether_rig.rigify_linked:
+            if aether_rig.rigified:
                 row = col.row(align=True)
-                row.operator("aether.unlink_rigify_rig", text="Unlink Rigify", icon="UNLINKED")
+                row.operator("aether.clean_up_rig", text="Clean Up Rig", icon="BRUSH_DATA")
             else:
                 ref_col = row.column(align=True)
                 ref_col.scale_x = 2.0
-                if armature.data.collections.get("FFXIV-REF"):
-                    ref_col.operator("aether.create_ref_collection", text="Update REF", icon="RECOVER_LAST")
+                if cplus.backup_armature:
+                    ref_col.operator("aether.create_backup_armature", text="Update Backup", icon="RECOVER_LAST")
                 else:
-                    ref_col.operator("aether.create_ref_collection", text="Create REF Collection", icon="COLLECTION_NEW")
+                    ref_col.operator("aether.create_backup_armature", text="Create Backup", icon="DUPLICATE")
                 
                 arrow_col = row.column(align=True)
                 arrow_col.scale_x = 0.3
@@ -78,9 +78,9 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
                 cplus_col = row.column(align=True)
                 cplus_col.scale_x = 2.0
 
-                cplus_col.enabled = bool(cplus.code) and bool(armature.data.collections.get("FFXIV-REF"))
+                cplus_col.enabled = bool(cplus.code) and bool(cplus.backup_armature)
                 if cplus.applied:
-                    cplus_col.operator("aether.revert_cplus_to_ref", text="Revert to REF", icon="LOOP_BACK")
+                    cplus_col.operator("aether.revert_cplus_to_backup", text="Revert to Backup", icon="LOOP_BACK")
                 else:
                     cplus_col.operator("aether.q_apply_cplus_string", text="Quick Apply", icon="CHECKBOX_HLT")
 

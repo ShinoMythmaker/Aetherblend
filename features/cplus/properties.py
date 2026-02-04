@@ -10,6 +10,22 @@ class AETHER_PROP_CustomizePlus(bpy.types.PropertyGroup):
         description="Tracks if C+ is currently applied to this armature",
         default=False
     ) # type: ignore
+    backup_armature: bpy.props.PointerProperty(
+        name="Backup Armature",
+        type=bpy.types.Object,
+        description="Reference to the backup armature for C+ reversion",
+        poll=lambda self, obj: obj.type == 'ARMATURE'
+    ) # type: ignore
+    import_bone_primary_axis: bpy.props.StringProperty(
+        name="Import Primary Axis",
+        description="Primary bone axis used during character import",
+        default="Y"
+    ) # type: ignore
+    import_bone_secondary_axis: bpy.props.StringProperty(
+        name="Import Secondary Axis",
+        description="Secondary bone axis used during character import",
+        default="X"
+    ) # type: ignore
 
 
 def register():

@@ -93,7 +93,7 @@ def find_meshes(armature: bpy.types.Object) -> list:
                     break
     return meshes
 
-def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey") -> None:
+def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> None:
     """
     Applies the armature modifier as a shapekey to the mesh object and renames the shapekey.
     """
@@ -112,19 +112,15 @@ def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object
         armature_mods = [m for m in mesh_obj.modifiers if m.type == 'ARMATURE' and m.object == armature_obj]
         for mod in armature_mods:
 
-            previous_values = {}
-            if mesh_obj.data.shape_keys:
-                for key_block in mesh_obj.data.shape_keys.key_blocks:
-                    previous_values[key_block.name] = key_block.value
-                    key_block.value = 0.0
-
             bpy.ops.object.modifier_apply_as_shapekey(modifier=mod.name, keep_modifier=True)
+
+            if mesh_obj.data.shape_keys and disable_all:
+                for key_block in mesh_obj.data.shape_keys.key_blocks:
+                    key_block.mute = True
+
             mesh_obj.data.shape_keys.key_blocks[-1].name = shapekey_name
             mesh_obj.data.shape_keys.key_blocks[-1].value = 1.0
-
-            for key_block in mesh_obj.data.shape_keys.key_blocks:
-                if key_block.name in previous_values:
-                    key_block.value = previous_values[key_block.name]
+            mesh_obj.data.shape_keys.key_blocks[-1].mute = False    
 
     except Exception as e:
         print(f"[AetherBlend] Failed to apply armature modifier as shapekey on '{mesh_obj.name}': {e}")
@@ -132,13 +128,13 @@ def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object
         mesh_obj.hide_set(object_state)
     bpy.ops.object.mode_set(mode=original_mode)
 
-def apply_all_as_shapekey(armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey") -> list:
+def apply_all_as_shapekey(armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> list:
     """
     Applies the armature modifier as a shapekey to all mesh objects using the given armature. Returns the list of affected mesh objects.
     """
     meshes = find_meshes(armature_obj)
     for mesh_obj in meshes:
-        apply_as_shapekey(mesh_obj, armature_obj, shapekey_name)
+        apply_as_shapekey(mesh_obj, armature_obj, shapekey_name, disable_all=disable_all)
     return meshes
 
 
