@@ -1,7 +1,7 @@
 import bpy
 import mathutils
 
-from .....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone, RegexBoneGroup
+from .....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone, RegexBoneGroup, ParallelBone
 from .....core.shared import PoseOperations, BoneGroup, TransformLink
 from .....core import rigify
 
@@ -283,16 +283,18 @@ LEG_R = BoneGroup(
                     b_collection="Leg.R (IK)"
                 )
             ),
-            ExtensionBone(
+            ParallelBone(
                 name="heel_pivot.R.helper",
-                bone_a="j_asi_e_r",
+                bone_a="toe.R",
+                bone_b="shin.R",
                 parent="shin.R",
                 is_connected=False,
                 axis_type="local",
                 axis="Y",
                 start="head",
-                size_factor=-4.0,
-                req_bones=["j_asi_e_r"],
+                end="tail",
+                coordinate="Y",
+                req_bones=["toe.R", "shin.R"],
                 pose_operations=PoseOperations(
                     b_collection="Leg.R (IK)"
                 )
@@ -369,16 +371,18 @@ LEG_L = BoneGroup(
                     b_collection="Leg.L (IK)"
                 )
             ),
-            ExtensionBone(
+            ParallelBone(
                 name="heel_pivot.L.helper",
-                bone_a="j_asi_e_l",
+                bone_a="toe.L",
+                bone_b="shin.L",
                 parent="shin.L",
                 is_connected=False,
                 axis_type="local",
                 axis="Y",
                 start="head",
-                size_factor=-4.0,
-                req_bones=["j_asi_e_l"],
+                end="tail",
+                coordinate="Y",
+                req_bones=["toe.L", "shin.L"],
                 pose_operations=PoseOperations(
                     b_collection="Leg.L (IK)"
                 )

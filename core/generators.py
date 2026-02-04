@@ -397,6 +397,137 @@ class CopyBone(BoneGenerator):
         return [created_name]
     
 @dataclass(frozen=True)
+class ParallelBone(BoneGenerator):
+    """Creates a bone extending from a source bone along an axis until it reaches a target coordinate."""
+    name: str
+    bone_a: str
+    bone_b: str
+    axis_type: str = "local"  # e.g., "global", "local", "armature"
+    axis: str = "Y"  # e.g., "X", "Y", "Z" - direction to extend
+    coordinate: str = "Y"  # e.g., "X", "Y", "Z" - which coordinate of bone_b to match
+    start: str = "tail"  # e.g., "head", "tail" - which end of bone_a to start from
+    end: str = "head"  # e.g., "head", "tail" - which end of bone_b to get coordinate from
+    parent: str | None = None
+    is_connected: bool = False
+    roll: float = 0.0
+
+    req_bones: list[str] | None = None
+    pose_operations: 'PoseOperations | None' = None
+    is_optional: bool = False
+
+    def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
+        """Generates the ParallelBone extending from bone_a until reaching bone_b's coordinate."""
+        if not armature:
+            print(f"[AetherBlend] Invalid armature provided for ParallelBone '{self.name}'.")
+            return None
+        
+        edit_bones = armature.data.edit_bones
+        bone_a_ref = edit_bones.get(self.bone_a)
+        bone_b_ref = edit_bones.get(self.bone_b)
+
+        if not bone_a_ref:
+            print(f"[AetherBlend] Reference bone '{self.bone_a}' not found for ParallelBone '{self.name}'.")
+            return None
+        
+        if not bone_b_ref:
+            print(f"[AetherBlend] Target bone '{self.bone_b}' not found for ParallelBone '{self.name}'.")
+            return None
+        
+        # Get start position from bone_a
+        if self.start == "tail":
+            start_pos = bone_a_ref.tail.copy()
+        else:  # "head"
+            start_pos = bone_a_ref.head.copy()
+
+        # Get target coordinate from bone_b
+        if self.end == "tail":
+            target_pos = bone_b_ref.tail.copy()
+        else:  # "head"
+            target_pos = bone_b_ref.head.copy()
+        
+        # Get the target coordinate value
+        coord_index = {"X": 0, "Y": 1, "Z": 2}.get(self.coordinate.upper(), 1)
+        target_coord_value = target_pos[coord_index]
+
+        # Calculate direction vector
+        direction_vector = None
+        if self.axis_type == "local":
+            local_bone_matrix = bone_a_ref.matrix.to_3x3().inverted()
+            if self.axis == "X":
+                direction_vector = local_bone_matrix[0]
+            elif self.axis == "Y":
+                direction_vector = local_bone_matrix[1] 
+            elif self.axis == "Z":
+                direction_vector = local_bone_matrix[2]
+        elif self.axis_type == "armature":
+            if self.axis == "X":
+                direction_vector = mathutils.Vector((1.0, 0.0, 0.0))
+            elif self.axis == "Y":
+                direction_vector = mathutils.Vector((0.0, 1.0, 0.0))
+            elif self.axis == "Z":
+                direction_vector = mathutils.Vector((0.0, 0.0, 1.0))
+        elif self.axis_type == "global":
+            if self.axis == "X":
+                world_direction = mathutils.Vector((1.0, 0.0, 0.0))
+            elif self.axis == "Y":
+                world_direction = mathutils.Vector((0.0, 1.0, 0.0))
+            elif self.axis == "Z":
+                world_direction = mathutils.Vector((0.0, 0.0, 1.0))
+            
+            armature_matrix_inv = armature.matrix_world.to_3x3().inverted()
+            direction_vector = armature_matrix_inv @ world_direction
+        
+        if not direction_vector:
+            print(f"[AetherBlend] Invalid axis configuration for ParallelBone '{self.name}': axis_type='{self.axis_type}', axis='{self.axis}'.")
+            return None
+        
+        direction_vector = direction_vector.normalized()
+        
+        # Calculate the length needed to reach the target coordinate
+        # We need to solve: start_pos[coord_index] + t * direction_vector[coord_index] = target_coord_value
+        if abs(direction_vector[coord_index]) < 0.0001:
+            print(f"[AetherBlend] Direction vector has no component along coordinate '{self.coordinate}' for ParallelBone '{self.name}'. Cannot reach target.")
+            return None
+        
+        t = (target_coord_value - start_pos[coord_index]) / direction_vector[coord_index]
+        
+        if t < 0:
+            print(f"[AetherBlend] Warning: ParallelBone '{self.name}' requires negative extension (t={t}). This may result in unexpected bone direction.")
+        
+        tail_pos = start_pos + direction_vector * t
+        
+        if self.name in edit_bones:
+            edit_bones.remove(edit_bones[self.name])
+
+        new_bone = edit_bones.new(self.name)
+        new_bone.head = start_pos
+        new_bone.tail = tail_pos
+        new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
+
+        if self.parent:
+            if isinstance(self.parent, list):
+                for bone_name in self.parent:
+                    parent_bone = edit_bones.get(bone_name)
+                    if parent_bone and parent_bone != new_bone:
+                        break
+            else:
+                parent_bone = edit_bones.get(self.parent)
+
+            if parent_bone:
+                new_bone.parent = parent_bone
+                new_bone.use_connect = self.is_connected
+            else:
+                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ParallelBone '{self.name}'.")
+        
+        created_name = new_bone.name
+        
+        if self.pose_operations and self.pose_operations.b_collection:
+            utils.armature.b_collection.assign_bones(armature, [created_name], self.pose_operations.b_collection)
+        
+        return [created_name]
+
+
+@dataclass(frozen=True)
 class SkinBone(BoneGenerator):
     name: str
     bone_a: str
