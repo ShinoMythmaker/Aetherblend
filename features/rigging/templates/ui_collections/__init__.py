@@ -1,0 +1,3 @@
+from .ui_player_sfw import UI_PLAYER_SFW, UI_PLAYER_SFW_IV, UI_PLAYER_NSFW_IV
+
+__all__ = ['UI_PLAYER_SFW', 'UI_PLAYER_SFW_IV', 'UI_PLAYER_NSFW_IV']

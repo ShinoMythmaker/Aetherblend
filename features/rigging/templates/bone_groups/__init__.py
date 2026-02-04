@@ -1,0 +1,3 @@
+from .bg_player_sfw import BG_PLAYER_SFW, BG_PLAYER_SFW_IV, BG_PLAYER_NSFW_IV
+
+__all__ = ['BG_PLAYER_SFW', 'BG_PLAYER_SFW_IV', 'BG_PLAYER_NSFW_IV']

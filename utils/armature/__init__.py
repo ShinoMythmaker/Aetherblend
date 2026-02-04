@@ -1,6 +1,5 @@
 from . import b_collection
 from . import bone
-from . import rigify
 
 import bpy
 
@@ -63,10 +62,9 @@ def reset_transforms(armature):
     bpy.context.view_layer.objects.active = armature
 
     bpy.ops.object.mode_set(mode='POSE')
-    for bone in armature.pose.bones:
-        bone.location = (0.0, 0.0, 0.0)
-        bone.rotation_euler = (0.0, 0.0, 0.0)
-        bone.scale = (1.0, 1.0, 1.0)
+    bpy.ops.pose.select_all(action='SELECT')
+    bpy.ops.pose.transforms_clear()
+    bpy.ops.pose.select_all(action='DESELECT')
 
     bpy.ops.object.mode_set(mode=original_mode)
     print(f"[AetherBlend] Transforms of armature '{armature.name}' reset to default.")
@@ -95,7 +93,7 @@ def find_meshes(armature: bpy.types.Object) -> list:
                     break
     return meshes
 
-def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey") -> None:
+def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> None:
     """
     Applies the armature modifier as a shapekey to the mesh object and renames the shapekey.
     """
@@ -114,19 +112,15 @@ def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object
         armature_mods = [m for m in mesh_obj.modifiers if m.type == 'ARMATURE' and m.object == armature_obj]
         for mod in armature_mods:
 
-            previous_values = {}
-            if mesh_obj.data.shape_keys:
-                for key_block in mesh_obj.data.shape_keys.key_blocks:
-                    previous_values[key_block.name] = key_block.value
-                    key_block.value = 0.0
-
             bpy.ops.object.modifier_apply_as_shapekey(modifier=mod.name, keep_modifier=True)
+
+            if mesh_obj.data.shape_keys and disable_all:
+                for key_block in mesh_obj.data.shape_keys.key_blocks:
+                    key_block.mute = True
+
             mesh_obj.data.shape_keys.key_blocks[-1].name = shapekey_name
             mesh_obj.data.shape_keys.key_blocks[-1].value = 1.0
-
-            for key_block in mesh_obj.data.shape_keys.key_blocks:
-                if key_block.name in previous_values:
-                    key_block.value = previous_values[key_block.name]
+            mesh_obj.data.shape_keys.key_blocks[-1].mute = False    
 
     except Exception as e:
         print(f"[AetherBlend] Failed to apply armature modifier as shapekey on '{mesh_obj.name}': {e}")
@@ -134,13 +128,13 @@ def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object
         mesh_obj.hide_set(object_state)
     bpy.ops.object.mode_set(mode=original_mode)
 
-def apply_all_as_shapekey(armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey") -> list:
+def apply_all_as_shapekey(armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> list:
     """
     Applies the armature modifier as a shapekey to all mesh objects using the given armature. Returns the list of affected mesh objects.
     """
     meshes = find_meshes(armature_obj)
     for mesh_obj in meshes:
-        apply_as_shapekey(mesh_obj, armature_obj, shapekey_name)
+        apply_as_shapekey(mesh_obj, armature_obj, shapekey_name, disable_all=disable_all)
     return meshes
 
 
@@ -183,7 +177,7 @@ def restore_bone_parenting(armature: bpy.types.Object, parent_map: dict) -> None
             bone.parent = edit_bones.get(parent_name) if parent_name else None
     bpy.ops.object.mode_set(mode=original_mode)
 
-def create(location: tuple, armature_name: str) -> bpy.types.Armature:
+def create(location: tuple, armature_name: str) -> bpy.types.Object:
     """Create the base meta rig armature."""
     original_mode = bpy.context.object.mode if bpy.context.object else 'OBJECT'
 
@@ -199,3 +193,28 @@ def create(location: tuple, armature_name: str) -> bpy.types.Armature:
 
     bpy.ops.object.mode_set(mode=original_mode)
     return armature
+
+def duplicate(armature: bpy.types.Object) -> bpy.types.Object:
+    """Duplicates the given armature object."""
+    bpy.ops.object.select_all(action='DESELECT')
+    armature.select_set(True)
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.duplicate_move()
+    duplicated_armature = bpy.context.active_object
+    return duplicated_armature
+
+def add_bone_prefix(armature: bpy.types.Object, prefix: str) -> None:
+    """Adds a prefix to all bone names in the armature."""
+    original_mode = armature.mode
+    bpy.ops.object.mode_set(mode='EDIT')
+    for bone in armature.data.edit_bones:
+        bone.name = f"{prefix}{bone.name}"
+    bpy.ops.object.mode_set(mode=original_mode)
+
+def join(src: bpy.types.Object, target: bpy.types.Object) -> None:
+    """Joins the source armature into the target armature."""
+    bpy.ops.object.select_all(action='DESELECT')
+    src.select_set(True)
+    target.select_set(True)
+    bpy.context.view_layer.objects.active = target
+    bpy.ops.object.join()
