@@ -4,8 +4,8 @@
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
-    <img src="https://img.shields.io/badge/Blender-4.5%2B-orange">
-    <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/Mythmaker-Sponsor-pink?style=flat"></a>
+    <img src="https://img.shields.io/badge/Blender-5.0%2B-orange">
+    <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
 </p>
 
 AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
@@ -46,6 +46,7 @@ AetherBlend is a plugin designed for posing and animation of character models fr
 - Check the [wiki](https://github.com/ShinoMythmaker/Aetherblend/wiki/Home) for useful information!
 - To stay up to date or find out more about development, join our [Discord]( https://discord.gg/NEF7TdXGqH)!
 <p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
+    
 </p>
 &nbsp;
 
