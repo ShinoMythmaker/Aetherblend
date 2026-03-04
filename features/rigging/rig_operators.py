@@ -54,15 +54,15 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             ]    
             all_pose_operations[bone.name] = ops_list
 
-        # Preliminary MCH bone generation and joining
-        mch_rig = utils.armature.duplicate(armature)
-        utils.armature.add_bone_prefix(mch_rig, "MCH-")
-        mch_ffxiv_coll = mch_rig.data.collections.get("FFXIV")
-        if mch_ffxiv_coll:
-            mch_rig.data.collections.remove(mch_rig.data.collections["FFXIV"])
-        utils.armature.b_collection.assign_bones(mch_rig, list(mch_rig.data.bones.keys()), "MCH")
+        # Preliminary LINK bone generation and joining
+        link_rig = utils.armature.duplicate(armature)
+        utils.armature.add_bone_prefix(link_rig, "LINK-")
+        link_ffxiv_coll = link_rig.data.collections.get("FFXIV")
+        if link_ffxiv_coll:
+            link_rig.data.collections.remove(link_rig.data.collections["FFXIV"])
+        utils.armature.b_collection.assign_bones(link_rig, list(link_rig.data.bones.keys()), "LINK")
 
-        utils.armature.join(src=mch_rig, target=meta_rig)
+        utils.armature.join(src=link_rig, target=meta_rig)
 
 
         # Rigify Settings and Collections

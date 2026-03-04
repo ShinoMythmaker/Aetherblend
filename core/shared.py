@@ -46,19 +46,19 @@ class TransformLink:
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
 
         ff_bone = self.bone
-        mch_bone = f"MCH-{ff_bone}"
+        link_bone = f"LINK-{ff_bone}"
         if ff_bone not in pose_operations_dict:
             pose_operations_dict[ff_bone] = []
         pose_operations_dict[ff_bone].append(
             PoseOperations(
                 # rigify_settings=rigify.types.basic_raw_copy(True),
-                constraints=[CopyTransformsConstraint(mch_bone, name=f"AetherBlend-CopyTransform@MCH-{ff_bone}", remove_target_shear=True)]
+                constraints=[CopyTransformsConstraint(link_bone, name=f"AetherBlend-CopyTransform@LINK-{ff_bone}", remove_target_shear=True)]
             )
         )
 
-        if mch_bone not in pose_operations_dict:
-            pose_operations_dict[mch_bone] = []
-        pose_operations_dict[mch_bone].append(
+        if link_bone not in pose_operations_dict:
+            pose_operations_dict[link_bone] = []
+        pose_operations_dict[link_bone].append(
             PoseOperations(
                 rigify_settings=rigify.types.basic_raw_copy(True, self.target)
             )
