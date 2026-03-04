@@ -44,6 +44,23 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         meta_rig = utils.armature.duplicate(armature)
         meta_rig.name = f"META_{armature.name}"
 
+        linked_coll = meta_rig.data.collections.get("Linked")
+        unlinked_coll = meta_rig.data.collections.get("Unlinked")
+        ffxiv_coll = meta_rig.data.collections.get("FFXIV")
+
+        ## Setup for mendatory collections 
+        if not linked_coll:
+            linked_coll=meta_rig.data.collections.new("Linked")
+        if not unlinked_coll:
+            unlinked_coll=meta_rig.data.collections.new("Unlinked")
+        if not ffxiv_coll:
+            ffxiv_coll=meta_rig.data.collections.new("FFXIV")
+        
+        meta_rig_collections = meta_rig.data.collections
+        meta_rig_collections.move(linked_coll.index, 0)  # Move Linked to the top
+        meta_rig_collections.move(unlinked_coll.index, 1)  # Move Unlinked to the second position
+        meta_rig_collections.move(ffxiv_coll.index, 2)  # Move FFXIV to the third position
+        
         ## This will make sure all FF bones will carry over to the rigify rig
         all_pose_operations: dict[str, list[PoseOperations]] = {}
         for bone in meta_rig.data.bones:
@@ -60,7 +77,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         link_ffxiv_coll = link_rig.data.collections.get("FFXIV")
         if link_ffxiv_coll:
             link_rig.data.collections.remove(link_rig.data.collections["FFXIV"])
-        utils.armature.b_collection.assign_bones(link_rig, list(link_rig.data.bones.keys()), "LINK")
+        utils.armature.b_collection.assign_bones(link_rig, list(link_rig.data.bones.keys()), "LINK", clear=True)
 
         utils.armature.join(src=link_rig, target=meta_rig)
 
@@ -98,6 +115,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if len(data) == 0:
             data = None
 
+        generated_bones = []
         # Loop through all bone groups
         for bone_group_handler in aether_rig_generator.getBoneGroups().values():
             for bone_group in bone_group_handler:
@@ -105,15 +123,50 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
                 if not bones and not pose_ops:
                     continue # Skip if nothing to process
+
+                if bones:
+                    generated_bones.extend(bones)
                 
                 # Merge operations, appending to existing lists
                 for bone_name, ops_list in pose_ops.items():
-                    # Since we store lists, if the bone doesnt exist yet, create an empty list, so we can use .extend()
                     if bone_name not in all_pose_operations:
                         all_pose_operations[bone_name] = []
                     all_pose_operations[bone_name].extend(ops_list)
                 
                 break  # Only process the first matching bone group
+
+        ## Cleanup unlinked Bones and assign Collection to FFXIV bones
+        data_bones = meta_rig.data.bones
+        bones_to_delete = []
+        for bone in data_bones.values():
+            ffxiv_coll = meta_rig.data.collections.get("FFXIV")
+            if ffxiv_coll and bone.name in ffxiv_coll.bones:
+                if not bone.get("ab_linked", False):
+                    pose_op = PoseOperations(
+                        b_collection="Unlinked",
+                    )
+                    if bone.name not in all_pose_operations:
+                        all_pose_operations[bone.name] = []
+                    all_pose_operations[bone.name].extend([pose_op])
+
+                    link_bone = meta_rig.data.bones.get(f"LINK-{bone.name}")
+                    if link_bone:
+                        bones_to_delete.append(link_bone.name)
+                else:
+                    pose_op = PoseOperations(
+                        b_collection="Linked",
+                    )
+                    if bone.name not in all_pose_operations:
+                        all_pose_operations[bone.name] = []
+                    all_pose_operations[bone.name].extend([pose_op])
+        
+        
+        bpy.ops.object.mode_set(mode='EDIT')
+        for bone_name in bones_to_delete:
+            bone = meta_rig.data.edit_bones.get(bone_name)
+            if bone:
+                meta_rig.data.edit_bones.remove(bone)
+                
 
         # Now apply all operations per bone
         bpy.ops.object.mode_set(mode='POSE')
@@ -121,6 +174,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             bone = meta_rig.pose.bones.get(bone_name)
             for ops in ops_list:
                 ops.execute(bone, meta_rig)
+       
                 
         for hide_coll in hide_collections:
             hide_coll.is_visible = False
@@ -242,8 +296,14 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
                 widget.execute(armature)
             
             ffxiv_coll = armature.data.collections.get("FFXIV")
+            linked_coll = armature.data.collections.get("Linked")
+            unlinked_coll = armature.data.collections.get("Unlinked")
             if ffxiv_coll:
                 ffxiv_coll.is_visible = False
+            if linked_coll:
+                linked_coll.is_visible = False
+            if unlinked_coll:
+                unlinked_coll.is_visible = False
                 
             bpy.ops.object.mode_set(mode='OBJECT')
             armature.aether_rig.rigified = True
@@ -270,6 +330,9 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             return {'CANCELLED'}
         
+        rig_collections = armature.data.collections
+        if not rig_collections.get("FFXIV"):
+            return {'FINISHED'} # If it doesnt have a FFXIV collection, we can assume its already clean and just exit
 
         ## Delete Meta Rig and Scripts
         existing_meta_rig = armature.aether_rig.meta_rig
@@ -293,34 +356,16 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
             pass
         
         # Cleanup Bones
-        coll_to_delete = []
         bpy.ops.object.mode_set(mode='EDIT')
-        for collection in armature.data.collections_all:
-            if collection.name == "FFXIV":
-                collection.is_visible = False
-            else:
-                collection.is_visible = True
-                coll_to_delete.append(collection.name)
-
-        bpy.ops.armature.select_all(action='DESELECT')
-        bpy.ops.armature.reveal()
-        bpy.ops.armature.select_all(action='SELECT')
-        bpy.ops.armature.delete()
-
-        ## Deep Cleanup
-        root_level_bones = [bone for bone in armature.data.edit_bones if bone.parent is None]
-        for root_bone in root_level_bones:
-            if root_bone.name != "n_root":      ## whack
-                for child_bone in root_bone.children_recursive:
-                    armature.data.edit_bones.remove(child_bone)
-
-                armature.data.edit_bones.remove(root_bone)
-
-        # Cleanup Collections
-        for coll_name in coll_to_delete:
-            coll = armature.data.collections.get(coll_name)
-            if coll:
-                armature.data.collections.remove(coll)
+        edit_bones = armature.data.edit_bones
+        for bone in edit_bones:
+            delete = True
+            for coll in bone.collections:
+                if coll.name == "FFXIV":
+                    delete = False
+                    break
+            if delete:
+                edit_bones.remove(bone)
 
         try:
             bpy.ops.armature.collection_remove_unused()

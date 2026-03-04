@@ -41,18 +41,23 @@ class TransformLink:
     bone: str
     retarget: str | None = None
 
+    def mark_linked(self, armature: bpy.types.Object) -> None:
+        """Marks the bone as linked in the armature's data."""
+        bone = armature.data.bones.get(self.bone)
+        if bone:
+            bone["ab_linked"] = True
+
     def to_pose_operations(self) -> dict[str, list[PoseOperations]]:
         """Convert this TransformLink to PoseOperations."""
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
-
+        
         ff_bone = self.bone
         link_bone = f"LINK-{ff_bone}"
         if ff_bone not in pose_operations_dict:
             pose_operations_dict[ff_bone] = []
         pose_operations_dict[ff_bone].append(
             PoseOperations(
-                # rigify_settings=rigify.types.basic_raw_copy(True),
-                constraints=[CopyTransformsConstraint(link_bone, name=f"AetherBlend-CopyTransform@LINK-{ff_bone}", remove_target_shear=True)]
+                constraints=[CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)]
             )
         )
 
@@ -188,7 +193,9 @@ class BoneGroup:
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
 
         # Add TransformLink operations
+        bpy.ops.object.mode_set(mode='OBJECT')
         for link_item in self.transform_link or []:
+            link_item.mark_linked(armature)
             for bone_name, operations in link_item.to_pose_operations().items():
                 if bone_name not in pose_operations_dict:
                     pose_operations_dict[bone_name] = []
@@ -206,6 +213,7 @@ class BoneGroup:
             # Collect dynamic transform links (empty list for most generators)
             dynamic_links = bone_gen.get_dynamic_transform_links()
             for link_item in dynamic_links:
+                link_item.mark_linked(armature)
                 for bone_name, operations in link_item.to_pose_operations().items():
                     if bone_name not in pose_operations_dict:
                         pose_operations_dict[bone_name] = []
