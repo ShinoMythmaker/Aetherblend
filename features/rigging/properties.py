@@ -30,6 +30,19 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         items=module_manager.get_colorset_items,
         default=0
     ) # type: ignore
+    
+    link_inherit_scale : bpy.props.EnumProperty(
+        name="LINK Inherit Scale",
+        description="Inherit scale setting for LINK collection bones",
+        items=[
+            ('FULL', "Full", "Full inherit scale"),
+            ('FIX_SHEAR', "Aligned", "Inherit scale with shear fixed"),
+            ('AVERAGE', "Average", "Average scale inheritance"),
+            ('NONE', "None", "No scale inheritance"),
+            ('NONE_LEGACY', "None (Legacy)", "No scale inheritance (legacy)"),
+        ],
+        default='FULL',
+    ) # type: ignore
 
 
 def register():
