@@ -4,7 +4,7 @@
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
-    <img src="https://img.shields.io/badge/Blender-4.5%2B-orange">
+    <img src="https://img.shields.io/badge/Blender-5.0%2B-orange">
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
 </p>
 
@@ -44,13 +44,9 @@ AetherBlend is a plugin designed for posing and animation of character models fr
 
 - Make sure to submit [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on Github.
 - Check the [wiki](https://github.com/ShinoMythmaker/Aetherblend/wiki/Home) for useful information!
-<<<<<<< HEAD
 - To stay up to date or find out more about development, join our [Discord]( https://discord.gg/NEF7TdXGqH)!
 <p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
-=======
-- To stay up to date or find out more about development, join our [Discord](https://discord.gg/NEF7TdXGqH )!
-<p><a href="https://discord.gg/NEF7TdXGqH"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
->>>>>>> origin/main
+    
 </p>
 &nbsp;
 
