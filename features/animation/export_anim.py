@@ -32,7 +32,7 @@ class AETHER_OT_AnimExport(Operator, ExportHelper):
         name="Primary Axis",
         items=[('X', "X", ""), ('Y', "Y", ""), ('Z', "Z", ""), 
                ('-X', "-X", ""), ('-Y', "-Y", ""), ('-Z', "-Z", "")],
-        default='-Z',
+        default='X',
     ) # type: ignore
     
     pose_secondary_axis: bpy.props.EnumProperty(
