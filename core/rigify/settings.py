@@ -31,7 +31,8 @@ class BoneCollection:
         hide_collections = False
         if coll:
             if self.ui:
-                coll.rigify_color_set_name = self.color_set
+                if self.color_set:
+                    coll.rigify_color_set_name = self.color_set
                 coll.rigify_ui_row = self.row_index
                 coll.rigify_ui_title = self.title
 
