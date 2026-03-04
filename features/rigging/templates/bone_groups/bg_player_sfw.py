@@ -170,6 +170,7 @@ SPINE = BoneGroup(
         name="spine",
         transform_link= [
             TransformLink(target="DEF-Spine.001", bone="j_kosi", retarget="FK-Spine.001"),
+            TransformLink(target="MCH-pivot", bone="n_hara", retarget="Torso"),
             TransformLink(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
             TransformLink(target="DEF-Spine.003", bone="j_sebo_b", retarget="FK-Spine.003"),
             TransformLink(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
