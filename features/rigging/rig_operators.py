@@ -228,10 +228,13 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
             aether_rig_generator = module_manager.get_rig_generator(armature.aether_rig)
 
             ## Execute Post Generation Steps
+            data_bones = armature.data.bones
             ffxiv_data_bones = utils.armature.b_collection.get_bones(armature, "FFXIV")
-            for bone in ffxiv_data_bones.values():
-                if bone:
+            for bone in data_bones.values():
+                if bone in ffxiv_data_bones.values():
                     bone.use_deform = True
+                else:
+                    bone.use_deform = False
 
             ## Widget Overrides
             bpy.ops.object.mode_set(mode='POSE')
