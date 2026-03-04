@@ -80,13 +80,60 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         row.prop(aether_rig, "selected_colorset", text="")
 
 
+class AETHER_PT_RigManipulation(bpy.types.Panel):
+    bl_label = "Rig Manipulation"
+    bl_idname = "AETHER_PT_rig_manipulation"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'AetherBlend'
+    bl_order = 5
+
+    @classmethod
+    def poll(cls, context):
+        if context.scene.aether_tabs.active_tab != 'GENERATE':
+            return False
+
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return False
+        
+        aether_rig = getattr(armature, 'aether_rig', None)
+        return aether_rig and aether_rig.rigified
+
+    def draw(self, context):
+        layout = self.layout
+        armature = context.active_object
+        aether_rig = getattr(armature, 'aether_rig', None)
+        
+        link_collection = armature.data.collections.get('LINK')
+        if not link_collection:
+            layout.label(text="LINK collection not found", icon='ERROR')
+            return
+        
+        row = layout.row(align=True)
+        row.label(text="Inherit Scale", icon='BONE_DATA')
+        
+        current_text = "Full"
+        if aether_rig:
+            scale_labels = {
+                'FULL': 'Full',
+                'FIX_SHEAR': 'Aligned',
+                'AVERAGE': 'Average',
+                'NONE': 'None',
+                'NONE_LEGACY': 'None (Legacy)'
+            }
+            current_text = scale_labels.get(aether_rig.link_inherit_scale, 'Full')
+        
+        row.operator_menu_enum("aether.set_bone_inherit_scale", "inherit_scale", text=current_text)
+
+
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
     bl_label = "Rig Layers"
     bl_idname = "AETHER_PT_rig_layers"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 5
+    bl_order = 6
 
     @classmethod
     def poll(cls, context):
@@ -148,7 +195,7 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 6
+    bl_order = 7
 
     @classmethod
     def poll(cls, context):
@@ -220,7 +267,7 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 7
+    bl_order = 8
 
     @classmethod
     def poll(cls, context):
@@ -266,12 +313,14 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(AETHER_PT_RigCreation)
+    bpy.utils.register_class(AETHER_PT_RigManipulation)
     bpy.utils.register_class(AETHER_PT_RigLayersPanel)
     bpy.utils.register_class(AETHER_PT_RigUIPanel)
     bpy.utils.register_class(AETHER_PT_RigBakeSettingsPanel)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_RigCreation)
+    bpy.utils.unregister_class(AETHER_PT_RigManipulation)
     bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
     bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
     bpy.utils.unregister_class(AETHER_PT_RigBakeSettingsPanel)

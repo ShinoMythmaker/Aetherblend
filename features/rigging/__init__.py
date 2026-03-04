@@ -1,10 +1,11 @@
 from . import rig_operators
 from . import ui_operators
+from . import rig_edit_operators
 from . import properties
 from . import panels
 from . import module_manager
 
-modules = (properties, module_manager, rig_operators, ui_operators, panels)
+modules = (properties, module_manager, rig_operators, ui_operators, rig_edit_operators, panels)
 
 def register():
     for mod in modules:

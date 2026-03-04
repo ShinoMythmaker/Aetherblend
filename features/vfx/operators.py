@@ -48,7 +48,9 @@ class AETHER_OT_VFXExport(Operator, ExportHelper):
                 export_tangents=True,  # Keep tangents
                 export_attributes=True,
                 export_materials='EXPORT',
-                export_image_format='AUTO'
+                export_image_format='AUTO',
+                use_mesh_edges=True,
+                use_mesh_vertices=True,
             )
             
             self.report({'INFO'}, f"VFX model exported to {self.filepath}")

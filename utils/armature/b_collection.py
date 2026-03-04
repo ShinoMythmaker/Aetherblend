@@ -20,17 +20,19 @@ def unassign_bones(armature, bone_names, collection_name) -> None:
 
     bpy.ops.object.mode_set(mode=original_mode)
 
-def assign_bones(armature, bone_names, collection_name) -> None:
+def assign_bones(armature, bone_names, collection_name, clear=False) -> None:
     """Assigns the specified bones to the given collection in the armature."""
     target_coll = armature.data.collections.get(collection_name)
 
     if not target_coll:
         target_coll = armature.data.collections.new(collection_name)
 
-
+    
     for bone_name in bone_names:
         bone = armature.data.bones.get(bone_name)
         if bone:
+            if clear:
+                bone.collections.clear()
             target_coll.assign(bone)
         else:
             print(f"[AetherBlend] Bone '{bone_name}' not found in armature '{armature.name}'")
