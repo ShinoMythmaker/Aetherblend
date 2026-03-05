@@ -3,11 +3,20 @@ import json
 import os
 import re
 import math
+import base64
+import tempfile
 from bpy.types import Operator
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper, axis_conversion
 from mathutils import Matrix, Euler
 from ...preferences import get_preferences
+
+
+def pose_export_image_items(_self, _context):
+    items = [('__NONE__', "None", "Do not embed an image")]
+    for image in bpy.data.images:
+        items.append((image.name, image.name, ""))
+    return items
 
 
 class AETHER_OT_PoseExport(Operator, ExportHelper):
@@ -78,6 +87,18 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
         description="Comma-separated tags written to the pose file",
         default="",
     ) # type: ignore
+
+    include_preview_image: BoolProperty(
+        name="Include Preview Image",
+        description="Embed a selected Blender image as Base64Image in the pose file",
+        default=True,
+    ) # type: ignore
+
+    preview_image_name: bpy.props.EnumProperty(
+        name="Preview Image",
+        description="Image datablock to embed into the pose file",
+        items=pose_export_image_items,
+    ) # type: ignore
     
     
     def invoke(self, context, event):
@@ -92,8 +113,39 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             self.filepath = os.path.join(prefs.default_pose_export_path, blend_filename)
         else:
             self.filepath = blend_filename
+
+        # Default to Blender's latest render result when available.
+        render_result = bpy.data.images.get("Render Result")
+        self.preview_image_name = render_result.name if render_result else '__NONE__'
         
         return super().invoke(context, event)
+
+    def _encode_image_to_base64(self, context, image):
+        if not image:
+            return None
+
+        temp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+                temp_path = temp_file.name
+
+            if image.type == 'RENDER_RESULT':
+                image.save_render(temp_path, scene=context.scene)
+            else:
+                # save_render works for most image datablocks and avoids mutating image settings.
+                image.save_render(temp_path, scene=context.scene)
+
+            with open(temp_path, 'rb') as f:
+                return base64.b64encode(f.read()).decode('ascii')
+        except Exception as ex:
+            self.report({'WARNING'}, f"Could not embed preview image: {ex}")
+            return None
+        finally:
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except OSError:
+                    pass
     
     
     def execute(self, context):
@@ -153,6 +205,16 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
                 bone_data["Scale"] = f"{bone_matrix_world.to_scale().x:.8f}, {bone_matrix_world.to_scale().y:.8f}, {bone_matrix_world.to_scale().z:.8f}"
                 
                 skeleton_data["Bones"][clean_bone_name] = bone_data
+
+        preview_image = None
+        if self.preview_image_name and self.preview_image_name != '__NONE__':
+            preview_image = bpy.data.images.get(self.preview_image_name)
+        if not preview_image:
+            preview_image = bpy.data.images.get("Render Result")
+        if self.include_preview_image and preview_image:
+            encoded_image = self._encode_image_to_base64(context, preview_image)
+            if encoded_image:
+                skeleton_data["Base64Image"] = encoded_image
         
         with open(self.filepath, 'w') as f:
             json.dump(skeleton_data, f, indent=4)
