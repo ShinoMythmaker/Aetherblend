@@ -54,6 +54,30 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
         ),
         default='Y',
     ) # type: ignore
+
+    pose_author: bpy.props.StringProperty(
+        name="Author",
+        description="Author name written to the pose file",
+        default="",
+    ) # type: ignore
+
+    pose_description: bpy.props.StringProperty(
+        name="Description",
+        description="Description written to the pose file",
+        default="",
+    ) # type: ignore
+
+    pose_version: bpy.props.StringProperty(
+        name="Pose Version",
+        description="Pose version string written to the pose file (example: 1.0.0)",
+        default="1.0.0",
+    ) # type: ignore
+
+    pose_tags: bpy.props.StringProperty(
+        name="Tags",
+        description="Comma-separated tags written to the pose file",
+        default="",
+    ) # type: ignore
     
     
     def invoke(self, context, event):
@@ -89,8 +113,14 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             ).to_4x4()
         
         x_rotation = Matrix.Rotation(math.radians(-90), 4, 'X')
+
+        tags = [tag.strip() for tag in self.pose_tags.split(',') if tag.strip()]
         
         skeleton_data = {
+            "Author": self.pose_author,
+            "Description": self.pose_description,
+            "Version": self.pose_version,
+            "Tags": tags,
             "FileExtension": ".pose",
             "TypeName": "Aetherblend Pose",
             "FileVersion": 2,
