@@ -363,7 +363,8 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
             for coll in bone.collections:
                 if coll.name == "FFXIV":
                     delete = False
-                    break
+                else:
+                    coll.unassign(bone)
             if delete:
                 edit_bones.remove(bone)
 
