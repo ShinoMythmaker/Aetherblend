@@ -1,5 +1,19 @@
 import bpy
 import addon_utils
+from ...preferences import get_preferences
+from ...properties.tab_prop import get_active_tab
+
+
+def _visible_in_current_area(context):
+    prefs = get_preferences()
+    area = context.area
+    if area is None:
+        return True
+    if area.type == 'VIEW_3D':
+        return prefs.show_n_panel == 'ON'
+    if area.type == 'PROPERTIES':
+        return prefs.show_properties_tool_tab == 'ON'
+    return True
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -11,7 +25,9 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'GENERATE':
+        if not _visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'GENERATE':
             return False
 
         armature = context.active_object
@@ -90,7 +106,9 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'GENERATE':
+        if not _visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'GENERATE':
             return False
 
         armature = context.active_object
@@ -137,7 +155,9 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'RIG_LAYERS':
+        if not _visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'RIG_LAYERS':
             return False
 
         armature = context.active_object
@@ -199,7 +219,9 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'RIG_UI':
+        if not _visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'RIG_UI':
             return False
         
         armature = context.active_object
@@ -271,7 +293,9 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'RIG_UI':
+        if not _visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'RIG_UI':
             return False
         
         armature = context.active_object

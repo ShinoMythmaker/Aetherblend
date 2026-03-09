@@ -1,4 +1,5 @@
 import bpy
+from ...properties.tab_prop import get_active_tab
 
 class AETHER_PT_CPlusEditor(bpy.types.Panel):
     bl_label = "C+ Editor"
@@ -10,7 +11,7 @@ class AETHER_PT_CPlusEditor(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return context.scene.aether_tabs.active_tab == 'CPLUS'
+        return get_active_tab(context) == 'CPLUS'
     
     def draw(self, context):
         layout = self.layout

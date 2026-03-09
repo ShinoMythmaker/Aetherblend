@@ -1,6 +1,19 @@
 import bpy
 import addon_utils
 from ...preferences import get_preferences
+from ...properties.tab_prop import get_active_tab
+
+
+def _visible_in_current_area(context):
+    prefs = get_preferences()
+    area = context.area
+    if area is None:
+        return True
+    if area.type == 'VIEW_3D':
+        return prefs.show_n_panel == 'ON'
+    if area.type == 'PROPERTIES':
+        return prefs.show_properties_tool_tab == 'ON'
+    return True
 
 def check_for_meddle():
     """Check if Meddle Tools addon is installed and enabled"""
@@ -20,7 +33,7 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return context.scene.aether_tabs.active_tab == 'IMPORT_EXPORT'
+        return _visible_in_current_area(context) and get_active_tab(context) == 'IMPORT_EXPORT'
     
     def draw(self, context):
         layout = self.layout

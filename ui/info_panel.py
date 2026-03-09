@@ -1,4 +1,6 @@
 import bpy
+from ..preferences import get_preferences
+from ..properties.tab_prop import get_active_tab_prop_name
 
 GITHUB_URL = "https://github.com/ShinoMythmaker/Aetherblend"
 
@@ -10,6 +12,18 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = "AetherBlend"
     bl_order = 0 
+
+    @classmethod
+    def poll(cls, context):
+        prefs = get_preferences()
+        area = context.area
+        if area is None:
+            return True
+        if area.type == 'VIEW_3D':
+            return prefs.show_n_panel == 'ON'
+        if area.type == 'PROPERTIES':
+            return prefs.show_properties_tool_tab == 'ON'
+        return True
 
     def draw_header(self, context):
         self.layout.label(text=f"AetherBlend")
@@ -26,6 +40,7 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         # Tab selector
         layout.separator()
         tabs = context.scene.aether_tabs
+        active_tab_prop = get_active_tab_prop_name(context)
         
         # Check if armature is selected
         armature = context.active_object
@@ -38,22 +53,22 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
             has_rig_id = rig_id is not None
         
         split = layout.split(factor=0.2, align=True)
-        split.prop_enum(tabs, "active_tab", 'IMPORT_EXPORT', icon='FILE', text="")
+        split.prop_enum(tabs, active_tab_prop, 'IMPORT_EXPORT', icon='FILE', text="")
         split = split.split(factor=0.25, align=True)
         col = split.column(align=True)
         col.enabled = has_armature
-        col.prop_enum(tabs, "active_tab", 'CPLUS', text="C+")
+        col.prop_enum(tabs, active_tab_prop, 'CPLUS', text="C+")
         split = split.split(factor=0.333, align=True)
         col = split.column(align=True)
         col.enabled = has_armature
-        col.prop_enum(tabs, "active_tab", 'GENERATE', icon='POSE_HLT', text="")
+        col.prop_enum(tabs, active_tab_prop, 'GENERATE', icon='POSE_HLT', text="")
         split = split.split(factor=0.5, align=True)
         col = split.column(align=True)
         col.enabled = has_rig_id
-        col.prop_enum(tabs, "active_tab", 'RIG_LAYERS', icon='BONE_DATA', text="")
+        col.prop_enum(tabs, active_tab_prop, 'RIG_LAYERS', icon='BONE_DATA', text="")
         col = split.column(align=True)
         col.enabled = has_rig_id
-        col.prop_enum(tabs, "active_tab", 'RIG_UI', icon='PROPERTIES', text="")
+        col.prop_enum(tabs, active_tab_prop, 'RIG_UI', icon='PROPERTIES', text="")
 
 
 def register():
