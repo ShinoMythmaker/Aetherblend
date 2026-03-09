@@ -1,18 +1,6 @@
 import bpy
-from ...preferences import get_preferences
 from ...properties.tab_prop import get_active_tab
-
-
-def _visible_in_current_area(context):
-    prefs = get_preferences()
-    area = context.area
-    if area is None:
-        return True
-    if area.type == 'VIEW_3D':
-        return prefs.show_n_panel == 'ON'
-    if area.type == 'PROPERTIES':
-        return prefs.show_properties_tool_tab == 'ON'
-    return True
+from ...utils.ui_visibility import visible_in_current_area
 
 class AETHER_PT_CustomizePlus(bpy.types.Panel):
     bl_label = "Customize Plus"
@@ -24,7 +12,7 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        if not _visible_in_current_area(context):
+        if not visible_in_current_area(context):
             return False
         if get_active_tab(context) != 'CPLUS':
             return False

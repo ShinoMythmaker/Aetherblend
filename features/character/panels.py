@@ -1,21 +1,9 @@
 import bpy
 import addon_utils
-from ...preferences import get_preferences
 from ...properties.tab_prop import get_active_tab
+from ...utils.ui_visibility import visible_in_current_area
 
-
-def _visible_in_current_area(context):
-    prefs = get_preferences()
-    area = context.area
-    if area is None:
-        return True
-    if area.type == 'VIEW_3D':
-        return prefs.show_n_panel == 'ON'
-    if area.type == 'PROPERTIES':
-        return prefs.show_properties_tool_tab == 'ON'
-    return True
-
-def check_for_meddle():
+def _check_for_meddle():
     """Check if Meddle Tools addon is installed and enabled"""
     addon_module = [m for m in addon_utils.modules() if m.bl_info.get('name') == "Meddle Tools"]
     if not addon_module:
@@ -33,12 +21,12 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return _visible_in_current_area(context) and get_active_tab(context) == 'IMPORT_EXPORT'
+        return visible_in_current_area(context) and get_active_tab(context) == 'IMPORT_EXPORT'
     
     def draw(self, context):
         layout = self.layout
 
-        if not check_for_meddle():
+        if not _check_for_meddle():
             layout = self.layout
             box = layout.box()
             box.label(text="Missing Meddle Tools addon", icon='ERROR')
@@ -51,7 +39,7 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
 
 def menu_func_import(self, context):
     """Add the import operator to the File > Import menu"""
-    if check_for_meddle():
+    if _check_for_meddle():
         self.layout.operator("aether.character_import", text="FFXIV Character (Meddle)")
 
 def register():
