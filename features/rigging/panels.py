@@ -199,8 +199,8 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
                 for index, coll in enumerate(row_buttons):
                     title = coll.rigify_ui_title or coll.name
                     row2 = row.row(align=True)
-                    place_solo_left = index < midpoint
                     
+                    place_solo_left = index < midpoint
                     if len(row_buttons) == 1:
                         place_solo_left = False
 
