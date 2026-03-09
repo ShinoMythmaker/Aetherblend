@@ -6,6 +6,7 @@ from bpy_extras.io_utils import axis_conversion
 
 from ... import utils
 from ...preferences import get_preferences
+from ...properties.tab_prop import set_active_tab
 
 class AETHER_OT_Character_Import(bpy.types.Operator):
     """Import a character model into Blender with various options."""
@@ -241,8 +242,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         
         self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
         
-        if get_preferences().auto_navigate_tabs:
-            bpy.context.scene.aether_tabs.active_tab = 'GENERATE'
+        if get_preferences().auto_navigate_tabs == 'ON':
+            set_active_tab(context, 'GENERATE')
         
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}

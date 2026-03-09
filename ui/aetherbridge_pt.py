@@ -1,4 +1,5 @@
 import bpy
+from ..properties.tab_prop import get_active_tab
 
 class AETHER_PT_AetherBridge(bpy.types.Panel):
     bl_label = "AetherBridge"
@@ -10,7 +11,7 @@ class AETHER_PT_AetherBridge(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return context.scene.aether_tabs.active_tab == 'IMPORT_EXPORT'
+        return get_active_tab(context) == 'IMPORT_EXPORT'
     
     def draw(self, context):
         layout = self.layout

@@ -4,7 +4,7 @@
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
-    <img src="https://img.shields.io/badge/Blender-5.0%2B-orange">
+    <img src="https://img.shields.io/badge/Blender-4.5.7%2B-orange">
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
 </p>
 
@@ -45,13 +45,12 @@ AetherBlend is a plugin designed for posing and animation of character models fr
 - Make sure to submit [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on Github.
 - Check the [wiki](https://github.com/ShinoMythmaker/Aetherblend/wiki/Home) for useful information!
 - To stay up to date or find out more about development, join our [Discord]( https://discord.gg/NEF7TdXGqH)!
-<p><a href="https://discord.gg/mythmaker"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
+<p><a href="https://discord.gg/NEF7TdXGqH"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
     
 </p>
 &nbsp;
 
 &nbsp;
-
 ## Acknowledgements
 💖 A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
 
@@ -62,7 +61,6 @@ AetherBlend is a plugin designed for posing and animation of character models fr
 💖 [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
 
 💖 Ofcourse everyone that showed interest in not only AetherBlend but also [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!
-
 
 ---
 &nbsp; 

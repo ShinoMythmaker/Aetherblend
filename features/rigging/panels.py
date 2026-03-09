@@ -1,5 +1,15 @@
 import bpy
 import addon_utils
+import collections
+from ...properties.tab_prop import get_active_tab
+from ...utils.ui_visibility import visible_in_current_area
+
+
+def _flatten_children(iterable):
+    """Enumerate the iterator items as well as their children in the tree order."""
+    for item in iterable:
+        yield item
+        yield from _flatten_children(item.children)
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -11,7 +21,9 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'GENERATE':
+        if not visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'GENERATE':
             return False
 
         armature = context.active_object
@@ -90,7 +102,9 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'GENERATE':
+        if not visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'GENERATE':
             return False
 
         armature = context.active_object
@@ -137,56 +151,71 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'RIG_LAYERS':
+        if not visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'RIG_LAYERS':
             return False
 
-        armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        try:
+            return (context.active_object.data.get("rig_id") is not None)
+        except (AttributeError, KeyError, TypeError):
             return False
-        
-        # Get rig_id from armature custom properties
-        rig_id = armature.data.get("rig_id")
-        if not rig_id:
-            return False
-            
-        panel_name = "VIEW3D_PT_rig_layers_" + rig_id
-        panel_class = getattr(bpy.types, panel_name, None)
-        
-        if panel_class and hasattr(panel_class, 'poll'):
-            return panel_class.poll(context)
-        
-        return False
 
     def draw(self, context):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return
-        
-        # Get rig_id from armature custom properties
-        rig_id = armature.data.get("rig_id")
-        if not rig_id:
+
+        if not armature.data.get("rig_id"):
             return
         
         layout = self.layout
+        any_soloed = any(collection.is_solo for collection in armature.data.collections)
         
+        ## AB Additions
         if context.mode == 'POSE':
-            any_soloed = any(collection.is_solo for collection in armature.data.collections)
-            
             row = layout.row(align=True)
-            op = row.operator("aether.solo_bone_collections", 
-                             text="Unsolo All" if any_soloed else "Solo Selected", 
-                             icon='SOLO_ON' if any_soloed else 'SOLO_OFF',
-                             depress=any_soloed)
+            row.operator(
+                "aether.solo_bone_collections",
+                text="Unsolo All" if any_soloed else "Solo Selected",
+                icon='SOLO_ON' if any_soloed else 'SOLO_OFF',
+                depress=any_soloed,
+            )
             layout.separator()
             
-        panel_name = "VIEW3D_PT_rig_layers_" + rig_id
-        panel_class = getattr(bpy.types, panel_name, None)
-        
-        if panel_class and hasattr(panel_class, 'draw'):
-            panel_class.draw(self, context)
-        else:
-            # Fallback to default behavior if panel not found
-            layout.label(text=f"Rig layers panel not found for: {rig_id}")
+        ## Rigify UI
+        layout = self.layout
+        row_table = collections.defaultdict(list)
+        for coll in _flatten_children(context.active_object.data.collections):
+            row_id = coll.rigify_ui_row
+            if row_id > 0:
+                row_table[row_id].append(coll)
+        col = layout.column()
+        for row_id in range(min(row_table.keys()), 1 + max(row_table.keys())):
+            row = col.row()
+            row_buttons = row_table[row_id]
+            if row_buttons:
+                midpoint = len(row_buttons) / 2
+                for index, coll in enumerate(row_buttons):
+                    title = coll.rigify_ui_title or coll.name
+                    row2 = row.row(align=True)
+                    
+                    place_solo_left = index < midpoint
+                    if len(row_buttons) == 1:
+                        place_solo_left = False
+
+                    if place_solo_left:
+                        solo = row2.row(align=True)
+                        visibility = row2.row(align=True)
+                    else:
+                        visibility = row2.row(align=True)
+                        solo = row2.row(align=True)
+
+                    visibility.enabled = coll.is_visible_ancestors and not any_soloed
+                    visibility.prop(coll, 'is_visible', toggle=True, text=title, translate=False)
+                    solo.prop(coll, 'is_solo', toggle=True, text="", icon='RADIOBUT_OFF' if not coll.is_solo else 'RADIOBUT_ON', translate=False)
+            else:
+                row.separator()
 
 
 class AETHER_PT_RigUIPanel(bpy.types.Panel):
@@ -199,7 +228,9 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'RIG_UI':
+        if not visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'RIG_UI':
             return False
         
         armature = context.active_object
@@ -271,7 +302,9 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'RIG_UI':
+        if not visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'RIG_UI':
             return False
         
         armature = context.active_object

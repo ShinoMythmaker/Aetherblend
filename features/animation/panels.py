@@ -1,5 +1,6 @@
 import bpy
-from ...preferences import get_preferences
+from ...properties.tab_prop import get_active_tab
+from ...utils.ui_visibility import visible_in_current_area
 
 class AETHER_PT_ExportPanel(bpy.types.Panel):
     bl_label = "Export"
@@ -11,7 +12,7 @@ class AETHER_PT_ExportPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return context.scene.aether_tabs.active_tab == 'IMPORT_EXPORT'
+        return visible_in_current_area(context) and get_active_tab(context) == 'IMPORT_EXPORT'
 
     def draw(self, context):
         layout = self.layout

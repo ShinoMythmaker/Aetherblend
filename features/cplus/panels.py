@@ -1,5 +1,6 @@
 import bpy
-from ...preferences import get_preferences
+from ...properties.tab_prop import get_active_tab
+from ...utils.ui_visibility import visible_in_current_area
 
 class AETHER_PT_CustomizePlus(bpy.types.Panel):
     bl_label = "Customize Plus"
@@ -11,7 +12,9 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        if context.scene.aether_tabs.active_tab != 'CPLUS':
+        if not visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'CPLUS':
             return False
 
         armature = context.active_object
