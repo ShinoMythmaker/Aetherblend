@@ -852,14 +852,23 @@ IV_HAND_R = BoneGroup(
             )
         ),
         #Thumb
+        CopyBone(
+            name="DEF-thumb_master.R",
+            source_bone="j_oya_a_r",
+            parent="hand.R",
+            req_bones=["hand.R", "j_oya_a_r"],
+            pose_operations=PoseOperations(
+                b_collection="DEF",
+                rigify_settings=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")
+                )),
         ConnectBone(
             name="thumb.R",
             bone_a="j_oya_a_r",
             bone_b="j_oya_b_r",
-            parent="hand.R",
-            roll=15,
+            parent="DEF-thumb_master.R",
             is_connected=False,
-            req_bones=["j_oya_a_r", "j_oya_b_r"],
+            roll=-15,
+            req_bones=["DEF-thumb_master.R", "j_oya_a_r", "j_oya_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
                 b_collection="Fingers.R",
@@ -1108,14 +1117,23 @@ HAND_R = BoneGroup(
             )
         ),
         #Thumb
+        CopyBone(
+            name="DEF-thumb_master.R",
+            source_bone="j_oya_a_r",
+            parent="hand.R",
+            req_bones=["hand.R", "j_oya_a_r"],
+            pose_operations=PoseOperations(
+                b_collection="DEF",
+                rigify_settings=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")
+                )),
         ConnectBone(
             name="thumb.R",
             bone_a="j_oya_a_r",
             bone_b="j_oya_b_r",
-            parent="palm.01.R",
-            roll=15,
+            parent="DEF-thumb_master.R",
             is_connected=False,
-            req_bones=["j_oya_a_r", "j_oya_b_r"],
+            roll=-15,
+            req_bones=["DEF-thumb_master.R", "j_oya_a_r", "j_oya_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
                 b_collection="Fingers.R",
@@ -1324,14 +1342,23 @@ IV_HAND_L = BoneGroup(
             )
         ),
         #Thumb
+        CopyBone(
+            name="DEF-thumb_master.L",
+            source_bone="j_oya_a_l",
+            parent="hand.L",
+            req_bones=["hand.L", "j_oya_a_l"],
+            pose_operations=PoseOperations(
+                b_collection="DEF",
+                rigify_settings=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")
+                )),
         ConnectBone(
             name="thumb.L",
             bone_a="j_oya_a_l",
             bone_b="j_oya_b_l",
-            parent="hand.L",
+            parent="DEF-thumb_master.L",
             is_connected=False,
             roll=-15,
-            req_bones=["j_oya_a_l", "j_oya_b_l"],
+            req_bones=["DEF-thumb_master.L", "j_oya_a_l", "j_oya_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
                 b_collection="Fingers.L",
@@ -1580,14 +1607,23 @@ HAND_L = BoneGroup(
             )
         ),
         #Thumb
+        CopyBone(
+            name="DEF-thumb_master.L",
+            source_bone="j_oya_a_l",
+            parent="hand.L",
+            req_bones=["hand.L", "j_oya_a_l"],
+            pose_operations=PoseOperations(
+                b_collection="DEF",
+                rigify_settings=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")
+                )),
         ConnectBone(
             name="thumb.L",
             bone_a="j_oya_a_l",
             bone_b="j_oya_b_l",
-            parent="palm.01.L",
+            parent="DEF-thumb_master.L",
             is_connected=False,
             roll=-15,
-            req_bones=["j_oya_a_l", "j_oya_b_l"],
+            req_bones=["DEF-thumb_master.L", "j_oya_a_l", "j_oya_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
                 b_collection="Fingers.L",
