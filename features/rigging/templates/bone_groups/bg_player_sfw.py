@@ -4,6 +4,7 @@ import mathutils
 from .....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone, RegexBoneGroup, ParallelBone
 from .....core.shared import PoseOperations, BoneGroup, TransformLink
 from .....core import rigify
+from .....core import drivers
 
 
 # Individual bone list (for backwards compatibility and direct access)
@@ -439,15 +440,15 @@ LEG_L = BoneGroup(
 SKIRT_R = BoneGroup(
         name="Skirt Right",
         transform_link= [
-            TransformLink(target="DEF-Skirt_Front.R", bone="j_sk_f_a_r"),
-            TransformLink(target="DEF-Skirt_Front.R.001", bone="j_sk_f_b_r"),
-            TransformLink(target="DEF-Skirt_Front.R.002", bone="j_sk_f_c_r"),
-            TransformLink(target="DEF-Skirt_Side.R", bone="j_sk_s_a_r"),
-            TransformLink(target="DEF-Skirt_Side.R.001", bone="j_sk_s_b_r"),
-            TransformLink(target="DEF-Skirt_Side.R.002", bone="j_sk_s_c_r"),
-            TransformLink(target="DEF-Skirt_Back.R", bone="j_sk_b_a_r"),
-            TransformLink(target="DEF-Skirt_Back.R.001", bone="j_sk_b_b_r"),
-            TransformLink(target="DEF-Skirt_Back.R.002", bone="j_sk_b_c_r"),
+            # TransformLink(target="DEF-Skirt_Front.R", bone="j_sk_f_a_r"),
+            # TransformLink(target="DEF-Skirt_Front.R.001", bone="j_sk_f_b_r"),
+            # TransformLink(target="DEF-Skirt_Front.R.002", bone="j_sk_f_c_r"),
+            # TransformLink(target="DEF-Skirt_Side.R", bone="j_sk_s_a_r"),
+            # TransformLink(target="DEF-Skirt_Side.R.001", bone="j_sk_s_b_r"),
+            # TransformLink(target="DEF-Skirt_Side.R.002", bone="j_sk_s_c_r"),
+            # TransformLink(target="DEF-Skirt_Back.R", bone="j_sk_b_a_r"),
+            # TransformLink(target="DEF-Skirt_Back.R.001", bone="j_sk_b_b_r"),
+            # TransformLink(target="DEF-Skirt_Back.R.002", bone="j_sk_b_c_r"),
             ],
         bones = [
             #Front
@@ -459,8 +460,17 @@ SKIRT_R = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
-                    b_collection="Skirt (Tweak)"
+                    rigify_settings = rigify.types.basic_raw_copy(widget_type="bone"),
+                    driver_settings = drivers.TransformDriver(
+                        driver_name = "Skirt_Front_R_Follow", 
+                        channel_target="rotation_quaternion", 
+                        driver_expression="var + 0", 
+                        channel_target_index=1,
+                        driver_variables=[
+                            drivers.TransformVariable(variable_name="Test", variable_target="j_asi_c_r", transform_type="ROT_Y", rotation_mode="QUATERNION", transform_space="LOCAL SPACE"),
+                            ],
+                        ),
+                    b_collection="Skirt"
                 )
             ),
             ConnectBone(
@@ -559,46 +569,6 @@ SKIRT_R = BoneGroup(
                 req_bones=["j_sk_b_c_r"],
                 pose_operations=PoseOperations(
                     b_collection="Skirt"
-                )
-            ),
-             #Front
-            ConnectBone(
-                name="Skirt_Front.R.mch",
-                bone_a="shin.R",
-                bone_b="Skirt_Front.R.002",
-                parent="shin.R",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Front.R.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Front.R.002"),
-                    b_collection="Skirt MCH"
-                )
-            ),
-            ConnectBone(
-                name="Skirt_Side.R.mch",
-                bone_a="shin.R",
-                bone_b="Skirt_Side.R.002",
-                parent="shin.R",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Side.R.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Side.R.002"),
-                    b_collection="Skirt MCH"
-                )
-            ),
-            ConnectBone(
-                name="Skirt_Back.R.mch",
-                bone_a="shin.R",
-                bone_b="Skirt_Back.R.002",
-                parent="shin.R",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Back.R.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Back.R.002"),
-                    b_collection="Skirt MCH"
                 )
             ),
         ],
@@ -1871,7 +1841,7 @@ HEAD = BoneGroup(
         TransformLink(target="DEF-Tongue.002", bone="j_f_bero_03"),
         TransformLink(target="DEF-Ear.R", bone="j_mimi_r"),
         TransformLink(target="DEF-Ear.L", bone="j_mimi_l")
-    ],
+    ], # 10/10 list, no comments - Oats
     bones=[
         ConnectBone(
             name="Neck",
@@ -2122,7 +2092,12 @@ HEAD = BoneGroup(
             is_connected=False,
             req_bones=["j_f_ulip_01_r", "Mouth.Center"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 0.0, -1.0], primary_layer_extra="Face (Primary)"),
+                rigify_settings=rigify.types.skin_stretchy_chain(
+                    skin_control_orientation_bone="Head", 
+                    skin_chain_falloff_length=True, 
+                    skin_chain_falloff=[0.0, 0.0, -1.0], 
+                    primary_layer_extra="Face (Primary)"),
+                    skin_chain_use_scale=[True, True, True],
                 b_collection="Face (Secondary)"
             )
         ),
