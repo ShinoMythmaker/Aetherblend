@@ -125,7 +125,7 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
             return
         
         row = layout.row(align=True)
-        row.label(text="Inherit Scale", icon='BONE_DATA')
+        row.label(text="Inherit Scale", icon='ORIENTATION_PARENT')
         
         current_text = "Full"
         if aether_rig:
@@ -139,6 +139,17 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
             current_text = scale_labels.get(aether_rig.link_inherit_scale, 'Full')
         
         row.operator_menu_enum("aether.set_bone_inherit_scale", "inherit_scale", text=current_text)
+
+        layout.separator()
+
+        row = layout.row(align=True)
+
+        row.label(text="NoAnim Bones", icon='BONE_DATA')
+        row.operator(
+            "aether.delete_no_anim",
+            text="Delete",
+            icon="TRASH", 
+            )
 
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
