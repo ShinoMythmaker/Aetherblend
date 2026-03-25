@@ -4,7 +4,6 @@ import mathutils
 from .....core.generators import ConnectBone, ExtensionBone, SkinBone, BridgeBone, CenterBone, CopyBone, RegexBoneGroup, ParallelBone
 from .....core.shared import PoseOperations, BoneGroup, TransformLink
 from .....core import rigify
-from .....core import drivers
 
 
 # Individual bone list (for backwards compatibility and direct access)

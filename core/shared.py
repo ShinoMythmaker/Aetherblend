@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 from . import rigify
 from .constraints import Constraint, CopyTransformsConstraint
 from .. import utils
-from . import drivers
+from ..features import drivers
 
 @dataclass
 class PoseOperations:
