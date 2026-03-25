@@ -1,5 +1,7 @@
 """Character import operators."""
 
+import re
+
 import bpy
 from bpy.props import BoolProperty, StringProperty, EnumProperty
 from bpy_extras.io_utils import axis_conversion
@@ -29,6 +31,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
     s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
     s_create_backup_armature: BoolProperty(name="Create Backup Armature", description="Creates a backup armature for C+ reversion after import", default=True)  # type: ignore
+
+    s_clear_noanim_bones: BoolProperty(name="Clear NoAnim Bones", description="Deletes all 'noanim' bones from the armature to prevent unintended behaviour when importing animations to Final Fantasy XIV", default=True)  # type: ignore
     
     # Bone Axis Orientation (FBX-style)
     primary_bone_axis: EnumProperty(
@@ -144,6 +148,10 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         split.label(text=" ")
         split.prop(self, "s_create_backup_armature")
 
+        split = col.split(factor=indent)  
+        split.label(text=" ")
+        split.prop(self, "s_clear_noanim_bones")
+
         # Bone Orientation Section
         box = layout.box()
         row = box.row()
@@ -196,6 +204,9 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
 
         armature = utils.armature.find_armature_in_objects(imported_objects)
         if armature:
+            if self.s_clear_noanim_bones:
+                clear_noanim_bones(armature) #Removes noanim bones to prevent issues on import to game
+
             # Apply bone axis conversion if enabled
             if self.use_bone_axis_conversion:
                 apply_bone_axis_conversion(armature, self.primary_bone_axis, self.secondary_bone_axis)
@@ -316,6 +327,22 @@ def clear_animation_data(armature: bpy.types.Object) -> None:
         armature.animation_data_clear()    
     except Exception as e:
         print(f"[AetherBlend] Warning: Could not clear '{armature.name}''s animation_data: {e}")
+
+def clear_noanim_bones(armature: bpy.types.Object) -> None:
+    pattern = "noanim"
+    
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    edit_bones = armature.data.edit_bones
+    for bone in edit_bones:
+        if pattern in bone.name:
+            edit_bones.remove(bone)
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    print(f"[AetherBlend] Cleared noanim bones from armature '{armature.name}'.")
+        
+
 
 
 def register():
