@@ -18,7 +18,6 @@ class PoseOperations:
     rigify_settings: 'rigify.types.rigify_type | None' = None
     constraints: 'list[Constraint] | None' = None
     b_collection: str | None = None
-    driver_settings: 'drivers.TransformDriver | None' = None
 
     def execute(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object):
         """Executes all pose operations on the given pose bone."""
@@ -32,8 +31,6 @@ class PoseOperations:
             
             if self.b_collection:
                 utils.armature.b_collection.assign_bones(armature, [pose_bone.name], self.b_collection)
-            if self.driver_settings:
-                self.driver_settings.apply_driver(pose_bone, armature)
         except Exception as e:
             print(f"[AetherBlend] Error executing PoseOperations for bone: {e}")
 

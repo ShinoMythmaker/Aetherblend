@@ -251,7 +251,6 @@ class skin_stretchy_chain(rigify_type):
     skin_chain_falloff_length: bool = None
     skin_chain_falloff_spherical: list = None
     skin_chain_priority: int = None
-    skin_chain_use_scale: list = None
     primary_layer_extra: str = None
     secondary_layer_extra: str = None
     skin_control_orientation_bone: str = None

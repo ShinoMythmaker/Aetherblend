@@ -461,15 +461,6 @@ SKIRT_R = BoneGroup(
                 req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
                 pose_operations=PoseOperations(
                     rigify_settings = rigify.types.basic_raw_copy(widget_type="bone"),
-                    driver_settings = drivers.TransformDriver(
-                        driver_name = "Skirt_Front_R_Follow", 
-                        channel_target="rotation_quaternion", 
-                        driver_expression="var + 0", 
-                        channel_target_index=1,
-                        driver_variables=[
-                            drivers.TransformVariable(variable_name="Test", variable_target="j_asi_c_r", transform_type="ROT_Y", rotation_mode="QUATERNION", transform_space="LOCAL SPACE"),
-                            ],
-                        ),
                     b_collection="Skirt"
                 )
             ),
@@ -2097,7 +2088,6 @@ HEAD = BoneGroup(
                     skin_chain_falloff_length=True, 
                     skin_chain_falloff=[0.0, 0.0, -1.0], 
                     primary_layer_extra="Face (Primary)"),
-                    skin_chain_use_scale=[True, True, True],
                 b_collection="Face (Secondary)"
             )
         ),

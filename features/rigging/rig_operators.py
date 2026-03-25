@@ -48,7 +48,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         unlinked_coll = meta_rig.data.collections.get("Unlinked")
         ffxiv_coll = meta_rig.data.collections.get("FFXIV")
 
-        ## Setup for mendatory collections 
+        ## Setup for mandatory collections 
         if not linked_coll:
             linked_coll=meta_rig.data.collections.new("Linked")
         if not unlinked_coll:
