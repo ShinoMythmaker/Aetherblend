@@ -140,6 +140,16 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
         
         row.operator_menu_enum("aether.set_bone_inherit_scale", "inherit_scale", text=current_text)
 
+        layout.separator()
+
+        row = layout.row(align=True)
+
+        row.label(text="Delete NoAnim", icon='TRASH')
+        row.operator(
+            "aether.delete_no_anim", 
+            text="Delete", 
+            )
+
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
     bl_label = "Rig Layers"

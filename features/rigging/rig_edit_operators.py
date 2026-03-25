@@ -43,8 +43,36 @@ class AETHER_OT_SetBoneInheritScale(Operator):
         self.report({'INFO'}, f"Updated {bone_count} bones in LINK collection")
         return {'FINISHED'}
 
+class AETHER_OT_DeleteNoAnim(Operator):
+    bl_idname = "aether.delete_no_anim"
+    bl_label = "Delete NoAnim"
+    bl_description = "Deletes all bones containing the 'noanim' flag."
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    def execute(self, context):
+        pattern = "noanim"
+        armature = context.active_object
+        original_mode = context.active_object.mode
+
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        edit_bones = armature.data.edit_bones
+        
+        for bone in edit_bones:
+            if pattern in bone.name:
+                edit_bones.remove(bone)
+
+        bpy.ops.object.mode_set(mode=original_mode)  
+        return {'FINISHED'}
+
 def register():
+    bpy.utils.register_class(AETHER_OT_DeleteNoAnim)
     bpy.utils.register_class(AETHER_OT_SetBoneInheritScale)
 
 def unregister():
+    bpy.utils.unregister_class(AETHER_OT_DeleteNoAnim)
     bpy.utils.unregister_class(AETHER_OT_SetBoneInheritScale)
