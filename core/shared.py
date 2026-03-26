@@ -139,7 +139,6 @@ class PropOverride(Override):
         except Exception as e:
             print(f"[AetherBlend] Error applying PropOverride for bone '{pose_bone.name}': {e}")
 
-
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
@@ -226,7 +225,14 @@ class BoneGroup:
                 pose_operations_dict[bone_gen.name].append(bone_gen.pose_operations)
         
         return generated_bones, pose_operations_dict
-    
+
+@dataclass
+class RigModule:
+    """Defines a rig module with its bone groups and generation logic."""
+    name: str
+    type: str
+    bone_groups: list[BoneGroup]
+
 @dataclass(frozen=True)
 class AetherRigGenerator:
     """Generates an armature based on defined bone groups."""
@@ -234,7 +240,7 @@ class AetherRigGenerator:
     color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None
     ui_collections: 'list[dict[str, rigify.BoneCollection]] | None' = None
     overrides: 'list[dict[str, Override]] | None' = None
-    bone_groups: 'list[dict[str, list[BoneGroup]]] | None' = None
+    modules: 'list[RigModule] | None' = None
 
     def getColorSets(self) -> dict[str, rigify.ColorSet]:
         """Combine all color sets into a single dictionary."""
@@ -257,10 +263,12 @@ class AetherRigGenerator:
             combined.update(ov_dict)
         return combined
     
-    def getBoneGroups(self) -> dict[str, list[BoneGroup]]:
-        """Combine all bone groups into a single dictionary."""
+    def getBoneGroupsFromModules(self) -> dict[str, list[BoneGroup]]:
+        """Combine all bone groups from modules into a single dictionary categorized by module type."""
         combined: dict[str, list[BoneGroup]] = {}
-        for bg_dict in self.bone_groups or []:
-            combined.update(bg_dict)
+        for module in self.modules or []:
+            if module.type not in combined:
+                combined[module.type] = []
+            combined[module.type].extend(module.bone_groups)
         return combined
 

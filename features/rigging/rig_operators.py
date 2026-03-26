@@ -117,7 +117,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         generated_bones = []
         # Loop through all bone groups
-        for bone_group_handler in aether_rig_generator.getBoneGroups().values():
+        for bone_group_handler in aether_rig_generator.getBoneGroupsFromModules().values():
             for bone_group in bone_group_handler:
                 bones, pose_ops = bone_group.execute(meta_rig, data)
 

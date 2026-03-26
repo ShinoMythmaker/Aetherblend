@@ -35,7 +35,7 @@ def get_rig_generator(aether_rig):
         color_sets=color_sets,
         ui_collections=template.ui_collections,
         overrides=template.overrides,
-        bone_groups=template.bone_groups
+        modules=template.modules
     )
 
 def register():
