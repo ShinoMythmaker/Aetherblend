@@ -119,7 +119,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             for module in modules:
                 integrity, all_pose_operations = module.execute(meta_rig, data, all_pose_operations)
                 if integrity:
-                    break # If at least one bone group executed successfully, we consider this module as the successful one for this type and break out of the loop to avoid executing fallback modules of the same type
+                    break 
 
         ## Cleanup unlinked Bones and assign Collection to FFXIV bones
         data_bones = meta_rig.data.bones
