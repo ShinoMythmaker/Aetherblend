@@ -233,7 +233,26 @@ class RigModule:
     type: str
     bone_groups: list[BoneGroup]
 
-    ###### execute function goes right here ! you got this !!!
+    def execute(self, armature: bpy.types.Object, data: dict, all_pose_operations: dict[str, list[PoseOperations]]):
+        bpy.context.view_layer.objects.active = armature
+        
+        integrity = False  # keeps track if any bone group executed successfully, if not then we move to the next module of the same type as a fallback mechanism
+        for bone_group in self.bone_groups:
+            bones, pose_ops = bone_group.execute(armature, data)
+
+            if not bones and not pose_ops:
+                continue # Skip if nothing to process
+                
+            integrity = True # Mark as successful execution of at least one bone group
+
+            # Merge operations, appending to existing lists                    
+            for bone_name, ops_list in pose_ops.items():
+                if bone_name not in all_pose_operations:
+                    all_pose_operations[bone_name] = [] 
+                all_pose_operations[bone_name].extend(ops_list)
+
+        return integrity, all_pose_operations
+        
 
 @dataclass(frozen=True)
 class AetherRigGenerator:

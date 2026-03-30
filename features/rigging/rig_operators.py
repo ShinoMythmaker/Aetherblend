@@ -115,25 +115,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if len(data) == 0:
             data = None
 
-        ###### MARKED FOR REFACTOR
         for modules in aether_rig_generator.getModules().values():
             for module in modules:
-                bone_groups = module.bone_groups
-                integrity = False  # keeps track if any bone group executed successfully, if not then we move to the next module of the same type as a fallback mechanism
-                for bone_group in bone_groups:
-                    bones, pose_ops = bone_group.execute(meta_rig, data)
-
-                    if not bones and not pose_ops:
-                        continue # Skip if nothing to process
-                        
-                    integrity = True # Mark as successful execution of at least one bone group
-
-                    # Merge operations, appending to existing lists                    
-                    for bone_name, ops_list in pose_ops.items():
-                        if bone_name not in all_pose_operations:
-                            all_pose_operations[bone_name] = [] 
-                        all_pose_operations[bone_name].extend(ops_list)
-
+                integrity, all_pose_operations = module.execute(meta_rig, data, all_pose_operations)
                 if integrity:
                     break # If at least one bone group executed successfully, we consider this module as the successful one for this type and break out of the loop to avoid executing fallback modules of the same type
 
