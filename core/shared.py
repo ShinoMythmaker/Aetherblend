@@ -233,6 +233,8 @@ class RigModule:
     type: str
     bone_groups: list[BoneGroup]
 
+    ###### execute function goes right here ! you got this !!!
+
 @dataclass(frozen=True)
 class AetherRigGenerator:
     """Generates an armature based on defined bone groups."""

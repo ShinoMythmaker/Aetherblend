@@ -115,25 +115,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if len(data) == 0:
             data = None
 
-        # # Loop through all bone groups
-        # for bone_group_handler in aether_rig_generator.getBoneGroupsFromModules().values():
-        #     for bone_group in bone_group_handler:
-        #         bones, pose_ops = bone_group.execute(meta_rig, data)
-
-        #         if not bones and not pose_ops:
-        #             continue # Skip if nothing to process
-            
-        #         # Merge operations, appending to existing lists
-        #         for bone_name, ops_list in pose_ops.items():
-        #             if bone_name not in all_pose_operations:
-        #                 all_pose_operations[bone_name] = []
-        #             all_pose_operations[bone_name].extend(ops_list)
-                
-        #         break  # Only process the first matching bone group
-
-
-        # Refactor of code above, we now loop through rig modules each type executes the first rig modules, if all bonegroups fail inside of this module, then it will move to the next module of the same type and execute its bone groups, this allows us to have fallback modules in case of failure without having to hardcode it in the generator.]
-
+        ###### MARKED FOR REFACTOR
         for modules in aether_rig_generator.getModules().values():
             for module in modules:
                 bone_groups = module.bone_groups
