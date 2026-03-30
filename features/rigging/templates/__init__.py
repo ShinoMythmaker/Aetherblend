@@ -35,4 +35,11 @@ TEMPLATES = {
         overrides=[WO_NSFW, PO_DEFAULT],
         modules = [spine.default, arms.default, legs.default, skirt.default, hands.ivcs, toes.ivcs, tail.default, face.detailed, ears.miqo, ears.viera, hair.default, genitals.ivcs_both]
     ),
+    'Dynamic': AetherRigGenerator(
+        name= "Dynamic",
+        color_sets=[CS_AETHER_BLEND],
+        ui_collections=[UI_PLAYER_NSFW_IV],  
+        overrides=[WO_NSFW, PO_DEFAULT],
+        modules = [spine.default, arms.default, legs.default, skirt.default, hands.ivcs, hands.default, toes.ivcs, tail.default, face.detailed, ears.miqo, ears.viera, hair.default, genitals.ivcs_both]
+    ),
 }

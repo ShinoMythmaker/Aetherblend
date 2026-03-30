@@ -263,12 +263,21 @@ class AetherRigGenerator:
             combined.update(ov_dict)
         return combined
     
-    def getBoneGroupsFromModules(self) -> dict[str, list[BoneGroup]]:
+    def getBoneGroupsFromModules(self) -> dict[str, list[list[BoneGroup]]]:
         """Combine all bone groups from modules into a single dictionary categorized by module type."""
-        combined: dict[str, list[BoneGroup]] = {}
+        combined: dict[str, list[list[BoneGroup]]] = {}
         for module in self.modules or []:
             if module.type not in combined:
                 combined[module.type] = []
-            combined[module.type].extend(module.bone_groups)
+            combined[module.type].append(module.bone_groups)
+        return combined
+    
+    def getModules(self) -> dict[str, list[RigModule]]:
+        """Combine all modules into a single dictionary categorized by module type."""
+        combined: dict[str, list[RigModule]] = {}
+        for module in self.modules or []:
+            if module.type not in combined:
+                combined[module.type] = []
+            combined[module.type].append(module)
         return combined
 
