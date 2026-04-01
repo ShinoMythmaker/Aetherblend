@@ -63,6 +63,11 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
             col.separator()
 
             row = col.row(align=True)
+            row.operator("aether.parse_cplus_from_mcdf", text="Parse from MCDF file", icon = "IMPORT")
+
+            col.separator()
+
+            row = col.row(align=True)
             if aether_rig.rigified:
                 row = col.row(align=True)
                 row.operator("aether.clean_up_rig", text="Clean Up Rig", icon="BRUSH_DATA")

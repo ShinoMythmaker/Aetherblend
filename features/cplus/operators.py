@@ -208,12 +208,26 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
         self.report({'INFO'}, "Reverted CPlus changes to backup armature state.")
         return {'FINISHED'}
     
+class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
+    bl_label = "Parse from MCDF file"
+    bl_idname = "aether.parse_cplus_from_mcdf"
+    bl_description = (
+        "Parses the C+ string from an MCDF file."
+    )
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        self.report({'INFO'}, "Test")
+        return {'FINISHED'}
+
 def register():
     bpy.utils.register_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.register_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.register_class(AETHER_OT_RevertToBackup)
+    bpy.utils.register_class(AETHER_OT_ParseFromMCDF)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.unregister_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.unregister_class(AETHER_OT_RevertToBackup)
+    bpy.utils.unregister_class(AETHER_OT_ParseFromMCDF)
