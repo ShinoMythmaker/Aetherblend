@@ -226,20 +226,20 @@ def get_mcdf_cplus(path: str) -> str | None:
 
                 data.extend(chunk)
 
-        data_reader = BytesIO(data)
-        signature = data_reader.read(4).decode('utf-8')
+        with BytesIO(data) as data_reader:
+            signature = data_reader.read(4).decode('utf-8')
 
-        if signature != 'MCDF':
-            raise Exception(f'"MCDF" expected at the start of the file, got "{signature}" instead.')
+            if signature != 'MCDF':
+                raise Exception(f'"MCDF" expected at the start of the file, got "{signature}" instead.')
 
-        version = read_byte(data_reader)
+            version = read_byte(data_reader)
 
-        if version != 1:
-            raise Exception(f'Version {version} is unsupported.')
+            if version != 1:
+                raise Exception(f'Version {version} is unsupported.')
 
-        mcdf_json_size = read_int(data_reader)
-        mcdf_json = json.loads(data_reader.read(mcdf_json_size).decode('utf-8'))
-        return mcdf_json['CustomizePlusData']
+            mcdf_json_size = read_int(data_reader)
+            mcdf_json = json.loads(data_reader.read(mcdf_json_size).decode('utf-8'))
+            return mcdf_json['CustomizePlusData']
     except Exception as e:
         print("[AetherBlend] Failed to parse C+ string from MCDF file:", e)
         return None

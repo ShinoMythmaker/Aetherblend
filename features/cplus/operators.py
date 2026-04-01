@@ -29,8 +29,8 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         try:
             decoded = base64.b64decode(cplus_string)
 
-            data_reader = BytesIO(decoded)
-            signature = decoder.read_int(data_reader)
+            with BytesIO(decoded) as data_reader:
+                signature = decoder.read_int(data_reader)
 
             # Gzip Header
             if signature == 0x88B1F:
