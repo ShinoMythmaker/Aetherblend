@@ -1,4 +1,3 @@
-import base64
 import json
 import zlib
 import bpy
