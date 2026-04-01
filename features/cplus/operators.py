@@ -1,5 +1,9 @@
 import bpy
+import base64
+import json
+
 from bpy.props import StringProperty
+from io import BytesIO
 
 from ... import utils
 from . import decoder
@@ -22,9 +26,31 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
             self.report({'ERROR'}, "Please select a valid armature.")
             return {'CANCELLED'}
 
-        version, cplus_dict = decoder.translate_hash(cplus_string)
-        if not cplus_dict or version not in [4, 5]:
-            self.report({'ERROR'}, "Invalid or unsupported C+ string (must be version 4 or 5).")
+        try:
+            decoded = base64.b64decode(cplus_string)
+
+            data_reader = BytesIO(decoded)
+            signature = decoder.read_int(data_reader)
+
+            # Gzip Header
+            if signature == 0x88B1F:
+                version, cplus_dict = decoder.translate_hash(decoded)
+
+                if not cplus_dict:
+                    raise Exception('Invalid C+ String.')
+
+                if version not in [4, 5]:
+                    raise Exception('Unsupported C+ string (must be version 4 or 5).')
+            # MCDF C+ Strings are not compressed, and doesn't have a Version
+            else:
+                cplus_dict = json.loads(decoded)
+
+                # Unlike the regular C+ Strings, there's not that much to verify, so we just go with Bones
+                if 'Bones' not in cplus_dict:
+                    raise Exception('Invalid C+ String.')
+        except Exception as e:
+            print("[AetherBlend] Failed to Apply C+ String:", e)
+            self.report({'ERROR'}, "[AetherBlend] Invalid or Unsupported C+ String.")
             return {'CANCELLED'}
 
         scale_dict = decoder.get_bone_values(cplus_dict, 'Scaling')

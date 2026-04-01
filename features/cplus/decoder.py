@@ -11,20 +11,15 @@ from bpy_extras.io_utils import axis_conversion
 from mathutils import Matrix
 from io import BufferedIOBase, BytesIO
 
-def translate_hash(the_hasherrrr: str) -> tuple[int | None, dict]:
+def translate_hash(the_hasherrrr: bytes) -> tuple[int, dict]:
     """
-    Decodes and decompresses a C+ string, returning the version and data dict.
+    Decompresses a C+ string, returning the version and data dict.
     """
-    try:
-        decoded = base64.b64decode(the_hasherrrr)
-        inflated = zlib.decompress(decoded, zlib.MAX_WBITS | 16)
-        version = inflated[0]
-        json_str = inflated.decode('utf-8')
-        data = json.loads(json_str[1:])
-        return version, data
-    except Exception as e:
-        print("[AetherBlend] Failed to parse C+ string:", e)
-        return None, {}
+    inflated = zlib.decompress(the_hasherrrr, zlib.MAX_WBITS | 16)
+    version = inflated[0]
+    json_str = inflated.decode('utf-8')
+    data = json.loads(json_str[1:])
+    return version, data
 
 def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
     """
