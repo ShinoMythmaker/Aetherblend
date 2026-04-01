@@ -1,4 +1,5 @@
 import bpy
+from bpy.props import StringProperty
 
 from ... import utils
 from . import decoder
@@ -216,8 +217,22 @@ class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
     )
     bl_options = {'REGISTER', 'UNDO'}
 
+    filepath: StringProperty(subtype="FILE_PATH")  # type: ignore
+    filter_glob: StringProperty(default='*.mcdf', options={'HIDDEN'})  # type: ignore
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
     def execute(self, context):
-        self.report({'INFO'}, "Test")
+        context.window.cursor_set('WAIT')
+
+        if not self.filepath or not self.filepath.lower().endswith('.mcdf'): 
+            self.report({'ERROR'}, "[AetherBlend] Invalid file format. Please select a .mcdf file.")
+            return {'CANCELLED'}
+
+        self.report({'INFO'}, self.filepath)
+        context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
 
 def register():
