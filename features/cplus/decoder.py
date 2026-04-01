@@ -28,8 +28,20 @@ def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
     bones = cplus_dict.get('Bones', {})
     new_bones = defaultdict(dict)
     for key in bones.keys():
+        if value_key not in bones[key]:
+            continue
+
         values = bones[key][value_key]
         if value_key in ['Translation', 'Rotation']:
+            if 'X' not in values:
+                values['X'] = 0.0
+            
+            if 'Y' not in values:
+                values['Y'] = 0.0
+
+            if 'Z' not in values:
+                values['Z'] = 0.0
+
             if values['X'] == values['Y'] == values['Z'] == 0.0:
                 continue
         new_bones[key] = values
