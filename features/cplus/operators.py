@@ -227,11 +227,22 @@ class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
     def execute(self, context):
         context.window.cursor_set('WAIT')
 
+        armature = context.active_object
+        cplus = getattr(armature, 'aether_cplus', None)
+
         if not self.filepath or not self.filepath.lower().endswith('.mcdf'): 
             self.report({'ERROR'}, "[AetherBlend] Invalid file format. Please select a .mcdf file.")
             return {'CANCELLED'}
+        
+        cplus_string = decoder.get_mcdf_cplus(self.filepath)
 
-        self.report({'INFO'}, self.filepath)
+        if cplus_string is None:
+            self.report({'ERROR'}, "Invalid MCDF file.")
+            return {'CANCELLED'}
+        
+        cplus.code = cplus_string
+        self.report({'INFO'}, '[AetherBlend] C+ String read from MCDF file successfully.')
+
         context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
 
