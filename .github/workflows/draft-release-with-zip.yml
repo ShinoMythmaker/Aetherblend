@@ -37,7 +37,7 @@ jobs:
           set -e
           zipfile="${{ steps.vars.outputs.repo_name }}-${{ steps.vars.outputs.tag }}.zip"
           # Exclude repo.json, .gitignore, .git and .github
-          zip -r "$zipfile" . -x 'repo.json' '.gitignore' '.git/*' '.github/*'
+          zip -r "$zipfile" . -x 'repo.json' '.gitignore' '.git/*' '.github/*' 'get_dependencies.py'
           echo "ZIP file created: $zipfile"
 
       - name: Create draft release and upload ZIP
