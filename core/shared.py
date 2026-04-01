@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import bpy
 
 from abc import ABC
@@ -34,6 +36,23 @@ class PoseOperations:
         except Exception as e:
             print(f"[AetherBlend] Error executing PoseOperations for bone: {e}")
 
+
+class PoseOperationsStack:
+    """Holds function for merging multiple PoseOperations into one dictionary"""
+
+    stack: dict[str, list[PoseOperations]]
+    
+    def __init__(self, stack: dict[str, list[PoseOperations]] | None = None):
+        self.stack = stack if stack is not None else {}
+
+    def merge(self, diff: PoseOperationsStack):
+        """Merges multiple PoseOperations into one dictionary"""
+        
+        for bone_name, ops_list in diff.stack.items():
+            if bone_name not in self.stack:
+                self.stack[bone_name] = []
+            self.stack[bone_name].extend(ops_list)
+    
 @dataclass
 class TransformLink:
     """Links a bone to a target for rigging purposes."""
@@ -233,8 +252,11 @@ class RigModule:
     type: str
     bone_groups: list[BoneGroup]
 
-    def execute(self, armature: bpy.types.Object, data: dict, all_pose_operations: dict[str, list[PoseOperations]]):
+    def execute(self, armature: bpy.types.Object, data: dict) -> tuple[bool, PoseOperationsStack]:
+        
         bpy.context.view_layer.objects.active = armature
+
+        pose_op_stack = PoseOperationsStack()
         
         integrity = False  # keeps track if any bone group executed successfully, if not then we move to the next module of the same type as a fallback mechanism
         for bone_group in self.bone_groups:
@@ -245,13 +267,13 @@ class RigModule:
                 
             integrity = True # Mark as successful execution of at least one bone group
 
-            # Merge operations, appending to existing lists                    
-            for bone_name, ops_list in pose_ops.items():
-                if bone_name not in all_pose_operations:
-                    all_pose_operations[bone_name] = [] 
-                all_pose_operations[bone_name].extend(ops_list)
+            # Merge operations, appending to existing lists
+            
+        
+            pose_op_stack.merge(PoseOperationsStack(stack = pose_ops))
+            
 
-        return integrity, all_pose_operations
+        return integrity, pose_op_stack
         
 
 @dataclass(frozen=True)
