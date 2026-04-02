@@ -63,14 +63,9 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         meta_rig_collections.move(ffxiv_coll.index, 2)  # Move FFXIV to the third position
         
         ## This will make sure all FF bones will carry over to the rigify rig
-        all_pose_operations: dict[str, list[PoseOperations]] = {}
+        pose_ops_stack = PoseOperationsStack()
         for bone in meta_rig.data.bones:
-            ops_list = [
-                PoseOperations(
-                    rigify_settings=rigify.types.basic_raw_copy(True)
-                )
-            ]    
-            all_pose_operations[bone.name] = ops_list
+            pose_ops_stack.add(bone.name, PoseOperations(rigify_settings=rigify.types.basic_raw_copy(True)))
 
         # Preliminary LINK bone generation and joining
         link_rig = utils.armature.duplicate(armature)
@@ -116,16 +111,12 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if len(data) == 0:
             data = None
 
-        stack = PoseOperationsStack(stack =  all_pose_operations)
-
         for modules in aether_rig_generator.getModules().values():
             for module in modules:
                 integrity, module_pose_ops = module.execute(meta_rig, data)
-                stack.merge(module_pose_ops)
+                pose_ops_stack.merge(module_pose_ops)
                 if integrity:
-                    break # If at least one bone group executed successfully, we consider this module as the successful one for this type and break out of the loop to avoid executing fallback modules of the same type
-        
-        all_pose_operations = stack.stack
+                    break 
 
         ## Cleanup unlinked Bones and assign Collection to FFXIV bones
         data_bones = meta_rig.data.bones
@@ -134,23 +125,16 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             ffxiv_coll = meta_rig.data.collections.get("FFXIV")
             if ffxiv_coll and bone.name in ffxiv_coll.bones:
                 if not bone.get("ab_linked", False):
-                    pose_op = PoseOperations(
+                    pose_ops_stack.add(bone.name, PoseOperations(
                         b_collection="Unlinked",
-                    )
-                    if bone.name not in all_pose_operations:
-                        all_pose_operations[bone.name] = []
-                    all_pose_operations[bone.name].extend([pose_op])
-
+                    ))
                     link_bone = meta_rig.data.bones.get(f"LINK-{bone.name}")
                     if link_bone:
                         bones_to_delete.append(link_bone.name)
                 else:
-                    pose_op = PoseOperations(
+                    pose_ops_stack.add(bone.name, PoseOperations(
                         b_collection="Linked",
-                    )
-                    if bone.name not in all_pose_operations:
-                        all_pose_operations[bone.name] = []
-                    all_pose_operations[bone.name].extend([pose_op])
+                    ))
         
         
         bpy.ops.object.mode_set(mode='EDIT')
@@ -162,10 +146,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         # Now apply all operations per bone
         bpy.ops.object.mode_set(mode='POSE')
-        for bone_name, ops_list in all_pose_operations.items():
-            bone = meta_rig.pose.bones.get(bone_name)
-            for ops in ops_list:
-                ops.execute(bone, meta_rig)
+        pose_ops_stack.execute(meta_rig)
        
                 
         for hide_coll in hide_collections:

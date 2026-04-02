@@ -45,13 +45,28 @@ class PoseOperationsStack:
     def __init__(self, stack: dict[str, list[PoseOperations]] | None = None):
         self.stack = stack if stack is not None else {}
 
+    def add(self, bone_name: str, operations: PoseOperations):
+        """Adds PoseOperations to the stack for a specific bone."""
+        if bone_name not in self.stack:
+            self.stack[bone_name] = []
+        self.stack[bone_name].append(operations)
+
     def merge(self, diff: PoseOperationsStack):
         """Merges multiple PoseOperations into one dictionary"""
-        
         for bone_name, ops_list in diff.stack.items():
             if bone_name not in self.stack:
                 self.stack[bone_name] = []
             self.stack[bone_name].extend(ops_list)
+
+    def execute(self, armature: bpy.types.Object):
+        """Executes all PoseOperations in the stack on the corresponding bones."""
+        for bone_name, ops_list in self.stack.items():
+            pose_bone = armature.pose.bones.get(bone_name)
+            if pose_bone:
+                for ops in ops_list:
+                    ops.execute(pose_bone, armature)
+            else:
+                print(f"[AetherBlend] PoseOperationsStack: Bone '{bone_name}' not found in armature.")
     
 @dataclass
 class TransformLink:
