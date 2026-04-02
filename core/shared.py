@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import bpy
 
 from abc import ABC
@@ -34,6 +36,38 @@ class PoseOperations:
         except Exception as e:
             print(f"[AetherBlend] Error executing PoseOperations for bone: {e}")
 
+
+class PoseOperationsStack:
+    """Holds function for merging multiple PoseOperations into one dictionary"""
+
+    stack: dict[str, list[PoseOperations]]
+    
+    def __init__(self, stack: dict[str, list[PoseOperations]] | None = None):
+        self.stack = stack if stack is not None else {}
+
+    def add(self, bone_name: str, operations: PoseOperations):
+        """Adds PoseOperations to the stack for a specific bone."""
+        if bone_name not in self.stack:
+            self.stack[bone_name] = []
+        self.stack[bone_name].append(operations)
+
+    def merge(self, diff: PoseOperationsStack):
+        """Merges multiple PoseOperations into one dictionary"""
+        for bone_name, ops_list in diff.stack.items():
+            if bone_name not in self.stack:
+                self.stack[bone_name] = []
+            self.stack[bone_name].extend(ops_list)
+
+    def execute(self, armature: bpy.types.Object):
+        """Executes all PoseOperations in the stack on the corresponding bones."""
+        for bone_name, ops_list in self.stack.items():
+            pose_bone = armature.pose.bones.get(bone_name)
+            if pose_bone:
+                for ops in ops_list:
+                    ops.execute(pose_bone, armature)
+            else:
+                print(f"[AetherBlend] PoseOperationsStack: Bone '{bone_name}' not found in armature.")
+    
 @dataclass
 class TransformLink:
     """Links a bone to a target for rigging purposes."""
@@ -139,7 +173,6 @@ class PropOverride(Override):
         except Exception as e:
             print(f"[AetherBlend] Error applying PropOverride for bone '{pose_bone.name}': {e}")
 
-
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
@@ -226,7 +259,38 @@ class BoneGroup:
                 pose_operations_dict[bone_gen.name].append(bone_gen.pose_operations)
         
         return generated_bones, pose_operations_dict
-    
+
+@dataclass
+class RigModule:
+    """Defines a rig module with its bone groups and generation logic."""
+    name: str
+    type: str
+    bone_groups: list[BoneGroup]
+
+    def execute(self, armature: bpy.types.Object, data: dict) -> tuple[bool, PoseOperationsStack]:
+        
+        bpy.context.view_layer.objects.active = armature
+
+        pose_op_stack = PoseOperationsStack()
+        
+        integrity = False  # keeps track if any bone group executed successfully, if not then we move to the next module of the same type as a fallback mechanism
+        for bone_group in self.bone_groups:
+            bones, pose_ops = bone_group.execute(armature, data)
+
+            if not bones and not pose_ops:
+                continue # Skip if nothing to process
+                
+            integrity = True # Mark as successful execution of at least one bone group
+
+            # Merge operations, appending to existing lists
+            
+        
+            pose_op_stack.merge(PoseOperationsStack(stack = pose_ops))
+            
+
+        return integrity, pose_op_stack
+        
+
 @dataclass(frozen=True)
 class AetherRigGenerator:
     """Generates an armature based on defined bone groups."""
@@ -234,7 +298,7 @@ class AetherRigGenerator:
     color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None
     ui_collections: 'list[dict[str, rigify.BoneCollection]] | None' = None
     overrides: 'list[dict[str, Override]] | None' = None
-    bone_groups: 'list[dict[str, list[BoneGroup]]] | None' = None
+    modules: 'list[RigModule] | None' = None
 
     def getColorSets(self) -> dict[str, rigify.ColorSet]:
         """Combine all color sets into a single dictionary."""
@@ -257,10 +321,21 @@ class AetherRigGenerator:
             combined.update(ov_dict)
         return combined
     
-    def getBoneGroups(self) -> dict[str, list[BoneGroup]]:
-        """Combine all bone groups into a single dictionary."""
-        combined: dict[str, list[BoneGroup]] = {}
-        for bg_dict in self.bone_groups or []:
-            combined.update(bg_dict)
+    def getBoneGroupsFromModules(self) -> dict[str, list[list[BoneGroup]]]:
+        """Combine all bone groups from modules into a single dictionary categorized by module type."""
+        combined: dict[str, list[list[BoneGroup]]] = {}
+        for module in self.modules or []:
+            if module.type not in combined:
+                combined[module.type] = []
+            combined[module.type].append(module.bone_groups)
+        return combined
+    
+    def getModules(self) -> dict[str, list[RigModule]]:
+        """Combine all modules into a single dictionary categorized by module type."""
+        combined: dict[str, list[RigModule]] = {}
+        for module in self.modules or []:
+            if module.type not in combined:
+                combined[module.type] = []
+            combined[module.type].append(module)
         return combined
 
