@@ -2,9 +2,10 @@ import bpy
 import time
 
 from ... import utils
-from ...core.shared import PoseOperations
+from ...core.shared import PoseOperations, PoseOperationsStack
 from ...core import rigify
 from . import module_manager
+
 
 
 class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
@@ -115,11 +116,16 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if len(data) == 0:
             data = None
 
+        stack = PoseOperationsStack(stack =  all_pose_operations)
+
         for modules in aether_rig_generator.getModules().values():
             for module in modules:
-                integrity, all_pose_operations = module.execute(meta_rig, data, all_pose_operations)
+                integrity, module_pose_ops = module.execute(meta_rig, data)
+                stack.merge(module_pose_ops)
                 if integrity:
-                    break 
+                    break # If at least one bone group executed successfully, we consider this module as the successful one for this type and break out of the loop to avoid executing fallback modules of the same type
+        
+        all_pose_operations = stack.stack
 
         ## Cleanup unlinked Bones and assign Collection to FFXIV bones
         data_bones = meta_rig.data.bones
