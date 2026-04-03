@@ -90,7 +90,9 @@ class limbs_arm(rigify_type):
 class limbs_super_finger(rigify_type):
     """Rigify type: limbs.super_finger - Used for finger and toe rigs."""
     tweak_coll: str = None
+    tweak_layers_extra: bool = False
     make_extra_ik_control: bool = False
+    extra_ik_layers_extra: str = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
@@ -109,7 +111,18 @@ class limbs_super_finger(rigify_type):
                     if len(rigify_params.tweak_coll_refs) > 0:
                         tweak_ref = rigify_params.tweak_coll_refs[-1]
                         tweak_ref.name = self.tweak_coll
-            
+            else:
+                rigify_params.tweak_layers_extra = self.tweak_layers_extra
+
+            if self.extra_ik_layers_extra:
+                rigify_params.extra_ik_layers_extra = True
+                rigify_params.extra_ik_coll_refs.clear()
+                if self.extra_ik_layers_extra in armature.data.collections:
+                    bpy.ops.pose.rigify_collection_ref_add(prop_name="extra_ik_coll_refs")
+                    if len(rigify_params.extra_ik_coll_refs) > 0:
+                        ik_ref = rigify_params.extra_ik_coll_refs[-1]
+                        ik_ref.name = self.extra_ik_layers_extra
+
             if self.make_extra_ik_control:
                 rigify_params.make_extra_ik_control = self.make_extra_ik_control
         except Exception as e:

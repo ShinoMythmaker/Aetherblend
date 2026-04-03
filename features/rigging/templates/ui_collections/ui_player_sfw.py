@@ -14,6 +14,9 @@ UI_PLAYER_SFW = {
                 "torso_tweak": BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=7, title="Tweak", visible=False),
                 "fingers_left": BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=8, title="Fingers.L"),
                 "fingers_right": BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=8, title="Fingers.R"),
+                "fingers_left_IK": BoneCollection(name="Fingers.L (IK)", ui=True, color_set="Fingers_Left", row_index=9, title="Fingers.L (IK)", visible=False),
+                "fingers_right_IK": BoneCollection(name="Fingers.R (IK)", ui=True, color_set="Fingers_Right", row_index=9, title="Fingers.R (IK)", visible=False),
+                
                 # BoneCollection(name="Fingers (Details)", ui=True, color_set="FK", row_index=9, title="(Details)", visible=False),
                 # "toes_left": BoneCollection(name="Toes.L", ui=True, color_set="Fingers_Left", row_index=9, title="Toes.L", visible=False),
                 # "toes_right": BoneCollection(name="Toes.R", ui=True, color_set="Fingers_Right", row_index=9, title="Toes.R", visible=False),

@@ -94,7 +94,7 @@ HAND_R = BoneGroup(
             roll=-15,
             req_bones=["DEF-thumb_master.R", "j_oya_a_r", "j_oya_b_r"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.R (IK)"),
                 b_collection="Fingers.R",
             )
         ),
@@ -122,7 +122,7 @@ HAND_R = BoneGroup(
             is_connected=False,
             req_bones=["j_hito_a_r", "j_hito_b_r"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.R (IK)"),
                 b_collection="Fingers.R",
             )
         ),
@@ -149,7 +149,7 @@ HAND_R = BoneGroup(
             is_connected=False,
             req_bones=["j_naka_a_r", "j_naka_b_r"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.R (IK)"),
                 b_collection="Fingers.R",
             )
         ),
@@ -176,7 +176,7 @@ HAND_R = BoneGroup(
             is_connected=False,
             req_bones=["j_kusu_a_r", "j_kusu_b_r"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.R (IK)"),
                 b_collection="Fingers.R",
             )
         ),
@@ -203,7 +203,7 @@ HAND_R = BoneGroup(
             is_connected=False,
             req_bones=["j_ko_a_r", "j_ko_b_r"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.R (IK)"),
                 b_collection="Fingers.R",
             )
         ),
@@ -315,7 +315,7 @@ HAND_L = BoneGroup(
             roll=-15,
             req_bones=["DEF-thumb_master.L", "j_oya_a_l", "j_oya_b_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.L (IK)"),
                 b_collection="Fingers.L",
             )
         ),
@@ -343,7 +343,7 @@ HAND_L = BoneGroup(
             is_connected=False,
             req_bones=["j_hito_a_l", "j_hito_b_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.L (IK)"),
                 b_collection="Fingers.L",
             )
         ),
@@ -370,7 +370,7 @@ HAND_L = BoneGroup(
             is_connected=False,
             req_bones=["j_naka_a_l", "j_naka_b_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.L (IK)"),
                 b_collection="Fingers.L",
             )
         ),
@@ -397,7 +397,7 @@ HAND_L = BoneGroup(
             is_connected=False,
             req_bones=["j_kusu_a_l", "j_kusu_b_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.L (IK)"),
                 b_collection="Fingers.L",
             )
         ),
@@ -424,7 +424,7 @@ HAND_L = BoneGroup(
             is_connected=False,
             req_bones=["j_ko_a_l", "j_ko_b_l"],
             pose_operations=PoseOperations(
-                rigify_settings=rigify.types.limbs_super_finger(),
+                rigify_settings=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.L (IK)"),
                 b_collection="Fingers.L",
             )
         ),
