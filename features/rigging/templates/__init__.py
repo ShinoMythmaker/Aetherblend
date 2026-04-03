@@ -14,11 +14,11 @@ from .modules import *
 ## Each module has a type, wich is important because there can only be one of each type. 
 ## Should there be multiple of the same type, then the generator will prio the first one and use the second as a fallback in case the first one fails to generate.
 TEMPLATES = {
-    'Player SFW':   Template (
+    'Player SFW':   Template(
         name = "Player SFW",
         color_sets=[CS_AETHER_BLEND], 
         overrides=[WO_DEFAULT, PO_DEFAULT],
-        modules = [spine.default, arms.default, legs.default, skirt.default, hands.default, tail.default, face.detailed, ears.miqo, ears.viera, hair.default]
+        modules = [face.detailed, spine.default, arms.default, legs.default, skirt.default, hands.default, tail.default, face.detailed, ears.miqo, ears.viera, hair.default]
     ),
     'Player SFW (IVCS)': Template(
         name= "Player SFW (IVCS)",

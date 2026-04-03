@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import bpy
 
 from abc import ABC
@@ -51,7 +49,7 @@ class PoseOperationsStack:
             self.stack[bone_name] = []
         self.stack[bone_name].append(operations)
 
-    def merge(self, diff: PoseOperationsStack):
+    def merge(self, diff: 'PoseOperationsStack'):
         """Merges multiple PoseOperations into one dictionary"""
         for bone_name, ops_list in diff.stack.items():
             if bone_name not in self.stack:
@@ -292,7 +290,7 @@ class AetherRigGenerator:
     overrides: 'list[dict[str, Override]] | None' = None
     
 
-    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, overrides: 'list[dict[str, Override]] | None' = None, modules: 'list[RigModule]' | None = None):
+    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, overrides: 'list[dict[str, Override]] | None' = None, modules: 'list[RigModule] | None' = None):
         self.name = name
         self.color_sets = color_sets
         self.overrides = overrides
@@ -322,7 +320,7 @@ class AetherRigGenerator:
             combined[module.type].append(module)
         self.modules = combined
 
-@dataclass
+@dataclass(frozen=True)
 class Template():
     """Defines a rig template with its properties and modules."""
     name: str

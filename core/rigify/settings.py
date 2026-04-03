@@ -53,8 +53,15 @@ class UI_Collections:
         max_row_index = max((coll.row_index for coll in self.collections), default=0)
 
         for coll in diff.collections:
-            coll.row_index += max_row_index + 1
-            self.collections.append(coll)
+            new_coll = BoneCollection(
+                name=coll.name,
+                ui=coll.ui,
+                color_set=coll.color_set,
+                row_index=coll.row_index + max_row_index + 1,
+                title=coll.title,
+                visible=coll.visible
+            )
+            self.collections.append(new_coll)
 
 @dataclass(frozen=True)
 class ColorSet:
