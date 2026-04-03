@@ -1,6 +1,6 @@
 import bpy
 
-from . import module_manager
+from . import template_manager
 
 
 class AETHER_PROP_Rig(bpy.types.PropertyGroup):
@@ -20,14 +20,14 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     selected_template : bpy.props.EnumProperty(
         name="Template",
         description="Select a rig template",
-        items=module_manager.get_template_items,
+        items=template_manager.get_template_items,
         default=0
     ) # type: ignore
     
     selected_colorset : bpy.props.EnumProperty(
         name="Colorset",
         description="Select a colorset (replaces template default)",
-        items=module_manager.get_colorset_items,
+        items=template_manager.get_colorset_items,
         default=0
     ) # type: ignore
     

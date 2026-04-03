@@ -1,5 +1,7 @@
 import mathutils
 
+from ......core.rigify.settings import UI_Collections, BoneCollection
+
 from ......core.generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -1318,5 +1320,11 @@ def get_rig_module() -> RigModule:
         name="Detailed",
         type="face",
         bone_groups=[HEAD, BROW, LEFT_EYE, RIGHT_EYE],
+        ui = UI_Collections([
+            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
+            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=2, title="Primary", visible=False),
+            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=2, title="Secondary", visible=False),
+            BoneCollection(name="Mouth", ui=True, color_set="Torso", row_index=3, title="Mouth", visible=False),
+        ])
     )
 

@@ -266,52 +266,44 @@ class RigModule:
     name: str
     type: str
     bone_groups: list[BoneGroup]
+    ui: rigify.settings.UI_Collections | None = None
 
-    def execute(self, armature: bpy.types.Object, data: dict) -> tuple[bool, PoseOperationsStack]:
-        
+    def execute(self, armature: bpy.types.Object, data: dict) -> tuple[bool, PoseOperationsStack, rigify.settings.UI_Collections | None]:
         bpy.context.view_layer.objects.active = armature
-
         pose_op_stack = PoseOperationsStack()
-        
-        integrity = False  # keeps track if any bone group executed successfully, if not then we move to the next module of the same type as a fallback mechanism
+        integrity = False  
         for bone_group in self.bone_groups:
             bones, pose_ops = bone_group.execute(armature, data)
 
             if not bones and not pose_ops:
-                continue # Skip if nothing to process
+                continue 
                 
-            integrity = True # Mark as successful execution of at least one bone group
-
-            # Merge operations, appending to existing lists
-            
-        
+            integrity = True
             pose_op_stack.merge(PoseOperationsStack(stack = pose_ops))
             
-
-        return integrity, pose_op_stack
+        return integrity, pose_op_stack, self.ui
         
 
-@dataclass(frozen=True)
 class AetherRigGenerator:
     """Generates an armature based on defined bone groups."""
     name: str
-    color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None
-    ui_collections: 'list[dict[str, rigify.BoneCollection]] | None' = None
+    modules: 'dict[str, list[RigModule]]'
+    color_sets: 'list[dict[str, rigify.ColorSet]]'
     overrides: 'list[dict[str, Override]] | None' = None
-    modules: 'list[RigModule] | None' = None
+    
+
+    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, overrides: 'list[dict[str, Override]] | None' = None, modules: 'list[RigModule]' | None = None):
+        self.name = name
+        self.color_sets = color_sets
+        self.overrides = overrides
+        
+        self.set_modules(modules or [])
 
     def getColorSets(self) -> dict[str, rigify.ColorSet]:
         """Combine all color sets into a single dictionary."""
         combined: dict[str, rigify.ColorSet] = {}
         for cs_dict in self.color_sets or []:
             combined.update(cs_dict)
-        return combined
-    
-    def getUICollections(self) -> dict[str, rigify.BoneCollection]:
-        """Combine all UI collections into a single dictionary."""
-        combined: dict[str, rigify.BoneCollection] = {}
-        for ui_dict in self.ui_collections or []:
-            combined.update(ui_dict)
         return combined
     
     def getOverrides(self) -> dict[str, Override]:
@@ -321,21 +313,19 @@ class AetherRigGenerator:
             combined.update(ov_dict)
         return combined
     
-    def getBoneGroupsFromModules(self) -> dict[str, list[list[BoneGroup]]]:
-        """Combine all bone groups from modules into a single dictionary categorized by module type."""
-        combined: dict[str, list[list[BoneGroup]]] = {}
-        for module in self.modules or []:
-            if module.type not in combined:
-                combined[module.type] = []
-            combined[module.type].append(module.bone_groups)
-        return combined
-    
-    def getModules(self) -> dict[str, list[RigModule]]:
-        """Combine all modules into a single dictionary categorized by module type."""
+    def set_modules(self, modules: list[RigModule]):
+        """Set the modules for this rig generator."""
         combined: dict[str, list[RigModule]] = {}
-        for module in self.modules or []:
+        for module in modules or []:
             if module.type not in combined:
                 combined[module.type] = []
             combined[module.type].append(module)
-        return combined
+        self.modules = combined
 
+@dataclass
+class Template():
+    """Defines a rig template with its properties and modules."""
+    name: str
+    color_sets: 'list[dict[str, rigify.ColorSet]]'
+    overrides: 'list[dict[str, Override]] | None'
+    modules: 'list[RigModule]'
