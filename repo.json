@@ -7,7 +7,7 @@
       "id": "AetherBlend",
       "name": "AetherBlend",
       "tagline": "AetherBlend: Effortless FFXIV Workflows in Blender",
-      "version": "0.2.21",
+      "version": "0.2.22",
       "type": "add-on",
       "maintainer": "Shino Mythmaker, Oats",
       "license": [
@@ -26,8 +26,8 @@
         "3D-View"
       ],
       "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.2.22/Aetherblend-v0.2.22.zip",
-      "archive_size": 23638085,
-      "archive_hash": "sha256:5f69e2fd74dec78c0a327c99d8e257a9f039b846f83299948a1a42c576f44236"
+      "archive_size": 23638084,
+      "archive_hash": "sha256:285567ed58db4d4af597ac5aa1e76fc6e87c99a3b3be4ac7c48c4c6709979695"
     }
   ]
 }
