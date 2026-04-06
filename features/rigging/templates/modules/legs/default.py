@@ -1,3 +1,4 @@
+from ......core.rigify.settings import UI_Collections, BoneCollection
 from ......core.generators import ConnectBone, ExtensionBone, ParallelBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -179,9 +180,16 @@ LEG_L = BoneGroup(
 )
 
 def get_rig_module() -> RigModule:
-    rig_module = RigModule(
+    return RigModule(
         name="Default",
         type="legs",
-        bone_groups=[LEG_R, LEG_L]
+        bone_groups=[LEG_L, LEG_R],
+        ui = UI_Collections([
+            BoneCollection(name="Leg.L (IK)", ui=True, color_set="IK_Left", row_index=1, title="Leg IK.L"),
+            BoneCollection(name="Leg.L (FK)", ui=True, color_set="FK_Left", row_index=2, title="Leg FK.L", visible=False),
+            BoneCollection(name="Leg.L (Tweak)", ui=True, color_set="Tweak_Left", row_index=3, title="Tweak.L", visible=False),
+            BoneCollection(name="Leg.R (IK)", ui=True, color_set="IK_Right", row_index=1, title="Leg IK.R"),
+            BoneCollection(name="Leg.R (FK)", ui=True, color_set="FK_Right", row_index=2, title="Leg FK.R", visible=False),
+            BoneCollection(name="Leg.R (Tweak)", ui=True, color_set="Tweak_Right", row_index=3, title="Tweak.R", visible=False),
+        ])
     )
-    return rig_module

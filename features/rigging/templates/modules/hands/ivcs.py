@@ -1,6 +1,7 @@
 from ......core.generators import ConnectBone, ExtensionBone, CopyBone
 from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
+from ......core.rigify.settings import UI_Collections, BoneCollection
 
 IV_HAND_R = BoneGroup(
     name="Right Hand",
@@ -151,7 +152,7 @@ IV_HAND_R = BoneGroup(
             start="head",
             req_bones=["j_hito_b_r", "iv_hito_c_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.R",
             )
         ),
         #Middle
@@ -189,7 +190,7 @@ IV_HAND_R = BoneGroup(
             start="head",
             req_bones=["iv_naka_c_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.R",
             )
         ),
         #Ring
@@ -227,7 +228,7 @@ IV_HAND_R = BoneGroup(
             start="head",
             req_bones=["iv_kusu_c_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.R",
             )
         ),
         #Pinky
@@ -265,7 +266,7 @@ IV_HAND_R = BoneGroup(
             start="head",
             req_bones=["iv_ko_c_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.R",
             )
         ),
     ],
@@ -420,7 +421,7 @@ IV_HAND_L = BoneGroup(
             start="head",
             req_bones=["iv_hito_c_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.L",
             )
         ),
         #Middle
@@ -458,7 +459,7 @@ IV_HAND_L = BoneGroup(
             start="head",
             req_bones=["iv_naka_c_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.L",
             )
         ),
         #Ring
@@ -496,7 +497,7 @@ IV_HAND_L = BoneGroup(
             start="head",
             req_bones=["iv_kusu_c_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.L",
             )
         ),
         #Pinky
@@ -534,16 +535,22 @@ IV_HAND_L = BoneGroup(
             start="head",
             req_bones=["iv_ko_c_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS",
+                b_collection="IVCS.L",
             )
         ),
     ],
 )
 
 def get_rig_module() -> RigModule:
-    rig_module = RigModule(
+    return RigModule(
         name="IVCS",
         type="hands",
-        bone_groups=[IV_HAND_R, IV_HAND_L]
+        bone_groups=[IV_HAND_L, IV_HAND_R],
+        ui = UI_Collections([
+            BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=1, title="Fingers.L", visible=False),
+            BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=1, title="Fingers.R", visible=False),
+            BoneCollection(name="IVCS.L", ui=True, color_set="IVCS", row_index=2, title="IVCS.L", visible=False),
+            BoneCollection(name="IVCS.R", ui=True, color_set="IVCS", row_index=2, title="IVCS.R", visible=False),
+        ])
     )
-    return rig_module
+

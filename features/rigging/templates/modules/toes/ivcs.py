@@ -1,6 +1,7 @@
 from ......core.generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
+from ......core.rigify.settings import UI_Collections, BoneCollection
 
 IV_TOES = BoneGroup(
     name="IVCS Toes",
@@ -37,7 +38,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_oya_a_r", "iv_asi_oya_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -49,7 +50,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_oya_b_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -61,7 +62,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_hito_a_r", "iv_asi_hito_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -73,7 +74,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_hito_b_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -85,7 +86,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_naka_a_r", "iv_asi_naka_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -97,7 +98,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_naka_b_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -109,7 +110,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_kusu_a_r", "iv_asi_kusu_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -121,7 +122,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_kusu_b_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -133,7 +134,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_ko_a_r", "iv_asi_ko_b_r"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -145,7 +146,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_ko_b_r"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         #Toes Left
@@ -158,7 +159,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_oya_a_l", "iv_asi_oya_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -170,7 +171,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_oya_b_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -182,7 +183,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_hito_a_l", "iv_asi_hito_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -194,7 +195,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_hito_b_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -206,7 +207,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_naka_a_l", "iv_asi_naka_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -218,7 +219,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_naka_b_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -230,7 +231,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_kusu_a_l", "iv_asi_kusu_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -242,7 +243,7 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_kusu_b_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
         ConnectBone(
@@ -254,7 +255,7 @@ IV_TOES = BoneGroup(
             req_bones=["iv_asi_ko_a_l", "iv_asi_ko_b_l"],
             pose_operations=PoseOperations(
                 rigify_settings=rigify.types.limbs_super_finger(),
-                b_collection="IVCS",
+                b_collection="IVCS_Toes",
             )
         ),
         ExtensionBone(
@@ -266,16 +267,18 @@ IV_TOES = BoneGroup(
             axis="Y",
             req_bones=["iv_asi_ko_b_l"],
             pose_operations=PoseOperations(
-                b_collection="IVCS"
+                b_collection="IVCS_Toes"
             )
         ),
     ]
 )
 
 def get_rig_module() -> RigModule:
-    rig_module = RigModule(
+    return RigModule(
         name="IVCS Toes",
         type="toes",
-        bone_groups=[IV_TOES]
+        bone_groups=[IV_TOES],
+        ui = UI_Collections([
+            BoneCollection(name="IVCS_Toes", ui=True, color_set="IVCS", row_index=1, title="Toes", visible=False),
+        ])
     )
-    return rig_module

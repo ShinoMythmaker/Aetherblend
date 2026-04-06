@@ -1,3 +1,4 @@
+from ......core.rigify.settings import UI_Collections, BoneCollection
 from ......core.generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -341,9 +342,12 @@ SKIRT_L = BoneGroup(
 )
 
 def get_rig_module() -> RigModule:
-    rig_module = RigModule(
+    return RigModule(
         name="Default",
         type="skirt",
-        bone_groups=[SKIRT_R, SKIRT_L]
+        bone_groups=[SKIRT_R, SKIRT_L],
+        ui = UI_Collections([
+            BoneCollection(name="Skirt", ui=True, color_set="Torso", row_index=1, title="Skirt", visible=False),
+            BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Torso", row_index=2, title="Skirt (Tweak)", visible=False),
+        ])
     )
-    return rig_module
