@@ -3,6 +3,7 @@ import addon_utils
 import collections
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
+from . import template_manager
 
 
 def _flatten_children(iterable):
@@ -10,6 +11,30 @@ def _flatten_children(iterable):
     for item in iterable:
         yield item
         yield from _flatten_children(item.children)
+
+
+class AETHER_UL_RigModules(bpy.types.UIList):
+    """Display the currently selected rig modules in a Blender-style list."""
+    def draw_filter(self, context, layout):
+        # Intentionally draw nothing so Blender does not show the filter/sort footer.
+        pass
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        module = template_manager.AVAILABLE_MODULES.get(item.module_key)
+        if not module:
+            layout.label(text=item.module_key or "Unknown Module", icon='ERROR')
+            return
+
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            split = layout.split(factor=0.78, align=True)
+            split.label(text=f"{module.type.replace('_', ' ').title()}", icon='GROUP_BONE')
+            right = split.row(align=True)
+            right.alignment = 'RIGHT'
+            right.label(text=module.name)
+        elif self.layout_type == 'GRID':
+            layout.alignment = 'CENTER'
+            layout.label(text="", icon='PROPERTIES')
+
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -91,6 +116,28 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         row.label(text="Colorset", icon='COLOR')
         row.prop(aether_rig, "selected_colorset", text="")
 
+        modules_box = layout.box()
+        modules_box.label(text="Modules", icon='MODIFIER')
+
+        if len(aether_rig.modules) == 0:
+            modules_box.label(text="No modules found for this template.", icon='INFO')
+        else:
+            row = modules_box.row()
+            row.template_list(
+                "AETHER_UL_RigModules",
+                "",
+                aether_rig,
+                "modules",
+                aether_rig,
+                "module_index",
+                rows=max(4, min(10, len(aether_rig.modules))),
+                sort_lock=True,
+            )
+
+            buttons = row.column(align=True)
+            remove = buttons.operator("aether.remove_template_module", text="", icon='REMOVE')
+            remove.module_index = aether_rig.module_index
+
 
 class AETHER_PT_RigManipulation(bpy.types.Panel):
     bl_label = "Rig Manipulation"
@@ -150,7 +197,6 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
             text="Delete",
             icon="TRASH", 
             )
-
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
     bl_label = "Rig Layers"
@@ -228,7 +274,6 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
             else:
                 row.separator()
 
-
 class AETHER_PT_RigUIPanel(bpy.types.Panel):
     bl_label = "Rig UI"
     bl_idname = "AETHER_PT_rig_ui"
@@ -301,8 +346,6 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
             layout = self.layout
             layout.label(text=f"Rig UI panel not found for: {rig_id}")
        
-
-
 class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
     bl_label = "Rig Bake Settings"
     bl_idname = "AETHER_PT_rig_bake_settings"
@@ -356,6 +399,7 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
             layout.label(text=f"Rig bake settings panel not found for: {rig_id}")
 
 def register():
+    bpy.utils.register_class(AETHER_UL_RigModules)
     bpy.utils.register_class(AETHER_PT_RigCreation)
     bpy.utils.register_class(AETHER_PT_RigManipulation)
     bpy.utils.register_class(AETHER_PT_RigLayersPanel)
@@ -363,8 +407,9 @@ def register():
     bpy.utils.register_class(AETHER_PT_RigBakeSettingsPanel)
 
 def unregister():
-    bpy.utils.unregister_class(AETHER_PT_RigCreation)
-    bpy.utils.unregister_class(AETHER_PT_RigManipulation)
-    bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
-    bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
     bpy.utils.unregister_class(AETHER_PT_RigBakeSettingsPanel)
+    bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
+    bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
+    bpy.utils.unregister_class(AETHER_PT_RigManipulation)
+    bpy.utils.unregister_class(AETHER_PT_RigCreation)
+    bpy.utils.unregister_class(AETHER_UL_RigModules)

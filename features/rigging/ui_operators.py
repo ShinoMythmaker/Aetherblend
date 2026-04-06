@@ -1,5 +1,39 @@
 import bpy
 
+from . import template_manager
+
+
+class AETHER_OT_Remove_Template_Module(bpy.types.Operator):
+    bl_idname = "aether.remove_template_module"
+    bl_label = "Remove Template Module"
+    bl_description = "Remove this module from the rig's current temporary module selection"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    module_index: bpy.props.IntProperty(
+        name="Module Index",
+        default=-1,
+    ) # type: ignore
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            self.report({'ERROR'}, "Armature has no Aether rig settings")
+            return {'CANCELLED'}
+
+        if self.module_index < 0 or self.module_index >= len(aether_rig.modules):
+            self.report({'WARNING'}, "Invalid module index")
+            return {'CANCELLED'}
+
+        aether_rig.modules.remove(self.module_index)
+        aether_rig.module_index = min(self.module_index, len(aether_rig.modules) - 1)
+
+        return {'FINISHED'}
+
 
 class AETHER_OT_Solo_Bone_Collections(bpy.types.Operator):
     bl_idname = "aether.solo_bone_collections"
@@ -44,7 +78,9 @@ class AETHER_OT_Solo_Bone_Collections(bpy.types.Operator):
 
 
 def register():
+    bpy.utils.register_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.register_class(AETHER_OT_Solo_Bone_Collections)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_Solo_Bone_Collections)
+    bpy.utils.unregister_class(AETHER_OT_Remove_Template_Module)

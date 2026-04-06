@@ -274,7 +274,7 @@ IV_TOES = BoneGroup(
 
 def get_rig_module() -> RigModule:
     rig_module = RigModule(
-        name="IVCS Toes",
+        name="IVCS",
         type="toes",
         bone_groups=[IV_TOES]
     )

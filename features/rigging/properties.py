@@ -3,6 +3,13 @@ import bpy
 from . import template_manager
 
 
+class AETHER_PROP_RigModuleItem(bpy.types.PropertyGroup):
+    module_key : bpy.props.StringProperty(
+        name="Module Key",
+        description="Stable identifier for the selected rig module"
+    ) # type: ignore
+
+
 class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     meta_rig : bpy.props.PointerProperty(
         name="Meta Rig",
@@ -21,7 +28,18 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         name="Template",
         description="Select a rig template",
         items=template_manager.get_template_items,
+        update=template_manager.on_template_changed,
         default=0
+    ) # type: ignore
+
+    modules : bpy.props.CollectionProperty(
+        type=AETHER_PROP_RigModuleItem
+    ) # type: ignore
+
+    module_index : bpy.props.IntProperty(
+        name="Module Index",
+        default=0,
+        options={'HIDDEN'}
     ) # type: ignore
     
     selected_colorset : bpy.props.EnumProperty(
@@ -46,6 +64,7 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
 
 
 def register():
+    bpy.utils.register_class(AETHER_PROP_RigModuleItem)
     bpy.utils.register_class(AETHER_PROP_Rig)
     bpy.types.Object.aether_rig = bpy.props.PointerProperty(type=AETHER_PROP_Rig)
 
@@ -53,3 +72,4 @@ def unregister():
     if hasattr(bpy.types.Object, 'aether_rig'):
         del bpy.types.Object.aether_rig
     bpy.utils.unregister_class(AETHER_PROP_Rig)
+    bpy.utils.unregister_class(AETHER_PROP_RigModuleItem)
