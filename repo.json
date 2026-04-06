@@ -14,7 +14,7 @@
         "SPDX:GPL-3.0-or-later"
       ],
       "blender_version_min": "4.5.7",
-      "blender_version_max": "5.1.0",
+      "blender_version_max": "7.0.0",
       "website": "https://github.com/ShinoMythmaker/Aetherblend",
       "permissions": {
         "files": "Import files for most Aetherblends functions"
@@ -25,9 +25,9 @@
         "Import-Export",
         "3D-View"
       ],
-      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.2.21/Aetherblend-v0.2.21.zip",
+      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.2.22/Aetherblend-v0.2.22.zip",
       "archive_size": 23638085,
-      "archive_hash": "sha256:ff6006754a85dead317f76e576a3d75b27f02b3dc18c7f7c66a5d6cf794a6b18"
+      "archive_hash": "sha256:5f69e2fd74dec78c0a327c99d8e257a9f039b846f83299948a1a42c576f44236"
     }
   ]
 }
