@@ -15,6 +15,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Install Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install tomli-w
+        run: python -m pip install tomli-w
+
+      - name: Get Python Dependencies Wheels
+        run: python get_dependencies.py
+
       - name: Get repo name and tag
         id: vars
         run: |
@@ -26,7 +37,7 @@ jobs:
           set -e
           zipfile="${{ steps.vars.outputs.repo_name }}-${{ steps.vars.outputs.tag }}.zip"
           # Exclude repo.json, .gitignore, .git and .github
-          zip -r "$zipfile" . -x 'repo.json' '.gitignore' '.git/*' '.github/*'
+          zip -r "$zipfile" . -x 'repo.json' '.gitignore' '.git/*' '.github/*' 'get_dependencies.py'
           echo "ZIP file created: $zipfile"
 
       - name: Create draft release and upload ZIP

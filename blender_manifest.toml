@@ -11,6 +11,7 @@ blender_version_min = "4.5.7"
 blender_version_max = "7.0.0"
 website = "https://github.com/ShinoMythmaker/Aetherblend"
 tags = ["Animation", "Rigging", "Import-Export", "3D-View"]
+dependencies = ["lz4"]
 
 [permissions]
 files = "Import files for most Aetherblends functions"
