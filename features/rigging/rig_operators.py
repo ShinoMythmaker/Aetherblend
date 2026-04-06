@@ -4,7 +4,7 @@ import time
 from ... import utils
 from ...core.shared import PoseOperations, PoseOperationsStack
 from ...core import rigify
-from . import module_manager
+from . import template_manager
 
 
 
@@ -39,7 +39,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             return {'CANCELLED'}
         
         # Get Generator Data
-        aether_rig_generator = module_manager.get_rig_generator(armature.aether_rig)
+        aether_rig_generator = template_manager.get_rig_generator(armature.aether_rig)
         
         # Meta Rig Base Generation
         meta_rig = utils.armature.duplicate(armature)
@@ -91,14 +91,6 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         for color_set in aether_rig_generator.getColorSets().values():
             color_set.add(meta_rig)
 
-        ## Add Bone Collections UI
-        hide_collections = []
-        for coll in aether_rig_generator.getUICollections().values():
-            coll.create(meta_rig)
-            coll, hide = coll.create_ui(meta_rig)
-            if hide and coll:
-                hide_collections.append(coll)
-
         
         # Populate Data needed for generation
         eye_occlusion_object = self._find_objects_with_armature_and_material_property(armature=armature, property_name="ShaderPackage", property_value="characterocclusion.shpk")
@@ -111,10 +103,14 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         if len(data) == 0:
             data = None
 
-        for modules in aether_rig_generator.getModules().values():
+        ui = rigify.settings.UI_Collections()
+
+        for modules in aether_rig_generator.modules.values():
             for module in modules:
-                integrity, module_pose_ops = module.execute(meta_rig, data)
+                integrity, module_pose_ops, module_ui_collections = module.execute(meta_rig, data)
                 pose_ops_stack.merge(module_pose_ops)
+                if module_ui_collections:
+                    ui.add(module_ui_collections)
                 if integrity:
                     break 
 
@@ -142,6 +138,15 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             bone = meta_rig.data.edit_bones.get(bone_name)
             if bone:
                 meta_rig.data.edit_bones.remove(bone)
+
+
+        ## Add Bone Collections UI
+        hide_collections = []
+        for coll in ui.collections:
+            coll.create(meta_rig)
+            coll, hide = coll.create_ui(meta_rig)
+            if hide and coll:
+                hide_collections.append(coll)
                 
 
         # Now apply all operations per bone
@@ -252,7 +257,7 @@ class AETHER_OT_Generate_Rigify_Rig(bpy.types.Operator):
         result = bpy.ops.pose.rigify_generate()
 
         if result == {"FINISHED"}:
-            aether_rig_generator = module_manager.get_rig_generator(armature.aether_rig)
+            aether_rig_generator = template_manager.get_rig_generator(armature.aether_rig)
 
             ## Execute Post Generation Steps
             data_bones = armature.data.bones

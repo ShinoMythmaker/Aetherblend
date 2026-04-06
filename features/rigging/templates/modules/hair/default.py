@@ -1,6 +1,6 @@
 from ......core.generators import RegexBoneGroup
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
-from ......core import rigify
+from ......core.shared import BoneGroup, RigModule
+from ......core.rigify.settings import UI_Collections, BoneCollection
 
 HAIR = BoneGroup(
     name="Hair",
@@ -40,6 +40,10 @@ def get_rig_module() -> RigModule:
     rig_module = RigModule(
         name="Default",
         type="hair",
-        bone_groups=[HAIR]
+        bone_groups=[HAIR],
+        ui=UI_Collections([
+            BoneCollection(name="Hair", ui=True, color_set="Head", row_index=1, title="Hair", visible=False),
+            BoneCollection(name="Accessory", ui=True, color_set="Head", row_index=1, title="Accessory", visible=False),
+        ])
     )
     return rig_module

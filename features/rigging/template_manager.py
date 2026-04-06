@@ -33,7 +33,6 @@ def get_rig_generator(aether_rig):
     return AetherRigGenerator(
         name=template.name,
         color_sets=color_sets,
-        ui_collections=template.ui_collections,
         overrides=template.overrides,
         modules=template.modules
     )
