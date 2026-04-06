@@ -83,6 +83,6 @@ TEMPLATES = {
         name= "Dynamic",
         color_sets=[CS_AETHER_BLEND], 
         overrides=[WO_NSFW, PO_DEFAULT],
-        modules = [spine.default, arms.default, legs.default, skirt.default, hands.ivcs, hands.default, toes.ivcs, tail.default, face.detailed, ears.miqo, ears.viera, hair.default, genitals.ivcs_both]
+        modules = [ears.miqo, ears.viera, hair.default, face.detailed, arms.default, spine.default, hands.ivcs, hands.default, legs.default, toes.ivcs, skirt.default, tail.default, genitals.ivcs_both]
     ),
 }

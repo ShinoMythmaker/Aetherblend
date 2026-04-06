@@ -1,6 +1,7 @@
 from ......core.generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
+from ......core.rigify.settings import UI_Collections, BoneCollection
 
 SPINE = BoneGroup(
         name="spine",
@@ -97,9 +98,13 @@ SPINE = BoneGroup(
 )
 
 def get_rig_module() -> RigModule:
-    rig_module = RigModule(
+    return RigModule(
         name="Default",
         type="spine",
-        bone_groups=[SPINE]
+        bone_groups=[SPINE],
+        ui = UI_Collections([
+            BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=1, title="Torso"),
+            BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=2, title="Tweak", visible=False),
+        ])
     )
-    return rig_module
+    
