@@ -16,17 +16,14 @@ MODULE_TYPE_ORDER = {
 }
 _DYNAMIC_ADD_MENU_CLASSES = []
 
-
 def _format_family_name(family_name: str) -> str:
     """Convert a module family key into a UI-friendly label."""
     return (family_name or '').replace('_', ' ').title() or "Misc"
-
 
 def _get_family_menu_idname(mode: str, family_name: str) -> str:
     """Build a stable menu idname for a family submenu."""
     family_slug = family_name.replace('.', '_').replace('-', '_')
     return f"AETHER_MT_add_{mode.lower()}_{family_slug}_module_menu"
-
 
 def _draw_family_module_menu(layout, mode: str, family_name: str) -> None:
     """Draw the module entries for a single family, grouped by module type."""
@@ -168,6 +165,21 @@ class AETHER_MT_Add_Fallback_Module_Menu(bpy.types.Menu):
             )
 
 
+class AETHER_MT_Populate_Custom_Template_Menu(bpy.types.Menu):
+    bl_idname = "AETHER_MT_populate_custom_template_menu"
+    bl_label = "Populate Custom Modules"
+
+    def draw(self, context):
+        column = self.layout.column(align=True)
+        for template_name in template_manager.TEMPLATES.keys():
+            operator = column.operator(
+                "aether.populate_custom_template",
+                text=template_name,
+                icon='PRESET',
+            )
+            operator.template_name = template_name
+
+
 class AETHER_OT_Add_Template_Module(bpy.types.Operator):
     bl_idname = "aether.add_template_module"
     bl_label = "Add Template Module"
@@ -225,7 +237,41 @@ class AETHER_OT_Add_Template_Module(bpy.types.Operator):
 
         inserted_index = _insert_module_item(aether_rig, self.module_key, insert_index, group_index)
         _reindex_module_groups(aether_rig)
+        aether_rig.custom_modules_initialized = True
         aether_rig.module_index = inserted_index
+        return {'FINISHED'}
+
+
+class AETHER_OT_Populate_Custom_Template(bpy.types.Operator):
+    bl_idname = "aether.populate_custom_template"
+    bl_label = "Populate Custom Template"
+    bl_description = "Copy modules from a built-in template into the editable custom list"
+    bl_options = {'UNDO'}
+
+    template_name: bpy.props.StringProperty(
+        name="Template",
+        description="Built-in template used to populate the custom module list",
+        options={'HIDDEN'},
+    ) # type: ignore
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            self.report({'ERROR'}, "Armature has no Aether rig settings")
+            return {'CANCELLED'}
+
+        if self.template_name not in template_manager.TEMPLATES:
+            self.report({'WARNING'}, "Choose a valid template to populate from")
+            return {'CANCELLED'}
+
+        aether_rig.selected_template = template_manager.CUSTOM_TEMPLATE_NAME
+        template_manager.populate_modules_from_template(aether_rig, self.template_name)
+        aether_rig.module_index = 0 if aether_rig.modules else 0
         return {'FINISHED'}
 
 
@@ -298,6 +344,7 @@ class AETHER_OT_Move_Template_Module(bpy.types.Operator):
                 moved_index = index + 1
 
         _reindex_module_groups(aether_rig)
+        aether_rig.custom_modules_initialized = True
         aether_rig.module_index = moved_index
         return {'FINISHED'}
 
@@ -330,6 +377,7 @@ class AETHER_OT_Remove_Template_Module(bpy.types.Operator):
 
         aether_rig.modules.remove(self.module_index)
         _reindex_module_groups(aether_rig)
+        aether_rig.custom_modules_initialized = True
         aether_rig.module_index = min(self.module_index, len(aether_rig.modules) - 1)
 
         return {'FINISHED'}
@@ -391,7 +439,9 @@ def register():
 
     bpy.utils.register_class(AETHER_MT_Add_Group_Module_Menu)
     bpy.utils.register_class(AETHER_MT_Add_Fallback_Module_Menu)
+    bpy.utils.register_class(AETHER_MT_Populate_Custom_Template_Menu)
     bpy.utils.register_class(AETHER_OT_Add_Template_Module)
+    bpy.utils.register_class(AETHER_OT_Populate_Custom_Template)
     bpy.utils.register_class(AETHER_OT_Move_Template_Module)
     bpy.utils.register_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.register_class(AETHER_OT_Solo_Bone_Collections)
@@ -402,7 +452,9 @@ def unregister():
     bpy.utils.unregister_class(AETHER_OT_Solo_Bone_Collections)
     bpy.utils.unregister_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.unregister_class(AETHER_OT_Move_Template_Module)
+    bpy.utils.unregister_class(AETHER_OT_Populate_Custom_Template)
     bpy.utils.unregister_class(AETHER_OT_Add_Template_Module)
+    bpy.utils.unregister_class(AETHER_MT_Populate_Custom_Template_Menu)
     bpy.utils.unregister_class(AETHER_MT_Add_Fallback_Module_Menu)
     bpy.utils.unregister_class(AETHER_MT_Add_Group_Module_Menu)
 

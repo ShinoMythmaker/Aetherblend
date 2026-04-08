@@ -146,51 +146,59 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         row.label(text="Colorset", icon='COLOR')
         row.prop(aether_rig, "selected_colorset", text="")
 
-        modules_box = layout.box()
-        modules_box.label(text="Modules", icon='MODIFIER')
+        if template_manager.is_custom_template_selected(aether_rig):
+            modules_box = layout.box()
 
-        row = modules_box.row()
+            header = modules_box.row(align=True)
+            left = header.row(align=True)
+            right = header.row(align=True)
+            right.alignment = 'RIGHT'
+            right.scale_x = 1.25
 
-        if len(aether_rig.modules) == 0:
-            row.label(text="No modules found for this template.", icon='INFO')
-        else:
-            row.template_list(
+            left.label(text="Custom Template", icon='MODIFIER')
+            right.menu("AETHER_MT_populate_custom_template_menu", text="Populate", icon='IMPORT')
+
+            row = modules_box.row()
+            list_col = row.column(align=True)
+
+            list_col.template_list(
                 "AETHER_UL_RigModules",
                 "",
                 aether_rig,
                 "modules",
                 aether_rig,
                 "module_index",
-                rows=max(4, min(10, len(aether_rig.modules))),
+                rows=max(4, min(10, max(1, len(aether_rig.modules))))
+                if len(aether_rig.modules) > 0 else 4,
                 sort_lock=True,
             )
 
-        has_selection = 0 <= aether_rig.module_index < len(aether_rig.modules)
-        buttons = row.column(align=True)
+            has_selection = 0 <= aether_rig.module_index < len(aether_rig.modules)
+            buttons = row.column(align=True)
 
-        buttons.menu("AETHER_MT_add_group_module_menu", text="", icon='ADD')
+            buttons.menu("AETHER_MT_add_group_module_menu", text="", icon='ADD')
 
-        add_fallback_col = buttons.column(align=True)
-        add_fallback_col.enabled = has_selection
-        add_fallback_col.menu("AETHER_MT_add_fallback_module_menu", text="", icon='LINKED')
+            add_fallback_col = buttons.column(align=True)
+            add_fallback_col.enabled = has_selection
+            add_fallback_col.menu("AETHER_MT_add_fallback_module_menu", text="", icon='LINKED')
 
-        buttons.separator()
+            buttons.separator()
 
-        move_col = buttons.column(align=True)
-        move_col.enabled = has_selection
+            move_col = buttons.column(align=True)
+            move_col.enabled = has_selection
 
-        move_up = move_col.operator("aether.move_template_module", text="", icon='TRIA_UP')
-        move_up.direction = 'UP'
+            move_up = move_col.operator("aether.move_template_module", text="", icon='TRIA_UP')
+            move_up.direction = 'UP'
 
-        move_down = move_col.operator("aether.move_template_module", text="", icon='TRIA_DOWN')
-        move_down.direction = 'DOWN'
+            move_down = move_col.operator("aether.move_template_module", text="", icon='TRIA_DOWN')
+            move_down.direction = 'DOWN'
 
-        buttons.separator()
+            buttons.separator()
 
-        remove_col = buttons.column(align=True)
-        remove_col.enabled = has_selection
-        remove = remove_col.operator("aether.remove_template_module", text="", icon='REMOVE')
-        remove.module_index = aether_rig.module_index
+            remove_col = buttons.column(align=True)
+            remove_col.enabled = has_selection
+            remove = remove_col.operator("aether.remove_template_module", text="", icon='REMOVE')
+            remove.module_index = aether_rig.module_index
 
 
 class AETHER_PT_RigManipulation(bpy.types.Panel):

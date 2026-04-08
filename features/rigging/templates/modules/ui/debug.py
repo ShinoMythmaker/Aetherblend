@@ -4,7 +4,7 @@ from ......core.shared import RigModule
 
 def get_rig_module() -> RigModule:
     rig_module = RigModule(
-        name="Base",
+        name="Debug",
         type="UI-Addon",
         bone_groups=[],
         ui = UI_Collections([

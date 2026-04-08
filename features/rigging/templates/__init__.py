@@ -98,8 +98,7 @@ TEMPLATES = {
             [tail.default],
             [ears.miqo, ears.viera],
             [hair.default],
-            [base.base],
-            [base.base],
+            [ui.debug],
         ]
     ),
     'Player SFW (IVCS)': Template(
@@ -116,7 +115,7 @@ TEMPLATES = {
             [face.detailed],
             [ears.miqo, ears.viera],
             [hair.default],
-            [base.base],
+            [ui.debug],
         ]
     ),
     'Player NSFW (IVCS)': Template(
@@ -134,7 +133,7 @@ TEMPLATES = {
             [ears.miqo, ears.viera],
             [hair.default],
             [genitals.ivcs_both],
-            [base.base],
+            [ui.debug],
         ]
     ),
     'Dynamic': Template(
@@ -152,7 +151,7 @@ TEMPLATES = {
             [skirt.default],
             [tail.default],
             [genitals.ivcs_both],
-            [base.base],
+            [ui.debug],
         ]
     ),
 }

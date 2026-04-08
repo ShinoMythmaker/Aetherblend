@@ -33,10 +33,24 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     
     selected_template : bpy.props.EnumProperty(
         name="Template",
-        description="Select a rig template",
+        description="Select a rig template or switch to the editable custom module list",
         items=template_manager.get_template_items,
         update=template_manager.on_template_changed,
         default=0
+    ) # type: ignore
+
+    custom_template_source : bpy.props.StringProperty(
+        name="Custom Template Source",
+        description="Built-in template used to seed the editable custom module list",
+        default=template_manager.DEFAULT_TEMPLATE_NAME,
+        options={'HIDDEN'}
+    ) # type: ignore
+
+    custom_modules_initialized : bpy.props.BoolProperty(
+        name="Custom Modules Initialized",
+        description="Whether the editable custom module list has been intentionally created or populated",
+        default=False,
+        options={'HIDDEN'}
     ) # type: ignore
 
     selected_colorset : bpy.props.EnumProperty(
