@@ -344,7 +344,7 @@ SKIRT_L = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
-        type="skirt",
+        type="Generation",
         bone_groups=[SKIRT_R, SKIRT_L],
         ui = UI_Collections([
             BoneCollection(name="Skirt", ui=True, color_set="Torso", row_index=1, title="Skirt", visible=False),

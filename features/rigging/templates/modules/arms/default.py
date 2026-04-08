@@ -165,7 +165,7 @@ ARM_L = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
-        type="arms",
+        type="Generation",
         bone_groups=[ARM_L, ARM_R],
         ui = UI_Collections([
             BoneCollection(name="Arm.L (IK)", ui=True, color_set="IK_Left", row_index=1, title="Arm IK.L"),

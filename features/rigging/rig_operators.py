@@ -88,7 +88,7 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
             utils.collection.link_to_collection([meta_rig], armature_collection)
 
         ## Add Color Sets
-        for color_set in aether_rig_generator.getColorSets().values():
+        for color_set in aether_rig_generator.color_sets.values():
             color_set.add(meta_rig)
 
         
@@ -105,14 +105,14 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         ui = rigify.settings.UI_Collections()
 
-        for modules in aether_rig_generator.modules.values():
-            for module in modules:
+        for module_group in aether_rig_generator.modules:
+            for module in module_group:
                 integrity, module_pose_ops, module_ui_collections = module.execute(meta_rig, data)
                 pose_ops_stack.merge(module_pose_ops)
                 if module_ui_collections:
                     ui.add(module_ui_collections)
                 if integrity:
-                    break 
+                    break
 
         ## Cleanup unlinked Bones and assign Collection to FFXIV bones
         data_bones = meta_rig.data.bones

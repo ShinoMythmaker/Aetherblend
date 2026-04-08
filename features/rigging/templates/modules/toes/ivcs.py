@@ -284,7 +284,7 @@ IV_TOES_L = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="IVCS",
-        type="toes",
+        type="Generation",
         bone_groups=[IV_TOES_L, IV_TOES_R],
         ui = UI_Collections([
             BoneCollection(name="IVCS_Toes.L", ui=True, color_set="IVCS", row_index=1, title="Toes.L", visible=False),

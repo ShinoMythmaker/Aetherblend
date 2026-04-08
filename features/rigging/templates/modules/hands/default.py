@@ -449,7 +449,7 @@ HAND_L = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
-        type="hands",
+        type="Generation",
         bone_groups=[HAND_L, HAND_R],
         ui=UI_Collections([ 
             BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=1, title="Fingers.L", visible=False),

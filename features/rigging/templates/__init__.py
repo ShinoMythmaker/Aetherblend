@@ -14,10 +14,15 @@ from . import modules as module_root
 from .modules import *
 
 
-def build_module_registry() -> tuple[dict[str, RigModule], dict[str, dict[str, RigModule]]]:
-    """Auto-discover all rig modules from the modules package and group them by type."""
+def build_module_registry() -> tuple[
+    dict[str, RigModule],
+    dict[str, dict[str, RigModule]],
+    dict[str, dict[str, RigModule]],
+]:
+    """Auto-discover all rig modules from the modules package and group them by category and family."""
     available_modules: dict[str, RigModule] = {}
     modules_by_type: dict[str, dict[str, RigModule]] = defaultdict(dict)
+    modules_by_family: dict[str, dict[str, RigModule]] = defaultdict(dict)
 
     for module_info in pkgutil.iter_modules(module_root.__path__):
         if not module_info.ispkg or module_info.name.startswith("_"):
@@ -37,13 +42,18 @@ def build_module_registry() -> tuple[dict[str, RigModule], dict[str, dict[str, R
             key = f"{family_name}.{attr_name}"
             available_modules[key] = value
             modules_by_type[value.type][key] = value
+            modules_by_family[family_name][key] = value
 
     sorted_modules = dict(sorted(available_modules.items()))
     sorted_types = {
         module_type: dict(sorted(entries.items()))
         for module_type, entries in sorted(modules_by_type.items())
     }
-    return sorted_modules, sorted_types
+    sorted_families = {
+        family_name: dict(sorted(entries.items()))
+        for family_name, entries in sorted(modules_by_family.items())
+    }
+    return sorted_modules, sorted_types, sorted_families
 
 
 def get_modules_by_type(module_type: str | None = None):
@@ -53,36 +63,96 @@ def get_modules_by_type(module_type: str | None = None):
     return MODULES_BY_TYPE.get(module_type, {})
 
 
-AVAILABLE_MODULES, MODULES_BY_TYPE = build_module_registry()
+def get_modules_by_family(family_name: str | None = None):
+    """Return all modules grouped by family, or a single family bucket if requested."""
+    if family_name is None:
+        return MODULES_BY_FAMILY
+    return MODULES_BY_FAMILY.get(family_name, {})
+
+
+AVAILABLE_MODULES, MODULES_BY_TYPE, MODULES_BY_FAMILY = build_module_registry()
+MODULE_KEYS_BY_ID = {id(module): key for key, module in AVAILABLE_MODULES.items()}
+
+
+def get_module_key(module: RigModule) -> str:
+    """Resolve the registry key for a rig module instance."""
+    return MODULE_KEYS_BY_ID.get(id(module), "")
 
 
 ## Templates
-## About Modules: Each modules is a self-contained rig component. you can add as many modules as you wish and the generator will handle sorting and excution. 
-## Each module has a type, wich is important because there can only be one of each type. 
-## Should there be multiple of the same type, then the generator will prio the first one and use the second as a fallback in case the first one fails to generate.
+## About Modules: Each entry in `modules` is an ordered priority group.
+## Use `[module]` for a standalone module, or `[primary, fallback, ...]` when several modules should compete for the same slot.
+## `RigModule.type` now describes behavior category: `Generation`, `UI-Addon`, or `Patch`.
+## Only modules inside the same inner list will fight for priority; every other group is always evaluated in order.
 TEMPLATES = {
     'Player SFW':   Template(
         name = "Player SFW",
-        color_sets=[CS_AETHER_BLEND], 
         overrides=[WO_DEFAULT, PO_DEFAULT],
-        modules = [face.detailed, spine.default, arms.default, legs.default, skirt.default, hands.default, tail.default, face.detailed, ears.miqo, ears.viera, hair.default]
+        modules = [
+            [face.detailed],
+            [spine.default],
+            [arms.default],
+            [legs.default],
+            [skirt.default],
+            [hands.default],
+            [tail.default],
+            [ears.miqo, ears.viera],
+            [hair.default],
+            [base.base],
+            [base.base],
+        ]
     ),
     'Player SFW (IVCS)': Template(
         name= "Player SFW (IVCS)",
-        color_sets=[CS_AETHER_BLEND], 
         overrides=[WO_DEFAULT, PO_DEFAULT],
-        modules = [spine.default, arms.default, legs.default, skirt.default, hands.ivcs, toes.ivcs, tail.default, face.detailed, ears.miqo, ears.viera, hair.default]
+        modules = [
+            [spine.default],
+            [arms.default],
+            [legs.default],
+            [skirt.default],
+            [hands.ivcs],
+            [toes.ivcs],
+            [tail.default],
+            [face.detailed],
+            [ears.miqo, ears.viera],
+            [hair.default],
+            [base.base],
+        ]
     ),
     'Player NSFW (IVCS)': Template(
         name= "Player NSFW (IVCS)",
-        color_sets=[CS_AETHER_BLEND],
         overrides=[WO_NSFW, PO_DEFAULT],
-        modules = [spine.default, arms.default, legs.default, skirt.default, hands.ivcs, toes.ivcs, tail.default, face.detailed, ears.miqo, ears.viera, hair.default, genitals.ivcs_both]
+        modules = [
+            [spine.default],
+            [arms.default],
+            [legs.default],
+            [skirt.default],
+            [hands.ivcs],
+            [toes.ivcs],
+            [tail.default],
+            [face.detailed],
+            [ears.miqo, ears.viera],
+            [hair.default],
+            [genitals.ivcs_both],
+            [base.base],
+        ]
     ),
     'Dynamic': Template(
         name= "Dynamic",
-        color_sets=[CS_AETHER_BLEND], 
         overrides=[WO_NSFW, PO_DEFAULT],
-        modules = [ears.miqo, ears.viera, hair.default, face.detailed, arms.default, spine.default, hands.ivcs, hands.default, legs.default, toes.ivcs, skirt.default, tail.default, genitals.ivcs_both]
+        modules = [
+            [ears.miqo, ears.viera],
+            [hair.default],
+            [face.detailed],
+            [arms.default],
+            [spine.default],
+            [hands.ivcs, hands.default],
+            [legs.default],
+            [toes.ivcs],
+            [skirt.default],
+            [tail.default],
+            [genitals.ivcs_both],
+            [base.base],
+        ]
     ),
 }

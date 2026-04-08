@@ -77,7 +77,7 @@ TAIL = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
-        type="tail",
+        type="Generation",
         bone_groups=[TAIL],
         ui = UI_Collections([
             BoneCollection(name="Tail", ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),

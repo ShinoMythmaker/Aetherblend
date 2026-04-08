@@ -46,7 +46,7 @@ MIQO_EARS = BoneGroup(
 def get_rig_module() -> RigModule:
     rig_module = RigModule(
         name="Miqo",
-        type="ears",
+        type="Generation",
         bone_groups=[MIQO_EARS]
     )
     return rig_module

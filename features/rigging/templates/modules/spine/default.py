@@ -100,7 +100,7 @@ SPINE = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
-        type="spine",
+        type="Generation",
         bone_groups=[SPINE],
         ui = UI_Collections([
             BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=1, title="Torso"),

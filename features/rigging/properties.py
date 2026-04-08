@@ -9,6 +9,13 @@ class AETHER_PROP_RigModuleItem(bpy.types.PropertyGroup):
         description="Stable identifier for the selected rig module"
     ) # type: ignore
 
+    group_index : bpy.props.IntProperty(
+        name="Priority Group",
+        description="Ordered fallback group this module belongs to",
+        default=-1,
+        options={'HIDDEN'}
+    ) # type: ignore
+
 
 class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     meta_rig : bpy.props.PointerProperty(
@@ -32,6 +39,13 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         default=0
     ) # type: ignore
 
+    selected_colorset : bpy.props.EnumProperty(
+        name="Colorset",
+        description="Select a colorset (replaces template default)",
+        items=template_manager.get_colorset_items,
+        default=0
+    ) # type: ignore
+
     modules : bpy.props.CollectionProperty(
         type=AETHER_PROP_RigModuleItem
     ) # type: ignore
@@ -40,13 +54,6 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         name="Module Index",
         default=0,
         options={'HIDDEN'}
-    ) # type: ignore
-    
-    selected_colorset : bpy.props.EnumProperty(
-        name="Colorset",
-        description="Select a colorset (replaces template default)",
-        items=template_manager.get_colorset_items,
-        default=0
     ) # type: ignore
     
     link_inherit_scale : bpy.props.EnumProperty(

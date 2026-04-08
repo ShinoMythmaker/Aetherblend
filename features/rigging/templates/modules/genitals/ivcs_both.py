@@ -9,7 +9,7 @@ def get_rig_module() -> RigModule:
 
     rig_module = RigModule(
         name="IVCS Both",
-        type="genitals",
+        type="Generation",
         bone_groups=[*female_module.bone_groups, *male_module.bone_groups]
     )
     return rig_module

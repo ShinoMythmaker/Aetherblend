@@ -260,12 +260,11 @@ class BoneGroup:
 
 @dataclass
 class RigModule:
-    """Defines a rig module with its bone groups and generation logic."""
+    """Defines a rig module and its behavior category."""
     name: str
     type: str
     bone_groups: list[BoneGroup]
     ui: rigify.settings.UI_Collections | None = None
-
     def execute(self, armature: bpy.types.Object, data: dict) -> tuple[bool, PoseOperationsStack, rigify.settings.UI_Collections | None]:
         bpy.context.view_layer.objects.active = armature
         pose_op_stack = PoseOperationsStack()
@@ -283,26 +282,19 @@ class RigModule:
         
 
 class AetherRigGenerator:
-    """Generates an armature based on defined bone groups."""
+    """Generates an armature based on ordered module priority groups."""
     name: str
-    modules: 'dict[str, list[RigModule]]'
-    color_sets: 'list[dict[str, rigify.ColorSet]]'
+    modules: 'list[list[RigModule]]'
+    color_sets: 'dict[str, rigify.ColorSet]'
     overrides: 'list[dict[str, Override]] | None' = None
     
 
-    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, overrides: 'list[dict[str, Override]] | None' = None, modules: 'list[RigModule] | None' = None):
+    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, overrides: 'list[dict[str, Override]] | None' = None, modules: 'list[list[RigModule]] | None' = None):
         self.name = name
         self.color_sets = color_sets
         self.overrides = overrides
         
         self.set_modules(modules or [])
-
-    def getColorSets(self) -> dict[str, rigify.ColorSet]:
-        """Combine all color sets into a single dictionary."""
-        combined: dict[str, rigify.ColorSet] = {}
-        for cs_dict in self.color_sets or []:
-            combined.update(cs_dict)
-        return combined
     
     def getOverrides(self) -> dict[str, Override]:
         """Combine all widget overrides into a single dictionary."""
@@ -311,19 +303,13 @@ class AetherRigGenerator:
             combined.update(ov_dict)
         return combined
     
-    def set_modules(self, modules: list[RigModule]):
-        """Set the modules for this rig generator."""
-        combined: dict[str, list[RigModule]] = {}
-        for module in modules or []:
-            if module.type not in combined:
-                combined[module.type] = []
-            combined[module.type].append(module)
-        self.modules = combined
+    def set_modules(self, modules: 'list[list[RigModule]]'):
+        """Store the already-resolved module priority groups."""
+        self.modules = [list(group) for group in modules if group]
 
 @dataclass(frozen=True)
 class Template():
     """Defines a rig template with its properties and modules."""
     name: str
-    color_sets: 'list[dict[str, rigify.ColorSet]]'
     overrides: 'list[dict[str, Override]] | None'
-    modules: 'list[RigModule]'
+    modules: 'list[list[RigModule]]'

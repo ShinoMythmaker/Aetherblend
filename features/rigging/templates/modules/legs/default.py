@@ -182,7 +182,7 @@ LEG_L = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
-        type="legs",
+        type="Generation",
         bone_groups=[LEG_L, LEG_R],
         ui = UI_Collections([
             BoneCollection(name="Leg.L (IK)", ui=True, color_set="IK_Left", row_index=1, title="Leg IK.L"),

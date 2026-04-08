@@ -13,6 +13,30 @@ def _flatten_children(iterable):
         yield from _flatten_children(item.children)
 
 
+MODULE_TYPE_ICONS = {
+    "Generation": 'GROUP_BONE',
+    "UI-Addon": 'OUTLINER_COLLECTION',
+    "Patch": 'MODIFIER',
+}
+
+
+def _format_module_family(module_key: str) -> str:
+    family_name = (module_key or '').split('.', 1)[0]
+    return family_name.replace('_', ' ').title() or "Misc"
+
+
+def _is_group_fallback(aether_rig, index: int) -> bool:
+    modules = getattr(aether_rig, 'modules', None)
+    if not modules or index <= 0 or index >= len(modules):
+        return False
+
+    group_index = getattr(modules[index], 'group_index', -1)
+    if group_index < 0:
+        return False
+
+    return getattr(modules[index - 1], 'group_index', -1) == group_index
+
+
 class AETHER_UL_RigModules(bpy.types.UIList):
     """Display the currently selected rig modules in a Blender-style list."""
     def draw_filter(self, context, layout):
@@ -26,10 +50,19 @@ class AETHER_UL_RigModules(bpy.types.UIList):
             return
 
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            split = layout.split(factor=0.78, align=True)
-            split.label(text=f"{module.type.replace('_', ' ').title()}", icon='GROUP_BONE')
+            family_label = _format_module_family(item.module_key)
+            type_icon = MODULE_TYPE_ICONS.get(module.type, 'QUESTION')
+            is_fallback = _is_group_fallback(data, index)
+
+            split = layout.split(factor=0.72, align=True)
+            left = split.row(align=True)
             right = split.row(align=True)
             right.alignment = 'RIGHT'
+
+            if is_fallback:
+                left.label(text="", icon='TRIA_UP')
+
+            left.label(text=family_label, icon=type_icon)
             right.label(text=module.name)
         elif self.layout_type == 'GRID':
             layout.alignment = 'CENTER'

@@ -1318,7 +1318,7 @@ RIGHT_EYE = BoneGroup(
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
-        type="face",
+        type="Generation",
         bone_groups=[HEAD, BROW, LEFT_EYE, RIGHT_EYE],
         ui = UI_Collections([
             BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
