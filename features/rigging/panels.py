@@ -19,11 +19,9 @@ MODULE_TYPE_ICONS = {
     "Patch": 'MODIFIER',
 }
 
-
 def _format_module_family(module_key: str) -> str:
     family_name = (module_key or '').split('.', 1)[0]
     return family_name.replace('_', ' ').title() or "Misc"
-
 
 def _is_group_fallback(aether_rig, index: int) -> bool:
     modules = getattr(aether_rig, 'modules', None)
@@ -35,7 +33,6 @@ def _is_group_fallback(aether_rig, index: int) -> bool:
         return False
 
     return getattr(modules[index - 1], 'group_index', -1) == group_index
-
 
 class AETHER_UL_RigModules(bpy.types.UIList):
     """Display the currently selected rig modules in a Blender-style list."""
@@ -152,10 +149,11 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         modules_box = layout.box()
         modules_box.label(text="Modules", icon='MODIFIER')
 
+        row = modules_box.row()
+
         if len(aether_rig.modules) == 0:
-            modules_box.label(text="No modules found for this template.", icon='INFO')
+            row.label(text="No modules found for this template.", icon='INFO')
         else:
-            row = modules_box.row()
             row.template_list(
                 "AETHER_UL_RigModules",
                 "",
@@ -167,9 +165,32 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
                 sort_lock=True,
             )
 
-            buttons = row.column(align=True)
-            remove = buttons.operator("aether.remove_template_module", text="", icon='REMOVE')
-            remove.module_index = aether_rig.module_index
+        has_selection = 0 <= aether_rig.module_index < len(aether_rig.modules)
+        buttons = row.column(align=True)
+
+        buttons.menu("AETHER_MT_add_group_module_menu", text="", icon='ADD')
+
+        add_fallback_col = buttons.column(align=True)
+        add_fallback_col.enabled = has_selection
+        add_fallback_col.menu("AETHER_MT_add_fallback_module_menu", text="", icon='LINKED')
+
+        buttons.separator()
+
+        move_col = buttons.column(align=True)
+        move_col.enabled = has_selection
+
+        move_up = move_col.operator("aether.move_template_module", text="", icon='TRIA_UP')
+        move_up.direction = 'UP'
+
+        move_down = move_col.operator("aether.move_template_module", text="", icon='TRIA_DOWN')
+        move_down.direction = 'DOWN'
+
+        buttons.separator()
+
+        remove_col = buttons.column(align=True)
+        remove_col.enabled = has_selection
+        remove = remove_col.operator("aether.remove_template_module", text="", icon='REMOVE')
+        remove.module_index = aether_rig.module_index
 
 
 class AETHER_PT_RigManipulation(bpy.types.Panel):

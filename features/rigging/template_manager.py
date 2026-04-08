@@ -39,7 +39,6 @@ def resolve_module_groups(aether_rig) -> list[list[RigModule]]:
 
     return [group for group in grouped_modules if group]
 
-
 def sync_modules_from_template(aether_rig) -> None:
     """Template to Module Prop"""
     if not aether_rig or not hasattr(aether_rig, 'modules'):

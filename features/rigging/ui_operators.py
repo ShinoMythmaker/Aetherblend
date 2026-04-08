@@ -1,13 +1,312 @@
 import bpy
 
 from . import template_manager
+from .templates import get_modules_by_family
+
+
+MODULE_TYPE_ICONS = {
+    "Generation": 'GROUP_BONE',
+    "UI-Addon": 'OUTLINER_COLLECTION',
+    "Patch": 'MODIFIER',
+}
+MODULE_TYPE_ORDER = {
+    "Generation": 0,
+    "UI-Addon": 1,
+    "Patch": 2,
+}
+_DYNAMIC_ADD_MENU_CLASSES = []
+
+
+def _format_family_name(family_name: str) -> str:
+    """Convert a module family key into a UI-friendly label."""
+    return (family_name or '').replace('_', ' ').title() or "Misc"
+
+
+def _get_family_menu_idname(mode: str, family_name: str) -> str:
+    """Build a stable menu idname for a family submenu."""
+    family_slug = family_name.replace('.', '_').replace('-', '_')
+    return f"AETHER_MT_add_{mode.lower()}_{family_slug}_module_menu"
+
+
+def _draw_family_module_menu(layout, mode: str, family_name: str) -> None:
+    """Draw the module entries for a single family, grouped by module type."""
+    modules_by_type: dict[str, list[tuple[str, object]]] = {}
+
+    for key, module in get_modules_by_family(family_name).items():
+        module_type = getattr(module, 'type', None) or "Other"
+        modules_by_type.setdefault(module_type, []).append((key, module))
+
+    for index, (module_type, entries) in enumerate(
+        sorted(
+            modules_by_type.items(),
+            key=lambda item: (MODULE_TYPE_ORDER.get(item[0], 99), item[0]),
+        )
+    ):
+        if index > 0:
+            layout.separator()
+
+        layout.label(text=module_type, icon=MODULE_TYPE_ICONS.get(module_type, 'DOT'))
+        column = layout.column(align=True)
+
+        for key, module in entries:
+            operator = column.operator(
+                "aether.add_template_module",
+                text=module.name,
+                icon='NONE',
+            )
+            operator.mode = mode
+            operator.module_key = key
+
+
+def _build_family_menu_class(mode: str, family_name: str):
+    """Create a dedicated submenu class for one module family."""
+    menu_idname = _get_family_menu_idname(mode, family_name)
+    class_name = ''.join(part.capitalize() for part in f"{mode}_{family_name}".replace('.', '_').split('_'))
+
+    def draw(self, context):
+        _draw_family_module_menu(self.layout, mode, family_name)
+
+    return type(
+        f"AETHER_MT_{class_name}_Module_Menu",
+        (bpy.types.Menu,),
+        {
+            "bl_idname": menu_idname,
+            "bl_label": _format_family_name(family_name),
+            "draw": draw,
+        },
+    )
+
+
+def _get_group_bounds(modules, index: int) -> tuple[int, int]:
+    """Return the contiguous bounds for the selected fallback group."""
+    if index < 0 or index >= len(modules):
+        return index, index
+
+    group_index = getattr(modules[index], 'group_index', -1)
+    if group_index < 0:
+        return index, index + 1
+
+    start = index
+    while start > 0 and getattr(modules[start - 1], 'group_index', -1) == group_index:
+        start -= 1
+
+    end = index + 1
+    while end < len(modules) and getattr(modules[end], 'group_index', -1) == group_index:
+        end += 1
+
+    return start, end
+
+
+def _reindex_module_groups(aether_rig) -> None:
+    """Normalize stored group indices so they match the current UI list order."""
+    next_group_index = 0
+    previous_group_index = None
+
+    for item in aether_rig.modules:
+        group_index = getattr(item, 'group_index', -1)
+        starts_new_group = (
+            previous_group_index is None
+            or group_index < 0
+            or previous_group_index < 0
+            or group_index != previous_group_index
+        )
+
+        if starts_new_group:
+            item.group_index = next_group_index
+            next_group_index += 1
+        else:
+            item.group_index = next_group_index - 1
+
+        previous_group_index = group_index
+
+
+def _get_next_group_index(modules) -> int:
+    """Return a temporary group index that will not collide with existing groups."""
+    return max((getattr(item, 'group_index', -1) for item in modules), default=-1) + 1
+
+
+def _insert_module_item(aether_rig, module_key: str, insert_index: int, group_index: int) -> int:
+    """Insert a module entry at the requested UI position."""
+    modules = aether_rig.modules
+    item = modules.add()
+    item.module_key = module_key
+    item.group_index = group_index
+
+    new_index = len(modules) - 1
+    insert_index = max(0, min(insert_index, new_index))
+    if insert_index != new_index:
+        modules.move(new_index, insert_index)
+
+    return insert_index
+
+
+class AETHER_MT_Add_Group_Module_Menu(bpy.types.Menu):
+    bl_idname = "AETHER_MT_add_group_module_menu"
+    bl_label = "Add Group"
+
+    def draw(self, context):
+        column = self.layout.column(align=True)
+        for family_name in get_modules_by_family().keys():
+            column.menu(
+                _get_family_menu_idname('GROUP', family_name),
+                text=_format_family_name(family_name),
+                icon='FILE_FOLDER',
+            )
+
+
+class AETHER_MT_Add_Fallback_Module_Menu(bpy.types.Menu):
+    bl_idname = "AETHER_MT_add_fallback_module_menu"
+    bl_label = "Add Fallback"
+
+    def draw(self, context):
+        column = self.layout.column(align=True)
+        for family_name in get_modules_by_family().keys():
+            column.menu(
+                _get_family_menu_idname('FALLBACK', family_name),
+                text=_format_family_name(family_name),
+                icon='FILE_FOLDER',
+            )
+
+
+class AETHER_OT_Add_Template_Module(bpy.types.Operator):
+    bl_idname = "aether.add_template_module"
+    bl_label = "Add Template Module"
+    bl_description = "Insert a module as a new group or fallback entry"
+    bl_options = {'UNDO'}
+
+    mode: bpy.props.EnumProperty(
+        name="Insert Mode",
+        items=[
+            ('GROUP', "Group", "Insert a new standalone priority group after the selected group"),
+            ('FALLBACK', "Fallback", "Add a fallback module to the selected group"),
+        ],
+        options={'HIDDEN'},
+    ) # type: ignore
+
+    module_key: bpy.props.StringProperty(
+        name="Module Key",
+        description="Registered rig module to add",
+        options={'HIDDEN'},
+    ) # type: ignore
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            self.report({'ERROR'}, "Armature has no Aether rig settings")
+            return {'CANCELLED'}
+
+        if self.module_key not in template_manager.AVAILABLE_MODULES:
+            self.report({'WARNING'}, "Choose a valid module to add")
+            return {'CANCELLED'}
+
+        modules = aether_rig.modules
+        selected_index = aether_rig.module_index
+        has_selection = 0 <= selected_index < len(modules)
+
+        if self.mode == 'FALLBACK' and not has_selection:
+            self.report({'WARNING'}, "Select a module group first")
+            return {'CANCELLED'}
+
+        if not has_selection:
+            insert_index = len(modules)
+            group_index = _get_next_group_index(modules)
+        else:
+            start, end = _get_group_bounds(modules, selected_index)
+            insert_index = end
+            if self.mode == 'FALLBACK':
+                group_index = getattr(modules[start], 'group_index', -1)
+            else:
+                group_index = _get_next_group_index(modules)
+
+        inserted_index = _insert_module_item(aether_rig, self.module_key, insert_index, group_index)
+        _reindex_module_groups(aether_rig)
+        aether_rig.module_index = inserted_index
+        return {'FINISHED'}
+
+
+class AETHER_OT_Move_Template_Module(bpy.types.Operator):
+    bl_idname = "aether.move_template_module"
+    bl_label = "Move Template Module"
+    bl_description = "Move the selected group up/down, or reorder a child module within its fallback group"
+    bl_options = {'UNDO'}
+
+    direction: bpy.props.EnumProperty(
+        name="Direction",
+        items=[
+            ('UP', "Up", "Move the selected entry upward"),
+            ('DOWN', "Down", "Move the selected entry downward"),
+        ],
+        options={'HIDDEN'},
+    ) # type: ignore
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            self.report({'ERROR'}, "Armature has no Aether rig settings")
+            return {'CANCELLED'}
+
+        modules = aether_rig.modules
+        index = aether_rig.module_index
+        if index < 0 or index >= len(modules):
+            self.report({'WARNING'}, "Select a module to move")
+            return {'CANCELLED'}
+
+        start, end = _get_group_bounds(modules, index)
+        moved_index = index
+
+        if index == start:
+            group_size = end - start
+
+            if self.direction == 'UP':
+                if start == 0:
+                    self.report({'INFO'}, "This group is already at the top")
+                    return {'CANCELLED'}
+
+                previous_start, _ = _get_group_bounds(modules, start - 1)
+                for offset in range(group_size):
+                    modules.move(start + offset, previous_start + offset)
+                moved_index = previous_start
+            else:
+                if end >= len(modules):
+                    self.report({'INFO'}, "This group is already at the bottom")
+                    return {'CANCELLED'}
+
+                _, next_end = _get_group_bounds(modules, end)
+                for _ in range(group_size):
+                    modules.move(start, next_end - 1)
+                moved_index = next_end - group_size
+        else:
+            if self.direction == 'UP':
+                modules.move(index, index - 1)
+                moved_index = index - 1
+            else:
+                if index >= end - 1:
+                    self.report({'INFO'}, "This module is already last in its fallback group")
+                    return {'CANCELLED'}
+
+                modules.move(index, index + 1)
+                moved_index = index + 1
+
+        _reindex_module_groups(aether_rig)
+        aether_rig.module_index = moved_index
+        return {'FINISHED'}
 
 
 class AETHER_OT_Remove_Template_Module(bpy.types.Operator):
     bl_idname = "aether.remove_template_module"
     bl_label = "Remove Template Module"
     bl_description = "Remove this module from the rig's current temporary module selection"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'UNDO'}
 
     module_index: bpy.props.IntProperty(
         name="Module Index",
@@ -30,6 +329,7 @@ class AETHER_OT_Remove_Template_Module(bpy.types.Operator):
             return {'CANCELLED'}
 
         aether_rig.modules.remove(self.module_index)
+        _reindex_module_groups(aether_rig)
         aether_rig.module_index = min(self.module_index, len(aether_rig.modules) - 1)
 
         return {'FINISHED'}
@@ -78,9 +378,35 @@ class AETHER_OT_Solo_Bone_Collections(bpy.types.Operator):
 
 
 def register():
+    global _DYNAMIC_ADD_MENU_CLASSES
+
+    _DYNAMIC_ADD_MENU_CLASSES = [
+        _build_family_menu_class(mode, family_name)
+        for mode in ('GROUP', 'FALLBACK')
+        for family_name in get_modules_by_family().keys()
+    ]
+
+    for menu_class in _DYNAMIC_ADD_MENU_CLASSES:
+        bpy.utils.register_class(menu_class)
+
+    bpy.utils.register_class(AETHER_MT_Add_Group_Module_Menu)
+    bpy.utils.register_class(AETHER_MT_Add_Fallback_Module_Menu)
+    bpy.utils.register_class(AETHER_OT_Add_Template_Module)
+    bpy.utils.register_class(AETHER_OT_Move_Template_Module)
     bpy.utils.register_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.register_class(AETHER_OT_Solo_Bone_Collections)
 
 def unregister():
+    global _DYNAMIC_ADD_MENU_CLASSES
+
     bpy.utils.unregister_class(AETHER_OT_Solo_Bone_Collections)
     bpy.utils.unregister_class(AETHER_OT_Remove_Template_Module)
+    bpy.utils.unregister_class(AETHER_OT_Move_Template_Module)
+    bpy.utils.unregister_class(AETHER_OT_Add_Template_Module)
+    bpy.utils.unregister_class(AETHER_MT_Add_Fallback_Module_Menu)
+    bpy.utils.unregister_class(AETHER_MT_Add_Group_Module_Menu)
+
+    for menu_class in reversed(_DYNAMIC_ADD_MENU_CLASSES):
+        bpy.utils.unregister_class(menu_class)
+
+    _DYNAMIC_ADD_MENU_CLASSES = []
