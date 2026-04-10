@@ -11,7 +11,6 @@ from . import rigify
 from .constraints import Constraint, CopyTransformsConstraint
 from .. import utils
 
-
 @dataclass
 class PoseOperations:
     """Groups all pose mode operations for a single bone."""

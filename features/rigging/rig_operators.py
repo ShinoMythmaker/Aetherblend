@@ -5,8 +5,7 @@ from ... import utils
 from ...core.shared import PoseOperations, PoseOperationsStack
 from ...core import rigify
 from . import template_manager
-
-
+from ...core.operations import ABOperation, ABOperationStack, ConstraintOperation, CollectionOperation, RigifyTypeOperation
 
 class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_idname = "aether.generate_meta_rig"
@@ -150,8 +149,17 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
                 
 
         # Now apply all operations per bone
-        bpy.ops.object.mode_set(mode='POSE')
-        pose_ops_stack.execute(meta_rig)
+
+        ## Lets turn our old PoseOps into our new ABOperation system so we can apply them in one go
+
+        newOPStack = ABOperationStack()
+        newOPStack._addPoseOperationStack(pose_ops_stack)
+
+        newOPStack.applyPreEditOperations(meta_rig)
+        newOPStack.applyPrePoseOperations(meta_rig)
+
+        # bpy.ops.object.mode_set(mode='POSE')
+        # pose_ops_stack.execute(meta_rig)
        
                 
         for hide_coll in hide_collections:
