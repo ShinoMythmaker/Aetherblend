@@ -17,7 +17,7 @@ IV_TOES_R = BoneGroup(
         TransformLink(target="DEF-Pinky_Toe.R", bone="iv_asi_ko_a_r"),
         TransformLink(target="DEF-Pinky_Toe.R.001", bone="iv_asi_ko_b_r"),
     ],
-    bones=[
+    generators=[
         #Toes Right
         ConnectBone(
             name="Hallux_Toe.R",
@@ -156,7 +156,7 @@ IV_TOES_L = BoneGroup(
         TransformLink(target="DEF-Pinky_Toe.L", bone="iv_asi_ko_a_l"),
         TransformLink(target="DEF-Pinky_Toe.L.001", bone="iv_asi_ko_b_l"),
     ],
-    bones=[
+    generators=[
         #Toes Left
         ConnectBone(
             name="Hallux_Toe.L",

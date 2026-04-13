@@ -15,7 +15,7 @@ ARM_R = BoneGroup(
             TransformLink(target="DEF-forearm.R.001", bone="n_hte_r"),
             TransformLink(target="DEF-elbow.R", bone="n_hhiji_r")
             ],
-        bones = [
+        generators = [
             #Right Clavicle
             ConnectBone(
                 name="clavicle.R",
@@ -93,7 +93,7 @@ ARM_L = BoneGroup(
             TransformLink(target="DEF-forearm.L.001", bone="n_hte_l"),
             TransformLink(target="DEF-elbow.L", bone="n_hhiji_l")
             ],
-        bones = [
+        generators = [
             #Left Clavicle
             ConnectBone(
                 name="clavicle.L",

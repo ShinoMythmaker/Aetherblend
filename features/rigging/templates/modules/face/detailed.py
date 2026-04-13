@@ -51,12 +51,12 @@ HEAD = BoneGroup(
         TransformLink(target="DEF-Tongue.001", bone="j_f_bero_02"),
         TransformLink(target="DEF-Tongue.002", bone="j_f_bero_03"),
     ],
-    bones=[
+    generators=[
         ConnectBone(
             name="Neck",
             bone_a="j_kubi",
             bone_b="j_kao",
-            parent="Spine.004",
+            parent=["Spine.004", "j_sebo_c"],
             is_connected=False,
             req_bones=["j_kubi", "j_kao"],
             pose_operations=PoseOperations(
@@ -778,7 +778,7 @@ BROW = BoneGroup(
         TransformLink(target="DEF-Brow.L.002", bone="j_f_miken_01_l"),
         TransformLink(target="DEF-Brow.L.003", bone="j_f_miken_02_l")
     ],
-    bones=[
+    generators=[
         ConnectBone(
             name="Brow.R",
             bone_a="j_f_mayu_r",
@@ -885,7 +885,7 @@ LEFT_EYE = BoneGroup(
         TransformLink(target="lid.T.L.003", bone="j_f_mabup_03in_l"),
         TransformLink(target="MCH-Eye.L", bone="j_f_eyepuru_l"),
     ],
-    bones=[
+    generators=[
 
         ## Skin Bone, Basicly Corner Bones for the eyes
         SkinBone(
@@ -1118,7 +1118,7 @@ RIGHT_EYE = BoneGroup(
         TransformLink(target="lid.T.R.003", bone="j_f_mabup_03in_r"),
         TransformLink(target="MCH-Eye.R", bone="j_f_eyepuru_r"),
     ],
-    bones=[
+    generators=[
         ## Skin Bone, Basicly Corner Bones for the eyes
         SkinBone(
             name="lid.T.R", 

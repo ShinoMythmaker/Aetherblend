@@ -23,7 +23,7 @@ VIERA_EARS = BoneGroup(
         TransformLink(target="DEF-V_Ear.L", bone="j_zerd_a_l"),
         TransformLink(target="DEF-V_Ear.L.001", bone="j_zerd_b_l"),
     ],
-    bones=[
+    generators=[
         ConnectBone(
             name="V_Ear.R",
             bone_a="j_zera_a_r",

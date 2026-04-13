@@ -11,7 +11,6 @@ class Constraint(ABC):
         """Applies the constraint to the given bone."""
         pass
 
-
 @dataclass(frozen=True)
 class CopyScaleConstraint(Constraint):
     target_bone: str | None = None
@@ -44,7 +43,6 @@ class CopyScaleConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
-
 
 @dataclass(frozen=True)
 class CopyLocationConstraint(Constraint):
@@ -80,7 +78,6 @@ class CopyLocationConstraint(Constraint):
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
 
-
 @dataclass(frozen=True)
 class CopyRotationConstraint(Constraint):
     target_bone: str | None = None
@@ -115,7 +112,6 @@ class CopyRotationConstraint(Constraint):
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
 
-
 @dataclass(frozen=True)
 class CopyTransformsConstraint(Constraint):
     target_bone: str | None = None
@@ -143,7 +139,6 @@ class CopyTransformsConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
-
 
 @dataclass(frozen=True)
 class TrackToConstraint(Constraint):

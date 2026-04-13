@@ -14,7 +14,7 @@ GENITALS_M = BoneGroup(
         TransformLink(target="DEF-Testicle.R", bone="iv_kougan_r"),
         TransformLink(target="DEF-Testicle.L", bone="iv_kougan_l")
     ],
-    bones=[
+    generators=[
         ConnectBone(
             name="Penis",
             bone_a="iv_ochinko_a",

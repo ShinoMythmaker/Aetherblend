@@ -11,7 +11,7 @@ LEG_R = BoneGroup(
             TransformLink(target="DEF-foot.R", bone="j_asi_d_r", retarget="FK-foot.R"),
             TransformLink(target="DEF-toe.R", bone="j_asi_e_r", retarget="FK-toe.R"),
             ],
-        bones = [
+        generators = [
             # Right Leg
             ConnectBone(
                 name="thigh.R", 
@@ -99,7 +99,7 @@ LEG_L = BoneGroup(
             TransformLink(target="DEF-foot.L", bone="j_asi_d_l", retarget="FK-foot.L"),
             TransformLink(target="DEF-toe.L", bone="j_asi_e_l", retarget="FK-toe.L"),
             ],
-        bones = [
+        generators = [
             # Left Leg
             ConnectBone(
                 name="thigh.L", 

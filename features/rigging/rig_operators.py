@@ -2,10 +2,9 @@ import bpy
 import time
 
 from ... import utils
-from ...core.shared import PoseOperations, PoseOperationsStack
 from ...core import rigify
 from . import template_manager
-from ...core.operations import ABOperation, ABOperationStack, ConstraintOperation, CollectionOperation, RigifyTypeOperation
+from ...core.operations import ABOperation, ABOperationStack,  PoseOperations, PoseOperationsStack
 
 class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
     bl_idname = "aether.generate_meta_rig"
@@ -63,6 +62,8 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         
         ## This will make sure all FF bones will carry over to the rigify rig
         pose_ops_stack = PoseOperationsStack()
+        newOPStack = ABOperationStack()
+
         for bone in meta_rig.data.bones:
             pose_ops_stack.add(bone.name, PoseOperations(rigify_settings=rigify.types.basic_raw_copy(True)))
 
@@ -106,12 +107,17 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
 
         for module_group in aether_rig_generator.modules:
             for module in module_group:
-                integrity, module_pose_ops, module_ui_collections = module.execute(meta_rig, data)
+                integrity, module_pose_ops, module_ui_collections, module_new_ops = module.execute(meta_rig, data)
+                if not integrity:
+                    print(f"[AetherBlend] Module '{module.name}' failed integrity check during meta rig generation.")
+                    continue
                 pose_ops_stack.merge(module_pose_ops)
                 if module_ui_collections:
                     ui.add(module_ui_collections)
-                if integrity:
-                    break
+                if module_new_ops:
+                    for op in module_new_ops:
+                        newOPStack.add_operation(op)
+                break
 
         ## Cleanup unlinked Bones and assign Collection to FFXIV bones
         data_bones = meta_rig.data.bones
@@ -151,14 +157,11 @@ class AETHER_OT_Generate_Meta_Rig(bpy.types.Operator):
         # Now apply all operations per bone
 
         ## Lets turn our old PoseOps into our new ABOperation system so we can apply them in one go
-
-        newOPStack = ABOperationStack()
         newOPStack._addPoseOperationStack(pose_ops_stack)
 
         newOPStack.applyPreEditOperations(meta_rig)
         newOPStack.applyPrePoseOperations(meta_rig)
 
-        # bpy.ops.object.mode_set(mode='POSE')
         # pose_ops_stack.execute(meta_rig)
        
                 

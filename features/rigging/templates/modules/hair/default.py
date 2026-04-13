@@ -5,7 +5,7 @@ from ......core.rigify.settings import UI_Collections, BoneCollection
 HAIR = BoneGroup(
     name="Hair",
     transform_link=[],
-    bones=[
+    generators=[
         RegexBoneGroup(
             name="Hair",
             pattern=r"^j_ex_h.*",

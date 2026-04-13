@@ -18,7 +18,7 @@ HAND_R = BoneGroup(
         TransformLink(target="DEF-pinky.R", bone="j_ko_a_r"),
         TransformLink(target="DEF-pinky.R.001", bone="j_ko_b_r"),
     ],
-    bones=[
+    generators=[
         #Palm Control - Very cool stuff, thank you rigify - Oats
         ExtensionBone(
             name="palm.01.R",
@@ -239,7 +239,7 @@ HAND_L = BoneGroup(
         TransformLink(target="DEF-pinky.L", bone="j_ko_a_l"),
         TransformLink(target="DEF-pinky.L.001", bone="j_ko_b_l"),
     ],
-    bones=[
+    generators=[
         #Palm Control - Very cool stuff, thank you rigify - Oats
         ExtensionBone(
             name="palm.01.L",

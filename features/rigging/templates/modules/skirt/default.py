@@ -16,7 +16,7 @@ SKIRT_R = BoneGroup(
             TransformLink(target="DEF-Skirt_Back.R.001", bone="j_sk_b_b_r"),
             TransformLink(target="DEF-Skirt_Back.R.002", bone="j_sk_b_c_r"),
             ],
-        bones = [
+        generators = [
             #Front
             ConnectBone(
                 name="Skirt_Front.R",
@@ -184,7 +184,7 @@ SKIRT_L = BoneGroup(
             TransformLink(target="DEF-Skirt_Back.L.001", bone="j_sk_b_b_l"),
             TransformLink(target="DEF-Skirt_Back.L.002", bone="j_sk_b_c_l"),
             ],
-        bones = [
+        generators = [
             #Front
             ConnectBone(
                 name="Skirt_Front.L",

@@ -10,7 +10,7 @@ GENITALS_F = BoneGroup(
         TransformLink(target="DEF-Vulva.L", bone="iv_inshin_l"),
         TransformLink(target="DEF-Vulva", bone="iv_omanko"),
     ],
-    bones=[
+    generators=[
         ConnectBone(
             name="Clitoris",
             bone_a="iv_kuritto",

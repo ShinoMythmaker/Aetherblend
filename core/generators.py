@@ -3,33 +3,49 @@ import math
 import mathutils 
 import re
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .shared import PoseOperations, TransformLink
+    from .operations import PoseOperations
 
 from . import rigify
-from .shared import PoseOperations, TransformLink
+from .operations import ABOperation, ParentBoneOperation, PoseOperations
+from .shared import TransformLink
 from .. import utils
 
-
+@dataclass
 class BoneGenerator(ABC):
     """Base interface for all bone generation types."""
-    # These fields will be defined in child dataclasses
+
     name: str
-    parent: str | None = None
-    is_connected: bool = False
-    roll: float = 0.0
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
-    
+    parent: str | list[str] | None = field(default=None, kw_only=True)
+    is_connected: bool = field(default=False, kw_only=True)
+    roll: float = field(default=0.0, kw_only=True)
+    req_bones: list[str] | None = field(default=None, kw_only=True)
+    pose_operations: 'PoseOperations | None' = field(default=None, kw_only=True)
+    operations: list[ABOperation] = field(default_factory=list, kw_only=True)
+    is_optional: bool = field(default=False, kw_only=True)
+
     @abstractmethod
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the bone and returns the created bone name(s)."""
-        pass
+        return NotImplementedError
+        
+    def _set_parent(self, new_bone: bpy.types.EditBone, edit_bones: bpy.types.ArmatureEditBones, is_connected_overrite: bool | None = None) -> None:
+        """Sets the parent bone for the generated bone. Override in subclasses if needed."""
+        is_connected_overrite = is_connected_overrite if is_connected_overrite is not None else self.is_connected
+        if self.parent:
+            parent_names = self.parent if isinstance(self.parent, list) else [self.parent]
+            parent_bone_name = parent_names[0]
+            parent_bone = edit_bones.get(parent_bone_name)
+            if parent_bone:
+                new_bone.parent = parent_bone
+                new_bone.use_connect = is_connected_overrite
+            else:
+                self.operations.append(ParentBoneOperation(new_bone.name, tuple(parent_names), is_connected_overrite))
+        return 
     
     def get_dynamic_pose_operations(self) -> dict[str, list['PoseOperations']]:
         """Returns dynamically generated pose operations. Override in subclasses that need this."""
@@ -39,25 +55,16 @@ class BoneGenerator(ABC):
         """Returns dynamically generated transform links. Override in subclasses that need this."""
         return []
 
-@dataclass(frozen=True)
+@dataclass
 class RegexBoneGroup(BoneGenerator):
-    name: str
     pattern: str
     prefix: str = "HAIR"
     extension_size_factor: float = 1.0
-    extension_axis_type: str = "local"  # e.g., "global", "local", "armature"
-    extension_axis: str  = "Y"  # e.g., "X", "Y", "Z"
-    parent: str | None = None
-    is_connected: bool = False
-    b_collection: str | None = None  # Bone collection to assign generated bones to
-    
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
-    
-    # These are populated after generate() is called
-    _dynamic_pose_operations: dict[str, list['PoseOperations']] | None = None
-    _dynamic_transform_links: list['TransformLink'] | None = None
+    extension_axis_type: str = "local"
+    extension_axis: str = "Y"
+    b_collection: str | None = None
+    _dynamic_pose_operations: dict[str, list['PoseOperations']] = field(default_factory=dict, init=False, repr=False)
+    _dynamic_transform_links: list['TransformLink'] = field(default_factory=list, init=False, repr=False)
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates bone chains for pattern-matched bones in the target armature."""
@@ -66,9 +73,9 @@ class RegexBoneGroup(BoneGenerator):
             print(f"[AetherBlend] Invalid armatures provided for RegexBoneGroup with pattern '{self.pattern}'.")
             return None
         
-        # Initialize dynamic tracking (work around frozen=True)
-        object.__setattr__(self, '_dynamic_pose_operations', {})
-        object.__setattr__(self, '_dynamic_transform_links', [])
+        # Reset dynamic tracking for each generate() call
+        self._dynamic_pose_operations = {}
+        self._dynamic_transform_links = []
         
         ref_bones = armature.data.bones
         matched_bones = [bone for bone in ref_bones if re.match(self.pattern, bone.name)]
@@ -139,7 +146,7 @@ class RegexBoneGroup(BoneGenerator):
                             size_factor=1.0,
                             axis_type="local",
                             axis="Y",
-                            parent=created_bones[-1] if created_bones else self.parent,
+                            parent=list(created_bones[-1]) if created_bones else self.parent,
                             is_connected=True,
                             start="head"
                         )
@@ -183,22 +190,13 @@ class RegexBoneGroup(BoneGenerator):
         """Returns the dynamically generated transform links after generate() is called."""
         return self._dynamic_transform_links if self._dynamic_transform_links else []
 
-
-@dataclass(frozen=True)
+@dataclass
 class ConnectBone(BoneGenerator):
     """Creates a bone connecting point A to point B."""
-    name: str
     bone_a: str
-    bone_b: str 
-    start: str = "head"  # e.g., "head", "tail" - which end of bone_a to start from
-    end: str = "head"    # e.g., "head", "tail" - which end of bone_b to connect to
-    parent: str | None = None
-    is_connected: bool = False
-    roll: float = 0.0
-    
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
+    bone_b: str
+    start: str = "head"
+    end: str = "head"
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the ConnectBone from bone_a to bone_b."""
@@ -232,35 +230,20 @@ class ConnectBone(BoneGenerator):
         new_bone.tail = tail_pos
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
         
-        if self.parent:
-            parent_bone = edit_bones.get(self.parent)
-            if parent_bone:
-                new_bone.parent = parent_bone
-                new_bone.use_connect = self.is_connected
-            else:
-                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ConnectBone '{self.name}'.")
+        self._set_parent(new_bone, edit_bones)
         
         created_name = new_bone.name
         
         return [created_name]
 
-
-@dataclass(frozen=True)
+@dataclass
 class ExtensionBone(BoneGenerator):
     """Creates a bone extending from a source bone in a given direction."""
-    name: str
-    bone_a: str 
+    bone_a: str
     size_factor: float = 1.0
-    axis_type: str = "local"  # e.g., "global", "local", "armature"
-    axis: str = "Y"  # e.g., "X", "Y", "Z"
-    start: str = "tail"  # e.g., "head", "tail"
-    parent: str | None = None
-    is_connected: bool = False
-    roll: float = 0.0
-
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
+    axis_type: str = "local"
+    axis: str = "Y"
+    start: str = "tail"
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the ExtensionBone extending from bone_a."""
@@ -324,42 +307,17 @@ class ExtensionBone(BoneGenerator):
         new_bone.tail = tail_pos
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
 
-        if self.parent:
-            if isinstance(self.parent, list):
-                for bone_name in self.parent:
-                    parent_bone = edit_bones.get(bone_name)
-                    if parent_bone and parent_bone != new_bone:
-                        break
-            else:
-                parent_bone = edit_bones.get(self.parent)
-
-            if parent_bone:
-                new_bone.parent = parent_bone
-                new_bone.use_connect = self.is_connected
-            else:
-                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ExtensionBone '{self.name}'.")
+        self._set_parent(new_bone, edit_bones)
         
         created_name = new_bone.name
         
-        if self.pose_operations and self.pose_operations.b_collection:
-            utils.armature.b_collection.assign_bones(armature, [created_name], self.pose_operations.b_collection)
-        
         return [created_name]
 
-
-@dataclass(frozen=True)
+@dataclass
 class CopyBone(BoneGenerator):
     """Creates a bone by copying the transform of an existing bone."""
-    name: str
     source_bone: str
-    parent: str | None = None
-    is_connected: bool = False
-    roll: float = 0.0
 
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
-    
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates a copy of the source bone."""
         if not armature:
@@ -381,39 +339,21 @@ class CopyBone(BoneGenerator):
         new_bone.tail = source_bone_ref.tail.copy()
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else source_bone_ref.roll
 
-        if self.parent:
-            parent_bone = edit_bones.get(self.parent)
-            if parent_bone:
-                new_bone.parent = parent_bone
-                new_bone.use_connect = self.is_connected
-            else:
-                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for CopyBone '{self.name}'.")
+        self._set_parent(new_bone, edit_bones)
         
         created_name = new_bone.name
-        
-        if self.pose_operations and self.pose_operations.b_collection:
-            utils.armature.b_collection.assign_bones(armature, [created_name], self.pose_operations.b_collection)
-        
         return [created_name]
     
-@dataclass(frozen=True)
+@dataclass
 class ParallelBone(BoneGenerator):
     """Creates a bone extending from a source bone along an axis until it reaches a target coordinate."""
-    name: str
     bone_a: str
     bone_b: str
-    axis_type: str = "local"  # e.g., "global", "local", "armature"
-    axis: str = "Y"  # e.g., "X", "Y", "Z" - direction to extend
-    coordinate: str = "Y"  # e.g., "X", "Y", "Z" - which coordinate of bone_b to match
-    start: str = "tail"  # e.g., "head", "tail" - which end of bone_a to start from
-    end: str = "head"  # e.g., "head", "tail" - which end of bone_b to get coordinate from
-    parent: str | None = None
-    is_connected: bool = False
-    roll: float = 0.0
-
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
+    axis_type: str = "local"
+    axis: str = "Y"
+    coordinate: str = "Y"
+    start: str = "tail"
+    end: str = "head"
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the ParallelBone extending from bone_a until reaching bone_b's coordinate."""
@@ -504,40 +444,17 @@ class ParallelBone(BoneGenerator):
         new_bone.tail = tail_pos
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
 
-        if self.parent:
-            if isinstance(self.parent, list):
-                for bone_name in self.parent:
-                    parent_bone = edit_bones.get(bone_name)
-                    if parent_bone and parent_bone != new_bone:
-                        break
-            else:
-                parent_bone = edit_bones.get(self.parent)
+        self._set_parent(new_bone, edit_bones)
 
-            if parent_bone:
-                new_bone.parent = parent_bone
-                new_bone.use_connect = self.is_connected
-            else:
-                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for ParallelBone '{self.name}'.")
-        
         created_name = new_bone.name
-        
-        if self.pose_operations and self.pose_operations.b_collection:
-            utils.armature.b_collection.assign_bones(armature, [created_name], self.pose_operations.b_collection)
         
         return [created_name]
 
-
-@dataclass(frozen=True)
+@dataclass
 class SkinBone(BoneGenerator):
-    name: str
     bone_a: str
-    parent: str | None = None
     size_factor: float = 1.0
     mesh_restriction: str | None = None
-
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the SkinBone at the highest weighted vertex position for bone_a."""
@@ -576,12 +493,12 @@ class SkinBone(BoneGenerator):
         
         bpy.context.view_layer.objects.active = armature
         
-        target_edit_bones = armature.data.edit_bones
+        edit_bones = armature.data.edit_bones
         
-        if self.name in target_edit_bones:
-            target_edit_bones.remove(target_edit_bones[self.name])
+        if self.name in edit_bones:
+            edit_bones.remove(edit_bones[self.name])
         
-        new_bone = target_edit_bones.new(self.name)
+        new_bone = edit_bones.new(self.name)
         
         local_co = armature.matrix_world.inverted() @ world_co
         new_bone.head = local_co
@@ -589,14 +506,8 @@ class SkinBone(BoneGenerator):
         direction = mathutils.Vector((0.0, 0.0, bone_length))
         new_bone.tail = local_co + direction
         
-        if self.parent:
-            parent_bone = target_edit_bones.get(self.parent)
-            if parent_bone:
-                new_bone.parent = parent_bone
-                new_bone.use_connect = False
-            else:
-                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for SkinBone '{self.name}'.")
-        
+        self._set_parent(new_bone, edit_bones)
+
         created_name = new_bone.name
         return [created_name]
     
@@ -676,18 +587,13 @@ class SkinBone(BoneGenerator):
         
         return (best_world_co, best_weight)
     
-@dataclass(frozen=True)
+@dataclass
 class BridgeBone(BoneGenerator):
-    name: str
+    #Unlike other generators, BridgeBone's is_connected defines whether the last bone is connected to bone_b
     bone_a: str
     bone_b: str
-    offset_factor: mathutils.Vector = mathutils.Vector((0.0, 0.0, 0.0))
-    is_connected: bool = True #Unlike ExtensionBone and SkinBone, BridgeBones is_connect defines wether the last bone is connected to bone_b
-    parent : str | None = None
-
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
+    offset_factor: mathutils.Vector = field(default_factory=lambda: mathutils.Vector((0.0, 0.0, 0.0)))
+    is_connected: bool = field(default=True, kw_only=True)
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the BridgeBone from bone_a to bone_b with curved offset in target armature."""
@@ -710,8 +616,6 @@ class BridgeBone(BoneGenerator):
         curve_factor = math.sin(math.pi * 0.5)  # Maximum curve at t=0.5
         bridge_head = midpoint + (self.offset_factor * curve_factor)
         
-        edit_bones = armature.data.edit_bones
-        
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
 
@@ -719,47 +623,29 @@ class BridgeBone(BoneGenerator):
         new_bone.head = bridge_head
         new_bone.tail = end_pos
         
-        bone_a_target = edit_bones.get(self.bone_a)
-        if bone_a_target:
-            bone_a_target.tail = bridge_head
-            new_bone.parent = bone_a_target
-            new_bone.use_connect = True
+        bone_a_ref.tail = bridge_head
+        new_bone.parent = bone_a_ref
+        new_bone.use_connect = True    
             
-            # Set bone_a's parent if parent parameter is provided
-            if self.parent:
-                parent_bone = edit_bones.get(self.parent)
-                if parent_bone:
-                    bone_a_target.parent = parent_bone
-                    bone_a_target.use_connect = False
-                else:
-                    print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for bone_a '{self.bone_a}' in BridgeBone '{self.name}'.")
-        else:
-            print(f"[AetherBlend] Warning: Parent bone '{self.bone_a}' not found in target armature for BridgeBone '{self.name}'.")
+        self._set_parent(bone_a_ref, edit_bones, is_connected_overrite=False)
         
         if self.is_connected:
-            bone_b_target = edit_bones.get(self.bone_b)
-            if bone_b_target:
-                bone_b_target.parent = new_bone
-                bone_b_target.use_connect = True
+            bone_b_ref = edit_bones.get(self.bone_b)
+            if bone_b_ref:
+                bone_b_ref.parent = new_bone
+                bone_b_ref.use_connect = True
             else:
                 print(f"[AetherBlend] Warning: Target bone '{self.bone_b}' not found for connection in BridgeBone '{self.name}'.")
         
         created_name = new_bone.name  
         return [created_name]
 
-
-@dataclass(frozen=True)
+@dataclass
 class CenterBone(BoneGenerator):
-    name: str
     ref_bones: list[str]
     size_factor: float = 1.0
-    parent: str | None = None
-    axis: str = "Z"  # e.g., "X", "Y", "Z" - axis direction for bone extension
-    inverted: bool = False  # True: tail to head, False: head to tail
-
-    req_bones: list[str] | None = None
-    pose_operations: 'PoseOperations | None' = None
-    is_optional: bool = False
+    axis: str = "Z"
+    inverted: bool = False
 
     def generate(self, armature: bpy.types.Object ,data: dict | None = None) -> list[str] | None:
         """Generates the CenterBone at the center position of reference bones in target armature."""
@@ -813,13 +699,7 @@ class CenterBone(BoneGenerator):
             new_bone.head = center_position.copy()
             new_bone.tail = center_position + direction_vector
         
-        if self.parent:
-            parent_bone = edit_bones.get(self.parent)
-            if parent_bone:
-                new_bone.parent = parent_bone
-                new_bone.use_connect = False
-            else:
-                print(f"[AetherBlend] Warning: Parent bone '{self.parent}' not found for CenterBone '{self.name}'.")
-        
+        self._set_parent(new_bone, edit_bones)
+
         created_name = new_bone.name
         return [created_name]

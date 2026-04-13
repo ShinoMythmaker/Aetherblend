@@ -9,7 +9,7 @@ MIQO_EARS = BoneGroup(
         TransformLink(target="DEF-Ear.R", bone="j_mimi_r"),
         TransformLink(target="DEF-Ear.L", bone="j_mimi_l")
     ],
-    bones=[
+    generators=[
         ExtensionBone(
             name="Ear.R",
             bone_a="j_mimi_r",

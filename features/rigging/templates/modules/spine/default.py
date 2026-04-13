@@ -14,7 +14,7 @@ SPINE = BoneGroup(
             TransformLink(target="DEF-Chest.R", bone="j_mune_r"),
             TransformLink(target="DEF-Chest.L", bone="j_mune_l"),
         ],
-        bones = [
+        generators = [
             #Spine
             ConnectBone(
                 name="Spine.001",

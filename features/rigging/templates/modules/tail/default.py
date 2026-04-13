@@ -12,7 +12,7 @@ TAIL = BoneGroup(
         TransformLink(target="DEF-Tail.003", bone="n_sippo_d"),
         TransformLink(target="DEF-Tail.004", bone="n_sippo_e"),
     ],
-    bones=[
+    generators=[
         ConnectBone(
             name="Tail",
             bone_a="n_sippo_a",
