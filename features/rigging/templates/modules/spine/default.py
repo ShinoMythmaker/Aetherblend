@@ -1,4 +1,5 @@
 from ......core.generators import ConnectBone, ExtensionBone
+from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
@@ -20,79 +21,68 @@ SPINE = BoneGroup(
                 name="Spine.001",
                 bone_a="j_kosi",
                 bone_b="j_kosi",
-                parent="Torso",
                 start="tail",
                 end="head",
                 is_connected=True,
                 req_bones=["j_kosi"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.spines_basic_spine(fk_coll="Torso (Tweak)", tweak_coll="Torso (Tweak)", pivot_pos=1),
-                    b_collection="Torso"
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.001", parent=["root"], is_connected=False),
+                            RigifyTypeOperation(time="Pre", bone_name="Spine.001", rigify_type=rigify.types.spines_basic_spine(fk_coll="Torso (Tweak)", tweak_coll="Torso (Tweak)", pivot_pos=1)),
+                            CollectionOperation(time="Pre", bone_name="Spine.001", collection_name="Torso"),
+                            ]
             ),
             ConnectBone(
                 name="Spine.002",
                 bone_a="j_sebo_a",
                 bone_b="j_sebo_b",
-                parent="Spine.001",
-                is_connected=True,
                 req_bones=["j_sebo_a", "j_sebo_b"],
-                pose_operations=PoseOperations(
-                    b_collection="Torso"
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.002", parent=["Spine.001"], is_connected=True),
+                            CollectionOperation(time="Pre", bone_name="Spine.002", collection_name="Torso"),
+                            ]
             ),
             ConnectBone(
                 name="Spine.003",
                 bone_a="j_sebo_b",
                 bone_b="j_sebo_c",
-                parent="Spine.002",
-                is_connected=True,
                 req_bones=["j_sebo_b", "j_sebo_c"],
-                pose_operations=PoseOperations(
-                    b_collection="Torso"
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.003", parent=["Spine.002"], is_connected=True),
+                            CollectionOperation(time="Pre", bone_name="Spine.003", collection_name="Torso"),
+                            ]
             ),
             ConnectBone(
                 name="Spine.004",
                 bone_a="j_sebo_c",
                 bone_b="j_kubi",
-                parent="Spine.003",
-                is_connected=True,
                 req_bones=["j_sebo_c", "j_kubi"],
-                pose_operations=PoseOperations(
-                    b_collection="Torso"
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.004", parent=["Spine.003"], is_connected=True),
+                            CollectionOperation(time="Pre", bone_name="Spine.004", collection_name="Torso"),
+                            ]
             ),
             #Chest
             ExtensionBone(
                 name="Chest.R",
                 bone_a="j_mune_r",
-                parent="Spine.003",
-                is_connected=False,
                 start="head",
                 axis_type="local",
                 axis="Y",
                 roll=-48,
                 req_bones=["j_mune_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
-                    b_collection="Torso",
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="Chest.R", parent=["Spine.003"], is_connected=False),
+                            RigifyTypeOperation(time="Pre", bone_name="Chest.R", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
+                            CollectionOperation(time="Pre", bone_name="Chest.R", collection_name="Torso"),
+                            ]
             ),
             ExtensionBone(
                 name="Chest.L",
                 bone_a="j_mune_l",
-                parent="Spine.003",
-                is_connected=False,
                 start="head",
                 axis_type="local",
                 axis="Y",
                 roll=-132,
                 req_bones=["j_mune_l"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
-                    b_collection="Torso",
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="Chest.L", parent=["Spine.003"], is_connected=False),
+                            RigifyTypeOperation(time="Pre", bone_name="Chest.L", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
+                            CollectionOperation(time="Pre", bone_name="Chest.L", collection_name="Torso"),
+                            ]
             ),
         ],
 )

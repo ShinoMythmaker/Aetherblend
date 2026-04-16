@@ -1,4 +1,5 @@
 from ......core.generators import ConnectBone, ExtensionBone, CopyBone
+from ......core.operations import ParentBoneOperation
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
@@ -23,7 +24,7 @@ HAND_R = BoneGroup(
         ExtensionBone(
             name="palm.01.R",
             bone_a="j_hito_a_r",
-            parent="hand.R",
+            parent=["hand.R", "j_te_r"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -38,7 +39,7 @@ HAND_R = BoneGroup(
         ExtensionBone(
             name="palm.02.R",
             bone_a="j_naka_a_r",
-            parent="hand.R",
+            parent=["hand.R", "j_te_r"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -52,7 +53,7 @@ HAND_R = BoneGroup(
         ExtensionBone(
             name="palm.03.R",
             bone_a="j_kusu_a_r",
-            parent="hand.R",
+            parent=["hand.R", "j_te_r"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -66,7 +67,7 @@ HAND_R = BoneGroup(
         ExtensionBone(
             name="palm.04.R",
             bone_a="j_ko_a_r",
-            parent="hand.R",
+            parent=["hand.R", "j_te_r"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -81,12 +82,13 @@ HAND_R = BoneGroup(
         CopyBone(
             name="DEF-thumb_master.R",
             source_bone="j_oya_a_r",
-            parent="hand.R",
-            req_bones=["hand.R", "j_oya_a_r"],
+            parent=["hand.R"],
+            req_bones=["j_oya_a_r"],
             pose_operations=PoseOperations(
                 b_collection="DEF",
                 rigify_settings=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")
-                )),
+                ),
+                ),
         ConnectBone(
             name="thumb.R",
             bone_a="j_oya_a_r",
@@ -244,7 +246,7 @@ HAND_L = BoneGroup(
         ExtensionBone(
             name="palm.01.L",
             bone_a="j_hito_a_l",
-            parent="hand.L",
+            parent=["hand.L", "j_te_l"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -259,7 +261,7 @@ HAND_L = BoneGroup(
         ExtensionBone(
             name="palm.02.L",
             bone_a="j_naka_a_l",
-            parent="hand.L",
+            parent=["hand.L", "j_te_l"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -273,7 +275,7 @@ HAND_L = BoneGroup(
         ExtensionBone(
             name="palm.03.L",
             bone_a="j_kusu_a_l",
-            parent="hand.L",
+            parent=["hand.L", "j_te_l"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -287,7 +289,7 @@ HAND_L = BoneGroup(
         ExtensionBone(
             name="palm.04.L",
             bone_a="j_ko_a_l",
-            parent="hand.L",
+            parent=["hand.L", "j_te_l"],
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -302,11 +304,11 @@ HAND_L = BoneGroup(
         CopyBone(
             name="DEF-thumb_master.L",
             source_bone="j_oya_a_l",
-            parent="hand.L",
-            req_bones=["hand.L", "j_oya_a_l"],
+            parent=["hand.L"],
+            req_bones=["j_oya_a_l"],
             pose_operations=PoseOperations(
                 b_collection="DEF",
-                rigify_settings=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")
+                rigify_settings=rigify.types.basic_raw_copy(relink_constraints=False, parent="DEF")
                 )),
         ConnectBone(
             name="thumb.L",

@@ -9,7 +9,7 @@ HAIR = BoneGroup(
         RegexBoneGroup(
             name="Hair",
             pattern=r"^j_ex_h.*",
-            parent="Head",
+            parent=["Head", "j_kao"],
             extension_size_factor=10.0,
             is_connected=False,
             req_bones=[],
@@ -18,7 +18,7 @@ HAIR = BoneGroup(
         RegexBoneGroup(
             name="Kami",
             pattern=r"^j_kami.*",
-            parent="Head",
+            parent=["Head", "j_kao"],
             extension_size_factor=10.0,
             is_connected=False,
             req_bones=[],
@@ -27,7 +27,7 @@ HAIR = BoneGroup(
         RegexBoneGroup(
             name="Accessory",
             pattern=r"^j_ex_met.*",
-            parent="Head",
+            parent=["Head", "j_kao"],
             extension_size_factor=10.0,
             is_connected=False,
             req_bones=[],
@@ -37,7 +37,7 @@ HAIR = BoneGroup(
 )
 
 def get_rig_module() -> RigModule:
-    rig_module = RigModule(
+    return RigModule(
         name="Default",
         type="Generation",
         bone_groups=[HAIR],
@@ -46,4 +46,3 @@ def get_rig_module() -> RigModule:
             BoneCollection(name="Accessory", ui=True, color_set="Head", row_index=1, title="Accessory", visible=False),
         ])
     )
-    return rig_module
