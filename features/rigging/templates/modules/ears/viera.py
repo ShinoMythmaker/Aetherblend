@@ -42,17 +42,18 @@ VIERA_EARS = BoneGroup(
             start="head",
             end="tail",
             req_bones=["j_zera_b_r", "j_zera_b_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="V_Ear.R.001", collection_name="Head")]
+            operations=[ParentBoneOperation(time="Pre", bone_name="V_Ear.R.001", parent=["V_Ear.R"], is_connected=False),
+                        CollectionOperation(time="Pre", bone_name="V_Ear.R.001", collection_name="Head")]
         ),
         ConnectBone(
             name="V_Ear.L",
             bone_a="j_zera_a_l",
             bone_b="j_zera_b_l",
             req_bones=["j_zera_a_l", "j_zera_b_l"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_copy_chain(),
-                    b_collection="Head",
-                )
+            operations=[ParentBoneOperation(time="Pre", bone_name="V_Ear.L", parent=["Head", "j_kao"], is_connected=False),
+                        RigifyTypeOperation(time="Pre", bone_name="V_Ear.L", rigify_type=rigify.types.basic_copy_chain()),
+                        CollectionOperation(time="Pre", bone_name="V_Ear.L", collection_name="Head"),
+                        ]
         ),
         ConnectBone(
             name="V_Ear.L.001",
@@ -61,7 +62,8 @@ VIERA_EARS = BoneGroup(
             start="head",
             end="tail",
             req_bones=["j_zera_b_l", "j_zera_b_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="V_Ear.L.001", collection_name="Head")]
+            operations=[ParentBoneOperation(time="Pre", bone_name="V_Ear.L.001", parent=["V_Ear.L"], is_connected=False),
+                        CollectionOperation(time="Pre", bone_name="V_Ear.L.001", collection_name="Head")]
         ),
     ]
 )
