@@ -120,19 +120,6 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         reset = full_rig_button.column(align=False)
         reset.scale_x = 1.3
         reset.operator("aether.reset_rig", text="", icon="RESTRICT_INSTANCED_ON")
-        
-        col.separator()
-        
-        row = col.row(align=True)
-        
-        meta_col = row.column(align=True)
-        meta_col.operator("aether.generate_meta_rig", text="Meta", icon="OUTLINER_DATA_ARMATURE")
-        
-
-        control_col = row.column(align=True)
-        control_col.enabled = bool(aether_rig.meta_rig)
-        
-        control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
 
         row = col.row(align=True)
 
