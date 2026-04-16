@@ -15,15 +15,29 @@ class _RigGenerationState:
     rig_generator: object
     operation_stack: ABOperationStack
 
+class _RigGenerationHelpers:
+    def _resolve_source_armature(self, armature: bpy.types.Object | None) -> bpy.types.Object | None:
+        if not armature or armature.type != 'ARMATURE':
+            return armature
 
-class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
-    bl_idname = "aether.generate_full_rig"
-    bl_label = "Generate Full Rig"
-    bl_description = ("Generate meta rig, rigify rig, and link them in one operation")
-    bl_options = {'REGISTER', 'UNDO'}
+        parent = armature.parent
+        if not parent or parent.type != 'ARMATURE':
+            return armature
+
+        parent_rig = getattr(parent, 'aether_rig', None)
+        if not parent_rig:
+            return armature
+
+        if getattr(parent_rig, 'meta_rig', None) != armature:
+            return armature
+
+        parent.hide_set(False)
+        parent.hide_viewport = False
+        self._select_object(parent)
+        return parent
 
     def _get_active_armature(self, context) -> bpy.types.Object | None:
-        armature = context.active_object
+        armature = self._resolve_source_armature(context.active_object)
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature object")
             return None
@@ -31,6 +45,9 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
         return armature
 
     def _select_object(self, obj: bpy.types.Object):
+        if bpy.context.mode != 'OBJECT':
+            bpy.ops.object.mode_set(mode='OBJECT')
+
         bpy.ops.object.select_all(action='DESELECT')
         bpy.context.view_layer.objects.active = obj
         obj.select_set(True)
@@ -346,6 +363,12 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
             and self._object_has_material_property(obj, property_name, property_value)
         ]
 
+class AETHER_OT_Generate_Full_Rig(_RigGenerationHelpers, bpy.types.Operator):
+    bl_idname = "aether.generate_full_rig"
+    bl_label = "Generate Full Rig"
+    bl_description = ("Generate meta rig, rigify rig, and link them in one operation")
+    bl_options = {'REGISTER', 'UNDO'}
+
     def execute(self, context):
         time_start = time.time()
         bpy.context.window.cursor_set('WAIT')
@@ -363,6 +386,36 @@ class AETHER_OT_Generate_Full_Rig(bpy.types.Operator):
                 return {'CANCELLED'}
 
             print(f"[AetherBlend] Full rig generation: {time.time() - time_start:.3f}s")
+            return {'FINISHED'}
+        finally:
+            bpy.context.window.cursor_set('DEFAULT')
+
+class AETHER_OT_Generate_Meta_Rig(_RigGenerationHelpers, bpy.types.Operator):
+    bl_idname = "aether.generate_meta_rig"
+    bl_label = "Generate Meta Rig"
+    bl_description = "Generate only the meta rig without running Rigify"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        time_start = time.time()
+        bpy.context.window.cursor_set('WAIT')
+
+        try:
+            armature = self._get_active_armature(context)
+            if not armature:
+                return {'CANCELLED'}
+
+            state = self._generate_meta_rig(armature)
+            if not state:
+                return {'CANCELLED'}
+
+            self._set_meta_rig_visibility(state.meta_rig, visible=True)
+            armature.hide_set(True)
+            armature.hide_viewport = True
+            self._select_object(state.meta_rig)
+            bpy.ops.object.mode_set(mode='POSE')
+
+            print(f"[AetherBlend] Meta rig generation: {time.time() - time_start:.3f}s")
             return {'FINISHED'}
         finally:
             bpy.context.window.cursor_set('DEFAULT')
@@ -469,8 +522,10 @@ def register():
     bpy.utils.register_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.register_class(AETHER_OT_Reset_Rig)
     bpy.utils.register_class(AETHER_OT_Generate_Full_Rig)
+    bpy.utils.register_class(AETHER_OT_Generate_Meta_Rig)
 
 def unregister():
+    bpy.utils.unregister_class(AETHER_OT_Generate_Meta_Rig)
     bpy.utils.unregister_class(AETHER_OT_Clean_Up_Rig)
     bpy.utils.unregister_class(AETHER_OT_Reset_Rig)
     bpy.utils.unregister_class(AETHER_OT_Generate_Full_Rig)

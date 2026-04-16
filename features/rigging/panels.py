@@ -121,6 +121,10 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         reset.scale_x = 1.3
         reset.operator("aether.reset_rig", text="", icon="RESTRICT_INSTANCED_ON")
 
+        meta_rig_button = col.row(align=True)
+        meta_rig_button.scale_y = 0.95
+        meta_rig_button.operator("aether.generate_meta_rig", text="Generate Meta Rig", icon="ARMATURE_DATA")
+
         row = col.row(align=True)
 
         # Template selection
