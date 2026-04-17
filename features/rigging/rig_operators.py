@@ -12,6 +12,7 @@ from ...core.operations import ABOperationStack, PoseOperations, PoseOperationsS
 class _RigGenerationState:
     armature: bpy.types.Object
     meta_rig: bpy.types.Object
+    visible_collections: list[bpy.types.BoneCollection]
     rig_generator: object
     operation_stack: ABOperationStack
 
@@ -201,15 +202,15 @@ class _RigGenerationHelpers:
                 rig_object.data.edit_bones.remove(bone)
 
     def _create_ui_collections(self, meta_rig: bpy.types.Object, ui_collections: rigify.settings.UI_Collections) -> list[bpy.types.BoneCollection]:
-        hidden_collections = []
+        visible_collections = []
 
         for collection in ui_collections.collections:
             collection.create(meta_rig)
-            bone_collection, hide_collection = collection.create_ui(meta_rig)
-            if hide_collection and bone_collection:
-                hidden_collections.append(bone_collection)
+            bone_collection, show_collection = collection.create_ui(meta_rig)
+            if show_collection and bone_collection:
+                visible_collections.append(bone_collection)
 
-        return hidden_collections
+        return visible_collections
 
     def _apply_meta_rig_operations(
         self,
@@ -251,20 +252,23 @@ class _RigGenerationHelpers:
         bones_to_delete = self._collect_ffxiv_bone_updates(meta_rig, pose_ops_stack)
         self._remove_edit_bones(meta_rig, bones_to_delete)
 
-        hidden_collections = self._create_ui_collections(meta_rig, ui_collections)
+        visible_collections = self._create_ui_collections(meta_rig, ui_collections)
         self._apply_meta_rig_operations(meta_rig, pose_ops_stack, operation_stack)
 
-        for bone_collection in hidden_collections:
-            bone_collection.is_visible = False
 
         self._finalize_meta_rig(armature, meta_rig)
 
         return _RigGenerationState(
             armature=armature,
             meta_rig=meta_rig,
+            visible_collections=visible_collections,
             rig_generator=rig_generator,
             operation_stack=operation_stack,
         )
+
+    def _set_all_collections_visibility(self, armature: bpy.types.Object, visible: bool):
+        for collection in armature.data.collections:
+            collection.is_visible = visible
 
     def _run_rigify_generation(self, meta_rig: bpy.types.Object) -> bool:
         self._set_meta_rig_visibility(meta_rig, visible=True)
@@ -284,20 +288,22 @@ class _RigGenerationHelpers:
         operation_stack.applyPostPoseOperations(armature)
 
     def _update_deform_bones(self, armature: bpy.types.Object):
-        ffxiv_data_bones = utils.armature.b_collection.get_bones(armature, "FFXIV")
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        ffxiv_bone_names = set(utils.armature.b_collection.get_bones(armature, "FFXIV").keys())
         for bone in armature.data.bones.values():
-            bone.use_deform = bone in ffxiv_data_bones.values()
+            bone.use_deform = bone.name in ffxiv_bone_names
 
     def _apply_widget_overrides(self, armature: bpy.types.Object, rig_generator: object):
         bpy.ops.object.mode_set(mode='POSE')
         for widget in rig_generator.getOverrides().values():
             widget.execute(armature)
 
-    def _hide_generated_collections(self, armature: bpy.types.Object):
-        for collection_name in ("FFXIV", "Linked", "Unlinked"):
-            bone_collection = armature.data.collections.get(collection_name)
-            if bone_collection:
-                bone_collection.is_visible = False
+    def _hide_generated_collections(self, armature: bpy.types.Object, visible_collections: list[bpy.types.BoneCollection]):
+        self._set_all_collections_visibility(armature, visible=False)
+        for collection in armature.data.collections:
+            if collection.name in [coll.name for coll in visible_collections]:
+                collection.is_visible = True
 
     def _finalize_generated_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object):
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -314,12 +320,15 @@ class _RigGenerationHelpers:
 
         if not self._run_rigify_generation(meta_rig):
             return False
+        
 
+        ## implement function that enables all collections
         self._select_object(armature)
+        self._set_all_collections_visibility(armature, visible=True)
         self._apply_post_generation_operations(armature, state.operation_stack)
         self._update_deform_bones(armature)
         self._apply_widget_overrides(armature, state.rig_generator)
-        self._hide_generated_collections(armature)
+        self._hide_generated_collections(armature, state.visible_collections)
         self._finalize_generated_rig(armature, meta_rig)
         return True
 

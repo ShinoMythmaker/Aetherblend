@@ -10,48 +10,14 @@ from typing import Literal
 if TYPE_CHECKING:
     from .generators import BoneGenerator
 
-from .operations import ABOperation, PoseOperations, PoseOperationsStack
+from .operations import ABOperation, PoseOperations, PoseOperationsStack, ConstraintOperation, TransformLink
 from . import rigify
 from .constraints import Constraint, CopyTransformsConstraint
 from .. import utils
+from .generators import BoneGenerator
 
 ModuleType = Literal["Generator", "Patch","UI-Addon"]
   
-@dataclass
-class TransformLink:
-    """Links a bone to a target for rigging purposes."""
-    target: str
-    bone: str
-    retarget: str | None = None
-
-    def mark_linked(self, armature: bpy.types.Object) -> None:
-        """Marks the bone as linked in the armature's data."""
-        bone = armature.data.bones.get(self.bone)
-        if bone:
-            bone["ab_linked"] = True
-
-    def to_pose_operations(self) -> dict[str, list[PoseOperations]]:
-        """Convert this TransformLink to PoseOperations."""
-        pose_operations_dict: dict[str, list[PoseOperations]] = {}
-        
-        ff_bone = self.bone
-        link_bone = f"LINK-{ff_bone}"
-        if ff_bone not in pose_operations_dict:
-            pose_operations_dict[ff_bone] = []
-        pose_operations_dict[ff_bone].append(
-            PoseOperations(
-                constraints=[CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)]
-            )
-        )
-
-        if link_bone not in pose_operations_dict:
-            pose_operations_dict[link_bone] = []
-        pose_operations_dict[link_bone].append(
-            PoseOperations(
-                rigify_settings=rigify.types.basic_raw_copy(True, self.target)
-            )
-        )
-        return pose_operations_dict
     
 
 class Override(ABC):
@@ -129,7 +95,7 @@ class BoneGroup:
     name: str
     description: str = ""
     transform_link: list[TransformLink] = field(default_factory=list)
-    generators: 'list[BoneGenerator]' = field(default_factory=list)
+    generators: list[BoneGenerator] = field(default_factory=list)
     operations: list[ABOperation] = field(default_factory=list)
 
     def __post_init__(self):
@@ -195,14 +161,20 @@ class BoneGroup:
         # Collect Pose Operations
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
 
-        # Add TransformLink operations
+        # # Add TransformLink operations
+        # bpy.ops.object.mode_set(mode='OBJECT')
+        # for link_item in self.transform_link:
+        #     link_item.mark_linked(armature)
+        #     for bone_name, operations in link_item.to_pose_operations().items():
+        #         if bone_name not in pose_operations_dict:
+        #             pose_operations_dict[bone_name] = []
+        #         pose_operations_dict[bone_name].extend(operations)
+
         bpy.ops.object.mode_set(mode='OBJECT')
         for link_item in self.transform_link:
             link_item.mark_linked(armature)
-            for bone_name, operations in link_item.to_pose_operations().items():
-                if bone_name not in pose_operations_dict:
-                    pose_operations_dict[bone_name] = []
-                pose_operations_dict[bone_name].extend(operations)
+            for operation in link_item.to_ABOperation():
+                generated_operations.append(operation)
         
         # Add BoneGenerator pose operations
         for bone_gen in self.generators:

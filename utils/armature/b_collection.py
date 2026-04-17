@@ -1,6 +1,27 @@
 import bpy
 
 
+def _get_collection_bone_names(armature: bpy.types.Object, collection_name: str) -> set[str]:
+    """Returns the names of bones assigned to a collection, with edit-mode fallback."""
+    target_coll = armature.data.collections.get(collection_name)
+    if not target_coll:
+        print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
+        return set()
+
+    bone_names = {bone.name for bone in target_coll.bones}
+    if bone_names:
+        return bone_names
+
+    if armature.mode.startswith('EDIT'):
+        return {
+            bone.name
+            for bone in armature.data.edit_bones
+            if any(coll.name == collection_name for coll in bone.collections)
+        }
+
+    return set()
+
+
 def unassign_bones(armature, bone_names, collection_name) -> None:
     """Unassigns the specified bones from the given collection in the armature."""
     original_mode = armature.mode
@@ -52,22 +73,21 @@ def delete_with_bones(armature: bpy.types.Object, collection_name: str) -> None:
 
     armature.data.collections.remove(target_coll)
 
-def get_pose_bones(armature, collection_name) -> dict[str, bpy.types.PoseBone]:
-    """Returns a dictionary of bone names to pose bones contained within a collection"""
-    target_coll = armature.data.collections.get(collection_name)
-    if not target_coll:
-        print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
-        return {}
-    
-    pose_bones = {b.name: armature.pose.bones.get(b.name) for b in target_coll.bones if b.name in armature.pose.bones}
-    return pose_bones
+def get_pose_bones(armature: bpy.types.Object, collection_name: str) -> dict[str, bpy.types.PoseBone]:
+    """Returns a dictionary of bone names to pose bones contained within a collection."""
+    bone_names = _get_collection_bone_names(armature, collection_name)
+    return {
+        bone_name: armature.pose.bones.get(bone_name)
+        for bone_name in bone_names
+        if bone_name in armature.pose.bones
+    }
 
-def get_bones(armature, collection_name) -> dict[str, bpy.types.Bone]:
-    """Returns a dictionary of bone names to pose bones contained within a collection"""
-    target_coll = armature.data.collections.get(collection_name)
-    if not target_coll:
-        print(f"[AetherBlend] Collection '{collection_name}' not found in armature '{armature.name}'")
-        return {}
-    
-    bones = {b.name: armature.data.bones.get(b.name) for b in target_coll.bones if b.name in armature.data.bones}
-    return bones
+
+def get_bones(armature: bpy.types.Object, collection_name: str) -> dict[str, bpy.types.Bone]:
+    """Returns a dictionary of bone names to data bones contained within a collection."""
+    bone_names = _get_collection_bone_names(armature, collection_name)
+    return {
+        bone_name: armature.data.bones.get(bone_name)
+        for bone_name in bone_names
+        if bone_name in armature.data.bones
+    }

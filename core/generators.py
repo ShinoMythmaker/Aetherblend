@@ -11,8 +11,7 @@ if TYPE_CHECKING:
     from .operations import PoseOperations
 
 from . import rigify
-from .operations import ABOperation, ParentBoneOperation, PoseOperations
-from .shared import TransformLink
+from .operations import ABOperation, ParentBoneOperation, PoseOperations, TransformLink
 from .. import utils
 
 @dataclass
@@ -51,7 +50,7 @@ class BoneGenerator(ABC):
         """Returns dynamically generated pose operations. Override in subclasses that need this."""
         return {}
     
-    def get_dynamic_transform_links(self) -> list['TransformLink']:
+    def get_dynamic_transform_links(self) -> list[TransformLink]:
         """Returns dynamically generated transform links. Override in subclasses that need this."""
         return []
 

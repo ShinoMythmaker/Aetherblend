@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import ClassVar, Literal
 
-from .constraints import Constraint
+from .constraints import Constraint, CopyTransformsConstraint
 from . import rigify
 from .. import utils
 
@@ -63,6 +63,7 @@ class PoseOperationsStack:
                     ops.execute(pose_bone, armature)
             else:
                 print(f"[AetherBlend] PoseOperationsStack: Bone '{bone_name}' not found in armature.")
+
 
 @dataclass(frozen=True)
 class ABOperation(ABC):
@@ -207,6 +208,56 @@ class RigifyTypeOperation(ABOperation):
             self.rigify_type.apply(poseBone, armature)
         except Exception as e:
             print(f"[AetherBlend] Error applying RigifyTypeOperation for bone '{self.bone_name}': {e}")
+
+@dataclass
+class TransformLink:
+    """Links a bone to a target for rigging purposes."""
+    target: str
+    bone: str
+    retarget: str | None = None
+
+    def mark_linked(self, armature: bpy.types.Object) -> None:
+        """Marks the bone as linked in the armature's data."""
+        bone = armature.data.bones.get(self.bone)
+        if bone:
+            bone["ab_linked"] = True
+
+    def to_pose_operations(self) -> dict[str, list[PoseOperations]]:
+        """Convert this TransformLink to PoseOperations."""
+        pose_operations_dict: dict[str, list[PoseOperations]] = {}
+        
+        ff_bone = self.bone
+        link_bone = f"LINK-{ff_bone}"
+        if ff_bone not in pose_operations_dict:
+            pose_operations_dict[ff_bone] = []
+        pose_operations_dict[ff_bone].append(
+            PoseOperations(
+                constraints=[CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)]
+            )
+        )
+
+        if link_bone not in pose_operations_dict:
+            pose_operations_dict[link_bone] = []
+        pose_operations_dict[link_bone].append(
+            PoseOperations(
+                rigify_settings=rigify.types.basic_raw_copy(True, self.target)
+            )
+        )
+        return pose_operations_dict
+    
+    def to_ABOperation(self) -> list[ABOperation]:
+        """Convert this TransformLink to an ABOperation."""
+        ops = []
+        ff_bone = self.bone
+        link_bone = f"LINK-{ff_bone}"
+
+        constraint = CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)
+        ops.append(ConstraintOperation(ff_bone, constraint=constraint))
+
+        rigify_op = rigify.types.basic_raw_copy(True, self.target)
+        ops.append(RigifyTypeOperation(link_bone, rigify_type=rigify_op))
+
+        return ops
 
 @dataclass(frozen=True)
 class CollectionOperation(ABOperation):
