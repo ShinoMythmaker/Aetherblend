@@ -1,5 +1,6 @@
 from ......core.generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
+from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
 
@@ -20,10 +21,10 @@ TAIL = BoneGroup(
             parent="Spine.001",
             is_connected=False,
             req_bones=["n_sippo_a", "n_sippo_b"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.basic_copy_chain(),
-                b_collection="Tail"
-            )
+            operations=[ParentBoneOperation(time="Pre", bone_name="Tail", parent=["Spine.001", "j_kosi"], is_connected=False),
+                        RigifyTypeOperation(time="Pre", bone_name="Tail", rigify_type=rigify.types.basic_copy_chain()),
+                        CollectionOperation(time="Pre", bone_name="Tail", collection_name="Tail"),
+            ]
         ),
         ConnectBone(
             name="Tail.001",
@@ -32,9 +33,7 @@ TAIL = BoneGroup(
             parent="Tail",
             is_connected=True,
             req_bones=["n_sippo_b", "n_sippo_c"],
-            pose_operations=PoseOperations(
-                b_collection="Tail"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.001", collection_name="Tail")]
         ),
         ConnectBone(
             name="Tail.002",
@@ -43,9 +42,7 @@ TAIL = BoneGroup(
             parent="Tail.001",
             is_connected=True,
             req_bones=["n_sippo_c", "n_sippo_d"],
-            pose_operations=PoseOperations(
-                b_collection="Tail"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.002", collection_name="Tail")]
         ),
         ConnectBone(
             name="Tail.003",
@@ -54,9 +51,7 @@ TAIL = BoneGroup(
             parent="Tail.002",
             is_connected=True,
             req_bones=["n_sippo_d", "n_sippo_e"],
-            pose_operations=PoseOperations(
-                b_collection="Tail"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.003", collection_name="Tail")]
         ),
         ExtensionBone(
             name="Tail.004",
@@ -67,9 +62,7 @@ TAIL = BoneGroup(
             axis="Y",
             size_factor=1,
             req_bones=["n_sippo_e"],
-            pose_operations=PoseOperations(
-                b_collection="Tail"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.004", collection_name="Tail")]
         )
     ]
 )

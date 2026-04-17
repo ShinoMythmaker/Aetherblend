@@ -68,91 +68,90 @@ HEAD = BoneGroup(
             axis_type="armature",
             axis="Z",
             size_factor=20.0,
+            parent="Neck",
+            is_connected=True,
             req_bones=["j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Head", parent=["Neck"], is_connected=True),
-                        CollectionOperation(time="Pre", bone_name="Head", collection_name="Head")
-                        ]
+            operations=[CollectionOperation(time="Pre", bone_name="Head", collection_name="Head")]
         ),
         #Cheek Right
         ConnectBone(
             name="Cheek.B.R",
             bone_a="j_f_shoho_r",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_shoho_r", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.B.R", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.B.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[ RigifyTypeOperation(time="Pre", bone_name="Cheek.B.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.B.R", collection_name="Face (Primary)")
-                        ]
-        ),
+            ]
+         ),
         ConnectBone(
             name="Cheek.B.R.001",
             bone_a="j_f_dhoho_r",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_dhoho_r", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.B.R.001", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.B.R.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.B.R.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.B.R.001", collection_name="Face (Secondary)")
-                        ]
+            ]   
         ),
         ConnectBone(
             name="Cheek.T.R",
             bone_a="j_f_hoho_r",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_hoho_r", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.T.R", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.T.R", collection_name="Face (Primary)")
-                        ]
+            ]         
         ),
         ConnectBone(
             name="Cheek.T.R.001",
             bone_a="j_f_dmemoto_r",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_dmemoto_r", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.T.R.001", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.T.R.001", collection_name="Face (Secondary)")
-                        ]
+            ]  
         ),
         #Cheek Left
         ConnectBone(
             name="Cheek.B.L",
             bone_a="j_f_shoho_l",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_shoho_l", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.B.L", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.B.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.B.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.B.L", collection_name="Face (Primary)")
-                        ]
-
+            ]
         ),
         ConnectBone(
             name="Cheek.B.L.001",
             bone_a="j_f_dhoho_l",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_dhoho_l", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.B.L.001", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.B.L.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.B.L.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.B.L.001", collection_name="Face (Secondary)")
-                        ]
+            ]            
         ),
         ConnectBone(
             name="Cheek.T.L",
             bone_a="j_f_hoho_l",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_hoho_l", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.T.L", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.T.L", collection_name="Face (Primary)")
-                        ]
+            ]       
         ),
         ConnectBone(
             name="Cheek.T.L.001",
             bone_a="j_f_dmemoto_l",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_dmemoto_l", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.T.L.001", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Cheek.T.L.001", collection_name="Face (Secondary)")
                         ]
         ),
@@ -161,67 +160,67 @@ HEAD = BoneGroup(
             name="Nose",
             bone_a="j_f_uhana",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_uhana", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nose", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Nose", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Nose", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Nose", collection_name="Face (Primary)")
-                        ]
+            ]     
         ),
         #Nose Right
         ConnectBone(
             name="Nose.R",
             bone_a="j_f_dmiken_r",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_dmiken_r", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nose.R", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Nose.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Nose.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Nose.R", collection_name="Face (Primary)")
-                        ]
+            ] 
         ),
         ConnectBone(
             name="Nostril.R",
             bone_a="j_f_hana_r",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_hana_r", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.R", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Nostril.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Nostril.R", collection_name="Face (Primary)")
-                        ]
+            ]    
         ),
         #Nose Left
         ConnectBone(
             name="Nose.L",
             bone_a="j_f_dmiken_l",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_dmiken_l", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nose.L", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Nose.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Nose.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Nose.L", collection_name="Face (Primary)")
-                        ]
+            ]
         ),
         ConnectBone(
             name="Nostril.L",
             bone_a="j_f_hana_l",
             bone_b="j_kao",
+            parent="Head",
             req_bones=["j_f_hana_l", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.L", parent=["Head"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Nostril.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Nostril.L", collection_name="Face (Primary)")
-                        ]
+            ]  
         ),
         
         #Anchor
         ExtensionBone(
             name="Face.Suppressor",
             bone_a="j_kao",
-            parent="j_kao",
             is_connected=False,
             axis_type="local",
             axis="Y",
             start="head",
             size_factor=1.0,
+            parent="Head",
             req_bones=["j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Face.Suppressor", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Face.Suppressor", rigify_type=rigify.types.skin_anchor(skin_anchor_hide=True)),
                         CollectionOperation(time="Pre", bone_name="Face.Suppressor", collection_name="MCH")
                         ]
@@ -232,8 +231,9 @@ HEAD = BoneGroup(
             ref_bones=["j_f_dlip_01_r", "j_f_dlip_01_l"],
             axis="Y",
             inverted=False,
+            parent="Head",
             req_bones=["j_f_dlip_01_r", "j_f_dlip_01_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="jaw_master_ref", parent=["Head"], is_connected=False),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="jaw_master_ref", collection_name="MCH")
                         ]
         ),
@@ -241,8 +241,9 @@ HEAD = BoneGroup(
             name="jaw_master",
             bone_a="j_f_ago",
             bone_b="jaw_master_ref",
+            parent="Head",
             req_bones=["j_f_ago", "jaw_master_ref"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="jaw_master", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="jaw_master", rigify_type=rigify.types.face_skin_jaw(jaw_mouth_influence = 1)),
                         CollectionOperation(time="Pre", bone_name="jaw_master", collection_name="Face (Primary)")
             ]
@@ -253,8 +254,9 @@ HEAD = BoneGroup(
             ref_bones=["j_f_ulip_01_r", "j_f_ulip_01_l"],
             axis="Y",
             inverted=False,
+            parent="Head",
             req_bones=["j_f_ulip_01_r", "j_f_ulip_01_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Mouth.Center", parent=["Head"], is_connected=False),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Mouth.Center", collection_name="MCH")
                         ]
         ),
@@ -263,8 +265,9 @@ HEAD = BoneGroup(
             name="Lip.T.R",
             bone_a="Mouth.Center",
             bone_b="j_f_ulip_01_r",
+            parent="jaw_master",
             req_bones=["j_f_ulip_01_r", "Mouth.Center"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.R", parent=["jaw_master"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Lip.T.R", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 0.0, -1.0], primary_layer_extra="Face (Primary)")),
                         CollectionOperation(time="Pre", bone_name="Lip.T.R", collection_name="Face (Primary)")
                         ]
@@ -273,8 +276,10 @@ HEAD = BoneGroup(
             name="Lip.T.R.001",
             bone_a="j_f_ulip_01_r",
             bone_b="j_f_umlip_01_r",
+            parent="Lip.T.R",
+            is_connected=True,
             req_bones=["j_f_umlip_01_r", "j_f_ulip_01_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.R.001", parent=["Lip.T.R"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.T.R.001", collection_name="Face")
                         ]
         ),
@@ -282,8 +287,9 @@ HEAD = BoneGroup(
             name="Lip.B.R",
             bone_a="jaw_master_ref",
             bone_b="j_f_dlip_01_r",
+            parent="jaw_master",
             req_bones=["j_f_dlip_01_r", "jaw_master_ref"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.R", parent=["jaw_master"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Lip.B.R", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 0.0, -1.0], primary_layer_extra="Face (Primary)")),
                         CollectionOperation(time="Pre", bone_name="Lip.B.R", collection_name="Face (Primary)")
                         ]
@@ -292,8 +298,10 @@ HEAD = BoneGroup(
             name="Lip.B.R.001",
             bone_a="j_f_dlip_01_r",
             bone_b="j_f_dmlip_01_r",
+            parent="Lip.B.R",
+            is_connected=True,
             req_bones=["j_f_dmlip_01_r", "j_f_dlip_01_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.R.001", parent=["Lip.B.R"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.B.R.001", collection_name="Face")
                         ]
         ),
@@ -304,8 +312,9 @@ HEAD = BoneGroup(
             ref_bones=["j_f_uslip_r", "j_f_dslip_r", "Cheek.B.R"],
             axis="Y",
             inverted=False,
+            parent="Head",
             req_bones=["j_f_uslip_r", "j_f_dslip_r", "Cheek.B.R"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Corner.R", parent=["Head"], is_connected=False),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Corner.R", collection_name="MCH")
             ]
         ),
@@ -313,8 +322,10 @@ HEAD = BoneGroup(
             name="Lip.T.R.002",
             bone_a="j_f_umlip_01_r",
             bone_b="j_f_uslip_r",
+            parent="Lip.T.R.001",
+            is_connected=True,
             req_bones=["j_f_uslip_r", "j_f_umlip_01_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.R.002", parent=["Lip.T.R.001"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.T.R.002", collection_name="Face")
                         ]
         ),
@@ -322,8 +333,10 @@ HEAD = BoneGroup(
             name="Lip.T.R.003",
             bone_a="j_f_uslip_r",
             bone_b="Corner.R",
+            parent="Lip.T.R.002",
+            is_connected=True,
             req_bones=["j_f_uslip_r", "Corner.R"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.R.003", parent=["Lip.T.R.002"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.T.R.003", collection_name="Face")
                         ]
         ),
@@ -331,8 +344,10 @@ HEAD = BoneGroup(
             name="Lip.B.R.002",
             bone_a="j_f_dmlip_01_r",
             bone_b="j_f_dslip_r",
+            parent="Lip.B.R.001",
+            is_connected=True,
             req_bones=["j_f_dmlip_01_r", "j_f_dslip_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.R.002", parent=["Lip.B.R.001"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.B.R.002", collection_name="Face")
                         ]
         ),
@@ -340,10 +355,12 @@ HEAD = BoneGroup(
             name="Lip.B.R.003",
             bone_a="j_f_dslip_r",
             bone_b="Corner.R",
+            parent="Lip.B.R.002",
+            is_connected=True,
             req_bones=["j_f_dslip_r", "Corner.R"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.R.003", parent=["Lip.B.R.002"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.B.R.003", collection_name="Face")
-            ]
+                        ]
         ),
 
         #Left Mouth
@@ -351,18 +368,21 @@ HEAD = BoneGroup(
             name="Lip.T.L",
             bone_a="Mouth.Center",
             bone_b="j_f_ulip_01_l",
+            parent="jaw_master",
             req_bones=["j_f_ulip_01_l", "Mouth.Center"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.L", parent=["jaw_master"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Lip.T.L", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 0.0, -1.0], primary_layer_extra="Face (Primary)")),
                         CollectionOperation(time="Pre", bone_name="Lip.T.L", collection_name="Face (Primary)"),
-            ]
+                        ]
         ),
         ConnectBone(
             name="Lip.T.L.001",
             bone_a="j_f_ulip_01_l",
             bone_b="j_f_umlip_01_l",
+            parent="Lip.T.L",
+            is_connected=True,
             req_bones=["j_f_umlip_01_l", "j_f_ulip_01_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.L.001", parent=["Lip.T.L"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.T.L.001", collection_name="Face")
             ]
         ),
@@ -370,8 +390,9 @@ HEAD = BoneGroup(
             name="Lip.B.L",
             bone_a="jaw_master_ref",
             bone_b="j_f_dlip_01_l",
+            parent="jaw_master",
             req_bones=["j_f_dlip_01_l", "jaw_master_ref"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.L", parent=["jaw_master"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Lip.B.L", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head", skin_chain_falloff_length=True, skin_chain_falloff=[0.0, 0.0, -1.0], primary_layer_extra="Face (Primary)")),
                         CollectionOperation(time="Pre", bone_name="Lip.B.L", collection_name="Face (Primary)")
             ]
@@ -380,8 +401,10 @@ HEAD = BoneGroup(
             name="Lip.B.L.001",
             bone_a="j_f_dlip_01_l",
             bone_b="j_f_dmlip_01_l",
+            parent="Lip.B.L",
+            is_connected=True,
             req_bones=["j_f_dmlip_01_l", "j_f_dlip_01_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.L.001", parent=["Lip.B.L"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Lip.B.L.001", collection_name="Face")
             ]
         ),
@@ -391,8 +414,9 @@ HEAD = BoneGroup(
             ref_bones=["j_f_uslip_l", "j_f_dslip_l", "Cheek.B.L"],
             axis="Y",
             inverted=False,
+            parent="Head",
             req_bones=["j_f_uslip_l", "j_f_dslip_l", "Cheek.B.L"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Corner.L", parent=["Head"], is_connected=False),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Corner.L", collection_name="MCH")
             ]
         ),
@@ -400,8 +424,10 @@ HEAD = BoneGroup(
            name = "Lip.T.L.002",
            bone_a = "j_f_umlip_01_l",
            bone_b = "j_f_uslip_l",
+           parent="Lip.T.L.001",
+           is_connected=True,
            req_bones = ["j_f_umlip_01_l", "j_f_uslip_l"],
-           operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.L.002", parent=["Lip.T.L.001"], is_connected=True),
+           operations=[
                        CollectionOperation(time="Pre", bone_name="Lip.T.L.002", collection_name="Face")
            ]
        ),
@@ -409,8 +435,10 @@ HEAD = BoneGroup(
            name = "Lip.T.L.003",
            bone_a = "j_f_uslip_l",
            bone_b = "Corner.L",
+           parent="Lip.T.L.002",
+           is_connected=True,
            req_bones = ["j_f_uslip_l", "Corner.L"],
-           operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.L.003", parent=["Lip.T.L.002"], is_connected=True),
+           operations=[
                        CollectionOperation(time="Pre", bone_name="Lip.T.L.003", collection_name="Face")
            ]
        ),
@@ -418,8 +446,10 @@ HEAD = BoneGroup(
            name = "Lip.B.L.002",
            bone_a = "j_f_dmlip_01_l",
            bone_b = "j_f_dslip_l",
+           parent="Lip.B.L.001",
+           is_connected=True,
            req_bones = ["j_f_dmlip_01_l", "j_f_dslip_l"],
-           operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.L.002", parent=["Lip.B.L.001"], is_connected=True),
+           operations=[
                        CollectionOperation(time="Pre", bone_name="Lip.B.L.002", collection_name="Face")
            ]
        ),
@@ -427,8 +457,10 @@ HEAD = BoneGroup(
            name = "Lip.B.L.003",
            bone_a = "j_f_dslip_l",
            bone_b = "Corner.L",
+           parent="Lip.B.L.002",
+           is_connected=True,
            req_bones = ["Corner.L", "j_f_dslip_l"],
-           operations=[ParentBoneOperation(time="Pre", bone_name="Lip.B.L.003", parent=["Lip.B.L.002"], is_connected=True),
+           operations=[
                        CollectionOperation(time="Pre", bone_name="Lip.B.L.003", collection_name="Face")
            ]
        ),
@@ -440,7 +472,9 @@ HEAD = BoneGroup(
             axis_type="local",
             axis="Y",
             start="head",
-            operations=[ParentBoneOperation(time="Pre", bone_name="Teeth.T", parent=["Head"], is_connected=False),
+            parent="Head",
+            req_bones=["j_f_hagukiup"],
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Teeth.T", rigify_type=rigify.types.basic_super_copy(widget_type="teeth")),
                         CollectionOperation(time="Pre", bone_name="Teeth.T", collection_name="Mouth")
             ]
@@ -452,7 +486,9 @@ HEAD = BoneGroup(
             axis_type="local",
             axis="Y",
             start="head",
-            operations=[ParentBoneOperation(time="Pre", bone_name="Teeth.B", parent=["jaw_master"], is_connected=False),
+            parent="jaw_master",
+            req_bones=["j_f_hagukidn"],
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Teeth.B", rigify_type=rigify.types.basic_super_copy(widget_type="teeth")),
                         CollectionOperation(time="Pre", bone_name="Teeth.B", collection_name="Mouth")
             ]
@@ -462,8 +498,9 @@ HEAD = BoneGroup(
             name="Tongue",
             bone_a="j_f_bero_01",
             bone_b="j_f_bero_02",
+            parent="jaw_master",
             req_bones=["j_f_bero_01", "j_f_bero_02"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Tongue", parent=["jaw_master"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Tongue", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Head")),
                         CollectionOperation(time="Pre", bone_name="Tongue", collection_name="Mouth")
             ]
@@ -472,8 +509,10 @@ HEAD = BoneGroup(
             name="Tongue.001",
             bone_a="j_f_bero_02",
             bone_b="j_f_bero_03",
+            parent="Tongue",
+            is_connected=True,
             req_bones=["j_f_bero_02", "j_f_bero_03"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Tongue.001", parent=["Tongue"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Tongue.001", collection_name="Mouth")
             ]
         ),
@@ -482,8 +521,10 @@ HEAD = BoneGroup(
             bone_a="Tongue.001",
             axis_type="local",
             axis="Y",
+            parent="Tongue.001",
+            is_connected=True,
             req_bones=["Tongue.001"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Tongue.002", parent=["Tongue.001"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Tongue.002", collection_name="Mouth")
             ]
         ),
@@ -492,8 +533,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.R",
             bone_a="j_f_hana_r",
             bone_b="j_f_uhana",
+            parent="Head",
             req_bones=["j_f_hana_r", "j_f_uhana"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.R", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.R", collection_name="MCH")
                         ]
@@ -502,8 +544,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.L",
             bone_a="j_f_hana_l",
             bone_b="j_f_uhana",
+            parent="Head",
             req_bones=["j_f_hana_l", "j_f_uhana"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.L", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.L", collection_name="MCH")
                         ]
@@ -512,8 +555,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.R.001",
             bone_a="Cheek.T.R.001", 
             bone_b="Nostril.R",
+            parent="Head",
             req_bones=["Cheek.T.R.001", "Nostril.R"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.R.001", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.R.001", collection_name="MCH")
                         ]
@@ -522,8 +566,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.L.001",
             bone_a="Cheek.T.L.001", 
             bone_b="Nostril.L",
+            parent="Head",
             req_bones=["Cheek.T.L.001", "Nostril.L"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.L.001", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.L.001", collection_name="MCH")
             ]
@@ -533,8 +578,9 @@ HEAD = BoneGroup(
             name="Cheek.B.R.glue",
             bone_a="j_f_dhoho_r",
             bone_b="j_f_shoho_r",
+            parent="Head",
             req_bones=["j_f_shoho_r", "j_f_dhoho_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.B.R.glue", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Cheek.B.R.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Cheek.B.R.glue", collection_name="MCH")
             ]
@@ -543,8 +589,9 @@ HEAD = BoneGroup(
             name="Cheek.T.R.glue",
             bone_a="j_f_dhoho_r",
             bone_b="j_f_hoho_r",
+            parent="Head",
             req_bones=["j_f_hoho_r", "j_f_dhoho_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.T.R.glue", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Cheek.T.R.glue", collection_name="MCH")
             ]
@@ -554,8 +601,9 @@ HEAD = BoneGroup(
             name="Cheek.B.L.glue",
             bone_a="j_f_dhoho_l",
             bone_b="j_f_shoho_l",
+            parent="Head",
             req_bones=["j_f_shoho_l", "j_f_dhoho_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.B.L.glue", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Cheek.B.L.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Cheek.B.L.glue", collection_name="MCH")
             ]
@@ -564,8 +612,9 @@ HEAD = BoneGroup(
             name="Cheek.T.L.glue",
             bone_a="j_f_dhoho_l",
             bone_b="j_f_hoho_l",
+            parent="Head",
             req_bones=["j_f_hoho_l", "j_f_dhoho_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Cheek.T.L.glue", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Cheek.T.L.glue", collection_name="MCH")
             ]
@@ -575,8 +624,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.R",
             bone_a="j_f_hana_r",
             bone_b="j_f_uhana",
+            parent="Head",
             req_bones=["j_f_hana_r", "j_f_uhana"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.R", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.R", collection_name="MCH")
             ]
@@ -585,8 +635,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.L",
             bone_a="j_f_hana_l",
             bone_b="j_f_uhana",
+            parent="Head",
             req_bones=["j_f_hana_l", "j_f_uhana"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.L", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.L", collection_name="MCH")
             ]
@@ -595,8 +646,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.R.001",
             bone_a="Cheek.T.R.001", 
             bone_b="Nostril.R",
+            parent="Head",
             req_bones=["Cheek.T.R.001", "Nostril.R"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.R.001", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.R.001", collection_name="MCH")
             ]
@@ -605,8 +657,9 @@ HEAD = BoneGroup(
             name="Nostril.Glue.L.001",
             bone_a="Cheek.T.L.001", 
             bone_b="Nostril.L",
+            parent="Head",
             req_bones=["Cheek.T.L.001", "Nostril.L"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Nostril.Glue.L.001", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.L.001", collection_name="MCH")
             ]
@@ -616,8 +669,9 @@ HEAD = BoneGroup(
             name="Lip.T.R.001.glue",
             bone_a="j_f_hana_r",
             bone_b="j_f_ulip_01_r",
+            parent="Head",
             req_bones=["j_f_hana_r", "j_f_ulip_01_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.R.001.glue", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.001.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2, skin_glue_tail_reparent=True)),
                         CollectionOperation(time="Pre", bone_name="Lip.T.R.001.glue", collection_name="MCH")
             ]
@@ -626,8 +680,9 @@ HEAD = BoneGroup(
             name="Lip.T.L.001.glue",
             bone_a="j_f_hana_l",
             bone_b="j_f_ulip_01_l",
+            parent="Head",
             req_bones=["j_f_hana_l", "j_f_ulip_01_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Lip.T.L.001.glue", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.001.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2, skin_glue_tail_reparent=True)),
                         CollectionOperation(time="Pre", bone_name="Lip.T.L.001.glue", collection_name="MCH")
             ]
@@ -637,8 +692,9 @@ HEAD = BoneGroup(
             name="Mouth.Corner.glue.L",
             bone_a="j_f_shoho_l",
             bone_b="Corner.L",
+            parent="Head",
             req_bones=["j_f_shoho_l", "Corner.L"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Mouth.Corner.glue.L", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Mouth.Corner.glue.L", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True)),
                         CollectionOperation(time="Pre", bone_name="Mouth.Corner.glue.L", collection_name="MCH")
             ]
@@ -648,9 +704,8 @@ HEAD = BoneGroup(
             bone_a="j_f_shoho_r",
             bone_b="Corner.R",
             parent="Head",
-            is_connected=False,
             req_bones=["j_f_shoho_r", "Corner.R"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Mouth.Corner.glue.R", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Mouth.Corner.glue.R", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True)),
                         CollectionOperation(time="Pre", bone_name="Mouth.Corner.glue.R", collection_name="MCH")
             ]
@@ -675,8 +730,9 @@ BROW = BoneGroup(
             name="Brow.R",
             bone_a="j_f_mayu_r",
             bone_b="j_f_mmayu_r",
+            parent="Head",
             req_bones=["j_f_mayu_r", "j_f_mmayu_r",],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.R", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Brow.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, skin_control_orientation_bone="Head", skin_chain_falloff_length=True, primary_layer_extra="Face (Primary)")),
                         CollectionOperation(time="Pre", bone_name="Brow.R", collection_name="Face (Secondary)")
             ]
@@ -685,8 +741,10 @@ BROW = BoneGroup(
             name="Brow.R.001",
             bone_a="j_f_mmayu_r",
             bone_b="j_f_miken_01_r",
+            parent="Brow.R",
+            is_connected=True,
             req_bones=["j_f_mmayu_r", "j_f_miken_01_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.R.001", parent=["Brow.R"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Brow.R.001", collection_name="Face (Primary)")
             ]
         ),
@@ -694,8 +752,10 @@ BROW = BoneGroup(
             name="Brow.R.002",
             bone_a="j_f_miken_01_r",
             bone_b="j_f_miken_02_r",
+            parent="Brow.R.001",
+            is_connected=True,
             req_bones=["j_f_miken_01_r", "j_f_miken_02_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.R.002", parent=["Brow.R.001"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Brow.R.002", collection_name="Face (Primary)")
             ]
         ),
@@ -704,8 +764,10 @@ BROW = BoneGroup(
             bone_a="Brow.R.002",
             axis_type="local",
             axis="Y",
+            parent="Brow.R.002",
+            is_connected=True,
             req_bones=["j_f_miken_02_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.R.003", parent=["Brow.R.002"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Brow.R.003", collection_name="Face (Primary)")
             ]
         ),
@@ -713,8 +775,9 @@ BROW = BoneGroup(
             name="Brow.L",
             bone_a="j_f_mayu_l",
             bone_b="j_f_mmayu_l",
+            parent="Head",
             req_bones=["j_f_mayu_l", "j_f_mmayu_l",],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.L", parent=["Head"], is_connected=False),
+            operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Brow.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, skin_control_orientation_bone="Head", skin_chain_falloff_length=True, primary_layer_extra="Face (Primary)")),
                         CollectionOperation(time="Pre", bone_name="Brow.L", collection_name="Face (Secondary)")
             ]
@@ -723,8 +786,10 @@ BROW = BoneGroup(
             name="Brow.L.001",
             bone_a="j_f_mmayu_l",
             bone_b="j_f_miken_01_l",
+            parent="Brow.L",
+            is_connected=True,
             req_bones=["j_f_mmayu_l", "j_f_miken_01_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.L.001", parent=["Brow.L"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Brow.L.001", collection_name="Face (Primary)")
             ]
         ),
@@ -732,8 +797,10 @@ BROW = BoneGroup(
             name="Brow.L.002",
             bone_a="j_f_miken_01_l",
             bone_b="j_f_miken_02_l",
+            parent="Brow.L.001",
+            is_connected=True,
             req_bones=["j_f_miken_01_l", "j_f_miken_02_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.L.002", parent=["Brow.L.001"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Brow.L.002", collection_name="Face (Primary)")
             ]
         ),
@@ -742,8 +809,10 @@ BROW = BoneGroup(
             bone_a="Brow.L.002",
             axis_type="local",
             axis="Y",
+            parent="Brow.L.002",
+            is_connected=True,
             req_bones=["j_f_miken_02_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Brow.L.003", parent=["Brow.L.002"], is_connected=True),
+            operations=[
                         CollectionOperation(time="Pre", bone_name="Brow.L.003", collection_name="Face (Primary)")
             ]
         )
@@ -769,38 +838,32 @@ LEFT_EYE = BoneGroup(
             bone_a="j_f_mabup_02out_l", 
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_02out_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True), 
-                b_collection="Face (Secondary)"
-                )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.T.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True)),
+                         CollectionOperation(time="Pre", bone_name="lid.T.L", collection_name="Face (Secondary)")
+            ]
         ),
         SkinBone(
             name="lid.T.L.002", 
             bone_a="j_f_mabup_01_l", 
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_01_l"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-                )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.002", collection_name="Face (Secondary)")]
         ),
         SkinBone(
             name="lid.B.L", 
             bone_a="j_f_mabdn_03in_l", 
             mesh_restriction="eye_occlusion", 
             req_bones=["j_f_mabdn_03in_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head"), 
-                b_collection="Face (Secondary)"
-                )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.B.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head")),
+                         CollectionOperation(time="Pre", bone_name="lid.B.L", collection_name="Face (Secondary)")
+            ]
         ),
         SkinBone(
             name="lid.B.L.002", 
             bone_a="j_f_mabdn_01_l", 
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabdn_01_l"], 
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-                )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002", collection_name="Face (Secondary)")]
         ),
 
 
@@ -809,10 +872,10 @@ LEFT_EYE = BoneGroup(
             source_bone="j_f_eyepuru_l",
             req_bones=["j_f_eyepuru_l"],
             parent="Head",
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.face_skin_eye(),
-                b_collection="Face (Primary)"
-            )
+            operations=[
+                        RigifyTypeOperation(time="Pre", bone_name="Eye.L", rigify_type=rigify.types.face_skin_eye()),
+                        CollectionOperation(time="Pre", bone_name="Eye.L", collection_name="Face")
+            ]
         ),
 
         # CenterBone(
@@ -836,9 +899,8 @@ LEFT_EYE = BoneGroup(
             is_connected=True,  
             parent="Eye.L",
             req_bones=["lid.T.L", "lid.T.L.002"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.001", collection_name="Face (Secondary)")
+            ]
         ), 
 
         BridgeBone(
@@ -848,9 +910,7 @@ LEFT_EYE = BoneGroup(
             offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
             is_connected=False,
             req_bones=["lid.T.L.002", "lid.B.L"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.003", collection_name="Face (Secondary)")]
         ),
         BridgeBone(
             name="lid.B.L.001",
@@ -860,9 +920,7 @@ LEFT_EYE = BoneGroup(
             is_connected=True,
             parent="Eye.L",
             req_bones=["lid.B.L", "lid.B.L.002"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001", collection_name="Face (Secondary)")]
         ),
 
         BridgeBone(
@@ -872,9 +930,7 @@ LEFT_EYE = BoneGroup(
             offset_factor=mathutils.Vector((0.003, -0.001, -0.003)),
             is_connected=False,
             req_bones=["lid.B.L.002", "lid.T.L"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003", collection_name="Face (Secondary)")]
         ),
 
 
@@ -885,10 +941,8 @@ LEFT_EYE = BoneGroup(
             parent="Eye.L",
             is_connected=False,
             req_bones=["j_f_mabdn_03in_l", "j_f_eye_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.L.001", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.L.001", collection_name="Face")]
         ),
 
         ConnectBone(
@@ -898,10 +952,9 @@ LEFT_EYE = BoneGroup(
             parent="Eye.L",
             is_connected=False,
             req_bones=["j_f_mabdn_01_l", "j_f_eye_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.L.002", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.L.002", collection_name="Face")
+            ]
         ),
 
         ConnectBone(
@@ -911,10 +964,9 @@ LEFT_EYE = BoneGroup(
             parent="Eye.L",
             is_connected=False,
             req_bones=["j_f_mabdn_02out_l", "j_f_eye_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.L.003", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.L.003", collection_name="Face")
+            ]
         ),
 
         ConnectBone(
@@ -924,10 +976,9 @@ LEFT_EYE = BoneGroup(
             parent="Eye.L",
             is_connected=False,
             req_bones=["j_f_mabup_02out_l", "j_f_eye_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.L.001", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.L.001", collection_name="Face")
+            ]
         ),
 
         ConnectBone(
@@ -937,10 +988,9 @@ LEFT_EYE = BoneGroup(
             parent="Eye.L",
             is_connected=False,
             req_bones=["j_f_mabup_01_l", "j_f_eye_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.L.002", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.L.002", collection_name="Face")
+            ]
         ),
 
         ConnectBone(
@@ -950,10 +1000,9 @@ LEFT_EYE = BoneGroup(
             parent="Eye.L",
             is_connected=False,
             req_bones=["j_f_mabup_03in_l", "j_f_eye_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.L.003", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.L.003", collection_name="Face")
+            ]
         ),
         #Glue Bones
         ConnectBone(
@@ -963,10 +1012,9 @@ LEFT_EYE = BoneGroup(
             parent="Head",
             is_connected=False,
             req_bones=["j_f_hoho_l", "lid.B.L.002"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
-                b_collection="MCH"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Lower.Lid.L.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
+                        CollectionOperation(time="Pre", bone_name="Lower.Lid.L.Glue", collection_name="MCH")
+            ]    
         ),
         ConnectBone(
             name="Upper.Lid.L.Glue",
@@ -975,10 +1023,9 @@ LEFT_EYE = BoneGroup(
             parent="Head",
             is_connected=False,
             req_bones=["j_f_miken_02_l", "lid.T.L.002"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
-                b_collection="MCH"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Upper.Lid.L.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
+                        CollectionOperation(time="Pre", bone_name="Upper.Lid.L.Glue", collection_name="MCH")
+            ]
         ),
     ]
 )  
@@ -1001,48 +1048,40 @@ RIGHT_EYE = BoneGroup(
             bone_a="j_f_mabup_02out_r", 
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_02out_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True), 
-                b_collection="Face (Secondary)"
-                )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.T.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True)), 
+                        CollectionOperation(time="Pre", bone_name="lid.T.R", collection_name="Face (Secondary)")
+            ]
         ),
         SkinBone(
             name="lid.T.R.002", 
             bone_a="j_f_mabup_01_r", 
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabup_01_r"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-                )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.002", collection_name="Face (Secondary)")]
         ),
         SkinBone(
             name="lid.B.R", 
             bone_a="j_f_mabdn_03in_r", 
             mesh_restriction="eye_occlusion", 
             req_bones=["j_f_mabdn_03in_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head"), 
-                b_collection="Face (Secondary)"
-                )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.B.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head")), 
+                        CollectionOperation(time="Pre", bone_name="lid.B.R", collection_name="Face (Secondary)")]
         ),
         SkinBone(
             name="lid.B.R.002",
             bone_a="j_f_mabdn_01_r",
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabdn_01_r"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-                )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002", collection_name="Face (Secondary)")]
         ),
         CopyBone(
             name="Eye.R",
             source_bone="j_f_eyepuru_r",
             req_bones=["j_f_eyepuru_r"],
             parent="Head",
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.face_skin_eye(),
-                b_collection="Face (Primary)"
-                )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Eye.R", rigify_type=rigify.types.face_skin_eye()), 
+                        CollectionOperation(time="Pre", bone_name="Eye.R", collection_name="Face (Primary)")
+            ]
         ),
         BridgeBone(
             name="lid.T.R.001",
@@ -1052,9 +1091,7 @@ RIGHT_EYE = BoneGroup(
             is_connected=True,  
             parent="Eye.R",
             req_bones=["lid.T.R", "lid.T.R.002"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.001", collection_name="Face (Secondary)")]
         ),
         BridgeBone(
             name="lid.T.R.003", 
@@ -1063,9 +1100,7 @@ RIGHT_EYE = BoneGroup(
             offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
             is_connected=False,
             req_bones=["lid.T.R.002", "lid.B.R"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.003", collection_name="Face (Secondary)")]
         ),
         BridgeBone(
             name="lid.B.R.001",
@@ -1075,9 +1110,7 @@ RIGHT_EYE = BoneGroup(
             is_connected=True,
             parent="Eye.R",
             req_bones=["lid.B.R", "lid.B.R.002"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001", collection_name="Face (Secondary)")]
         ),
         BridgeBone(
             name="lid.B.R.003",
@@ -1086,9 +1119,7 @@ RIGHT_EYE = BoneGroup(
             offset_factor=mathutils.Vector((-0.003, -0.001, -0.003)),
             is_connected=False,
             req_bones=["lid.B.R.002", "lid.T.R"],
-            pose_operations=PoseOperations(
-                b_collection="Face (Secondary)"
-            )
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003", collection_name="Face (Secondary)")]
         ),
 
         ConnectBone(
@@ -1098,10 +1129,9 @@ RIGHT_EYE = BoneGroup(
             parent="Eye.R",
             is_connected=False,
             req_bones=["j_f_mabdn_03in_r", "j_f_eye_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.R.001", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.R.001", collection_name="Face")
+            ]
         ),
         ConnectBone(
             name="eye_tracker.B.R.002",
@@ -1110,10 +1140,9 @@ RIGHT_EYE = BoneGroup(
             parent="Eye.R",
             is_connected=False,
             req_bones=["j_f_mabdn_01_r", "j_f_eye_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.R.002", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.R.002", collection_name="Face")
+            ]
         ),
         ConnectBone(
             name="eye_tracker.B.R.003",
@@ -1122,10 +1151,9 @@ RIGHT_EYE = BoneGroup(
             parent="Eye.R",
             is_connected=False,
             req_bones=["j_f_mabdn_02out_r", "j_f_eye_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.R.003", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.R.003", collection_name="Face")
+            ]
         ),
         ConnectBone(
             name="eye_tracker.T.R.001",
@@ -1134,10 +1162,9 @@ RIGHT_EYE = BoneGroup(
             parent="Eye.R",
             is_connected=False,
             req_bones=["j_f_mabup_02out_r", "j_f_eye_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.R.001", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.R.001", collection_name="Face")
+            ]
         ),
         ConnectBone(
             name="eye_tracker.T.R.002",
@@ -1146,10 +1173,9 @@ RIGHT_EYE = BoneGroup(
             parent="Eye.R",
             is_connected=False,
             req_bones=["j_f_mabup_01_r", "j_f_eye_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.R.002", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.R.002", collection_name="Face")
+            ]
         ),
         ConnectBone(
             name="eye_tracker.T.R.003",
@@ -1158,10 +1184,9 @@ RIGHT_EYE = BoneGroup(
             parent="Eye.R",
             is_connected=False,
             req_bones=["j_f_mabup_03in_r", "j_f_eye_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(),
-                b_collection="Face"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.R.003", rigify_type=rigify.types.skin_basic_chain()),
+                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.R.003", collection_name="Face")
+            ]
         ),
         #Glue Bones
         ConnectBone(
@@ -1171,10 +1196,8 @@ RIGHT_EYE = BoneGroup(
             parent="Head",
             is_connected=False,
             req_bones=["j_f_hoho_r", "lid.B.R.002"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
-                b_collection="MCH"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Lower.Lid.R.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
+                        CollectionOperation(time="Pre", bone_name="Lower.Lid.R.Glue", collection_name="MCH")]
         ),
         ConnectBone(
             name="Upper.Lid.R.Glue",
@@ -1183,10 +1206,8 @@ RIGHT_EYE = BoneGroup(
             parent="Head",
             is_connected=False,
             req_bones=["j_f_miken_02_r", "lid.T.R.002"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True),
-                b_collection="MCH"
-            )
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Upper.Lid.R.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
+                        CollectionOperation(time="Pre", bone_name="Upper.Lid.R.Glue", collection_name="MCH")]
         ),
     ]
 )

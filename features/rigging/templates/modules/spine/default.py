@@ -23,9 +23,10 @@ SPINE = BoneGroup(
                 bone_b="j_kosi",
                 start="tail",
                 end="head",
-                is_connected=True,
+                parent="root",
+                is_connected=False,
                 req_bones=["j_kosi"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.001", parent=["root"], is_connected=False),
+                operations=[
                             RigifyTypeOperation(time="Pre", bone_name="Spine.001", rigify_type=rigify.types.spines_basic_spine(fk_coll="Torso (Tweak)", tweak_coll="Torso (Tweak)", pivot_pos=1)),
                             CollectionOperation(time="Pre", bone_name="Spine.001", collection_name="Torso"),
                             ]
@@ -34,8 +35,10 @@ SPINE = BoneGroup(
                 name="Spine.002",
                 bone_a="j_sebo_a",
                 bone_b="j_sebo_b",
+                parent="Spine.001",
+                is_connected=True,
                 req_bones=["j_sebo_a", "j_sebo_b"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.002", parent=["Spine.001"], is_connected=True),
+                operations=[
                             CollectionOperation(time="Pre", bone_name="Spine.002", collection_name="Torso"),
                             ]
             ),
@@ -43,8 +46,10 @@ SPINE = BoneGroup(
                 name="Spine.003",
                 bone_a="j_sebo_b",
                 bone_b="j_sebo_c",
+                parent="Spine.002",
+                is_connected=True,
                 req_bones=["j_sebo_b", "j_sebo_c"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.003", parent=["Spine.002"], is_connected=True),
+                operations=[
                             CollectionOperation(time="Pre", bone_name="Spine.003", collection_name="Torso"),
                             ]
             ),
@@ -52,8 +57,10 @@ SPINE = BoneGroup(
                 name="Spine.004",
                 bone_a="j_sebo_c",
                 bone_b="j_kubi",
+                parent="Spine.003",
+                is_connected=True,
                 req_bones=["j_sebo_c", "j_kubi"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="Spine.004", parent=["Spine.003"], is_connected=True),
+                operations=[
                             CollectionOperation(time="Pre", bone_name="Spine.004", collection_name="Torso"),
                             ]
             ),
@@ -65,8 +72,9 @@ SPINE = BoneGroup(
                 axis_type="local",
                 axis="Y",
                 roll=-48,
+                parent="Spine.003",
                 req_bones=["j_mune_r"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="Chest.R", parent=["Spine.003"], is_connected=False),
+                operations=[
                             RigifyTypeOperation(time="Pre", bone_name="Chest.R", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
                             CollectionOperation(time="Pre", bone_name="Chest.R", collection_name="Torso"),
                             ]
@@ -78,8 +86,9 @@ SPINE = BoneGroup(
                 axis_type="local",
                 axis="Y",
                 roll=-132,
+                parent="Spine.003",
                 req_bones=["j_mune_l"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="Chest.L", parent=["Spine.003"], is_connected=False),
+                operations=[
                             RigifyTypeOperation(time="Pre", bone_name="Chest.L", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
                             CollectionOperation(time="Pre", bone_name="Chest.L", collection_name="Torso"),
                             ]

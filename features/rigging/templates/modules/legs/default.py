@@ -1,5 +1,6 @@
 from ......core.rigify.settings import UI_Collections, BoneCollection
 from ......core.generators import ConnectBone, ExtensionBone, ParallelBone
+from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
 
@@ -19,10 +20,9 @@ LEG_R = BoneGroup(
                 bone_b="j_asi_c_r",
                 parent="Spine.001",
                 req_bones=["j_asi_a_r", "j_asi_c_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_leg(fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)"),
-                    b_collection="Leg.R (IK)"
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="thigh.R", parent=["Spine.001", "j_kosi"], is_connected=False),
+                            RigifyTypeOperation(time="Pre", bone_name="thigh.R", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)")), 
+                            CollectionOperation(time="Pre", bone_name="thigh.R", collection_name="Leg.R")]
             ),
             ConnectBone(
                 name="shin.R", 
@@ -31,9 +31,7 @@ LEG_R = BoneGroup(
                 parent="thigh.R", 
                 is_connected=True,
                 req_bones=["j_asi_c_r", "j_asi_d_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.R (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="shin.R", collection_name="Leg.R")]
             ),
             ConnectBone(
                 name="foot.R", 
@@ -42,9 +40,7 @@ LEG_R = BoneGroup(
                 parent="shin.R",
                 is_connected=True,
                 req_bones=["j_asi_d_r", "j_asi_e_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.R (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="foot.R", collection_name="Leg.R (IK)")]
             ),
             ExtensionBone(
                 name="toe.R",
@@ -55,9 +51,7 @@ LEG_R = BoneGroup(
                 axis="Y",
                 start="head",
                 req_bones=["j_asi_e_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.R (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="toe.R", collection_name="Leg.R (IK)")]
             ),
             ParallelBone(
                 name="heel_pivot.R.helper",
@@ -71,9 +65,7 @@ LEG_R = BoneGroup(
                 end="tail",
                 coordinate="Y",
                 req_bones=["toe.R", "shin.R"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.R (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.R.helper", collection_name="Leg.R (IK)")]
             ),
             ExtensionBone(
                 name="heel_pivot.R",
@@ -84,9 +76,7 @@ LEG_R = BoneGroup(
                 axis="Y",
                 size_factor=1.0,
                 req_bones=["heel_pivot.R.helper"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.R (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.R", collection_name="Leg.R (IK)")]
             )
         ],
 )
@@ -107,10 +97,9 @@ LEG_L = BoneGroup(
                 bone_b="j_asi_c_l",
                 parent="Spine.001",
                 req_bones=["j_asi_a_l", "j_asi_c_l"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)"),
-                    b_collection="Leg.L (IK)"
-                )
+                operations=[ParentBoneOperation(time="Pre", bone_name="thigh.L", parent=["Spine.001", "j_kosi"], is_connected=False),
+                            RigifyTypeOperation(time="Pre", bone_name="thigh.L", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)")), 
+                            CollectionOperation(time="Pre", bone_name="thigh.L", collection_name="Leg.L")]
             ),
             ConnectBone(
                 name="shin.L", 
@@ -119,9 +108,7 @@ LEG_L = BoneGroup(
                 parent="thigh.L", 
                 is_connected=True,
                 req_bones=["j_asi_c_l", "j_asi_d_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.L (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="shin.L", collection_name="Leg.L (IK)")]
             ),
             ConnectBone(
                 name="foot.L", 
@@ -130,9 +117,7 @@ LEG_L = BoneGroup(
                 parent="shin.L",
                 is_connected=True,
                 req_bones=["j_asi_d_l", "j_asi_e_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.L (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="foot.L", collection_name="Leg.L (IK)")]
             ),
             ExtensionBone(
                 name="toe.L",
@@ -143,9 +128,7 @@ LEG_L = BoneGroup(
                 axis="Y",
                 start="head",
                 req_bones=["j_asi_e_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.L (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="toe.L", collection_name="Leg.L (IK)")]
             ),
             ParallelBone(
                 name="heel_pivot.L.helper",
@@ -159,9 +142,7 @@ LEG_L = BoneGroup(
                 end="tail",
                 coordinate="Y",
                 req_bones=["toe.L", "shin.L"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.L (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.L.helper", collection_name="Leg.L (IK)")]
             ),
             ExtensionBone(
                 name="heel_pivot.L",
@@ -172,9 +153,7 @@ LEG_L = BoneGroup(
                 axis="Y",
                 size_factor=1.0,
                 req_bones=["heel_pivot.L.helper"],
-                pose_operations=PoseOperations(
-                    b_collection="Leg.L (IK)"
-                )
+                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.L", collection_name="Leg.L (IK)")]
             )
         ],
 )

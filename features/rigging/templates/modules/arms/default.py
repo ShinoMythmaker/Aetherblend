@@ -22,7 +22,8 @@ ARM_R = BoneGroup(
                 bone_a="j_sako_r",
                 bone_b="j_ude_a_r",
                 req_bones=["j_sako_r"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.R", parent=["Spine.004"], is_connected=False), 
+                parent="Spine.004",
+                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.R", parent=["Spine.004", "j_sebo_c"], is_connected=False), 
                     RigifyTypeOperation(time="Pre", bone_name="clavicle.R", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")), 
                     CollectionOperation(time="Pre", bone_name="clavicle.R", collection_name="Torso")
                 ]
@@ -34,7 +35,7 @@ ARM_R = BoneGroup(
                 bone_b="j_ude_b_r", 
                 parent="clavicle.R",
                 req_bones=["j_ude_a_r", "j_ude_b_r"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="upper_arm.R", parent=["clavicle.R"], is_connected=False), 
+                operations=[
                     RigifyTypeOperation(time="Pre", bone_name="upper_arm.R", rigify_type=rigify.types.limbs_arm(fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)")), 
                     CollectionOperation(time="Pre", bone_name="upper_arm.R", collection_name="Arm.R (IK)")
                 ]
@@ -43,8 +44,10 @@ ARM_R = BoneGroup(
                 name="forearm.R", 
                 bone_a="j_ude_b_r", 
                 bone_b="j_te_r", 
+                parent="upper_arm.R",
+                is_connected=True,
                 req_bones=["j_ude_b_r", "j_te_r"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="forearm.R", parent=["upper_arm.R"], is_connected=True),
+                operations=[
                     CollectionOperation(time="Pre", bone_name="forearm.R", collection_name="Arm.R (IK)")
                 ]
             ),
@@ -54,8 +57,10 @@ ARM_R = BoneGroup(
                 size_factor=0.6, 
                 axis_type="local", 
                 axis="Y", 
+                parent="forearm.R",
+                is_connected=True,
                 req_bones=["forearm.R"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="hand.R", parent=["forearm.R"], is_connected=True),
+                operations=[
                     CollectionOperation(time="Pre", bone_name="hand.R", collection_name="Arm.R (IK)")
                 ]
             ),
@@ -66,8 +71,9 @@ ARM_R = BoneGroup(
                 axis_type="local",
                 axis="Y",
                 start="head",
+                parent="forearm.R",
                 req_bones=["n_hhiji_r"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="elbow.R", parent=["forearm.R"], is_connected=False),
+                operations=[
                             RigifyTypeOperation(time="Pre", bone_name="elbow.R", rigify_type=rigify.types.basic_super_copy(widget_type="pivot_cross")),
                             CollectionOperation(time="Pre", bone_name="elbow.R", collection_name="Arm.R (Tweak)")
                 ]
@@ -91,8 +97,9 @@ ARM_L = BoneGroup(
                 name="clavicle.L",
                 bone_a="j_sako_l",
                 bone_b="j_ude_a_l",
+                parent="Spine.004",
                 req_bones=["j_sako_l"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.L", parent=["Spine.004"], is_connected=False), 
+                operations=[
                     RigifyTypeOperation(time="Pre", bone_name="clavicle.L", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")), 
                     CollectionOperation(time="Pre", bone_name="clavicle.L", collection_name="Torso")
                 ]
@@ -101,9 +108,10 @@ ARM_L = BoneGroup(
             ConnectBone(
                 name="upper_arm.L", 
                 bone_a="j_ude_a_l", 
-                bone_b="j_ude_b_l", 
+                bone_b="j_ude_b_l",
+                parent="clavicle.L",
                 req_bones=["j_ude_a_l", "j_ude_b_l"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="upper_arm.L", parent=["clavicle.L"], is_connected=False), 
+                operations=[
                     RigifyTypeOperation(time="Pre", bone_name="upper_arm.L", rigify_type=rigify.types.limbs_arm(fk_coll="Arm.L (FK)", tweak_coll="Arm.L (Tweak)")), 
                     CollectionOperation(time="Pre", bone_name="upper_arm.L", collection_name="Arm.L (IK)")
                 ]
@@ -112,8 +120,10 @@ ARM_L = BoneGroup(
                 name="forearm.L", 
                 bone_a="j_ude_b_l", 
                 bone_b="j_te_l", 
+                parent="upper_arm.L",
+                is_connected=True,
                 req_bones=["j_ude_b_l", "j_te_l"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="forearm.L", parent=["upper_arm.L"], is_connected=True),
+                operations=[
                     CollectionOperation(time="Pre", bone_name="forearm.L", collection_name="Arm.L (IK)")
                 ]
             ),
@@ -123,8 +133,10 @@ ARM_L = BoneGroup(
                 size_factor=0.6, 
                 axis_type="local", 
                 axis="Y", 
+                parent="forearm.L",
+                is_connected=True,
                 req_bones=["forearm.L"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="hand.L", parent=["forearm.L"], is_connected=True),
+                operations=[
                     CollectionOperation(time="Pre", bone_name="hand.L", collection_name="Arm.L (IK)")
                 ]
             ),
@@ -136,9 +148,8 @@ ARM_L = BoneGroup(
                 axis="Y",
                 start="head",
                 parent="forearm.L",
-                is_connected=False,
                 req_bones=["n_hhiji_l"],
-                operations=[ParentBoneOperation(time="Pre", bone_name="elbow.L", parent=["forearm.L"], is_connected=False),
+                operations=[
                             RigifyTypeOperation(time="Pre", bone_name="elbow.L", rigify_type=rigify.types.basic_super_copy(widget_type="pivot_cross")),
                             CollectionOperation(time="Pre", bone_name="elbow.L", collection_name="Arm.L (Tweak)")
                         ]
