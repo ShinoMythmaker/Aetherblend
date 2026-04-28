@@ -1,5 +1,5 @@
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.generators import ConnectBone, ExtensionBone
+from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
 

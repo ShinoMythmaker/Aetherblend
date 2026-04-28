@@ -1,4 +1,5 @@
-from ...core.shared import AetherRigGenerator, RigModule
+from ...core.aether_rig_generator import AetherRigGenerator
+from ...core.shared import RigModule
 from .templates import AVAILABLE_MODULES, CS_COLORSETS, TEMPLATES, get_module_key
 
 

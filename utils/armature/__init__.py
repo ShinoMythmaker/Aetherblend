@@ -1,16 +1,11 @@
 from . import b_collection
-from . import bone
 
 import bpy
 
-def dupe_with_childs(armature):
-    """Duplicates an armature and its children."""
+def _select_single(obj: bpy.types.Object):
     bpy.ops.object.select_all(action='DESELECT')
-    armature.select_set(True)
-    for child in armature.children:
-        print(child.name)
-        child.select_set(True) 
-    bpy.ops.object.duplicate_move()
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
 
 def find_armature_in_objects(objects):
     """Finds the first armature in the objects imported."""
@@ -22,44 +17,13 @@ def find_armature_in_objects(objects):
             print(f"[AetherBlend] Skipping deleted object: {obj}")  
     return None
 
-def get_frame_range(armature):
-    """Returns the frame range of the armature's animation."""
-    if not armature or not armature.animation_data:
-        return (0, 0)
-    
-    action = armature.animation_data.action
-    if not action:
-        return (0, 0)
-    
-    start_frame = int(action.frame_range[0])
-    end_frame = int(action.frame_range[1])
-    
-    return start_frame, end_frame
-
-
-def delete_keyframes(armature):
-    """Deletes all keyframes from the armature."""
-    if not armature or not armature.animation_data:
-        return
-
-    action = armature.animation_data.action
-    if not action:
-        return
-
-    for fcurve in action.fcurves:
-        action.fcurves.remove(fcurve)
-
-    # Clear the action to remove all keyframes
-    action.clear()
-    print(f"[AetherBlend] All keyframes deleted from armature '{armature.name}'.")
-
 def reset_transforms(armature):
     """Resets the transforms of the armature."""
     original_mode = armature.mode
     if not armature:
         return
     
-    bpy.context.view_layer.objects.active = armature
+    _select_single(armature)
 
     bpy.ops.object.mode_set(mode='POSE')
     bpy.ops.pose.select_all(action='SELECT')
@@ -71,9 +35,7 @@ def reset_transforms(armature):
 
 
 def unparent_all_bones(armature: bpy.types.Object) -> None:
-    """
-    Unparents all bones in the given armature.
-    """
+    """Unparents all bones in the given armature."""
     original_mode = armature.mode
     bpy.ops.object.mode_set(mode='EDIT')
     for bone in armature.data.edit_bones:
@@ -81,9 +43,7 @@ def unparent_all_bones(armature: bpy.types.Object) -> None:
     bpy.ops.object.mode_set(mode=original_mode)
 
 def find_meshes(armature: bpy.types.Object) -> list:
-    """
-    Returns a list of mesh objects using the given armature as an armature modifier.
-    """
+    """Returns all mesh objects that use the given armature modifier."""
     meshes = []
     for obj in bpy.data.objects:
         if obj.type == "MESH":
@@ -93,10 +53,8 @@ def find_meshes(armature: bpy.types.Object) -> list:
                     break
     return meshes
 
-def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> None:
-    """
-    Applies the armature modifier as a shapekey to the mesh object and renames the shapekey.
-    """
+def _apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> None:
+    """Applies all armature modifiers using armature_obj as a new shapekey."""
     original_mode = mesh_obj.mode
     object_state = mesh_obj.hide_get()
     try:
@@ -129,33 +87,25 @@ def apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object
     bpy.ops.object.mode_set(mode=original_mode)
 
 def apply_all_as_shapekey(armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> list:
-    """
-    Applies the armature modifier as a shapekey to all mesh objects using the given armature. Returns the list of affected mesh objects.
-    """
+    """Applies armature modifiers as shapekeys to all meshes using this armature."""
     meshes = find_meshes(armature_obj)
     for mesh_obj in meshes:
-        apply_as_shapekey(mesh_obj, armature_obj, shapekey_name, disable_all=disable_all)
+        _apply_as_shapekey(mesh_obj, armature_obj, shapekey_name, disable_all=disable_all)
     return meshes
 
 
 def new_rest_pose(armature: bpy.types.Object) -> None:
-    """
-    Applies the current pose of the armature as the new rest pose.
-    """
+    """Applies the current pose as the new rest pose for the armature."""
     original_mode = armature.mode
     bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
-    armature.select_set(True)
-    bpy.context.view_layer.objects.active = armature
+    _select_single(armature)
     bpy.ops.object.mode_set(mode='POSE')
     bpy.ops.pose.armature_apply()
     bpy.ops.object.mode_set(mode=original_mode)
 
 
 def snapshot_parenting(armature: bpy.types.Object) -> dict:
-    """
-    Returns a mapping of bone names to their parent names for the given armature.
-    """
+    """Returns a mapping of bone names to their current parent names."""
     original_mode = armature.mode
     bpy.ops.object.mode_set(mode='EDIT')
     parent_map = {}
@@ -165,9 +115,7 @@ def snapshot_parenting(armature: bpy.types.Object) -> dict:
     return parent_map
 
 def restore_bone_parenting(armature: bpy.types.Object, parent_map: dict) -> None:
-    """
-    Restores bone parenting in the armature from the given parent map.
-    """
+    """Restores bone parenting from a map produced by snapshot_parenting."""
     original_mode = armature.mode
     bpy.ops.object.mode_set(mode='EDIT')
     edit_bones = armature.data.edit_bones
@@ -177,28 +125,9 @@ def restore_bone_parenting(armature: bpy.types.Object, parent_map: dict) -> None
             bone.parent = edit_bones.get(parent_name) if parent_name else None
     bpy.ops.object.mode_set(mode=original_mode)
 
-def create(location: tuple, armature_name: str) -> bpy.types.Object:
-    """Create the base meta rig armature."""
-    original_mode = bpy.context.object.mode if bpy.context.object else 'OBJECT'
-
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.armature_add(enter_editmode=False, location=location)
-    armature = bpy.context.active_object
-    armature.name = armature_name
-
-    bpy.ops.object.mode_set(mode='EDIT')
-    edit_bones = armature.data.edit_bones
-    if "Bone" in edit_bones:
-        edit_bones.remove(edit_bones["Bone"])
-
-    bpy.ops.object.mode_set(mode=original_mode)
-    return armature
-
 def duplicate(armature: bpy.types.Object) -> bpy.types.Object:
     """Duplicates the given armature object."""
-    bpy.ops.object.select_all(action='DESELECT')
-    armature.select_set(True)
-    bpy.context.view_layer.objects.active = armature
+    _select_single(armature)
     bpy.ops.object.duplicate_move()
     duplicated_armature = bpy.context.active_object
     return duplicated_armature

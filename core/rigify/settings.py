@@ -28,7 +28,7 @@ class BoneCollection:
             return None, False
         
         coll = armature.data.collections.get(self.name)
-        hide_collections = False
+        show_collection = True
         if coll:
             if self.ui:
                 if self.color_set:
@@ -37,10 +37,10 @@ class BoneCollection:
                 coll.rigify_ui_title = self.title
 
             if not self.visible:
-                hide_collections = True
+                show_collection = False
 
-            return coll,  hide_collections
-        return None, False
+            return coll,  show_collection
+        return None, True
     
 class UI_Collections:
     collections: list[BoneCollection]
