@@ -9,7 +9,7 @@ HAIR = BoneGroup(
         RegexBoneGroup(
             name="Hair",
             pattern=r"^j_ex_h.*",
-            parent=["Head", "j_kao"],
+            parent="Head",
             extension_size_factor=10.0,
             is_connected=False,
             req_bones=[],
@@ -18,7 +18,7 @@ HAIR = BoneGroup(
         RegexBoneGroup(
             name="Kami",
             pattern=r"^j_kami.*",
-            parent=["Head", "j_kao"],
+            parent="Head",
             extension_size_factor=10.0,
             is_connected=False,
             req_bones=[],
@@ -27,7 +27,7 @@ HAIR = BoneGroup(
         RegexBoneGroup(
             name="Accessory",
             pattern=r"^j_ex_met.*",
-            parent=["Head", "j_kao"],
+            parent="Head",
             extension_size_factor=10.0,
             is_connected=False,
             req_bones=[],
