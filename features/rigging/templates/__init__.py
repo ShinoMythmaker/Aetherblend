@@ -133,6 +133,7 @@ TEMPLATES = {
             [ears.miqo, ears.viera],
             [hair.default],
             [genitals.ivcs_both],
+            [mouth.default],
             [ui.debug],
         ]
     ),
@@ -143,6 +144,7 @@ TEMPLATES = {
             [ears.miqo, ears.viera],
             [hair.default],
             [face.detailed],
+            [mouth.default],
             [arms.default],
             [spine.default],
             [hands.ivcs, hands.default],
