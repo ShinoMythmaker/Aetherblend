@@ -1,4 +1,5 @@
 from ......core.generators import ConnectBone, ExtensionBone
+from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
 from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
 
@@ -19,13 +20,13 @@ GENITALS_M = BoneGroup(
             name="Penis",
             bone_a="iv_ochinko_a",
             bone_b="iv_ochinko_b",
-            parent="Spine.001",
+            parent=["Spine.001", "j_kosi"],
             is_connected=False,
             req_bones=["iv_ochinko_a", "iv_ochinko_b"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Spine.001"),
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                RigifyTypeOperation(bone_name="Penis", rigify_type=rigify.types.skin_stretchy_chain()),
+                CollectionOperation(bone_name="Penis", collection_name="Genitals (Male)")
+            ]
         ),
         ConnectBone(
             name="Penis.001",
@@ -34,9 +35,9 @@ GENITALS_M = BoneGroup(
             parent="Penis",
             is_connected=True,
             req_bones=["iv_ochinko_b", "iv_ochinko_c"],
-            pose_operations=PoseOperations(
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                CollectionOperation(bone_name="Penis.001", collection_name="Genitals (Male)")
+            ]
         ),
         ConnectBone(
             name="Penis.002",
@@ -45,9 +46,9 @@ GENITALS_M = BoneGroup(
             parent="Penis.001",
             is_connected=True,
             req_bones=["iv_ochinko_c", "iv_ochinko_d"],
-            pose_operations=PoseOperations(
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                CollectionOperation(bone_name="Penis.002", collection_name="Genitals (Male)")
+            ],
         ),
         ConnectBone(
             name="Penis.003",
@@ -56,9 +57,9 @@ GENITALS_M = BoneGroup(
             parent="Penis.002",
             is_connected=True,
             req_bones=["iv_ochinko_d", "iv_ochinko_e"],
-            pose_operations=PoseOperations(
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                CollectionOperation(bone_name="Penis.003", collection_name="Genitals (Male)")
+            ]
         ),
         ConnectBone(
             name="Penis.004",
@@ -67,9 +68,9 @@ GENITALS_M = BoneGroup(
             parent="Penis.003",
             is_connected=True,
             req_bones=["iv_ochinko_e", "iv_ochinko_f"],
-            pose_operations=PoseOperations(
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                CollectionOperation(bone_name="Penis.004", collection_name="Genitals (Male)")
+            ],
         ),
         ExtensionBone(
             name="Penis.005",
@@ -77,35 +78,35 @@ GENITALS_M = BoneGroup(
             parent="Penis.004",
             is_connected=True,
             req_bones=["iv_ochinko_f"],
-            pose_operations=PoseOperations(
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                CollectionOperation(bone_name="Penis.005", collection_name="Genitals (Male)")
+            ]
         ),
         ExtensionBone(
             name="Testicle.R",
             bone_a="iv_kougan_r",
-            parent="Spine.001",
+            parent=["Spine.001", "j_kosi"],
             is_connected=False,
             start="head",
             size_factor=0.5,
             req_bones=["iv_kougan_r"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                RigifyTypeOperation(bone_name="Testicle.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001")),
+                CollectionOperation(bone_name="Testicle.R", collection_name="Genitals (Male)")
+            ]
         ),
         ExtensionBone(
             name="Testicle.L",
             bone_a="iv_kougan_l",
-            parent="Spine.001",
+            parent=["Spine.001", "j_kosi"],
             is_connected=False,
             start="head",
             size_factor=0.5,
             req_bones=["iv_kougan_l"],
-            pose_operations=PoseOperations(
-                rigify_settings=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001"),
-                b_collection="Genitals (Male)"
-            )
+            operations=[
+                RigifyTypeOperation(bone_name="Testicle.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001")),
+                CollectionOperation(bone_name="Testicle.L", collection_name="Genitals (Male)")
+            ]
         )
     ]
 )
