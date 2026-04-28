@@ -2,7 +2,8 @@ import importlib
 import pkgutil
 from collections import defaultdict
 
-from ....core.shared import AetherRigGenerator, RigModule, Template ,WidgetOverride
+from ....core.aether_rig_generator import AetherRigGenerator
+from ....core.shared import RigModule, Template, WidgetOverride
 from ....core.rigify import *
 
 

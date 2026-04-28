@@ -2,6 +2,78 @@ import bpy
 from collections import defaultdict
 import os
 
+
+def ensure_mode(mode: str = 'OBJECT'):
+    """Switches Blender mode only when required."""
+    if bpy.context.mode != mode:
+        bpy.ops.object.mode_set(mode=mode)
+
+
+def select_only(obj: bpy.types.Object, mode: str = 'OBJECT'):
+    """Select exactly one object and set it as active."""
+    ensure_mode(mode)
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+
+
+def set_visibility(obj: bpy.types.Object, visible: bool):
+    """Sets viewport visibility for an object."""
+    obj.hide_set(not visible)
+    obj.hide_viewport = not visible
+
+
+def uses_armature(obj: bpy.types.Object, armature: bpy.types.Object) -> bool:
+    """Returns True if object has constraints/modifiers that reference the armature."""
+    for constraint in obj.constraints:
+        if hasattr(constraint, 'target') and constraint.target == armature:
+            return True
+
+    for modifier in obj.modifiers:
+        if modifier.type == 'ARMATURE' and modifier.object == armature:
+            return True
+
+    if obj.type != 'ARMATURE' or not obj.pose:
+        return False
+
+    for pose_bone in obj.pose.bones:
+        for constraint in pose_bone.constraints:
+            if hasattr(constraint, 'target') and constraint.target == armature:
+                return True
+
+    return False
+
+
+def has_material_property(obj: bpy.types.Object, property_name: str, property_value=None) -> bool:
+    """Returns True if object has a material with the given custom property value."""
+    if not obj.data or not hasattr(obj.data, 'materials'):
+        return False
+
+    for material_slot in obj.material_slots:
+        material = material_slot.material
+        if not material or property_name not in material:
+            continue
+
+        if property_value is None or material[property_name] == property_value:
+            return True
+
+    return False
+
+
+def find_by_armature_and_material_property(
+    armature: bpy.types.Object,
+    property_name: str,
+    property_value=None,
+) -> list[bpy.types.Object]:
+    """Finds objects driven by an armature and matching a material property filter."""
+    return [
+        obj
+        for obj in bpy.data.objects
+        if uses_armature(obj, armature)
+        and has_material_property(obj, property_name, property_value)
+    ]
+
+
 def merge_by_material(objects):
     """Merges objects that share the same material and returns the updated list of all objects, including non-mesh objects that were not modified."""
     material_mesh_groups = defaultdict(list)
@@ -66,33 +138,6 @@ def merge_by_name(objects, name_filter):
     bpy.ops.object.select_all(action='DESELECT') 
 
     return list(updated_objects)  
-  
-def get_icon(obj):
-    """Returns the icon for the given object type."""
-    return bpy.types.Object.bl_rna.properties['type'].enum_items[obj.type].icon
-
-def parent_objects(objects, parent_obj, keep_transform=True):
-    """Parents a list of objects to a given parent object."""
-    bpy.ops.object.mode_set(mode="OBJECT")  
-
-    for obj in objects:
-        try:
-            if obj != parent_obj:  
-                obj.parent = parent_obj
-                obj.matrix_parent_inverse = parent_obj.matrix_world.inverted() if keep_transform else obj.matrix_parent_inverse
-        except ReferenceError:
-            print(f"[AetherBlend] Skipping deleted object: {obj}")    
-
-def delete_rna_from_objects(objects):
-    """Deletes the RNA data from a list of objects, returning only those that are still valid."""
-    new_objects = set()
-    for obj in objects:
-        try:
-            if obj.name:
-                new_objects.add(obj)
-        except ReferenceError:
-            pass    
-    return new_objects
 
 def import_meddle_shader(filepath, imported_objects):
     """Imports Meddle shaders for the given objects."""
@@ -111,29 +156,6 @@ def import_meddle_shader(filepath, imported_objects):
         bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)  
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")
-
-def add_armature_modifier(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Object) -> None:
-    """
-    Adds a new armature modifier to the mesh object for the given armature.
-    """
-    if mesh_obj.type != 'MESH':
-        return
-
-    original_mode = mesh_obj.mode
-    object_state = mesh_obj.hide_get()
-    try:
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.select_all(action='DESELECT')
-        mesh_obj.hide_set(False)
-        mesh_obj.select_set(True)
-        bpy.context.view_layer.objects.active = mesh_obj
-        mod = mesh_obj.modifiers.new(name="Armature", type="ARMATURE")
-        mod.object = armature_obj
-    except Exception as e:
-        print(f"[AetherBlend] Failed to add armature modifier: {e}")
-    finally:
-        mesh_obj.hide_set(object_state)
-        bpy.ops.object.mode_set(mode=original_mode)
 
 def remove_shapekey(obj: bpy.types.Object, shapekey_name: str, enable_backup: bool = False, backup_shapekey_name: str = None) -> None:
     """

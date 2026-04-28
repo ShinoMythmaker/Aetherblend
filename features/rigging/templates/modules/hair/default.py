@@ -1,4 +1,4 @@
-from ......core.generators import RegexBoneGroup
+from ......core.bone_generators import RegexBoneGroup
 from ......core.shared import BoneGroup, RigModule
 from ......core.rigify.settings import UI_Collections, BoneCollection
 

@@ -8,13 +8,11 @@ from typing import Literal
 
 
 if TYPE_CHECKING:
-    from .generators import BoneGenerator
+    from .bone_generators import BoneGenerator
 
-from .operations import ABOperation, PoseOperations, PoseOperationsStack, ConstraintOperation, TransformLink
+from .operations import ABOperation, PoseOperations, PoseOperationsStack, TransformLink
 from . import rigify
-from .constraints import Constraint, CopyTransformsConstraint
-from .. import utils
-from .generators import BoneGenerator
+from .bone_generators import BoneGenerator
 
 ModuleType = Literal["Generator", "Patch","UI-Addon"]
   
@@ -229,33 +227,7 @@ class RigModule:
 
             
         return integrity, pose_op_stack, self.ui, module_operations
-        
 
-class AetherRigGenerator:
-    """Generates an armature based on ordered module priority groups."""
-    name: str
-    modules: 'list[list[RigModule]]'
-    color_sets: 'dict[str, rigify.ColorSet]'
-    overrides: 'list[dict[str, Override]] | None' = None
-    
-
-    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, overrides: 'list[dict[str, Override]] | None' = None, modules: 'list[list[RigModule]] | None' = None):
-        self.name = name
-        self.color_sets = color_sets
-        self.overrides = overrides
-        
-        self.set_modules(modules or [])
-    
-    def getOverrides(self) -> dict[str, Override]:
-        """Combine all widget overrides into a single dictionary."""
-        combined: dict[str, Override] = {}
-        for ov_dict in self.overrides or []:
-            combined.update(ov_dict)
-        return combined
-    
-    def set_modules(self, modules: 'list[list[RigModule]]'):
-        """Store the already-resolved module priority groups."""
-        self.modules = [list(group) for group in modules if group]
 
 @dataclass(frozen=True)
 class Template():

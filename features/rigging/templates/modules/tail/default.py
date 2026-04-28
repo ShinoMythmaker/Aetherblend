@@ -1,4 +1,4 @@
-from ......core.generators import ConnectBone, ExtensionBone
+from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
 from ......core import rigify
