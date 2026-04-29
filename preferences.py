@@ -2,6 +2,7 @@ import bpy
 from bpy.props import StringProperty, EnumProperty
 from pathlib import Path
 import os
+import json
 
 TOGGLE_ITEMS = [('ON', "Enable", ""), ('OFF', "Disable", "")]
 GITHUB_URL = "https://github.com/ShinoMythmaker/Aetherblend"
@@ -36,6 +37,26 @@ class AETHER_OT_Set_Default_Template(bpy.types.Operator):
     def execute(self, context):
         prefs = get_preferences()
         prefs.default_template = self.template_name
+        
+        # If the template being set as default is hidden, unhide it
+        raw = (getattr(prefs, 'hidden_templates', '') or '').strip()
+        hidden: set[str] = set()
+        if raw:
+            try:
+                values = json.loads(raw)
+                if isinstance(values, list):
+                    hidden = {
+                        value.strip()
+                        for value in values
+                        if isinstance(value, str) and value.strip()
+                    }
+            except Exception:
+                pass
+        
+        if self.template_name in hidden:
+            hidden.remove(self.template_name)
+            prefs.hidden_templates = json.dumps(sorted(hidden), ensure_ascii=True)
+        
         self.report({'INFO'}, f"Default template set to: {self.template_name}")
         return {'FINISHED'}
 
@@ -64,6 +85,56 @@ class AETHER_OT_Delete_Custom_Template(bpy.types.Operator):
             return {'CANCELLED'}
 
         self.report({'INFO'}, "Custom template deleted")
+        return {'FINISHED'}
+
+
+class AETHER_OT_Toggle_Template_Visibility(bpy.types.Operator):
+    """Toggle whether a template appears in dropdown lists."""
+    bl_idname = "aether.toggle_template_visibility"
+    bl_label = "Toggle Template Visibility"
+    bl_description = "Hide or show this template in template dropdowns"
+
+    template_name: StringProperty(
+        name="Template Name",
+        options={'HIDDEN'},
+    ) #type: ignore
+
+    def execute(self, context):
+        if not self.template_name:
+            self.report({'WARNING'}, "No template name was provided")
+            return {'CANCELLED'}
+
+        prefs = get_preferences()
+        default_name = (getattr(prefs, 'default_template', '') or '').strip()
+        
+        if self.template_name == default_name:
+            self.report({'WARNING'}, "Cannot hide the default template")
+            return {'CANCELLED'}
+
+        raw = (getattr(prefs, 'hidden_templates', '') or '').strip()
+
+        hidden: set[str] = set()
+        if raw:
+            try:
+                values = json.loads(raw)
+                if isinstance(values, list):
+                    hidden = {
+                        value.strip()
+                        for value in values
+                        if isinstance(value, str) and value.strip()
+                    }
+            except Exception:
+                hidden = set()
+
+        if self.template_name in hidden:
+            hidden.remove(self.template_name)
+            action = "shown"
+        else:
+            hidden.add(self.template_name)
+            action = "hidden"
+
+        prefs.hidden_templates = json.dumps(sorted(hidden), ensure_ascii=True)
+        self.report({'INFO'}, f"Template {action}: {self.template_name}")
         return {'FINISHED'}
 
 class AetherBlendPreferences(bpy.types.AddonPreferences):
@@ -142,6 +213,12 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         default=""
     ) #type: ignore
 
+    hidden_templates: StringProperty(
+        name="Hidden Templates",
+        description="JSON list of template names hidden from dropdown menus",
+        default=""
+    ) #type: ignore
+
     # default_pose_import_path: StringProperty(
     #     name="Pose Import",
     #     subtype='DIR_PATH',
@@ -192,42 +269,49 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             base_entries = catalogue.get("base", [])
             custom_entries = catalogue.get("custom", [])
             current_default = template_manager.get_default_template_name()
+            hidden_names = template_manager.get_hidden_template_names()
 
             col = layout.column(align=True)
 
-            col.label(text="Base Templates", icon='PRESET')
+            # col.label(text="Base Templates", icon='PRESET')
             for entry in base_entries:
                 row = col.row(align=True)
                 is_default = entry["name"] == current_default
-                if is_default:
-                    row.label(text=entry["name"], icon='SOLO_ON')
-                else:
-                    row.label(text=entry["name"], icon='BLANK1')
-                if not is_default:
-                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_OFF')
-                    set_op.template_name = entry["name"]
-                else:
-                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_ON')
-                    set_op.template_name = " "
+                is_hidden = entry["name"] in hidden_names
+
+                row.label(text="", icon='SOLO_ON' if is_default else 'BLANK1')
+                row.label(text=entry["name"], icon='HIDE_ON' if is_hidden else 'HIDE_OFF')
+
+                visibility_sub = row.row()
+                visibility_sub.enabled = not is_default
+                visibility_op = visibility_sub.operator("aether.toggle_template_visibility",text="",icon='HIDE_ON' if is_hidden else 'HIDE_OFF')
+                visibility_op.template_name = entry["name"]
+
+                set_op = row.operator("aether.set_default_template", text="", icon='SOLO_OFF' if not is_default else 'SOLO_ON')
+                set_op.template_name = entry["name"] if not is_default else " "
 
             col.separator()
 
-            col.label(text="Custom Templates", icon='FILE_FOLDER')
+            # col.label(text="Custom Templates", icon='FILE_FOLDER')
             for entry in custom_entries:
                 row = col.row(align=True)
                 is_default = entry["name"] == current_default
-                if is_default:
-                    row.label(text=entry["name"], icon='SOLO_ON')
-                else:
-                    row.label(text=entry["name"], icon='BLANK1')
+                is_hidden = entry["name"] in hidden_names
+
+                row.label(text="", icon='SOLO_ON' if is_default else 'BLANK1')
+                row.label(text=entry["name"], icon='HIDE_ON' if is_hidden else 'HIDE_OFF')
+
                 delete_op = row.operator("aether.delete_custom_template", text="", icon='TRASH')
                 delete_op.template_path = entry["path"]
-                if not is_default:
-                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_OFF')
-                    set_op.template_name = entry["name"]
-                else:
-                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_ON')
-                    set_op.template_name = " "
+
+                visibility_sub = row.row()
+                visibility_sub.enabled = not is_default
+                visibility_op = visibility_sub.operator("aether.toggle_template_visibility",text="",icon='HIDE_ON' if is_hidden else 'HIDE_OFF')
+                visibility_op.template_name = entry["name"]
+
+                set_op = row.operator("aether.set_default_template", text="", icon='SOLO_OFF' if not is_default else 'SOLO_ON')
+                set_op.template_name = entry["name"] if not is_default else " "
+
             if not custom_entries:
                 col.label(text="No custom templates saved yet", icon='INFO')
 
@@ -254,9 +338,11 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
 def register():
     bpy.utils.register_class(AETHER_OT_Set_Default_Template)
     bpy.utils.register_class(AETHER_OT_Delete_Custom_Template)
+    bpy.utils.register_class(AETHER_OT_Toggle_Template_Visibility)
     bpy.utils.register_class(AetherBlendPreferences)
 
 def unregister():
     bpy.utils.unregister_class(AetherBlendPreferences)
+    bpy.utils.unregister_class(AETHER_OT_Toggle_Template_Visibility)
     bpy.utils.unregister_class(AETHER_OT_Delete_Custom_Template)
     bpy.utils.unregister_class(AETHER_OT_Set_Default_Template)

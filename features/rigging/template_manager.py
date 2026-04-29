@@ -73,9 +73,35 @@ def _load_template_definitions() -> dict[str, dict]:
     return templates
 
 
+def get_hidden_template_names() -> set[str]:
+    """Return hidden template names stored in addon preferences."""
+    try:
+        raw = (getattr(get_preferences(), 'hidden_templates', '') or '').strip()
+    except Exception:
+        return set()
+
+    if not raw:
+        return set()
+
+    try:
+        values = json.loads(raw)
+    except Exception:
+        return set()
+
+    if not isinstance(values, list):
+        return set()
+
+    return {value.strip() for value in values if isinstance(value, str) and value.strip()}
+
+
 def get_available_template_names() -> list[str]:
     """Return template names discovered from JSON files."""
-    return sorted(_load_template_definitions().keys())
+    hidden_names = get_hidden_template_names()
+    return sorted(
+        name
+        for name in _load_template_definitions().keys()
+        if name not in hidden_names
+    )
 
 
 def _resolve_definition_path(definition: dict) -> Path | None:
@@ -264,7 +290,7 @@ def populate_modules_from_template(aether_rig, template_name: str | None = None)
     if not aether_rig or not hasattr(aether_rig, 'modules'):
         return
 
-    available_names = get_available_template_names()
+    available_names = set(_load_template_definitions().keys())
     source_name = template_name or getattr(aether_rig, 'custom_template_source', DEFAULT_TEMPLATE_NAME)
     template = _get_template_from_json(source_name) or _get_template_from_json(DEFAULT_TEMPLATE_NAME)
 
