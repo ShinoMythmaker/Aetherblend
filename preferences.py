@@ -21,6 +21,33 @@ def get_preferences():
     """Retrieve addon preferences."""
     return bpy.context.preferences.addons[__package__].preferences
 
+
+class AETHER_OT_Delete_Custom_Template(bpy.types.Operator):
+    """Delete one custom template file from addon preferences."""
+    bl_idname = "aether.delete_custom_template"
+    bl_label = "Delete Custom Template"
+    bl_description = "Delete this custom template JSON file"
+
+    template_path: StringProperty(
+        name="Template Path",
+        options={'HIDDEN'},
+    ) #type: ignore
+
+    def execute(self, context):
+        from .features.rigging import template_manager
+
+        if not self.template_path:
+            self.report({'WARNING'}, "No custom template path was provided")
+            return {'CANCELLED'}
+
+        deleted = template_manager.delete_custom_template_file(self.template_path)
+        if not deleted:
+            self.report({'WARNING'}, "Could not delete custom template")
+            return {'CANCELLED'}
+
+        self.report({'INFO'}, "Custom template deleted")
+        return {'FINISHED'}
+
 class AetherBlendPreferences(bpy.types.AddonPreferences):
     """Addon preferences for AetherBlend."""
     bl_idname = __package__
@@ -31,6 +58,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         items=[
             ('GENERAL', "General", "General addon settings"),
             ('PATHS', "Paths", "Set default paths for various functions"),
+            ('TEMPLATES', "Templates", "View available base and custom templates"),
             ('CONTRIBUTION', "Contribution", "How to support and contribute"),
         ],
         default='GENERAL'
@@ -133,6 +161,33 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             box.label(text="Rig Templates", icon='PRESET')
             box.prop(self, "custom_template_path")
 
+        elif self.tabs == 'TEMPLATES':
+            from .features.rigging import template_manager
+
+            catalogue = template_manager.get_template_catalogue()
+            base_entries = catalogue.get("base", [])
+            custom_entries = catalogue.get("custom", [])
+
+            base_box = layout.box()
+            base_box.label(text=f"Base Templates ({len(base_entries)})", icon='PRESET')
+            if base_entries:
+                for entry in base_entries:
+                    base_box.label(text=entry["name"], icon='DOT')
+            else:
+                base_box.label(text="No base templates found", icon='INFO')
+
+            custom_box = layout.box()
+            custom_box.label(text=f"Custom Templates ({len(custom_entries)})", icon='FILE_FOLDER')
+            custom_box.label(text=f"Path: {template_manager.get_custom_template_json_dir()}", icon='BLANK1')
+            if custom_entries:
+                for entry in custom_entries:
+                    row = custom_box.row(align=True)
+                    row.label(text=entry["name"], icon='DOT')
+                    delete_op = row.operator("aether.delete_custom_template", text="", icon='TRASH')
+                    delete_op.template_path = entry["path"]
+            else:
+                custom_box.label(text="No custom templates found", icon='INFO')
+
         elif self.tabs == 'CONTRIBUTION':
             main_box = layout.box()
             main_box.label(text="Contribution", icon='HEART')
@@ -154,7 +209,9 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             right.operator("wm.url_open", text="Patreon", icon='FUND').url = PATREON_URL
 
 def register():
+    bpy.utils.register_class(AETHER_OT_Delete_Custom_Template)
     bpy.utils.register_class(AetherBlendPreferences)
 
 def unregister():
     bpy.utils.unregister_class(AetherBlendPreferences)
+    bpy.utils.unregister_class(AETHER_OT_Delete_Custom_Template)

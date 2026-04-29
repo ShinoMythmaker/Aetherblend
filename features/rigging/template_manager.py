@@ -78,6 +78,62 @@ def get_available_template_names() -> list[str]:
     return sorted(_load_template_definitions().keys())
 
 
+def _resolve_definition_path(definition: dict) -> Path | None:
+    """Resolve and return the filesystem path stored in a template definition."""
+    raw_path = definition.get("path")
+    if not raw_path:
+        return None
+    try:
+        return Path(raw_path).resolve()
+    except Exception:
+        return None
+
+
+def get_template_catalogue() -> dict[str, list[dict[str, str]]]:
+    """Return all templates classified by source in one filesystem pass.
+
+    Returns a dict with keys ``"base"`` and ``"custom"``, each holding a
+    sorted list of ``{"name": ..., "path": ...}`` entries.
+    """
+    catalogue: dict[str, list[dict[str, str]]] = {"base": [], "custom": []}
+    base_dir = _TEMPLATE_JSON_DIR.resolve()
+    custom_dir = get_custom_template_json_dir().resolve()
+
+    for template_name, definition in _load_template_definitions().items():
+        path = _resolve_definition_path(definition)
+        if path is None:
+            continue
+        if path.parent == base_dir:
+            catalogue["base"].append({"name": template_name, "path": str(path)})
+        elif path.parent == custom_dir:
+            catalogue["custom"].append({"name": template_name, "path": str(path)})
+
+    for entries in catalogue.values():
+        entries.sort(key=lambda e: e["name"].lower())
+
+    return catalogue
+
+
+def delete_custom_template_file(template_path: str) -> bool:
+    """Delete one custom template JSON file by absolute path."""
+    try:
+        path = Path(template_path).resolve()
+    except Exception:
+        return False
+
+    if path.parent != get_custom_template_json_dir().resolve():
+        return False
+
+    if path.suffix.lower() != ".json" or not path.is_file():
+        return False
+
+    try:
+        path.unlink()
+        return True
+    except Exception:
+        return False
+
+
 def _resolve_overrides(definition: dict) -> list | None:
     """Resolve override objects declared in template JSON."""
     override_keys = definition.get("override_keys")
