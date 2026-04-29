@@ -213,9 +213,20 @@ def get_colorset_items(self, context):
     return [(key, key, "") for key in CS_COLORSETS.keys()]
 
 
-## Defaults 
+## Defaults
 DEFAULT_TEMPLATE_NAME = 'Player SFW'
 DEFAULT_COLORSET_NAME = 'AetherBlend'
+
+
+def get_default_template_name() -> str:
+    """Return the user-configured default template, falling back to the hardcoded constant."""
+    try:
+        stored = (getattr(get_preferences(), 'default_template', '') or '').strip()
+        if stored and stored in _load_template_definitions():
+            return stored
+    except Exception:
+        pass
+    return DEFAULT_TEMPLATE_NAME
 
 
 ## Translators

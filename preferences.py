@@ -22,6 +22,24 @@ def get_preferences():
     return bpy.context.preferences.addons[__package__].preferences
 
 
+class AETHER_OT_Set_Default_Template(bpy.types.Operator):
+    """Set the default rig template used for new rigs."""
+    bl_idname = "aether.set_default_template"
+    bl_label = "Set as Default Template"
+    bl_description = "Use this template as the default when creating a new rig"
+
+    template_name: StringProperty(
+        name="Template Name",
+        options={'HIDDEN'},
+    ) # type: ignore
+
+    def execute(self, context):
+        prefs = get_preferences()
+        prefs.default_template = self.template_name
+        self.report({'INFO'}, f"Default template set to: {self.template_name}")
+        return {'FINISHED'}
+
+
 class AETHER_OT_Delete_Custom_Template(bpy.types.Operator):
     """Delete one custom template file from addon preferences."""
     bl_idname = "aether.delete_custom_template"
@@ -118,6 +136,12 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         default=get_default_custom_template_path()
     ) #type: ignore
 
+    default_template: StringProperty(
+        name="Default Template",
+        description="Template selected by default when creating a new rig",
+        default=""
+    ) #type: ignore
+
     # default_pose_import_path: StringProperty(
     #     name="Pose Import",
     #     subtype='DIR_PATH',
@@ -167,26 +191,45 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             catalogue = template_manager.get_template_catalogue()
             base_entries = catalogue.get("base", [])
             custom_entries = catalogue.get("custom", [])
+            current_default = template_manager.get_default_template_name()
 
-            base_box = layout.box()
-            base_box.label(text=f"Base Templates ({len(base_entries)})", icon='PRESET')
-            if base_entries:
-                for entry in base_entries:
-                    base_box.label(text=entry["name"], icon='DOT')
-            else:
-                base_box.label(text="No base templates found", icon='INFO')
+            col = layout.column(align=True)
 
-            custom_box = layout.box()
-            custom_box.label(text=f"Custom Templates ({len(custom_entries)})", icon='FILE_FOLDER')
-            custom_box.label(text=f"Path: {template_manager.get_custom_template_json_dir()}", icon='BLANK1')
-            if custom_entries:
-                for entry in custom_entries:
-                    row = custom_box.row(align=True)
-                    row.label(text=entry["name"], icon='DOT')
-                    delete_op = row.operator("aether.delete_custom_template", text="", icon='TRASH')
-                    delete_op.template_path = entry["path"]
-            else:
-                custom_box.label(text="No custom templates found", icon='INFO')
+            col.label(text="Base Templates", icon='PRESET')
+            for entry in base_entries:
+                row = col.row(align=True)
+                is_default = entry["name"] == current_default
+                if is_default:
+                    row.label(text=entry["name"], icon='SOLO_ON')
+                else:
+                    row.label(text=entry["name"], icon='BLANK1')
+                if not is_default:
+                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_OFF')
+                    set_op.template_name = entry["name"]
+                else:
+                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_ON')
+                    set_op.template_name = " "
+
+            col.separator()
+
+            col.label(text="Custom Templates", icon='FILE_FOLDER')
+            for entry in custom_entries:
+                row = col.row(align=True)
+                is_default = entry["name"] == current_default
+                if is_default:
+                    row.label(text=entry["name"], icon='SOLO_ON')
+                else:
+                    row.label(text=entry["name"], icon='BLANK1')
+                delete_op = row.operator("aether.delete_custom_template", text="", icon='TRASH')
+                delete_op.template_path = entry["path"]
+                if not is_default:
+                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_OFF')
+                    set_op.template_name = entry["name"]
+                else:
+                    set_op = row.operator("aether.set_default_template", text="", icon='SOLO_ON')
+                    set_op.template_name = " "
+            if not custom_entries:
+                col.label(text="No custom templates saved yet", icon='INFO')
 
         elif self.tabs == 'CONTRIBUTION':
             main_box = layout.box()
@@ -209,9 +252,11 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             right.operator("wm.url_open", text="Patreon", icon='FUND').url = PATREON_URL
 
 def register():
+    bpy.utils.register_class(AETHER_OT_Set_Default_Template)
     bpy.utils.register_class(AETHER_OT_Delete_Custom_Template)
     bpy.utils.register_class(AetherBlendPreferences)
 
 def unregister():
     bpy.utils.unregister_class(AetherBlendPreferences)
     bpy.utils.unregister_class(AETHER_OT_Delete_Custom_Template)
+    bpy.utils.unregister_class(AETHER_OT_Set_Default_Template)
