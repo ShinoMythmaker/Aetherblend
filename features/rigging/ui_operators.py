@@ -1,4 +1,6 @@
 import bpy
+import base64
+import binascii
 import json
 
 from . import template_manager
@@ -16,6 +18,40 @@ MODULE_TYPE_ORDER = {
     "Patch": 2,
 }
 _DYNAMIC_ADD_MENU_CLASSES = []
+_TEMPLATE_CLIPBOARD_PREFIX = "AetherBlendTemplateV1"
+
+
+def _encode_template_clipboard_payload(payload: dict) -> str:
+    """Encode template payload as a compact, versioned Base64 token."""
+    json_payload = json.dumps(payload, separators=(",", ":"), ensure_ascii=False)
+    encoded = base64.urlsafe_b64encode(json_payload.encode("utf-8")).decode("ascii")
+    return f"{_TEMPLATE_CLIPBOARD_PREFIX}{encoded}"
+
+
+def _decode_template_clipboard_payload(clipboard_text: str) -> dict:
+    """Decode a versioned Base64 token; fallback to legacy raw JSON clipboard content."""
+    text = (clipboard_text or "").strip()
+    if not text:
+        raise ValueError("Clipboard is empty")
+
+    if text.startswith(_TEMPLATE_CLIPBOARD_PREFIX):
+        token = text[len(_TEMPLATE_CLIPBOARD_PREFIX):].strip()
+        try:
+            decoded = base64.urlsafe_b64decode(token.encode("ascii")).decode("utf-8")
+            payload = json.loads(decoded)
+        except (ValueError, binascii.Error, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ValueError("Clipboard template token is invalid") from exc
+    else:
+        # Support old JSON clipboard exports so users can still paste existing shares.
+        try:
+            payload = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise ValueError("Clipboard content is not a valid template token") from exc
+
+    if not isinstance(payload, dict):
+        raise ValueError("Clipboard template payload must be a JSON object")
+
+    return payload
 
 def _format_family_name(family_name: str) -> str:
     """Convert a module family key into a UI-friendly label."""
@@ -325,7 +361,7 @@ class AETHER_OT_Save_Custom_Template_JSON(bpy.types.Operator):
 class AETHER_OT_Export_Custom_Template_Clipboard(bpy.types.Operator):
     bl_idname = "aether.export_custom_template_clipboard"
     bl_label = "Export Custom Template to Clipboard"
-    bl_description = "Copy the current custom module layout as JSON to the system clipboard"
+    bl_description = "Copy the current custom module layout as a Base64 token to the system clipboard"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -359,15 +395,15 @@ class AETHER_OT_Export_Custom_Template_Clipboard(bpy.types.Operator):
             "name": template_name,
             "module_keys": module_keys,
         }
-        context.window_manager.clipboard = json.dumps(payload, indent=2)
-        self.report({'INFO'}, "Copied custom template JSON to clipboard")
+        context.window_manager.clipboard = _encode_template_clipboard_payload(payload)
+        self.report({'INFO'}, "Copied custom template token to clipboard")
         return {'FINISHED'}
 
 
 class AETHER_OT_Import_Custom_Template_Clipboard(bpy.types.Operator):
     bl_idname = "aether.import_custom_template_clipboard"
     bl_label = "Import Custom Template from Clipboard"
-    bl_description = "Paste JSON from clipboard and load it into the editable custom module list"
+    bl_description = "Paste a Base64 template token from clipboard and load it into the editable custom module list"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -381,24 +417,15 @@ class AETHER_OT_Import_Custom_Template_Clipboard(bpy.types.Operator):
             self.report({'ERROR'}, "Armature has no Aether rig settings")
             return {'CANCELLED'}
 
-        clipboard_text = (context.window_manager.clipboard or '').strip()
-        if not clipboard_text:
-            self.report({'WARNING'}, "Clipboard is empty")
-            return {'CANCELLED'}
-
         try:
-            payload = json.loads(clipboard_text)
-        except Exception:
-            self.report({'WARNING'}, "Clipboard content is not valid JSON")
-            return {'CANCELLED'}
-
-        if not isinstance(payload, dict):
-            self.report({'WARNING'}, "Clipboard JSON must be an object")
+            payload = _decode_template_clipboard_payload(context.window_manager.clipboard)
+        except ValueError as exc:
+            self.report({'WARNING'}, str(exc))
             return {'CANCELLED'}
 
         module_keys = payload.get("module_keys") or payload.get("modules")
         if not isinstance(module_keys, list):
-            self.report({'WARNING'}, "Template JSON must contain a module_keys list")
+            self.report({'WARNING'}, "Template payload must contain a module_keys list")
             return {'CANCELLED'}
 
         parsed_groups: list[list[str]] = []
@@ -415,7 +442,7 @@ class AETHER_OT_Import_Custom_Template_Clipboard(bpy.types.Operator):
                 parsed_groups.append(valid_keys)
 
         if not parsed_groups:
-            self.report({'WARNING'}, "No valid module keys found in clipboard JSON")
+            self.report({'WARNING'}, "No valid module keys found in template payload")
             return {'CANCELLED'}
 
         aether_rig.selected_template = template_manager.CUSTOM_TEMPLATE_NAME
@@ -433,7 +460,7 @@ class AETHER_OT_Import_Custom_Template_Clipboard(bpy.types.Operator):
 
         aether_rig.custom_modules_initialized = True
         aether_rig.module_index = 0 if aether_rig.modules else 0
-        self.report({'INFO'}, "Imported custom template from clipboard")
+        self.report({'INFO'}, "Imported custom template from clipboard token")
         return {'FINISHED'}
 
 
