@@ -354,6 +354,7 @@ class AETHER_OT_Save_Custom_Template_JSON(bpy.types.Operator):
             return {'CANCELLED'}
 
         file_path = template_manager.save_custom_template_json(template_name, module_keys)
+        aether_rig.selected_template = template_manager.CUSTOM_TEMPLATE_NAME
         self.report({'INFO'}, f"Saved template JSON: {file_path.name}")
         return {'FINISHED'}
 
