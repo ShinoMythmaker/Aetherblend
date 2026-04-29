@@ -1,4 +1,5 @@
 import bpy
+import json
 
 from . import template_manager
 from .templates import get_modules_by_family
@@ -171,7 +172,7 @@ class AETHER_MT_Populate_Custom_Template_Menu(bpy.types.Menu):
 
     def draw(self, context):
         column = self.layout.column(align=True)
-        for template_name in template_manager.TEMPLATES.keys():
+        for template_name in template_manager.get_available_template_names():
             operator = column.operator(
                 "aether.populate_custom_template",
                 text=template_name,
@@ -265,13 +266,174 @@ class AETHER_OT_Populate_Custom_Template(bpy.types.Operator):
             self.report({'ERROR'}, "Armature has no Aether rig settings")
             return {'CANCELLED'}
 
-        if self.template_name not in template_manager.TEMPLATES:
+        if self.template_name not in template_manager.get_available_template_names():
             self.report({'WARNING'}, "Choose a valid template to populate from")
             return {'CANCELLED'}
 
         aether_rig.selected_template = template_manager.CUSTOM_TEMPLATE_NAME
         template_manager.populate_modules_from_template(aether_rig, self.template_name)
         aether_rig.module_index = 0 if aether_rig.modules else 0
+        return {'FINISHED'}
+
+
+class AETHER_OT_Save_Custom_Template_JSON(bpy.types.Operator):
+    bl_idname = "aether.save_custom_template_json"
+    bl_label = "Save Custom Template"
+    bl_description = "Save the current custom module layout as a JSON template"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            self.report({'ERROR'}, "Armature has no Aether rig settings")
+            return {'CANCELLED'}
+
+        if len(aether_rig.modules) == 0:
+            self.report({'WARNING'}, "Custom template has no modules to save")
+            return {'CANCELLED'}
+
+        template_name = (getattr(aether_rig, 'custom_template_name', '') or '').strip()
+        if not template_name:
+            self.report({'WARNING'}, "Enter a template name before saving")
+            return {'CANCELLED'}
+
+        grouped_modules = template_manager.resolve_module_groups(aether_rig)
+        module_keys: list[list[str]] = []
+        for group in grouped_modules:
+            key_group: list[str] = []
+            for module in group:
+                module_key = template_manager.get_module_key(module)
+                if module_key:
+                    key_group.append(module_key)
+            if key_group:
+                module_keys.append(key_group)
+
+        if not module_keys:
+            self.report({'WARNING'}, "Could not resolve modules for saving")
+            return {'CANCELLED'}
+
+        file_path = template_manager.save_custom_template_json(template_name, module_keys)
+        self.report({'INFO'}, f"Saved template JSON: {file_path.name}")
+        return {'FINISHED'}
+
+
+class AETHER_OT_Export_Custom_Template_Clipboard(bpy.types.Operator):
+    bl_idname = "aether.export_custom_template_clipboard"
+    bl_label = "Export Custom Template to Clipboard"
+    bl_description = "Copy the current custom module layout as JSON to the system clipboard"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            self.report({'ERROR'}, "Armature has no Aether rig settings")
+            return {'CANCELLED'}
+
+        grouped_modules = template_manager.resolve_module_groups(aether_rig)
+        module_keys: list[list[str]] = []
+        for group in grouped_modules:
+            key_group: list[str] = []
+            for module in group:
+                module_key = template_manager.get_module_key(module)
+                if module_key:
+                    key_group.append(module_key)
+            if key_group:
+                module_keys.append(key_group)
+
+        if not module_keys:
+            self.report({'WARNING'}, "Custom template has no modules to export")
+            return {'CANCELLED'}
+
+        template_name = (getattr(aether_rig, 'custom_template_name', '') or '').strip() or "Custom Template"
+        payload = {
+            "name": template_name,
+            "module_keys": module_keys,
+        }
+        context.window_manager.clipboard = json.dumps(payload, indent=2)
+        self.report({'INFO'}, "Copied custom template JSON to clipboard")
+        return {'FINISHED'}
+
+
+class AETHER_OT_Import_Custom_Template_Clipboard(bpy.types.Operator):
+    bl_idname = "aether.import_custom_template_clipboard"
+    bl_label = "Import Custom Template from Clipboard"
+    bl_description = "Paste JSON from clipboard and load it into the editable custom module list"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if not aether_rig:
+            self.report({'ERROR'}, "Armature has no Aether rig settings")
+            return {'CANCELLED'}
+
+        clipboard_text = (context.window_manager.clipboard or '').strip()
+        if not clipboard_text:
+            self.report({'WARNING'}, "Clipboard is empty")
+            return {'CANCELLED'}
+
+        try:
+            payload = json.loads(clipboard_text)
+        except Exception:
+            self.report({'WARNING'}, "Clipboard content is not valid JSON")
+            return {'CANCELLED'}
+
+        if not isinstance(payload, dict):
+            self.report({'WARNING'}, "Clipboard JSON must be an object")
+            return {'CANCELLED'}
+
+        module_keys = payload.get("module_keys") or payload.get("modules")
+        if not isinstance(module_keys, list):
+            self.report({'WARNING'}, "Template JSON must contain a module_keys list")
+            return {'CANCELLED'}
+
+        parsed_groups: list[list[str]] = []
+        for key_group in module_keys:
+            if not isinstance(key_group, list):
+                continue
+
+            valid_keys: list[str] = []
+            for module_key in key_group:
+                if isinstance(module_key, str) and module_key in template_manager.AVAILABLE_MODULES:
+                    valid_keys.append(module_key)
+
+            if valid_keys:
+                parsed_groups.append(valid_keys)
+
+        if not parsed_groups:
+            self.report({'WARNING'}, "No valid module keys found in clipboard JSON")
+            return {'CANCELLED'}
+
+        aether_rig.selected_template = template_manager.CUSTOM_TEMPLATE_NAME
+        aether_rig.modules.clear()
+
+        for group_index, key_group in enumerate(parsed_groups):
+            for module_key in key_group:
+                item = aether_rig.modules.add()
+                item.module_key = module_key
+                item.group_index = group_index
+
+        template_name = payload.get("name")
+        if isinstance(template_name, str) and template_name.strip():
+            aether_rig.custom_template_name = template_name.strip()
+
+        aether_rig.custom_modules_initialized = True
+        aether_rig.module_index = 0 if aether_rig.modules else 0
+        self.report({'INFO'}, "Imported custom template from clipboard")
         return {'FINISHED'}
 
 
@@ -442,6 +604,9 @@ def register():
     bpy.utils.register_class(AETHER_MT_Populate_Custom_Template_Menu)
     bpy.utils.register_class(AETHER_OT_Add_Template_Module)
     bpy.utils.register_class(AETHER_OT_Populate_Custom_Template)
+    bpy.utils.register_class(AETHER_OT_Save_Custom_Template_JSON)
+    bpy.utils.register_class(AETHER_OT_Export_Custom_Template_Clipboard)
+    bpy.utils.register_class(AETHER_OT_Import_Custom_Template_Clipboard)
     bpy.utils.register_class(AETHER_OT_Move_Template_Module)
     bpy.utils.register_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.register_class(AETHER_OT_Solo_Bone_Collections)
@@ -452,6 +617,9 @@ def unregister():
     bpy.utils.unregister_class(AETHER_OT_Solo_Bone_Collections)
     bpy.utils.unregister_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.unregister_class(AETHER_OT_Move_Template_Module)
+    bpy.utils.unregister_class(AETHER_OT_Import_Custom_Template_Clipboard)
+    bpy.utils.unregister_class(AETHER_OT_Export_Custom_Template_Clipboard)
+    bpy.utils.unregister_class(AETHER_OT_Save_Custom_Template_JSON)
     bpy.utils.unregister_class(AETHER_OT_Populate_Custom_Template)
     bpy.utils.unregister_class(AETHER_OT_Add_Template_Module)
     bpy.utils.unregister_class(AETHER_MT_Populate_Custom_Template_Menu)

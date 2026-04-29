@@ -1,10 +1,21 @@
 import bpy
 from bpy.props import StringProperty, EnumProperty
+from pathlib import Path
+import os
 
 TOGGLE_ITEMS = [('ON', "Enable", ""), ('OFF', "Disable", "")]
 GITHUB_URL = "https://github.com/ShinoMythmaker/Aetherblend"
 DISCORD_URL = "https://discord.gg/NEF7TdXGqH"
 PATREON_URL = "https://www.patreon.com/ShinoMythmaker"
+
+
+def get_default_custom_template_path() -> str:
+    """Return the default custom template folder in the user's AppData profile."""
+    appdata = os.getenv("APPDATA")
+    if appdata:
+        return str(Path(appdata) / "AetherBlend" / "templates" / "custom")
+
+    return str(Path.home() / "AppData" / "Roaming" / "AetherBlend" / "templates" / "custom")
 
 def get_preferences():
     """Retrieve addon preferences."""
@@ -72,6 +83,13 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         description="Select the default directory for saving VFX model files"
     ) #type: ignore
 
+    custom_template_path: StringProperty(
+        name="Custom Templates",
+        subtype='DIR_PATH',
+        description="Directory used to save and load custom rig template JSON files",
+        default=get_default_custom_template_path()
+    ) #type: ignore
+
     # default_pose_import_path: StringProperty(
     #     name="Pose Import",
     #     subtype='DIR_PATH',
@@ -111,6 +129,9 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             box.prop(self, "default_pose_export_path")
             box.prop(self, "default_anim_export_path")
             box.prop(self, "default_vfx_export_path")
+            box.separator()
+            box.label(text="Rig Templates", icon='PRESET')
+            box.prop(self, "custom_template_path")
 
         elif self.tabs == 'CONTRIBUTION':
             main_box = layout.box()

@@ -1,0 +1,50 @@
+{
+    "name": "Dynamic",
+    "override_keys": [
+        "WO_NSFW",
+        "PO_DEFAULT"
+    ],
+    "module_keys": [
+        [
+            "ears.miqo",
+            "ears.viera"
+        ],
+        [
+            "hair.default"
+        ],
+        [
+            "face.detailed"
+        ],
+        [
+            "mouth.default"
+        ],
+        [
+            "arms.default"
+        ],
+        [
+            "spine.default"
+        ],
+        [
+            "hands.ivcs",
+            "hands.default"
+        ],
+        [
+            "legs.default"
+        ],
+        [
+            "toes.ivcs"
+        ],
+        [
+            "skirt.default"
+        ],
+        [
+            "tail.default"
+        ],
+        [
+            "genitals.ivcs_both"
+        ],
+        [
+            "ui.debug"
+        ]
+    ]
+}

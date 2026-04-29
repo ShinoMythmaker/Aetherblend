@@ -46,6 +46,12 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         options={'HIDDEN'}
     ) # type: ignore
 
+    custom_template_name : bpy.props.StringProperty(
+        name="Template Name",
+        description="Name used when saving this custom template as a JSON file",
+        default="",
+    ) # type: ignore
+
     custom_modules_initialized : bpy.props.BoolProperty(
         name="Custom Modules Initialized",
         description="Whether the editable custom module list has been intentionally created or populated",

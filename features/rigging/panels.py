@@ -147,7 +147,14 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
             right.scale_x = 1.25
 
             left.label(text="Custom Template", icon='MODIFIER')
-            right.menu("AETHER_MT_populate_custom_template_menu", text="Populate", icon='IMPORT')
+            right.menu("AETHER_MT_populate_custom_template_menu", text="Pop.", icon='IMPORT')
+
+            save_row = modules_box.row(align=True)
+            save_row.prop(aether_rig, "custom_template_name", text="Name")
+            save_row.operator("aether.save_custom_template_json", text="", icon='FILE_TICK')
+            save_row.operator("aether.export_custom_template_clipboard", text="", icon='COPYDOWN')
+            save_row.operator("aether.import_custom_template_clipboard", text="", icon='PASTEDOWN')
+            
 
             row = modules_box.row()
             list_col = row.column(align=True)

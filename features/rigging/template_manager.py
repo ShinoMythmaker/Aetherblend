@@ -1,15 +1,153 @@
 from ...core.aether_rig_generator import AetherRigGenerator
-from ...core.shared import RigModule
-from .templates import AVAILABLE_MODULES, CS_COLORSETS, TEMPLATES, get_module_key
+from ...core.shared import RigModule, Template
+from ...preferences import get_default_custom_template_path, get_preferences
+from .templates import AVAILABLE_MODULES, CS_COLORSETS, get_module_key
+from .templates.overrides import WO_DEFAULT, WO_NSFW, PO_DEFAULT
+from pathlib import Path
+import bpy
+import json
+import re
 
 
 ## For Dropdowns
 CUSTOM_TEMPLATE_NAME = 'Custom'
+_TEMPLATE_JSON_DIR = Path(__file__).resolve().parent / "templates" / "json"
+_DEFAULT_OVERRIDE_KEYS = ["WO_DEFAULT", "PO_DEFAULT"]
+_OVERRIDES_BY_KEY = {
+    "WO_DEFAULT": WO_DEFAULT,
+    "WO_NSFW": WO_NSFW,
+    "PO_DEFAULT": PO_DEFAULT,
+}
+
+
+def get_custom_template_json_dir() -> Path:
+    """Resolve the active custom template folder from preferences."""
+    custom_path = ""
+
+    try:
+        prefs = get_preferences()
+        custom_path = (getattr(prefs, "custom_template_path", "") or "").strip()
+    except Exception:
+        custom_path = ""
+
+    if custom_path:
+        return Path(bpy.path.abspath(custom_path))
+
+    return Path(get_default_custom_template_path())
+
+
+def _iter_template_json_files():
+    """Yield template json files from builtin and custom folders."""
+    for root_dir in (_TEMPLATE_JSON_DIR, get_custom_template_json_dir()):
+        if not root_dir.exists():
+            continue
+        for file_path in sorted(root_dir.glob("*.json")):
+            yield file_path
+
+
+def _load_template_definitions() -> dict[str, dict]:
+    """Load template definitions from JSON files on disk."""
+    templates: dict[str, dict] = {}
+
+    for file_path in _iter_template_json_files():
+        try:
+            with file_path.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            template_name = (data.get("name") or file_path.stem).strip()
+            module_keys = data.get("module_keys") or data.get("modules") or []
+
+            if not template_name or not isinstance(module_keys, list):
+                continue
+
+            templates[template_name] = {
+                "name": template_name,
+                "override_keys": data.get("override_keys"),
+                "module_keys": module_keys,
+                "path": str(file_path),
+            }
+        except Exception:
+            # Keep loading the remaining files even if one file is malformed.
+            continue
+
+    return templates
+
+
+def get_available_template_names() -> list[str]:
+    """Return template names discovered from JSON files."""
+    return sorted(_load_template_definitions().keys())
+
+
+def _resolve_overrides(definition: dict) -> list | None:
+    """Resolve override objects declared in template JSON."""
+    override_keys = definition.get("override_keys")
+    if not isinstance(override_keys, list):
+        override_keys = _DEFAULT_OVERRIDE_KEYS
+
+    resolved: list = []
+    for override_key in override_keys:
+        override = _OVERRIDES_BY_KEY.get(override_key)
+        if override is not None:
+            resolved.append(override)
+
+    return resolved or None
+
+
+def _template_from_definition(template_name: str, definition: dict) -> Template | None:
+    """Build a runtime Template object from one JSON definition."""
+    module_groups: list[list[RigModule]] = []
+
+    for key_group in definition.get("module_keys", []):
+        if not isinstance(key_group, list):
+            continue
+
+        runtime_group: list[RigModule] = []
+        for module_key in key_group:
+            module = AVAILABLE_MODULES.get(module_key)
+            if module:
+                runtime_group.append(module)
+        if runtime_group:
+            module_groups.append(runtime_group)
+
+    if not module_groups:
+        return None
+
+    overrides = _resolve_overrides(definition)
+    return Template(name=template_name, overrides=overrides, modules=module_groups)
+
+
+def _get_template_from_json(template_name: str) -> Template | None:
+    """Resolve one template from JSON definitions."""
+    definition = _load_template_definitions().get(template_name)
+    if not definition:
+        return None
+    return _template_from_definition(template_name, definition)
+
+
+def save_custom_template_json(template_name: str, module_keys: list[list[str]]) -> Path:
+    """Save a custom template definition to the custom JSON folder."""
+    custom_dir = get_custom_template_json_dir()
+    custom_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_stem = re.sub(r"[^a-zA-Z0-9_-]+", "_", template_name.strip()).strip("_").lower()
+    if not safe_stem:
+        safe_stem = "custom_template"
+
+    file_path = custom_dir / f"{safe_stem}.json"
+    payload = {
+        "name": template_name,
+        "module_keys": module_keys,
+    }
+
+    with file_path.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2)
+
+    return file_path
 
 
 def get_template_items(self, context):
     """Get available templates for dropdown."""
-    items = [(key, key, "") for key in TEMPLATES.keys()]
+    items = [(name, name, "") for name in get_available_template_names()]
     items.append((CUSTOM_TEMPLATE_NAME, CUSTOM_TEMPLATE_NAME, "Use the editable custom module list"))
     return items
 
@@ -55,15 +193,16 @@ def resolve_module_groups(aether_rig) -> list[list[RigModule]]:
 
 
 def populate_modules_from_template(aether_rig, template_name: str | None = None) -> None:
-    """Populate the editable custom module list from one of the built-in templates."""
+    """Populate the editable custom module list from a JSON template definition."""
     if not aether_rig or not hasattr(aether_rig, 'modules'):
         return
 
+    available_names = get_available_template_names()
     source_name = template_name or getattr(aether_rig, 'custom_template_source', DEFAULT_TEMPLATE_NAME)
-    template = TEMPLATES.get(source_name) or TEMPLATES.get(DEFAULT_TEMPLATE_NAME)
+    template = _get_template_from_json(source_name) or _get_template_from_json(DEFAULT_TEMPLATE_NAME)
 
     aether_rig.modules.clear()
-    aether_rig.custom_template_source = source_name if source_name in TEMPLATES else DEFAULT_TEMPLATE_NAME
+    aether_rig.custom_template_source = source_name if source_name in available_names else DEFAULT_TEMPLATE_NAME
 
     if not template:
         aether_rig.custom_modules_initialized = True
@@ -86,7 +225,7 @@ def get_selected_template(aether_rig):
     template_name = getattr(aether_rig, 'selected_template', DEFAULT_TEMPLATE_NAME)
     if template_name == CUSTOM_TEMPLATE_NAME:
         template_name = getattr(aether_rig, 'custom_template_source', DEFAULT_TEMPLATE_NAME)
-    return TEMPLATES.get(template_name) or TEMPLATES.get(DEFAULT_TEMPLATE_NAME)
+    return _get_template_from_json(template_name) or _get_template_from_json(DEFAULT_TEMPLATE_NAME)
 
 
 def get_selected_colorset(aether_rig):

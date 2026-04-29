@@ -2,8 +2,7 @@ import importlib
 import pkgutil
 from collections import defaultdict
 
-from ....core.aether_rig_generator import AetherRigGenerator
-from ....core.shared import RigModule, Template, WidgetOverride
+from ....core.shared import RigModule
 from ....core.rigify import *
 
 
@@ -79,82 +78,3 @@ def get_module_key(module: RigModule) -> str:
     """Resolve the registry key for a rig module instance."""
     return MODULE_KEYS_BY_ID.get(id(module), "")
 
-
-## Templates
-## About Modules: Each entry in `modules` is an ordered priority group.
-## Use `[module]` for a standalone module, or `[primary, fallback, ...]` when several modules should compete for the same slot.
-## `RigModule.type` now describes behavior category: `Generation`, `UI-Addon`, or `Patch`.
-## Only modules inside the same inner list will fight for priority; every other group is always evaluated in order.
-TEMPLATES = {
-    'Player SFW':   Template(
-        name = "Player SFW",
-        overrides=[WO_DEFAULT, PO_DEFAULT],
-        modules = [
-            [face.detailed],
-            [spine.default],
-            [arms.default],
-            [legs.default],
-            [skirt.default],
-            [hands.default],
-            [tail.default],
-            [ears.miqo, ears.viera],
-            [hair.default],
-            [ui.debug],
-        ]
-    ),
-    'Player SFW (IVCS)': Template(
-        name= "Player SFW (IVCS)",
-        overrides=[WO_DEFAULT, PO_DEFAULT],
-        modules = [
-            [spine.default],
-            [arms.default],
-            [legs.default],
-            [skirt.default],
-            [hands.ivcs],
-            [toes.ivcs],
-            [tail.default],
-            [face.detailed],
-            [ears.miqo, ears.viera],
-            [hair.default],
-            [ui.debug],
-        ]
-    ),
-    'Player NSFW (IVCS)': Template(
-        name= "Player NSFW (IVCS)",
-        overrides=[WO_NSFW, PO_DEFAULT],
-        modules = [
-            [spine.default],
-            [arms.default],
-            [legs.default],
-            [skirt.default],
-            [hands.ivcs],
-            [toes.ivcs],
-            [tail.default],
-            [face.detailed],
-            [ears.miqo, ears.viera],
-            [hair.default],
-            [genitals.ivcs_both],
-            [mouth.default],
-            [ui.debug],
-        ]
-    ),
-    'Dynamic': Template(
-        name= "Dynamic",
-        overrides=[WO_NSFW, PO_DEFAULT],
-        modules = [
-            [ears.miqo, ears.viera],
-            [hair.default],
-            [face.detailed],
-            [mouth.default],
-            [arms.default],
-            [spine.default],
-            [hands.ivcs, hands.default],
-            [legs.default],
-            [toes.ivcs],
-            [skirt.default],
-            [tail.default],
-            [genitals.ivcs_both],
-            [ui.debug],
-        ]
-    ),
-}
