@@ -248,7 +248,7 @@ def get_default_template_name() -> str:
     """Return the user-configured default template, falling back to the hardcoded constant."""
     try:
         stored = (getattr(get_preferences(), 'default_template', '') or '').strip()
-        if stored and stored in _load_template_definitions():
+        if stored and stored in get_available_template_names():
             return stored
     except Exception:
         pass

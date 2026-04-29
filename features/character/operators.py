@@ -9,6 +9,7 @@ from bpy_extras.io_utils import axis_conversion
 from ... import utils
 from ...preferences import get_preferences
 from ...properties.tab_prop import set_active_tab
+from ..rigging import template_manager
 
 class AETHER_OT_Character_Import(bpy.types.Operator):
     """Import a character model into Blender with various options."""
@@ -248,6 +249,10 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
                     armature_collection = utils.collection.get_collection(armature)
                     if armature_collection:
                         utils.collection.link_to_collection([backup], armature_collection)
+
+            aether_rig = getattr(armature, 'aether_rig', None)
+            if aether_rig:
+                aether_rig.selected_template = template_manager.get_default_template_name()
         
         self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
         

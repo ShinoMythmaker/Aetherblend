@@ -198,6 +198,10 @@ class AETHER_OT_Reset_Rig(bpy.types.Operator):
         # Remove all animation data
         if armature.animation_data:
             armature.animation_data_clear()
+
+        aether_rig = getattr(armature, 'aether_rig', None)
+        if aether_rig:
+            aether_rig.selected_template = template_manager.get_default_template_name()
     
         
         bpy.ops.object.mode_set(mode='OBJECT')
