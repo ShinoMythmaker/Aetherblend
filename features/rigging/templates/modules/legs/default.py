@@ -22,7 +22,7 @@ LEG_R = BoneGroup(
                 req_bones=["j_asi_a_r", "j_asi_c_r"],
                 operations=[ParentBoneOperation(time="Pre", bone_name="thigh.R", parent=["Spine.001", "j_kosi"], is_connected=False),
                             RigifyTypeOperation(time="Pre", bone_name="thigh.R", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)")), 
-                            CollectionOperation(time="Pre", bone_name="thigh.R", collection_name="Leg.R")]
+                            CollectionOperation(time="Pre", bone_name="thigh.R", collection_name="Leg.R (IK)")]
             ),
             ConnectBone(
                 name="shin.R", 
@@ -31,7 +31,7 @@ LEG_R = BoneGroup(
                 parent="thigh.R", 
                 is_connected=True,
                 req_bones=["j_asi_c_r", "j_asi_d_r"],
-                operations=[CollectionOperation(time="Pre", bone_name="shin.R", collection_name="Leg.R")]
+                operations=[CollectionOperation(time="Pre", bone_name="shin.R", collection_name="Leg.R (IK)")]
             ),
             ConnectBone(
                 name="foot.R", 
@@ -99,7 +99,7 @@ LEG_L = BoneGroup(
                 req_bones=["j_asi_a_l", "j_asi_c_l"],
                 operations=[ParentBoneOperation(time="Pre", bone_name="thigh.L", parent=["Spine.001", "j_kosi"], is_connected=False),
                             RigifyTypeOperation(time="Pre", bone_name="thigh.L", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)")), 
-                            CollectionOperation(time="Pre", bone_name="thigh.L", collection_name="Leg.L")]
+                            CollectionOperation(time="Pre", bone_name="thigh.L", collection_name="Leg.L (IK)")]
             ),
             ConnectBone(
                 name="shin.L", 

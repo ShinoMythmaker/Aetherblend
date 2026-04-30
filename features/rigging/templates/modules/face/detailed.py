@@ -25,31 +25,6 @@ HEAD = BoneGroup(
         TransformLink(target="DEF-Nostril.R", bone="j_f_hana_r"),
         TransformLink(target="DEF-Nose.L", bone="j_f_dmiken_l"),
         TransformLink(target="DEF-Nostril.L", bone="j_f_hana_l"),
-        TransformLink(target="DEF-Lip.T.R.001", bone="j_f_ulip_01_r"),
-        TransformLink(target="DEF-Lip.T.R.002", bone="j_f_umlip_01_r"),
-        TransformLink(target="DEF-Lip.T.R.003", bone="j_f_uslip_r"),
-        TransformLink(target="DEF-Lip.B.R.001", bone="j_f_dlip_01_r"),
-        TransformLink(target="DEF-Lip.B.R.002", bone="j_f_dmlip_01_r"),
-        TransformLink(target="DEF-Lip.B.R.003", bone="j_f_dslip_r"),
-        TransformLink(target="DEF-Lip.T.L.001", bone="j_f_ulip_01_l"),
-        TransformLink(target="DEF-Lip.T.L.002", bone="j_f_umlip_01_l"),
-        TransformLink(target="DEF-Lip.T.L.003", bone="j_f_uslip_l"),
-        TransformLink(target="DEF-Lip.B.L.001", bone="j_f_dlip_01_l"),
-        TransformLink(target="DEF-Lip.B.L.002", bone="j_f_dmlip_01_l"),
-        TransformLink(target="DEF-Lip.B.L.003", bone="j_f_dslip_l"),
-        TransformLink(target="Lip.T.L.001", bone="j_f_ulip_02_l"),
-        TransformLink(target="Lip.T.L.002", bone="j_f_umlip_02_l"),
-        TransformLink(target="Lip.T.R.001", bone="j_f_ulip_02_r"),
-        TransformLink(target="Lip.T.R.002", bone="j_f_umlip_02_r"),
-        TransformLink(target="Lip.B.L.001", bone="j_f_dlip_02_l"),
-        TransformLink(target="Lip.B.L.002", bone="j_f_dmlip_02_l"),
-        TransformLink(target="Lip.B.R.001", bone="j_f_dlip_02_r"),
-        TransformLink(target="Lip.B.R.002", bone="j_f_dmlip_02_r"),
-        TransformLink(target="DEF-Teeth.T", bone="j_f_hagukiup"),
-        TransformLink(target="DEF-Teeth.B", bone="j_f_hagukidn"),
-        TransformLink(target="DEF-Tongue", bone="j_f_bero_01"),
-        TransformLink(target="DEF-Tongue.001", bone="j_f_bero_02"),
-        TransformLink(target="DEF-Tongue.002", bone="j_f_bero_03"),
     ],
     generators=[
         ConnectBone(
@@ -571,7 +546,7 @@ LEFT_EYE = BoneGroup(
             parent="Head",
             operations=[
                         RigifyTypeOperation(time="Pre", bone_name="Eye.L", rigify_type=rigify.types.face_skin_eye()),
-                        CollectionOperation(time="Pre", bone_name="Eye.L", collection_name="Face")
+                        CollectionOperation(time="Pre", bone_name="Eye.L", collection_name="Face (Primary)")
             ]
         ),
 
@@ -916,9 +891,8 @@ def get_rig_module() -> RigModule:
         bone_groups=[HEAD, BROW, LEFT_EYE, RIGHT_EYE],
         ui = UI_Collections([
             BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=2, title="Primary", visible=False),
-            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=2, title="Secondary", visible=False),
-            BoneCollection(name="Mouth", ui=True, color_set="Torso", row_index=3, title="Mouth", visible=False),
+            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=0, title="Face (Primary)", visible=False),
+            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=0, title="Face (Secondary)", visible=False),
         ])
     )
 
