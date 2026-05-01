@@ -102,6 +102,8 @@ class RegexBoneGroup(BoneGenerator):
                     start="head"
                 )
                 result = extension_bone.generate(armature, data)
+                self.operations.extend(extension_bone.operations)
+
                 if result:
                     created_bones.extend(result)
                     # Add pose operations and transform link
@@ -118,7 +120,7 @@ class RegexBoneGroup(BoneGenerator):
                 processed_bones.add(bone.name)
             else:
                 # Chain of bones - create connect bones for each
-                chain_bones = self._build_chain(bone, ref_bones)
+                chain_bones = self._build_chain(bone)
                 processed_bones.update(chain_bones)
                 
                 # Create ConnectBones for all bones in chain including last
@@ -145,12 +147,13 @@ class RegexBoneGroup(BoneGenerator):
                             size_factor=1.0,
                             axis_type="local",
                             axis="Y",
-                            parent=list(created_bones[-1]) if created_bones else self.parent,
+                            parent=created_bones[-1] if created_bones else self.parent,
                             is_connected=True,
                             start="head"
                         )
                     
                     result = connect_bone.generate(armature, data)
+                    self.operations.extend(connect_bone.operations)
                     if result:
                         created_bones.extend(result)
                         # Add pose operations and transform link for this bone
@@ -166,7 +169,7 @@ class RegexBoneGroup(BoneGenerator):
                         
         return created_bones if created_bones else None
     
-    def _build_chain(self, start_bone, ref_bones) -> list[str]:
+    def _build_chain(self, start_bone) -> list[str]:
         """Build a chain of bones starting from start_bone following the pattern."""
         chain = [start_bone.name]
         current = start_bone
