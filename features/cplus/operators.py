@@ -1,4 +1,9 @@
 import bpy
+import base64
+import json
+
+from bpy.props import StringProperty
+from io import BytesIO
 
 from ... import utils
 from . import decoder
@@ -21,9 +26,31 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
             self.report({'ERROR'}, "Please select a valid armature.")
             return {'CANCELLED'}
 
-        version, cplus_dict = decoder.translate_hash(cplus_string)
-        if not cplus_dict or version not in [4, 5]:
-            self.report({'ERROR'}, "Invalid or unsupported C+ string (must be version 4 or 5).")
+        try:
+            decoded = base64.b64decode(cplus_string)
+
+            with BytesIO(decoded) as data_reader:
+                signature = decoder.read_int(data_reader)
+
+            # Gzip Header
+            if signature == 0x88B1F:
+                version, cplus_dict = decoder.translate_hash(decoded)
+
+                if not cplus_dict:
+                    raise Exception('Invalid C+ String.')
+
+                if version not in [4, 5]:
+                    raise Exception('Unsupported C+ string (must be version 4 or 5).')
+            # MCDF C+ Strings are not compressed, and doesn't have a Version
+            else:
+                cplus_dict = json.loads(decoded)
+
+                # Unlike the regular C+ Strings, there's not that much to verify, so we just go with Bones
+                if 'Bones' not in cplus_dict:
+                    raise Exception('Invalid C+ String.')
+        except Exception as e:
+            print("[AetherBlend] Failed to Apply C+ String:", e)
+            self.report({'ERROR'}, "[AetherBlend] Invalid or Unsupported C+ String.")
             return {'CANCELLED'}
 
         scale_dict = decoder.get_bone_values(cplus_dict, 'Scaling')
@@ -208,12 +235,55 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
         self.report({'INFO'}, "Reverted CPlus changes to backup armature state.")
         return {'FINISHED'}
     
+class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
+    bl_label = "Parse from MCDF file"
+    bl_idname = "aether.parse_cplus_from_mcdf"
+    bl_description = (
+        "Parses the C+ string from an MCDF file."
+    )
+    bl_options = {'REGISTER', 'UNDO'}
+
+    filepath: StringProperty(subtype="FILE_PATH")  # type: ignore
+    filter_glob: StringProperty(default='*.mcdf', options={'HIDDEN'})  # type: ignore
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        context.window.cursor_set('WAIT')
+
+        armature = context.active_object
+        cplus = getattr(armature, 'aether_cplus', None)
+
+        if not self.filepath or not self.filepath.lower().endswith('.mcdf'): 
+            self.report({'ERROR'}, "[AetherBlend] Invalid file format. Please select a .mcdf file.")
+            return {'CANCELLED'}
+        
+        cplus_string = decoder.get_mcdf_cplus(self.filepath)
+
+        if cplus_string is None:
+            self.report({'ERROR'}, "[AetherBlend] Invalid MCDF file.")
+            return {'CANCELLED'}
+        
+        if not cplus_string:
+            self.report({'WARNING'}, "[AetherBlend] MCDF file read successfully, but it didn't contain any C+ data.")
+            return {'CANCELLED'}
+
+        cplus.code = cplus_string
+        self.report({'INFO'}, '[AetherBlend] C+ String read from MCDF file successfully.')
+
+        context.window.cursor_set('DEFAULT')
+        return {'FINISHED'}
+
 def register():
     bpy.utils.register_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.register_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.register_class(AETHER_OT_RevertToBackup)
+    bpy.utils.register_class(AETHER_OT_ParseFromMCDF)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.unregister_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.unregister_class(AETHER_OT_RevertToBackup)
+    bpy.utils.unregister_class(AETHER_OT_ParseFromMCDF)
