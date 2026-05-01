@@ -18,6 +18,9 @@ _OVERRIDES_BY_KEY = {
     "WO_NSFW": WO_NSFW,
     "PO_DEFAULT": PO_DEFAULT,
 }
+## Defaults
+DEFAULT_TEMPLATE_NAME = 'Dynamic'
+DEFAULT_COLORSET_NAME = 'AetherBlend'
 
 
 def get_custom_template_json_dir() -> Path:
@@ -238,10 +241,6 @@ def get_colorset_items(self, context):
     """Get available colorsets for dropdown."""
     return [(key, key, "") for key in CS_COLORSETS.keys()]
 
-
-## Defaults
-DEFAULT_TEMPLATE_NAME = 'Player SFW'
-DEFAULT_COLORSET_NAME = 'AetherBlend'
 
 
 def get_default_template_name() -> str:
