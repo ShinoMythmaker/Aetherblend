@@ -11,7 +11,6 @@ HEAD = BoneGroup(
     transform_link= [
         TransformLink(target="DEF-Neck", bone="j_kubi"),
         TransformLink(target="DEF-Head", bone="j_kao"),
-        TransformLink(target="DEF-jaw_master", bone="j_f_ago"),
         TransformLink(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
         TransformLink(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
         TransformLink(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
@@ -336,52 +335,7 @@ HEAD = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="Nostril.Glue.L.001", collection_name="MCH")
             ]
         ),
-        #Lip Glue Bones
-        ConnectBone(
-            name="Lip.T.R.001.glue",
-            bone_a="j_f_hana_r",
-            bone_b="j_f_ulip_01_r",
-            parent="Head",
-            req_bones=["j_f_hana_r", "j_f_ulip_01_r"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.001.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.R.001.glue", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Lip.T.L.001.glue",
-            bone_a="j_f_hana_l",
-            bone_b="j_f_ulip_01_l",
-            parent="Head",
-            req_bones=["j_f_hana_l", "j_f_ulip_01_l"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.001.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.2, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.L.001.glue", collection_name="MCH")
-            ]
-        ),
-        #Mouth Corner Glue Bones
-        ConnectBone(
-            name="Mouth.Corner.glue.L",
-            bone_a="j_f_shoho_l",
-            bone_b="Corner.L",
-            parent="Head",
-            req_bones=["j_f_shoho_l"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Mouth.Corner.glue.L", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Mouth.Corner.glue.L", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Mouth.Corner.glue.R",
-            bone_a="j_f_shoho_r",
-            bone_b="Corner.R",
-            parent="Head",
-            req_bones=["j_f_shoho_r"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Mouth.Corner.glue.R", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Mouth.Corner.glue.R", collection_name="MCH")
-            ]
-        ),    
+        
     ]
 )
 
