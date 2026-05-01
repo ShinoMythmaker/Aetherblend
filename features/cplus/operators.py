@@ -276,14 +276,40 @@ class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
         context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
 
+class AETHER_OT_PasteFromClipboard(bpy.types.Operator):
+    bl_label = "Paste from Clipboard"
+    bl_idname = "aether.paste_cplus_from_clipboard"
+    bl_description = "Paste C+ string from clipboard"
+    bl_options = {'REGISTER'}
+
+    def execute(self, context):
+        armature = context.active_object
+        cplus = getattr(armature, 'aether_cplus', None)
+        
+        if not cplus:
+            self.report({'ERROR'}, "[AetherBlend] No C+ settings found.")
+            return {'CANCELLED'}
+        
+        clipboard_text = context.window_manager.clipboard.strip()
+        
+        if not clipboard_text:
+            self.report({'ERROR'}, "[AetherBlend] Clipboard is empty.")
+            return {'CANCELLED'}
+        
+        cplus.code = clipboard_text
+        self.report({'INFO'}, "[AetherBlend] C+ String pasted from clipboard.")
+        return {'FINISHED'}
+
 def register():
     bpy.utils.register_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.register_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.register_class(AETHER_OT_RevertToBackup)
     bpy.utils.register_class(AETHER_OT_ParseFromMCDF)
+    bpy.utils.register_class(AETHER_OT_PasteFromClipboard)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.unregister_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.unregister_class(AETHER_OT_RevertToBackup)
     bpy.utils.unregister_class(AETHER_OT_ParseFromMCDF)
+    bpy.utils.unregister_class(AETHER_OT_PasteFromClipboard)

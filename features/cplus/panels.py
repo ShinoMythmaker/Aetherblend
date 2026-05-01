@@ -41,6 +41,13 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
             box_row.alignment = 'CENTER'
             box_row.label(text="Missing FFXIV Bone Collection", icon="ERROR")
         else:
+
+            import_row = col.row(align=True)
+            import_row.operator("aether.paste_cplus_from_clipboard", text="Clipboard", icon="PASTEDOWN")
+            import_row.operator("aether.parse_cplus_from_mcdf", text="MCDF", icon="IMPORT")
+
+            col.separator()
+
             row = col.row(align=True)
             label_col = row.column(align=True)
             label_col.scale_x = 0.8
@@ -48,7 +55,7 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
             
             field_col = row.column(align=True)
             field_col.scale_x = 1.2
-            field_col.prop(cplus, "code", text="", icon='COPYDOWN')
+            field_col.prop(cplus, "code", text="")
 
             if (bool(cplus.code)):
                 col.separator()
@@ -59,11 +66,6 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
                     box_row.label(text="C+ currently applied", icon="RECORD_ON")
                 else:
                     box_row.label(text="C+ not applied", icon="PAUSE")
-
-            col.separator()
-
-            row = col.row(align=True)
-            row.operator("aether.parse_cplus_from_mcdf", text="Parse from MCDF file", icon = "IMPORT")
 
             col.separator()
 
