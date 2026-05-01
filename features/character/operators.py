@@ -253,6 +253,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             aether_rig = getattr(armature, 'aether_rig', None)
             if aether_rig:
                 aether_rig.selected_template = template_manager.get_default_template_name()
+
+            utils.object.select_only(armature)
         
         self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
         

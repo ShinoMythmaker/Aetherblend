@@ -1,6 +1,3 @@
-"""Compatibility shim for legacy imports.
-
-Prefer importing from core.bone_generators.
-"""
+"""Compatibility shim for legacy imports."""
 
 from .bone_generators import *

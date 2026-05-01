@@ -3,7 +3,8 @@ import time
 
 from ... import utils
 from . import template_manager
-
+from ...preferences import get_preferences
+from ...properties.tab_prop import set_active_tab
 
 class _ArmatureSelectionHelpers:
     def _resolve_source_armature(self, armature: bpy.types.Object | None) -> bpy.types.Object | None:
@@ -64,6 +65,12 @@ class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
             if not rig_generator.generate_rigify_rig(state):
                 self.report({'ERROR'}, "Rigify generation failed")
                 return {'CANCELLED'}
+            
+            if get_preferences().auto_navigate_tabs == 'ON':
+                set_active_tab(context, 'RIG_LAYERS')
+            
+            utils.object.select_only(armature)
+            bpy.ops.object.mode_set(mode='POSE')
 
             print(f"[AetherBlend] Full rig generation: {time.time() - time_start:.3f}s")
             return {'FINISHED'}
