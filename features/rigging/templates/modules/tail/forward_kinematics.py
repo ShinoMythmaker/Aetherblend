@@ -69,7 +69,7 @@ TAIL = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Default",
+        name="Forward Kinematics",
         type="Generation",
         bone_groups=[TAIL],
         ui = UI_Collections([

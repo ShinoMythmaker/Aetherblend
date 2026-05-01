@@ -135,6 +135,33 @@ class limbs_super_palm(rigify_type):
         except Exception as e:
             print(f"[AetherBlend] Error setting super palm parameters: {e}")
 
+@dataclass
+class limbs_spline_tentacle(rigify_type):
+    """Rigify type: limbs.spline_tentacle - Used for spline tentacle rigs."""
+
+    fk_coll: str = None
+    tweak_coll: str = None
+    sik_stretch_control: str = None
+
+    def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+        if pose_bone is None:
+            print(f"[AetherBlend] Warning: pose_bone is None")
+            return
+        
+        armature.data.bones.active = pose_bone.bone
+        pose_bone.rigify_type = "limbs.spline_tentacle"
+        rigify_params = pose_bone.rigify_parameters
+
+        try:
+            if self.sik_stretch_control is not None:
+                rigify_params.sik_stretch_control = self.sik_stretch_control
+
+            super().set_fk_collection(rigify_params)
+            super().set_tweak_collection(rigify_params)
+
+        except Exception as e:
+            print(f"[AetherBlend] Error setting spline tentacle parameters: {e}")
+
 
 @dataclass
 class spines_basic_spine(rigify_type):
@@ -468,6 +495,8 @@ RIGIFY_TYPE_REGISTRY = {
     "limbs.leg": limbs_leg,
     "limbs.arm": limbs_arm,
     "limbs.super_finger": limbs_super_finger,
+    "limbs.super_palm": limbs_super_palm,
+    "limbs.spline_tentacle": limbs_spline_tentacle,
     "spines.basic_spine": spines_basic_spine,
     "spines.super_head": spines_super_head,
     "spines.basic_tail": spines_basic_tail,

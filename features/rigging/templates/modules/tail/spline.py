@@ -1,0 +1,78 @@
+from ......core.bone_generators import ConnectBone, ExtensionBone
+from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
+from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
+from ......core import rigify
+from ......core.rigify.settings import UI_Collections, BoneCollection
+
+TAIL_SPLINE = BoneGroup(
+    name="Spline Tail",
+    transform_link= [
+        TransformLink(target="DEF-Tail", bone="n_sippo_a"),
+        TransformLink(target="DEF-Tail.001", bone="n_sippo_b"),
+        TransformLink(target="DEF-Tail.002", bone="n_sippo_c"),
+        TransformLink(target="DEF-Tail.003", bone="n_sippo_d"),
+        TransformLink(target="DEF-Tail.004", bone="n_sippo_e"),
+    ],
+    generators=[
+        ConnectBone(
+            name="Tail",
+            bone_a="n_sippo_a",
+            bone_b="n_sippo_b",
+            parent="Spine.001",
+            is_connected=False,
+            req_bones=["n_sippo_a", "n_sippo_b"],
+            operations=[ParentBoneOperation(time="Pre", bone_name="Tail", parent=["Spine.001", "j_kosi"], is_connected=False),
+                        RigifyTypeOperation(time="Pre", bone_name="Tail", rigify_type=rigify.types.limbs_spline_tentacle(sik_stretch_control = "MANUAL_STRETCH")),
+                        CollectionOperation(time="Pre", bone_name="Tail", collection_name="Tail"),
+            ]
+        ),
+        ConnectBone(
+            name="Tail.001",
+            bone_a="n_sippo_b",
+            bone_b="n_sippo_c",
+            parent="Tail",
+            is_connected=True,
+            req_bones=["n_sippo_b", "n_sippo_c"],
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.001", collection_name="Tail")]
+        ),
+        ConnectBone(
+            name="Tail.002",
+            bone_a="n_sippo_c",
+            bone_b="n_sippo_d",
+            parent="Tail.001",
+            is_connected=True,
+            req_bones=["n_sippo_c", "n_sippo_d"],
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.002", collection_name="Tail")]
+        ),
+        ConnectBone(
+            name="Tail.003",
+            bone_a="n_sippo_d",
+            bone_b="n_sippo_e",
+            parent="Tail.002",
+            is_connected=True,
+            req_bones=["n_sippo_d", "n_sippo_e"],
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.003", collection_name="Tail")]
+        ),
+        ExtensionBone(
+            name="Tail.004",
+            bone_a="Tail.003",
+            parent="Tail.003",
+            is_connected=True,
+            axis_type="local",
+            axis="Y",
+            size_factor=1,
+            req_bones=["n_sippo_e"],
+            operations=[CollectionOperation(time="Pre", bone_name="Tail.004", collection_name="Tail")]
+        )
+    ]
+)
+
+def get_rig_module() -> RigModule:
+    return RigModule(
+        name="Spline",
+        type="Generation",
+        bone_groups=[TAIL_SPLINE],
+        ui = UI_Collections([
+            BoneCollection(name="Tail", ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),
+        ])
+    )
