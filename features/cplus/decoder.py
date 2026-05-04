@@ -6,7 +6,6 @@ import math
 import lz4.block
 
 from collections import defaultdict
-from bpy_extras.io_utils import axis_conversion
 from mathutils import Matrix
 from io import BufferedIOBase, BytesIO
 
@@ -52,39 +51,20 @@ def apply_transforms(
     rot_dict: dict, 
     pos_dict: dict, 
     bones: dict[str, bpy.types.PoseBone] = None,
-    primary_axis: str = 'Y',
-    secondary_axis: str = 'X',
 ) -> None:
-    """
-    Applies C+ transforms after reverting bone orientation to Y/X.
-    Note: Bones remain in Y/X orientation after this function.
-    Call reapply_bone_orientation() after rest pose is applied.
+    """Applies C+ pose transforms (scale, rotation, translation) to *bones*.
+
+    Bones must already be in Y-up game-engine space before this is called.
+    Use ``utils.axis_conversion.revert_bone_axis_on_armature`` before calling
+    this function and ``utils.axis_conversion.apply_bone_axis_to_armature``
+    after the rest pose has been set.
     """
     original_mode = armature.mode
     
     if bones is None:
         bones = armature.pose.bones
     
-    if (primary_axis, secondary_axis) != ('Y', 'X'):
-        # Create the correction matrix used during import
-        bone_correction_matrix = axis_conversion(
-            from_up='Y',
-            from_forward='X',
-            to_up=primary_axis,
-            to_forward=secondary_axis,
-        ).to_4x4()
-        
-        # Step 1: Revert bones back to Y/X (undo import correction)
-        bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='EDIT')
-        
-        edit_bones = armature.data.edit_bones
-        for bone in edit_bones:
-            bone_matrix = bone.matrix.copy()
-            reverted_matrix = bone_matrix @ bone_correction_matrix.inverted()
-            bone.matrix = reverted_matrix
-    
-    # Step 2: Apply C+ transforms (bones are now in Y/X orientation)
+    # Apply C+ transforms (bones must be in Y/X orientation at this point)
     bpy.ops.object.mode_set(mode='POSE')
     bpy.context.view_layer.objects.active = armature
     
@@ -108,35 +88,6 @@ def apply_transforms(
             posebone.location += mathutils.Vector((translation['X'], translation['Y'], translation['Z']))
     
     bpy.ops.object.mode_set(mode=original_mode)
-
-def reapply_bone_orientation(
-    armature: bpy.types.Object,
-    primary_axis: str = 'Y',
-    secondary_axis: str = 'X',
-) -> None:
-    """Reapplies bone orientation correction after rest pose has been applied."""
-    
-    previous_mode = armature.mode if hasattr(armature, 'mode') else 'OBJECT'
-    
-    # Create the correction matrix used during import
-    bone_correction_matrix = axis_conversion(
-        from_up='Y',
-        from_forward='X',
-        to_up=primary_axis,
-        to_forward=secondary_axis,
-    ).to_4x4()
-    
-    # Reapply correction (convert back to primary_axis/secondary_axis)
-    bpy.context.view_layer.objects.active = armature
-    bpy.ops.object.mode_set(mode='EDIT')
-    
-    edit_bones = armature.data.edit_bones
-    for bone in edit_bones:
-        bone_matrix = bone.matrix.copy()
-        corrected_matrix = bone_matrix @ bone_correction_matrix
-        bone.matrix = corrected_matrix
-    
-    bpy.ops.object.mode_set(mode=previous_mode)
 
 def read_size(reader: BufferedIOBase, size: int) -> int | None:
     """

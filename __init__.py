@@ -17,3 +17,4 @@ def unregister():
     features.unregister()
     tab_prop.unregister()
     preferences.unregister()
+

@@ -1,5 +1,8 @@
 import bpy
 
+from ...utils.axis_conversion import AXIS_ITEMS
+
+
 class AETHER_PROP_CustomizePlus(bpy.types.PropertyGroup):
     code: bpy.props.StringProperty(
         name="C+ String",
@@ -16,16 +19,24 @@ class AETHER_PROP_CustomizePlus(bpy.types.PropertyGroup):
         description="Reference to the backup armature for C+ reversion",
         poll=lambda self, obj: obj.type == 'ARMATURE'
     ) # type: ignore
-    import_bone_primary_axis: bpy.props.StringProperty(
-        name="Import Primary Axis",
-        description="Primary bone axis used during character import",
-        default="Y"
-    ) # type: ignore
-    import_bone_secondary_axis: bpy.props.StringProperty(
-        name="Import Secondary Axis",
-        description="Secondary bone axis used during character import",
-        default="X"
-    ) # type: ignore
+
+    # Axis conversion settings for C+ apply.
+    # Defaults are pre-populated from import settings when a character is
+    # imported, but the user can override them here at any time.
+    cplus_primary_axis: bpy.props.EnumProperty(
+        name="Primary Axis",
+        description="Primary bone axis used when applying C+ transforms. "
+                    "Must match the axis used during character import",
+        items=AXIS_ITEMS,
+        default='X',
+    )  # type: ignore
+    cplus_secondary_axis: bpy.props.EnumProperty(
+        name="Secondary Axis",
+        description="Secondary bone axis used when applying C+ transforms. "
+                    "Must match the axis used during character import",
+        items=AXIS_ITEMS,
+        default='Y',
+    )  # type: ignore
 
 
 def register():

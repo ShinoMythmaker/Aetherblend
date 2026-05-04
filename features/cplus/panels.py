@@ -94,8 +94,45 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
                 else:
                     cplus_col.operator("aether.q_apply_cplus_string", text="Quick Apply", icon="CHECKBOX_HLT")
 
+
+class AETHER_PT_CustomizePlus_AxisConversion(bpy.types.Panel):
+    bl_label = "Axis Conversion"
+    bl_idname = "AETHER_PT_customize_plus_axis_conversion"
+    bl_parent_id = "AETHER_PT_customize_plus"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'AetherBlend'
+
+    @classmethod
+    def poll(cls, context):
+        if not visible_in_current_area(context):
+            return False
+        if get_active_tab(context) != 'CPLUS':
+            return False
+
+        armature = context.active_object
+        return (
+            armature is not None
+            and armature.type == 'ARMATURE'
+            and getattr(armature, 'aether_cplus', None)
+            and armature.data.collections.get("FFXIV") is not None
+        )
+
+    def draw(self, context):
+        armature = context.active_object
+        cplus = getattr(armature, 'aether_cplus', None)
+        if not cplus:
+            return
+
+        layout = self.layout
+        col = layout.column(align=True)
+        col.prop(cplus, "cplus_primary_axis", text="Primary")
+        col.prop(cplus, "cplus_secondary_axis", text="Secondary")
+
 def register():
     bpy.utils.register_class(AETHER_PT_CustomizePlus)
+    bpy.utils.register_class(AETHER_PT_CustomizePlus_AxisConversion)
 
 def unregister():
+    bpy.utils.unregister_class(AETHER_PT_CustomizePlus_AxisConversion)
     bpy.utils.unregister_class(AETHER_PT_CustomizePlus) 

@@ -7,9 +7,10 @@ import base64
 import tempfile
 from bpy.types import Operator
 from bpy.props import BoolProperty
-from bpy_extras.io_utils import ExportHelper, axis_conversion
+from bpy_extras.io_utils import ExportHelper
 from mathutils import Matrix, Euler
 from ...preferences import get_preferences
+from ...utils.axis_conversion import AXIS_ITEMS
 
 def pose_export_image_items(_self, _context):
     items = [('__NONE__', "None", "Do not embed an image")]
@@ -37,28 +38,14 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
     pose_primary_axis: bpy.props.EnumProperty(
         name="Primary Axis",
         description="Primary axis for pose export orientation. For FFXIV characters from Meddle, use -Z",
-        items=(
-            ('X', "X Axis", ""),
-            ('Y', "Y Axis", ""),
-            ('Z', "Z Axis", ""),
-            ('-X', "-X Axis", ""),
-            ('-Y', "-Y Axis", ""),
-            ('-Z', "-Z Axis", ""),
-        ),
+        items=AXIS_ITEMS,
         default='X',
     ) # type: ignore
     
     pose_secondary_axis: bpy.props.EnumProperty(
         name="Secondary Axis",
         description="Secondary axis for pose export orientation. For FFXIV characters from Meddle, use Y",
-        items=(
-            ('X', "X Axis", ""),
-            ('Y', "Y Axis", ""),
-            ('Z', "Z Axis", ""),
-            ('-X', "-X Axis", ""),
-            ('-Y', "-Y Axis", ""),
-            ('-Z', "-Z Axis", ""),
-        ),
+        items=AXIS_ITEMS,
         default='Y',
     ) # type: ignore
 
@@ -133,7 +120,7 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
         # Default to Blender's latest render result when available.
         render_result = bpy.data.images.get("Render Result")
         self.preview_image_name = render_result.name if render_result else '__NONE__'
-        
+
         return super().invoke(context, event)
 
     def draw(self, _context):
@@ -277,14 +264,12 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             self.report({'ERROR'}, "No armature selected")
             return {'CANCELLED'}
         
+        from ... import utils as aether_utils
         pose_correction_matrix = Matrix.Identity(4)
         if self.use_pose_axis_conversion:
-            pose_correction_matrix = axis_conversion(
-                from_up=self.pose_primary_axis,
-                from_forward=self.pose_secondary_axis,
-                to_up='Y',
-                to_forward='X',
-            ).to_4x4()
+            pose_correction_matrix = aether_utils.axis_conversion.get_export_correction_matrix(
+                self.pose_primary_axis, self.pose_secondary_axis
+            )
         
         x_rotation = Matrix.Rotation(math.radians(-90), 4, 'X')
 

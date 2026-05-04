@@ -4,6 +4,7 @@ import tempfile
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
 from ...preferences import get_preferences
+from ...utils.axis_conversion import AXIS_ITEMS
 
 class AETHER_OT_AnimExport(Operator, ExportHelper):
     bl_idname = "aether.anim_export"
@@ -30,15 +31,13 @@ class AETHER_OT_AnimExport(Operator, ExportHelper):
     
     pose_primary_axis: bpy.props.EnumProperty(
         name="Primary Axis",
-        items=[('X', "X", ""), ('Y', "Y", ""), ('Z', "Z", ""), 
-               ('-X', "-X", ""), ('-Y', "-Y", ""), ('-Z', "-Z", "")],
+        items=AXIS_ITEMS,
         default='X',
     ) # type: ignore
     
     pose_secondary_axis: bpy.props.EnumProperty(
         name="Secondary Axis",
-        items=[('X', "X", ""), ('Y', "Y", ""), ('Z', "Z", ""),
-               ('-X', "-X", ""), ('-Y', "-Y", ""), ('-Z', "-Z", "")],
+        items=AXIS_ITEMS,
         default='Y',
     ) # type: ignore
 

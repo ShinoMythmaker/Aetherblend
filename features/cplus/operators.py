@@ -63,33 +63,23 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
 
         utils.armature.unparent_all_bones(armature)
 
-        ffxiv_bones =utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
-        
-        # Get stored bone orientation from import, or default to standard Y/X
-        primary_axis = settings.import_bone_primary_axis if settings.import_bone_primary_axis else 'Y'
-        secondary_axis = settings.import_bone_secondary_axis if settings.import_bone_secondary_axis else 'X'
-        
-        # Step 1 & 2: Revert bone orientation and apply C+ transforms
-        decoder.apply_transforms(
-            armature, 
-            scale_dict, 
-            rot_dict, 
-            pos_dict, 
-            ffxiv_bones,
-            primary_axis=primary_axis,
-            secondary_axis=secondary_axis,
-        )
+        ffxiv_bones = utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
+
+        # Read the axis settings the user configured on this armature's C+ panel
+        primary_axis = settings.cplus_primary_axis
+        secondary_axis = settings.cplus_secondary_axis
+
+        # Step 1: Revert bones back to Y/X game-engine space (undo import correction)
+        utils.axis_conversion.revert_bone_axis_on_armature(armature, primary_axis, secondary_axis)
+
+        # Step 2: Apply C+ transforms (bones are now in Y/X orientation)
+        decoder.apply_transforms(armature, scale_dict, rot_dict, pos_dict, ffxiv_bones)
 
         utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
-
         utils.armature.new_rest_pose(armature)
-        
-        # Step 3: Reapply bone orientation correction after rest pose is set
-        decoder.reapply_bone_orientation(
-            armature,
-            primary_axis=primary_axis,
-            secondary_axis=secondary_axis,
-        )
+
+        # Step 3: Reapply the import correction so bones are back in Blender space
+        utils.axis_conversion.apply_bone_axis_to_armature(armature, primary_axis, secondary_axis)
 
         utils.armature.restore_bone_parenting(armature, parent_map)
 

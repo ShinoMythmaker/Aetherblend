@@ -4,9 +4,9 @@ import re
 
 import bpy
 from bpy.props import BoolProperty, StringProperty, EnumProperty
-from bpy_extras.io_utils import axis_conversion
 
 from ... import utils
+from ...utils.axis_conversion import AXIS_ITEMS
 from ...preferences import get_preferences
 from ...properties.tab_prop import set_active_tab
 from ..rigging import template_manager
@@ -38,29 +38,15 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     # Bone Axis Orientation (FBX-style)
     primary_bone_axis: EnumProperty(
         name="Primary Bone Axis",
-        description="Primary axis for bone orientation (the bone's length direction). For FFXIV characters from Meddle, use -Z",
-        items=(
-            ('X', "X Axis", ""),
-            ('Y', "Y Axis", ""),
-            ('Z', "Z Axis", ""),
-            ('-X', "-X Axis", ""),
-            ('-Y', "-Y Axis", ""),
-            ('-Z', "-Z Axis", ""),
-        ),
+        description="Primary axis for bone orientation (the bone's length direction). For FFXIV characters from Meddle, use X",
+        items=AXIS_ITEMS,
         default='X',
     )  # type: ignore
     
     secondary_bone_axis: EnumProperty(
         name="Secondary Bone Axis",
         description="Secondary axis for bone orientation (determines bone roll). For FFXIV characters from Meddle, use Y",
-        items=(
-            ('X', "X Axis", ""),
-            ('Y', "Y Axis", ""),
-            ('Z', "Z Axis", ""),
-            ('-X', "-X Axis", ""),
-            ('-Y', "-Y Axis", ""),
-            ('-Z', "-Z Axis", ""),
-        ),
+        items=AXIS_ITEMS,
         default='Y',
     )  # type: ignore
     
@@ -75,8 +61,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         prefs = get_preferences()
         if prefs.default_meddle_import_path:
             self.filepath = prefs.default_meddle_import_path
-        context.window_manager.fileselect_add(self)
 
+        context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
     
     def draw(self, context):
@@ -206,31 +192,32 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         armature = utils.armature.find_armature_in_objects(imported_objects)
         if armature:
 
-            # Apply bone axis conversion if enabled
-            if self.use_bone_axis_conversion:
-                apply_bone_axis_conversion(armature, self.primary_bone_axis, self.secondary_bone_axis)
-            
+            # First apply pose track to rest pose. 
             if self.s_apply_pose_track:
                 apply_pose_to_rest_pose(armature)
 
             clear_animation_data(armature)
             utils.armature.reset_transforms(armature)
-
+            
+            # Apply bone axis conversion if enabled
+            if self.use_bone_axis_conversion:
+                utils.axis_conversion.apply_bone_axis_to_armature(
+                    armature, self.primary_bone_axis, self.secondary_bone_axis
+                )
+            
+        
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.armature.select_all(action='SELECT')
             bpy.ops.armature.assign_to_collection(new_collection_name="FFXIV")
             bpy.ops.object.mode_set(mode='OBJECT')
             
-            # Store bone orientation settings for C+ operations
+            # Pre-populate C+ axis settings to match what was used during import
+            # so the user doesn't have to configure them manually.
             cplus = getattr(armature, 'aether_cplus', None)
-            if cplus:
-                if self.use_bone_axis_conversion:
-                    cplus.import_bone_primary_axis = self.primary_bone_axis
-                    cplus.import_bone_secondary_axis = self.secondary_bone_axis
-                else:
-                    cplus.import_bone_primary_axis = "Y"
-                    cplus.import_bone_secondary_axis = "X"
+            if cplus and self.use_bone_axis_conversion:
+                cplus.cplus_primary_axis = self.primary_bone_axis
+                cplus.cplus_secondary_axis = self.secondary_bone_axis
             
             # Create backup armature for C+ after import (if enabled)
             if self.s_create_backup_armature:
@@ -263,39 +250,6 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
-
-
-def apply_bone_axis_conversion(armature: bpy.types.Object, primary_axis: str, secondary_axis: str) -> None:
-    if not armature or armature.type != 'ARMATURE':
-        print(f"[AetherBlend] Invalid armature provided for bone axis conversion.")
-        return
-    
-    if (primary_axis, secondary_axis) == ('Y', 'X'):
-        print(f"[AetherBlend] Bone axis conversion skipped (already Y=primary, X=secondary).")
-        return
-    
-    bone_correction_matrix = axis_conversion(
-        from_up='Y',
-        from_forward='X',
-        to_up=primary_axis,
-        to_forward=secondary_axis,
-    ).to_4x4()
-
-    previous_mode = armature.mode if hasattr(armature, 'mode') else 'OBJECT'
-    bpy.context.view_layer.objects.active = armature
-    bpy.ops.object.mode_set(mode='EDIT')
-    
-    try:
-        edit_bones = armature.data.edit_bones
-        for bone in edit_bones:
-            bone_matrix = bone.matrix.copy()
-            
-            corrected_matrix = bone_matrix @ bone_correction_matrix
-    
-            bone.matrix = corrected_matrix
-        
-    finally:
-        bpy.ops.object.mode_set(mode=previous_mode)
 
 
 def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
