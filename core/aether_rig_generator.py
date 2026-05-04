@@ -127,6 +127,10 @@ class AetherRigGenerator:
 
         armature.hide_set(False)
         utils.object.select_only(armature)
+
+        # Always start generation from a neutral pose state.
+        utils.armature.reset_pose_bones(armature)
+
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
         if cleanup_existing:

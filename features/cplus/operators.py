@@ -57,6 +57,9 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         rot_dict = decoder.get_bone_values(cplus_dict, 'Rotation')
         pos_dict = decoder.get_bone_values(cplus_dict, 'Translation')
 
+        # Ensure C+ always starts from a neutral pose state.
+        utils.armature.reset_pose_bones(armature)
+
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.context.view_layer.objects.active = armature
         parent_map = utils.armature.snapshot_parenting(armature)

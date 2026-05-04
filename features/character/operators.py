@@ -150,13 +150,17 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         split.prop(self, "use_bone_axis_conversion")
 
         if self.use_bone_axis_conversion:
-            split = col.split(factor=indent)  
-            split.label(text=" ")
-            split.prop(self, "primary_bone_axis", text="Primary")
-
-            split = col.split(factor=indent)  
-            split.label(text=" ")
-            split.prop(self, "secondary_bone_axis", text="Secondary")
+            split = col.split(factor=indent)
+            left = split.row()
+            left.alignment = 'RIGHT'
+            left.label(text="Primary")
+            split.prop(self, "primary_bone_axis", text="")
+        
+            split = col.split(factor=indent)
+            left = split.row()
+            left.alignment = 'RIGHT'
+            left.label(text="Secondary")
+            split.prop(self, "secondary_bone_axis", text="")
  
     def execute(self, context):  
         bpy.context.window.cursor_set('WAIT')   
@@ -197,7 +201,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
                 apply_pose_to_rest_pose(armature)
 
             clear_animation_data(armature)
-            utils.armature.reset_transforms(armature)
+            utils.armature.reset_pose_bones(armature)
             
             # Apply bone axis conversion if enabled
             if self.use_bone_axis_conversion:

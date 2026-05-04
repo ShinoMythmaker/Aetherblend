@@ -17,12 +17,12 @@ def find_armature_in_objects(objects):
             print(f"[AetherBlend] Skipping deleted object: {obj}")  
     return None
 
-def reset_transforms(armature):
-    """Resets the transforms of the armature."""
-    original_mode = armature.mode
-    if not armature:
+def reset_pose_bones(armature: bpy.types.Object) -> None:
+    """Reset all pose bone transforms (location/rotation/scale) to default."""
+    if not armature or armature.type != 'ARMATURE':
         return
-    
+
+    original_mode = armature.mode
     _select_single(armature)
 
     bpy.ops.object.mode_set(mode='POSE')
@@ -31,8 +31,7 @@ def reset_transforms(armature):
     bpy.ops.pose.select_all(action='DESELECT')
 
     bpy.ops.object.mode_set(mode=original_mode)
-    print(f"[AetherBlend] Transforms of armature '{armature.name}' reset to default.")
-
+    print(f"[AetherBlend] Pose bones of armature '{armature.name}' reset to default.")
 
 def unparent_all_bones(armature: bpy.types.Object) -> None:
     """Unparents all bones in the given armature."""
