@@ -48,8 +48,6 @@ def main():
 
         for wheel in dependency_wheels:
             manifest['wheels'].append(wheel)
-    
-    del manifest['dependencies']
 
     with open(MANIFEST_FILENAME, 'wb') as f:
         tomli_w.dump(manifest, f)
