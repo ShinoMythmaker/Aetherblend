@@ -68,6 +68,7 @@ SPINE = BoneGroup(
             ExtensionBone(
                 name="Chest.R",
                 bone_a="j_mune_r",
+                is_optional=True,
                 start="head",
                 axis_type="local",
                 axis="Y",
@@ -82,6 +83,7 @@ SPINE = BoneGroup(
             ExtensionBone(
                 name="Chest.L",
                 bone_a="j_mune_l",
+                is_optional=True,
                 start="head",
                 axis_type="local",
                 axis="Y",
