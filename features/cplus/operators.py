@@ -1,4 +1,9 @@
 import bpy
+import base64
+import json
+
+from bpy.props import StringProperty
+from io import BytesIO
 
 from ... import utils
 from . import decoder
@@ -21,14 +26,39 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
             self.report({'ERROR'}, "Please select a valid armature.")
             return {'CANCELLED'}
 
-        version, cplus_dict = decoder.translate_hash(cplus_string)
-        if not cplus_dict or version not in [4, 5]:
-            self.report({'ERROR'}, "Invalid or unsupported C+ string (must be version 4 or 5).")
+        try:
+            decoded = base64.b64decode(cplus_string)
+
+            with BytesIO(decoded) as data_reader:
+                signature = decoder.read_int(data_reader)
+
+            # Gzip Header
+            if signature == 0x88B1F:
+                version, cplus_dict = decoder.translate_hash(decoded)
+
+                if not cplus_dict:
+                    raise Exception('Invalid C+ String.')
+
+                if version not in [4, 5]:
+                    raise Exception('Unsupported C+ string (must be version 4 or 5).')
+            # MCDF C+ Strings are not compressed, and doesn't have a Version
+            else:
+                cplus_dict = json.loads(decoded)
+
+                # Unlike the regular C+ Strings, there's not that much to verify, so we just go with Bones
+                if 'Bones' not in cplus_dict:
+                    raise Exception('Invalid C+ String.')
+        except Exception as e:
+            print("[AetherBlend] Failed to Apply C+ String:", e)
+            self.report({'ERROR'}, "[AetherBlend] Invalid or Unsupported C+ String.")
             return {'CANCELLED'}
 
         scale_dict = decoder.get_bone_values(cplus_dict, 'Scaling')
         rot_dict = decoder.get_bone_values(cplus_dict, 'Rotation')
         pos_dict = decoder.get_bone_values(cplus_dict, 'Translation')
+
+        # Ensure C+ always starts from a neutral pose state.
+        utils.armature.reset_pose_bones(armature)
 
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.context.view_layer.objects.active = armature
@@ -36,33 +66,23 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
 
         utils.armature.unparent_all_bones(armature)
 
-        ffxiv_bones =utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
-        
-        # Get stored bone orientation from import, or default to standard Y/X
-        primary_axis = settings.import_bone_primary_axis if settings.import_bone_primary_axis else 'Y'
-        secondary_axis = settings.import_bone_secondary_axis if settings.import_bone_secondary_axis else 'X'
-        
-        # Step 1 & 2: Revert bone orientation and apply C+ transforms
-        decoder.apply_transforms(
-            armature, 
-            scale_dict, 
-            rot_dict, 
-            pos_dict, 
-            ffxiv_bones,
-            primary_axis=primary_axis,
-            secondary_axis=secondary_axis,
-        )
+        ffxiv_bones = utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
+
+        # Read the axis settings the user configured on this armature's C+ panel
+        primary_axis = settings.cplus_primary_axis
+        secondary_axis = settings.cplus_secondary_axis
+
+        # Step 1: Revert bones back to Y/X game-engine space (undo import correction)
+        utils.axis_conversion.revert_bone_axis_on_armature(armature, primary_axis, secondary_axis)
+
+        # Step 2: Apply C+ transforms (bones are now in Y/X orientation)
+        decoder.apply_transforms(armature, scale_dict, rot_dict, pos_dict, ffxiv_bones)
 
         utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
-
         utils.armature.new_rest_pose(armature)
-        
-        # Step 3: Reapply bone orientation correction after rest pose is set
-        decoder.reapply_bone_orientation(
-            armature,
-            primary_axis=primary_axis,
-            secondary_axis=secondary_axis,
-        )
+
+        # Step 3: Reapply the import correction so bones are back in Blender space
+        utils.axis_conversion.apply_bone_axis_to_armature(armature, primary_axis, secondary_axis)
 
         utils.armature.restore_bone_parenting(armature, parent_map)
 
@@ -208,12 +228,81 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
         self.report({'INFO'}, "Reverted CPlus changes to backup armature state.")
         return {'FINISHED'}
     
+class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
+    bl_label = "Parse from MCDF file"
+    bl_idname = "aether.parse_cplus_from_mcdf"
+    bl_description = (
+        "Parses the C+ string from an MCDF file."
+    )
+    bl_options = {'REGISTER', 'UNDO'}
+
+    filepath: StringProperty(subtype="FILE_PATH")  # type: ignore
+    filter_glob: StringProperty(default='*.mcdf', options={'HIDDEN'})  # type: ignore
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        context.window.cursor_set('WAIT')
+
+        armature = context.active_object
+        cplus = getattr(armature, 'aether_cplus', None)
+
+        if not self.filepath or not self.filepath.lower().endswith('.mcdf'): 
+            self.report({'ERROR'}, "[AetherBlend] Invalid file format. Please select a .mcdf file.")
+            return {'CANCELLED'}
+        
+        cplus_string = decoder.get_mcdf_cplus(self.filepath)
+
+        if cplus_string is None:
+            self.report({'ERROR'}, "[AetherBlend] Invalid MCDF file.")
+            return {'CANCELLED'}
+        
+        if not cplus_string:
+            self.report({'WARNING'}, "[AetherBlend] MCDF file read successfully, but it didn't contain any C+ data.")
+            return {'CANCELLED'}
+
+        cplus.code = cplus_string
+        self.report({'INFO'}, '[AetherBlend] C+ String read from MCDF file successfully.')
+
+        context.window.cursor_set('DEFAULT')
+        return {'FINISHED'}
+
+class AETHER_OT_PasteFromClipboard(bpy.types.Operator):
+    bl_label = "Paste from Clipboard"
+    bl_idname = "aether.paste_cplus_from_clipboard"
+    bl_description = "Paste C+ string from clipboard"
+    bl_options = {'REGISTER'}
+
+    def execute(self, context):
+        armature = context.active_object
+        cplus = getattr(armature, 'aether_cplus', None)
+        
+        if not cplus:
+            self.report({'ERROR'}, "[AetherBlend] No C+ settings found.")
+            return {'CANCELLED'}
+        
+        clipboard_text = context.window_manager.clipboard.strip()
+        
+        if not clipboard_text:
+            self.report({'ERROR'}, "[AetherBlend] Clipboard is empty.")
+            return {'CANCELLED'}
+        
+        cplus.code = clipboard_text
+        self.report({'INFO'}, "[AetherBlend] C+ String pasted from clipboard.")
+        return {'FINISHED'}
+
 def register():
     bpy.utils.register_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.register_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.register_class(AETHER_OT_RevertToBackup)
+    bpy.utils.register_class(AETHER_OT_ParseFromMCDF)
+    bpy.utils.register_class(AETHER_OT_PasteFromClipboard)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_QuickApplyCustomizePlus)
     bpy.utils.unregister_class(AETHER_OT_CreateBackupArmature)
     bpy.utils.unregister_class(AETHER_OT_RevertToBackup)
+    bpy.utils.unregister_class(AETHER_OT_ParseFromMCDF)
+    bpy.utils.unregister_class(AETHER_OT_PasteFromClipboard)
