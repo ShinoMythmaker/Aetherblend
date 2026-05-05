@@ -1,3 +1,10 @@
+import sys
+import site
+# Make user site-packages available when running from source (dev only).
+for _path in site.getusersitepackages() if isinstance(site.getusersitepackages(), list) else [site.getusersitepackages()]:
+    if _path not in sys.path:
+        sys.path.append(_path)
+
 from . import preferences
 from . import features
 from . import ui
