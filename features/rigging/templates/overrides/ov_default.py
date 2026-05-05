@@ -53,6 +53,12 @@ WO_NSFW = {
         #chest
         "chest.R": WidgetOverride(bone="Chest.R", translation=[0.0, 0.05, 0.0]),
         "chest.L": WidgetOverride(bone="Chest.L", translation=[0.0, 0.05, 0.0]),
+        #Tail
+        "Tail-end": WidgetOverride(bone="Tail-end", scale_factor=0.5),
+        "Tail-end01": WidgetOverride(bone="Tail-end01", scale_factor=0.5),
+        "Tail-mid01": WidgetOverride(bone="Tail-mid01", scale_factor=0.5),
+        "Tail-start01": WidgetOverride(bone="Tail-start01", scale_factor=0.5),
+        "Tail-master": WidgetOverride(bone="Tail-master", scale_factor=0.5),
         #Genitals
         "Clitoris": WidgetOverride(bone="Clitoris", scale_factor=0.2),
         "Vulva.R": WidgetOverride(bone="Vulva.R", scale_factor=0.2),
