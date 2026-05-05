@@ -310,6 +310,46 @@ class ParentBoneOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying ParentBoneOperation for bone '{self.bone_name}': {e}")
 
+@dataclass(frozen=True)
+class DriverOperation(ABOperation):
+    mode: ClassVar[Mode] = "POSE"
+
+    driver_name: str
+    driver_property: dict[str, int] # e.g. {"location": 0} for location.x
+    driver_expression: str
+    driver_variables: dict[str, tuple[str, str, str]]  # variable name -> (target bone, target property, target subproperty e.g transform space)
+    rotation_mode: str | None = None # this option only applies to drivers with rotation as their property, hence why I separated it from the driver_property dict - Oats
+
+    def apply(self, armature: bpy.types.Object, var):
+        """Applies the driver operation to the given pose bone."""
+        if not self._switch_mode():
+            return
+        poseBone = self._getPoseBone(self.bone_name, armature)
+        if not poseBone:
+            return
+        
+        try:
+            f_curve = poseBone.driver_add(self.driver_property.keys(), self.driver_property.values())
+            f_curve.driver.expression = self.driver_expression
+
+            for var_name, (target_bone, target_prop, target_subprop) in self.driver_variables.items():
+
+                var.name = var_name
+                var.targets[0].id = armature
+                var.targets[0].bone_target = target_bone
+                var.targets[0].transform_type = target_prop
+                var.targets[0].transform_space = target_subprop
+
+                if self.rotation_mode:
+                    poseBone.rotation_mode = self.rotation_mode
+                    return {f"Finished applying DriverOperation with rotation mode for bone '{self.bone_name}'."}
+                else:
+                    return {f"Finished applying DriverOperation for bone '{self.bone_name}'."}
+
+        except Exception as e:
+            print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
+
+
 
     
 
