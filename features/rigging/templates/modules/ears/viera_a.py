@@ -8,21 +8,9 @@ VIERA_EARS = BoneGroup(
     transform_link=[
         TransformLink(target="DEF-V_Ear.R", bone="j_zera_a_r"),
         TransformLink(target="DEF-V_Ear.R.001", bone="j_zera_b_r"),
-        TransformLink(target="DEF-V_Ear.R", bone="j_zerb_a_r"),
-        TransformLink(target="DEF-V_Ear.R.001", bone="j_zerb_b_r"),
-        TransformLink(target="DEF-V_Ear.R", bone="j_zerc_a_r"),
-        TransformLink(target="DEF-V_Ear.R.001", bone="j_zerc_b_r"),
-        TransformLink(target="DEF-V_Ear.R", bone="j_zerd_a_r"),
-        TransformLink(target="DEF-V_Ear.R.001", bone="j_zerd_b_r"),
 
         TransformLink(target="DEF-V_Ear.L", bone="j_zera_a_l"),
         TransformLink(target="DEF-V_Ear.L.001", bone="j_zera_b_l"),
-        TransformLink(target="DEF-V_Ear.L", bone="j_zerb_a_l"),
-        TransformLink(target="DEF-V_Ear.L.001", bone="j_zerb_b_l"),
-        TransformLink(target="DEF-V_Ear.L", bone="j_zerc_a_l"),
-        TransformLink(target="DEF-V_Ear.L.001", bone="j_zerc_b_l"),
-        TransformLink(target="DEF-V_Ear.L", bone="j_zerd_a_l"),
-        TransformLink(target="DEF-V_Ear.L.001", bone="j_zerd_b_l"),
     ],
     generators=[
         ConnectBone(
