@@ -215,6 +215,7 @@ class TransformLink:
     target: str
     bone: str
     retarget: str | None = None
+    constraint: Constraint | None = None
 
     def mark_linked(self, armature: bpy.types.Object) -> None:
         """Marks the bone as linked in the armature's data."""
@@ -225,14 +226,14 @@ class TransformLink:
     def to_pose_operations(self) -> dict[str, list[PoseOperations]]:
         """Convert this TransformLink to PoseOperations."""
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
-        
         ff_bone = self.bone
         link_bone = f"LINK-{ff_bone}"
+        constraint = self.constraint if self.constraint is not None else CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)
         if ff_bone not in pose_operations_dict:
             pose_operations_dict[ff_bone] = []
         pose_operations_dict[ff_bone].append(
             PoseOperations(
-                constraints=[CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)]
+                constraints=[constraint]
             )
         )
 
@@ -251,7 +252,7 @@ class TransformLink:
         ff_bone = self.bone
         link_bone = f"LINK-{ff_bone}"
 
-        constraint = CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)
+        constraint = self.constraint if self.constraint is not None else CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)
         ops.append(ConstraintOperation(ff_bone, constraint=constraint))
 
         rigify_op = rigify.types.basic_raw_copy(True, self.target)
@@ -314,6 +315,7 @@ class ParentBoneOperation(ABOperation):
 class DriverOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
+    bone_name: str
     driver_name: str
     driver_property: dict[str, int] # e.g. {"location": 0} for location.x
     driver_expression: str

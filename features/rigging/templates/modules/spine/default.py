@@ -1,5 +1,6 @@
 from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation
+from ......core.constraints import CopyLocationConstraint
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
@@ -7,8 +8,8 @@ from ......core.rigify.settings import UI_Collections, BoneCollection
 SPINE = BoneGroup(
         name="spine",
         transform_link= [
+            TransformLink(target="MCH-pivot", bone="n_hara", constraint= CopyLocationConstraint(target_bone="LINK-n_hara", target_space="GLOBAL", owner_space="GLOBAL")),
             TransformLink(target="DEF-Spine.001", bone="j_kosi", retarget="FK-Spine.001"),
-            TransformLink(target="MCH-pivot", bone="n_hara", retarget="Torso"),
             TransformLink(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
             TransformLink(target="DEF-Spine.003", bone="j_sebo_b", retarget="FK-Spine.003"),
             TransformLink(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
