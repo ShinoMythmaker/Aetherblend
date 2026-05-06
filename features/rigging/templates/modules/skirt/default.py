@@ -159,7 +159,7 @@ SKIRT_R = BoneGroup(
                     DriverOperation(
                         bone_name="MCH-Skirt_Front.R",
                         driver_name="Sk_f_a_r",
-                        driver_property=["rotation_quaternion", 1],
+                        property=["rotation_quaternion", 1],
                         driver=Driver(
                             type="SCRIPTED",
                             expression="-var * prop / (1.2 + abs(var) *-0.4) if var < 0 else -var * 1 / (2 + abs(var) *6)",

@@ -320,7 +320,7 @@ class DriverOperation(ABOperation):
     bone_name: str
     driver_name: str
     bone_name: str
-    driver_property: tuple[str, int]
+    property: tuple[str, int]
     driver: Driver
 
     def apply(self, armature: bpy.types.Object):
