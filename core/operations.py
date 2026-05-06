@@ -331,29 +331,7 @@ class DriverOperation(ABOperation):
         if not poseBone:
             return
         try:
-<<<<<<< HEAD
-            f_curve = poseBone.driver_add(self.driver_property.keys(), self.driver_property.values())
-            f_curve.driver.expression = self.driver_expression
-
-            for var_name, (target_bone, target_prop, target_subprop) in self.driver_variables.items():
-
-                var = f_curve.driver.variables.new()
-                var.name = var_name
-                var.type = "TRANSFORMS"
-                var.targets[0].id = armature
-                var.targets[0].bone_target = target_bone
-                var.targets[0].transform_type = target_prop
-                var.targets[0].transform_space = target_subprop
-
-                if self.rotation_mode:
-                    poseBone.rotation_mode = self.rotation_mode
-                    return {f"Finished applying DriverOperation with rotation mode for bone '{self.bone_name}'."}
-                else:
-                    return {f"Finished applying DriverOperation for bone '{self.bone_name}'."}
-
-=======
             self.driver.apply(poseBone, self.property, armature)
->>>>>>> new_drivers
         except Exception as e:
             print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
 
