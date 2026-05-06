@@ -4,6 +4,7 @@ from ......core.constraints import DampedTrackConstraint
 from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
+from ......core.drivers import TransformChannelVariable, Driver
 
 SKIRT_R = BoneGroup(
         name="Skirt Right",
@@ -155,13 +156,18 @@ SKIRT_R = BoneGroup(
                 operations=[
                     RigifyTypeOperation(bone_name="MCH-Skirt_Front.R", rigify_type=rigify.types.basic_raw_copy()),
                     CollectionOperation(bone_name="MCH-Skirt_Front.R", collection_name="MCH", time="Post"),
-                    DriverOperation(bone_name="MCH-Skirt_Front.R", 
-                                    driver_name="Sk_f_a_r", 
-                                    driver_property=["rotation_quaternion", 0],
-                                    driver_expression="-var * prop / (1.2 + abs(var) *-0.4) if var < 0 else -var * 1 / (2 + abs(var) *6)",
-                                    driver_variables={"Xrot": ["MCH-thigh_driv_tgt.R", "ROT_X", "LOCAL_SPACE"]},
-                                    rotation_mode="QUATERNION"
-                                    )
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Front.R",
+                        driver_name="Sk_f_a_r",
+                        driver_property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="-var * prop / (1.2 + abs(var) *-0.4) if var < 0 else -var * 1 / (2 + abs(var) *6)",
+                            variables=[
+                                TransformChannelVariable(target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                            ],
+                        ),
+                    ),
                 ]
             ),
             ConnectBone(

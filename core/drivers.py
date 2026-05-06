@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from typing import Literal, ClassVar
 import bpy
@@ -28,12 +28,12 @@ class Driver():
     type: DriverType
     expression: str | None = None
     use_self: bool | None = None
-    variables: list[DriverVariable]
+    variables: list[DriverVariable] = field(default=None, kw_only=True)
     
-    def apply(self, pose_bone: bpy.types.PoseBone, property: tuple[str, int], armature: bpy.types.Object) -> None:
+    def apply(self, pose_bone: bpy.types.PoseBone, driver_property: tuple[str, int], armature: bpy.types.Object) -> None:
         """Applies the driver to the given bone."""
 
-        driver = pose_bone.driver_add(property[0], property[1])
+        driver = pose_bone.driver_add(driver_property[0], driver_property[1])
 
         if self.expression is not None:
             driver.driver.expression = self.expression
@@ -49,7 +49,7 @@ class Driver():
 ####################################################
 
 @dataclass(frozen=True)
-class TransfromChannelVariable(DriverVariable):
+class TransformChannelVariable(DriverVariable):
     """Driver variable for a transform channel."""
     type: ClassVar[VariableType] = 'TRANSFORMS'
 
