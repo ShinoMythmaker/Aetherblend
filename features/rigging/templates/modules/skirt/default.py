@@ -162,9 +162,9 @@ SKIRT_R = BoneGroup(
                         property=["rotation_quaternion", 1],
                         driver=Driver(
                             type="SCRIPTED",
-                            expression="-var * prop / (1.2 + abs(var) *-0.4) if var < 0 else -var * 1 / (2 + abs(var) *6)",
+                            expression="RotX * 1 / (1.2 + abs(RotX) *-0.4) if RotX < 0 else RotX * 1 / (2 + abs(RotX) *6)",
                             variables=[
-                                TransformChannelVariable(target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                TransformChannelVariable(name="RotX", target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
                             ],
                         ),
                     ),

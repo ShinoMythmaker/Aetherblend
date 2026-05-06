@@ -53,6 +53,7 @@ class TransformChannelVariable(DriverVariable):
     """Driver variable for a transform channel."""
     type: ClassVar[VariableType] = 'TRANSFORMS'
 
+    name: str
     target_bone: str | None = None
     transform_type: TransformType | None = None
     rotation_mode: RotationMode | None = None
