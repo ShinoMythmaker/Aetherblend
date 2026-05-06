@@ -30,7 +30,8 @@ SKIRT_R = BoneGroup(
                 req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
                 operations=[
                     RigifyTypeOperation(bone_name="Skirt_Front.R", rigify_type=rigify.types.basic_copy_chain()),
-                    CollectionOperation(bone_name="Skirt_Front.R", collection_name="Skirt")
+                    CollectionOperation(bone_name="Skirt_Front.R", collection_name="Skirt"),
+                    ParentBoneOperation("Skirt_Front.R", parent=["MCH-Skirt_Front.R"], time="Post")
                 ]
             ),
             ConnectBone(
