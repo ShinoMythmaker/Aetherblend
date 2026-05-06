@@ -182,7 +182,7 @@ class TrackToConstraint(Constraint):
 class DampedTrackConstraint(Constraint):
     target_bone: str
     track_axis: str = "TRACK_Y"
-    head_tail: float = 1
+    head_tail: float = 0
     influence: float = 1
     name: str = "AetherBlend_DampedTrack"
 

@@ -135,11 +135,13 @@ SKIRT_R = BoneGroup(
                 name="MCH-thigh_driv_tgt.R",
                 bone_a="thigh.R",
                 parent="Spine.001",
+                start="head",
+                size_factor=0.3,
                 req_bones=["thigh.R"],
                 operations=[
-                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.R", rigify_type=rigify.types.basic_raw_copy()),
-                    CollectionOperation(bone_name="MCH-Skirt_Front.R", collection_name="MCH", time="Post"),
-                    ConstraintOperation(bone_name="MCH-thigh_driv_tgt.R", constraint=DampedTrackConstraint(target_bone="ORG-thigh.R"))
+                    RigifyTypeOperation(bone_name="MCH-thigh_driv_tgt.R", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-thigh_driv_tgt.R", collection_name="MCH", time="Post"),
+                    ConstraintOperation(bone_name="MCH-thigh_driv_tgt.R", constraint=DampedTrackConstraint(target_bone="ORG-shin.R"))
                 ]
             ),
             #Driver Bones
@@ -157,7 +159,7 @@ SKIRT_R = BoneGroup(
                                     driver_name="Sk_f_a_r", 
                                     driver_property=["rotation_quaternion", 0],
                                     driver_expression="-var * prop / (1.2 + abs(var) *-0.4) if var < 0 else -var * 1 / (2 + abs(var) *6)",
-                                    driver_variables=["X rot", ["MCH-thigh_driv_tgt.R", "ROT_X", "LOCAL_SPACE"]],
+                                    driver_variables={"Xrot": ["MCH-thigh_driv_tgt.R", "ROT_X", "LOCAL_SPACE"]},
                                     rotation_mode="QUATERNION"
                                     )
                 ]
