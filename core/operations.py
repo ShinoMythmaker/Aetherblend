@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import ClassVar, Literal
 
+from core.drivers import Driver
+
 from .constraints import Constraint, CopyTransformsConstraint
 from . import rigify
 from .. import utils
@@ -317,10 +319,9 @@ class DriverOperation(ABOperation):
 
     bone_name: str
     driver_name: str
-    driver_property: dict[str, int] # e.g. {"location": 0} for location.x
-    driver_expression: str
-    driver_variables: dict[str, tuple[str, str, str]]  # variable name -> (target bone, target property, target subproperty e.g transform space)
-    rotation_mode: str | None = None # this option only applies to drivers with rotation as their property, hence why I separated it from the driver_property dict - Oats
+    bone_name: str
+    property: tuple[str, int]
+    driver: Driver
 
     def apply(self, armature: bpy.types.Object, var):
         """Applies the driver operation to the given pose bone."""
@@ -329,8 +330,8 @@ class DriverOperation(ABOperation):
         poseBone = self._getPoseBone(self.bone_name, armature)
         if not poseBone:
             return
-        
         try:
+<<<<<<< HEAD
             f_curve = poseBone.driver_add(self.driver_property.keys(), self.driver_property.values())
             f_curve.driver.expression = self.driver_expression
 
@@ -349,6 +350,9 @@ class DriverOperation(ABOperation):
                 else:
                     return {f"Finished applying DriverOperation for bone '{self.bone_name}'."}
 
+=======
+            self.driver.apply(poseBone, self.property, armature)
+>>>>>>> new_drivers
         except Exception as e:
             print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
 
