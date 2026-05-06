@@ -177,3 +177,24 @@ class TrackToConstraint(Constraint):
             else:
                 print(f"[AetherBlend] Warning: Space object '{self.space_object}' not found for Track To constraint.")
         constraint.influence = self.influence
+
+@dataclass(frozen=True)
+class DampedTrackConstraint(Constraint):
+    target_bone: str
+    track_axis: str = "TRACK_Y"
+    head_tail: float = 1
+    influence: float = 1
+    name: str = "AetherBlend_DampedTrack"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+       constraint = bone.constraints.new(type="DAMPED_TRACK")
+       constraint.name = self.name
+       target_obj = armature
+       if not target_obj:
+           print(f"[AetherBlend] Target object not found for Damped Track constraint.")
+           return
+       constraint.target =  target_obj
+       constraint.subtarget = self.target_bone
+       constraint.track_axis = self.track_axis
+       constraint.influence = self.influence
+       constraint.head_tail = self.head_tail

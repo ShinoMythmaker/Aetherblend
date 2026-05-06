@@ -1,4 +1,6 @@
 from ......core.rigify.settings import UI_Collections, BoneCollection
+from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, DriverOperation
+from ......core.constraints import DampedTrackConstraint
 from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -25,10 +27,10 @@ SKIRT_R = BoneGroup(
                 parent="Spine.001",
                 is_connected=False,
                 req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
-                    b_collection="Skirt (Tweak)"
-                )
+                operations=[
+                    RigifyTypeOperation(bone_name="Skirt_Front.R", rigify_type=rigify.types.basic_copy_chain()),
+                    CollectionOperation(bone_name="Skirt_Front.R", collection_name="Skirt")
+                ]
             ),
             ConnectBone(
                 name="Skirt_Front.R.001",
@@ -37,9 +39,9 @@ SKIRT_R = BoneGroup(
                 parent="Skirt_Front.R",
                 is_connected=True,
                 req_bones=["j_sk_f_b_r", "j_sk_f_c_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Front.R.001", collection_name="Skirt")
+                ]
             ),
             ExtensionBone(
                 name="Skirt_Front.R.002",
@@ -50,9 +52,9 @@ SKIRT_R = BoneGroup(
                 axis="Y",
                 start="tail",
                 req_bones=["j_sk_f_c_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Front.R.002", collection_name="Skirt")
+                ]
             ),
             #Side
             ConnectBone(
@@ -62,10 +64,10 @@ SKIRT_R = BoneGroup(
                 parent="Spine.001",
                 is_connected=False,
                 req_bones=["j_sk_s_a_r", "j_sk_s_b_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
-                    b_collection="Skirt (Tweak)"
-                )
+                operations=[
+                    RigifyTypeOperation(bone_name="Skirt_Side.R", rigify_type=rigify.types.basic_copy_chain()),
+                    CollectionOperation(bone_name="Skirt_Side.R", collection_name="Skirt")
+                ]
             ),
             ConnectBone(
                 name="Skirt_Side.R.001",
@@ -74,9 +76,9 @@ SKIRT_R = BoneGroup(
                 parent="Skirt_Side.R",
                 is_connected=True,
                 req_bones=["j_sk_s_b_r", "j_sk_s_c_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Side.R.001", collection_name="Skirt")
+                ]
             ),
             ExtensionBone(
                 name="Skirt_Side.R.002",
@@ -87,9 +89,9 @@ SKIRT_R = BoneGroup(
                 axis="Y",
                 start="head",
                 req_bones=["j_sk_s_c_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Side.R.002", collection_name="Skirt")
+                ]
             ),
             #Back
             ConnectBone(
@@ -99,10 +101,10 @@ SKIRT_R = BoneGroup(
                 parent="Spine.001",
                 is_connected=False,
                 req_bones=["j_sk_b_a_r", "j_sk_b_b_r"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
-                    b_collection="Skirt (Tweak)"
-                )
+                operations=[
+                    RigifyTypeOperation(bone_name="Skirt_Back.R", rigify_type=rigify.types.basic_copy_chain()),
+                    CollectionOperation(bone_name="Skirt_Back.R", collection_name="Skirt")
+                ]
             ),
             ConnectBone(
                 name="Skirt_Back.R.001",
@@ -111,9 +113,9 @@ SKIRT_R = BoneGroup(
                 parent="Skirt_Back.R",
                 is_connected=True,
                 req_bones=["j_sk_b_b_r", "j_sk_b_c_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Back.R.001", collection_name="Skirt")
+                ]
             ),
             ExtensionBone(
                 name="Skirt_Back.R.002",
@@ -124,49 +126,67 @@ SKIRT_R = BoneGroup(
                 axis="Y",
                 start="head",
                 req_bones=["j_sk_b_c_r"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Back.R.002", collection_name="Skirt")
+                ]
             ),
-             #Front
+            #DriverTGT
+            ExtensionBone(
+                name="MCH-thigh_driv_tgt.R",
+                bone_a="thigh.R",
+                parent="Spine.001",
+                req_bones=["thigh.R"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.R", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Front.R", collection_name="MCH", time="Post"),
+                    ConstraintOperation(bone_name="MCH-thigh_driv_tgt.R", constraint=DampedTrackConstraint(target_bone="ORG-thigh.R"))
+                ]
+            ),
+            #Driver Bones
             ConnectBone(
-                name="Skirt_Front.R.mch",
-                bone_a="shin.R",
-                bone_b="Skirt_Front.R.002",
-                parent="shin.R",
+                name="MCH-Skirt_Front.R",
+                bone_a="j_sk_f_a_r",
+                bone_b="j_sk_f_b_r",
+                parent="Spine.001",
                 is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Front.R.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Front.R.002"),
-                    b_collection="Skirt MCH"
-                )
+                req_bones=["j_sk_f_a_r", "j_sk_f_b_r"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.R", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Front.R", collection_name="MCH", time="Post"),
+                    DriverOperation(bone_name="MCH-Skirt_Front.R", 
+                                    driver_name="Sk_f_a_r", 
+                                    driver_property=["rotation_quaternion", 0],
+                                    driver_expression="-var * prop / (1.2 + abs(var) *-0.4) if var < 0 else -var * 1 / (2 + abs(var) *6)",
+                                    driver_variables=["X rot", ["MCH-thigh_driv_tgt.R", "ROT_X", "LOCAL_SPACE"]],
+                                    rotation_mode="QUATERNION"
+                                    )
+                ]
             ),
             ConnectBone(
-                name="Skirt_Side.R.mch",
-                bone_a="shin.R",
-                bone_b="Skirt_Side.R.002",
-                parent="shin.R",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Side.R.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Side.R.002"),
-                    b_collection="Skirt MCH"
-                )
+                name="MCH-Skirt_Front.R.001",
+                bone_a="j_sk_f_b_r",
+                bone_b="j_sk_f_c_r",
+                parent="MCH-Skirt_Front.R",
+                is_connected=True,
+                req_bones=["j_sk_f_b_r", "j_sk_f_c_r"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.R.001", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Front.R.001", collection_name="MCH", time="Post")
+                ]
             ),
-            ConnectBone(
-                name="Skirt_Back.R.mch",
-                bone_a="shin.R",
-                bone_b="Skirt_Back.R.002",
-                parent="shin.R",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Back.R.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Back.R.002"),
-                    b_collection="Skirt MCH"
-                )
+            ExtensionBone(
+                name="MCH-Skirt_Front.R.002",
+                bone_a="j_sk_f_c_r",
+                parent="MCH-Skirt_Front.R.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="tail",
+                req_bones=["j_sk_f_c_r"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.R.002", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Front.R.002", collection_name="MCH", time="Post")
+                ]
             ),
         ],
 )
@@ -194,7 +214,7 @@ SKIRT_L = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sk_f_a_l", "j_sk_f_b_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    rigify_settings=rigify.types.basic_copy_chain(),
                     b_collection="Skirt (Tweak)"
                 )
             ),
@@ -231,7 +251,7 @@ SKIRT_L = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sk_s_a_l", "j_sk_s_b_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    rigify_settings=rigify.types.basic_copy_chain(),
                     b_collection="Skirt (Tweak)"
                 )
             ),
@@ -268,7 +288,7 @@ SKIRT_L = BoneGroup(
                 is_connected=False,
                 req_bones=["j_sk_b_a_l", "j_sk_b_b_l"],
                 pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0, primary_layer_extra="Skirt", skin_chain_falloff_length=True, skin_chain_falloff_spherical=[True, False, True]),
+                    rigify_settings=rigify.types.basic_copy_chain(),
                     b_collection="Skirt (Tweak)"
                 )
             ),
@@ -296,48 +316,6 @@ SKIRT_L = BoneGroup(
                     b_collection="Skirt"
                 )
             ),
-            #Front
-            ConnectBone(
-                name="Skirt_Front.L.mch",
-                bone_a="shin.L",
-                bone_b="Skirt_Front.L.002",
-                parent="shin.L",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Front.L.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Front.L.002"),
-                    b_collection="Skirt MCH"
-                )
-            ),
-            #Side
-            ConnectBone(
-                name="Skirt_Side.L.mch",
-                bone_a="shin.L",
-                bone_b="Skirt_Side.L.002",
-                parent="shin.L",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Side.L.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Side.L.002"),
-                    b_collection="Skirt MCH"
-                )
-            ),
-            #Back
-            ConnectBone(
-                name="Skirt_Back.L.mch",
-                bone_a="shin.L",
-                bone_b="Skirt_Back.L.002",
-                parent="shin.L",
-                is_connected=False,
-                end="tail",
-                req_bones=["Skirt_Back.L.002"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Skirt_Back.L.002"),
-                    b_collection="Skirt MCH"
-                )
-            ),
         ],
 )
 
@@ -347,7 +325,7 @@ def get_rig_module() -> RigModule:
         type="Generation",
         bone_groups=[SKIRT_R, SKIRT_L],
         ui = UI_Collections([
-            BoneCollection(name="Skirt", ui=True, color_set="Torso", row_index=1, title="Skirt", visible=False),
-            BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Torso", row_index=2, title="Skirt (Tweak)", visible=False),
+            BoneCollection(name="Skirt", ui=True, color_set="Head", row_index=1, title="Skirt", visible=False),
+            BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Head", row_index=2, title="Skirt (Tweak)", visible=False),
         ])
     )

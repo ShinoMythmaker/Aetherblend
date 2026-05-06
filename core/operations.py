@@ -337,6 +337,7 @@ class DriverOperation(ABOperation):
             for var_name, (target_bone, target_prop, target_subprop) in self.driver_variables.items():
 
                 var.name = var_name
+                var.type = "TRANSFORM"
                 var.targets[0].id = armature
                 var.targets[0].bone_target = target_bone
                 var.targets[0].transform_type = target_prop
