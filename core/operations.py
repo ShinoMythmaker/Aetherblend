@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import ClassVar, Literal
 
 from .drivers import Driver
+from .custom_properties import CustomProperty
 
 from .constraints import Constraint, CopyTransformsConstraint
 from . import rigify
@@ -335,7 +336,30 @@ class DriverOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
 
+@dataclass(frozen=True)
+class CustomPropertyOperation(ABOperation):
+    mode: ClassVar[Mode] = "POSE"
 
+    property: CustomProperty
+    bone_name: str | None = None
+
+    def apply(self, armature: bpy.types.Object):
+        """Creates a custom property for a given bone or armature"""
+        if not self._switch_mode():
+            return
+        
+        try:
+            target = armature.data
+            if self.bone_name:
+                poseBone = self._getPoseBone(self.bone_name, armature)
+                if not poseBone:
+                    return
+                target = poseBone
+
+            self.property.apply(target=target)
+
+        except Exception as e:
+            print(f"[AetherBlend] Error applying CustomPropertyOperation for armature. : {e}")
 
     
 
