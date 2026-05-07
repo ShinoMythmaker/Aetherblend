@@ -160,7 +160,7 @@ SKIRT_R = BoneGroup(
                 operations=[
                     RigifyTypeOperation(bone_name="MCH-Skirt_Front.R", rigify_type=rigify.types.basic_raw_copy()),
                     CollectionOperation(bone_name="MCH-Skirt_Front.R", collection_name="MCH", time="Post"),
-                    CustomPropertyOperation(property=FloatProperty(property_name="skirt_automation", property_value=1.0, min=0, max=1), time="Post"),
+                    CustomPropertyOperation(property=FloatProperty(property_name="skirt_automation", property_value=1.0, min=0.0, max=1.0), time="Post"),
                     DriverOperation(
                         bone_name="MCH-Skirt_Front.R",
                         driver_name="Sk_f_a_r",

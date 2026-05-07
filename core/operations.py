@@ -67,7 +67,6 @@ class PoseOperationsStack:
             else:
                 print(f"[AetherBlend] PoseOperationsStack: Bone '{bone_name}' not found in armature.")
 
-
 @dataclass(frozen=True)
 class ABOperation(ABC):
     mode: ClassVar[Mode] = "POSE"

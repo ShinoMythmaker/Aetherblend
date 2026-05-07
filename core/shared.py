@@ -86,7 +86,6 @@ class PropOverride(Override):
         except Exception as e:
             print(f"[AetherBlend] Error applying PropOverride for bone '{pose_bone.name}': {e}")
 
-
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
