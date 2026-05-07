@@ -11,7 +11,7 @@ RotationMode = Literal['AUTO', 'XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX', 'QUATER
 SpaceType = Literal['WORLD_SPACE', 'TRANSFORM_SPACE', 'LOCAL_SPACE']
 ContextProperty = Literal['ACTIVE_VIEW_LAYER', 'ACTIVE_SCENE']
 
-
+@dataclass(frozen=True)
 class DriverVariable(ABC):
     """Abstract base class for driver variables."""
     name: str
@@ -53,7 +53,7 @@ class TransformChannelVariable(DriverVariable):
     """Driver variable for a transform channel."""
     type: ClassVar[VariableType] = 'TRANSFORMS'
 
-    name: str
+    
     target_bone: str | None = None
     transform_type: TransformType | None = None
     rotation_mode: RotationMode | None = None
@@ -92,3 +92,35 @@ class TransformChannelVariable(DriverVariable):
 
         return driver
 
+@dataclass(frozen=True)
+class SinglePropertyVariable(DriverVariable):
+    """Driver variable for a single property"""
+
+    type: ClassVar[VariableType] = 'SINGLE_PROP'
+
+    data_path: str | None = None
+    use_fallback_value: bool | None = None
+    fallback_value: float | None = None
+
+    def add(self, driver: bpy.types.FCurve, armature: bpy.types.Object) -> bpy.types.FCurve:
+        var = driver.driver.variables.new()
+        var.name = self.name
+        var.type = 'SINGLE_PROP'
+
+        d_target = var.targets[0]
+
+        if armature is not None:
+            d_target.id_type="ARMATURE"
+            d_target.id = armature.data
+        else:
+            print(f"[AetherBlend] Warning: Armature not found for driver variable '{self.name}'. Driver may not work as expected.")
+            return driver
+        
+        if self.data_path is not None:
+            d_target.data_path = self.data_path
+        if self.use_fallback_value is not None:
+            d_target.use_fallback_value = self.fallback_value
+        if self.fallback_value is not None:
+            d_target.fallback_value = self.fallback_value
+        
+        return driver
