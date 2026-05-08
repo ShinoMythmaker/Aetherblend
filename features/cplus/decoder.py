@@ -53,11 +53,6 @@ def apply_transforms(
     bones: dict[str, bpy.types.PoseBone] = None,
 ) -> None:
     """Applies C+ pose transforms (scale, rotation, translation) to *bones*.
-
-    Bones must already be in Y-up game-engine space before this is called.
-    Use ``utils.axis_conversion.revert_bone_axis_on_armature`` before calling
-    this function and ``utils.axis_conversion.apply_bone_axis_to_armature``
-    after the rest pose has been set.
     """
     original_mode = armature.mode
     
