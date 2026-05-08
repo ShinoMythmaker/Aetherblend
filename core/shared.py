@@ -15,9 +15,8 @@ from . import rigify
 from .bone_generators import BoneGenerator
 
 ModuleType = Literal["Generator", "Patch","UI-Addon"]
+UI_Type = Literal["checkbox", "slider", "dropdown"]
   
-    
-
 class Override(ABC):
     """Overrides properties of a bone."""
     bone: str
@@ -197,6 +196,63 @@ class BoneGroup:
                 pose_operations_dict[bone_gen.name].append(bone_gen.pose_operations)
         
         return generated_bones, pose_operations_dict, generated_operations
+    
+@dataclass
+class UILink:
+    """Defines a link between a bone or armature property and a UI element"""
+    
+    property_name: str
+    title: str
+    bone_name: str | None = None
+    constraint_name: str | None = None
+    white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show. 
+    ui_type: UI_Type = "checkbox"
+    ui_params: dict | None = None  # Additional parameters for the UI element
+     
+
+    def draw(self, context, layout: bpy.types.UILayout):
+        """Draws the UI element for this link."""
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return
+
+        # Collect selected pose bones (only available in POSE mode).
+        selected_bones: set[str] = set()
+        if context.mode == 'POSE':
+            try:
+                selected_bones = set(bone.name for bone in (context.selected_pose_bones or []))
+                if context.active_pose_bone:
+                    selected_bones.add(context.active_pose_bone.name)
+            except (AttributeError, TypeError):
+                pass
+
+        # Apply whitelist: skip drawing unless a whitelisted bone is selected.
+        if self.white_list:
+            if not selected_bones.intersection(self.white_list):
+                return
+
+        target = armature.data
+        if self.bone_name:
+            target = armature.pose.bones.get(self.bone_name)
+            if not target:
+                return
+            if self.constraint_name:
+                target = target.constraints.get(self.constraint_name)
+                if not target:
+                    return
+
+        col = layout.column(align=True)
+        if self.ui_type == "checkbox":
+            col.prop(target, "mute", text=self.title)
+        elif self.ui_type == "slider":
+            col.prop(target, self.property_name, text=self.title, slider=True, **(self.ui_params or {}))
+        elif self.ui_type == "dropdown":
+            col.prop(target, self.property_name, text=self.title, **(self.ui_params or {}))
+        else:
+            print(f"[AetherBlend] Unknown UI element type '{self.ui_type}' for UILink '{self.title}'")
+
+        
+    
 
 @dataclass
 class RigModule:
@@ -204,8 +260,9 @@ class RigModule:
     name: str
     type: ModuleType
     bone_groups: list[BoneGroup]
-    ui: rigify.settings.UI_Collections | None = None
+    ui_collections: rigify.settings.UI_Collections | None = None
     operations: list[ABOperation] = field(default_factory=list)
+    ui_flags: list[str] = field(default_factory=list)
 
     def execute(self, armature: bpy.types.Object, data: dict) -> tuple[bool, PoseOperationsStack, rigify.settings.UI_Collections | None, list[ABOperation]]:
         bpy.context.view_layer.objects.active = armature
@@ -225,7 +282,7 @@ class RigModule:
             module_operations.extend(operations or [])
 
             
-        return integrity, pose_op_stack, self.ui, module_operations
+        return integrity, pose_op_stack, self.ui_collections, module_operations
 
 
 @dataclass(frozen=True)

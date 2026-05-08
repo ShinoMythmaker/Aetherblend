@@ -163,7 +163,7 @@ def get_rig_module() -> RigModule:
         name="Default",
         type="Generation",
         bone_groups=[ARM_L, ARM_R],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="Arm.L (IK)", ui=True, color_set="IK_Left", row_index=1, title="Arm IK.L"),
             BoneCollection(name="Arm.L (FK)", ui=True, color_set="FK_Left", row_index=2, title="Arm FK.L", visible=False),
             BoneCollection(name="Arm.L (Tweak)", ui=True, color_set="Tweak_Left", row_index=3, title="Tweak.L", visible=False),

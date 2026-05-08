@@ -47,7 +47,7 @@ def get_rig_module() -> RigModule:
         name="Miqo",
         type="Generation",
         bone_groups=[MIQO_EARS],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="Head", ui=True, color_set="Head", row_index=0, title="Head", visible=True),
         ])
     )

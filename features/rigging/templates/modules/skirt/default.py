@@ -446,8 +446,9 @@ def get_rig_module() -> RigModule:
         name="Default",
         type="Generation",
         bone_groups=[SKIRT_R, SKIRT_L],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="Skirt", ui=True, color_set="Head", row_index=1, title="Skirt", visible=False),
             BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Head", row_index=2, title="Skirt (Tweak)", visible=False),
-        ])
+        ]),
+        ui_flags = ["Skirt Automation"]
     )

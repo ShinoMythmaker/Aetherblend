@@ -4,6 +4,7 @@ import collections
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
 from . import template_manager
+from .ui_links import UI_LINKS
 
 
 def _flatten_children(iterable):
@@ -353,7 +354,6 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         if not armature or armature.type != 'ARMATURE':
             return False
         
-        # Get rig_id from armature custom properties
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return False
@@ -375,44 +375,38 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         if not rig_id:
             return
             
+        aether_rig = getattr(armature, 'aether_rig', None)
+        # if not aether_rig:
+        #     return
+            
         panel_name = "VIEW3D_PT_rig_ui_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
         
+        ## Draw Links
+        flags = [item.value for item in aether_rig.ui_flags]
+            
+        for flag in flags:
+            ui_link = UI_LINKS.get(flag)
+            if not ui_link:
+                continue
+            ui_link.draw(context, self.layout)
+
+        ## Draw Rigify UI
         if panel_class and hasattr(panel_class, 'draw'):
-
-            # layout = self.layout
-            
-            # selected_bones = {bone.name for bone in context.selected_pose_bones or []}
-            
-            # controllers_to_show = []
-            # for bone_name in selected_bones:
-            #     if bone_name in UI_CONTROLLER_MAPPING:
-            #         controllers_to_show.extend(UI_CONTROLLER_MAPPING[bone_name])
-            
-            # seen = set()
-            # unique_controllers = []
-            # for controller in controllers_to_show:
-            #     if controller.name not in seen:
-            #         seen.add(controller.name)
-            #         unique_controllers.append(controller)
-            
-            # if unique_controllers:
-            #     for controller in unique_controllers:
-            #         controller.create_ui(layout, armature)
-
             panel_class.draw(self, context)
         else:
             # Fallback to default behavior if panel not found
             layout = self.layout
             layout.label(text=f"Rig UI panel not found for: {rig_id}")
-       
+
+
 class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
     bl_label = "Rig Bake Settings"
     bl_idname = "AETHER_PT_rig_bake_settings"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 8
+    bl_order = 9
 
     @classmethod
     def poll(cls, context):

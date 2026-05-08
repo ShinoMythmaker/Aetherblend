@@ -515,7 +515,7 @@ def get_rig_module() -> RigModule:
         name="IVCS",
         type="Generation",
         bone_groups=[IV_HAND_L, IV_HAND_R],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=1, title="Fingers.L", visible=False),
             BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=1, title="Fingers.R", visible=False),
             BoneCollection(name="IVCS.L", ui=True, color_set="IVCS", row_index=2, title="IVCS.L", visible=False),

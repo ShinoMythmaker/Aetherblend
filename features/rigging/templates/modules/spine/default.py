@@ -104,7 +104,7 @@ def get_rig_module() -> RigModule:
         name="Default",
         type="Generation",
         bone_groups=[SPINE],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=1, title="Torso"),
             BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=2, title="Tweak", visible=False),
         ])
