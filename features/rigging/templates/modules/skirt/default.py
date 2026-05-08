@@ -43,7 +43,8 @@ SKIRT_R = BoneGroup(
                 is_connected=True,
                 req_bones=["j_sk_f_b_r", "j_sk_f_c_r"],
                 operations=[
-                    CollectionOperation(bone_name="Skirt_Front.R.001", collection_name="Skirt")
+                    CollectionOperation(bone_name="Skirt_Front.R.001", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Front.R.001", parent=["MCH-Skirt_Front.R.001"], is_connected=False, time="Post")
                 ]
             ),
             ExtensionBone(
@@ -53,10 +54,11 @@ SKIRT_R = BoneGroup(
                 is_connected=True,
                 axis_type="local",
                 axis="Y",
-                start="tail",
+                start="head",
                 req_bones=["j_sk_f_c_r"],
                 operations=[
-                    CollectionOperation(bone_name="Skirt_Front.R.002", collection_name="Skirt")
+                    CollectionOperation(bone_name="Skirt_Front.R.002", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Front.R.002", parent=["MCH-Skirt_Front.R.002"], is_connected=False, time="Post")
                 ]
             ),
             #Side
@@ -81,7 +83,8 @@ SKIRT_R = BoneGroup(
                 is_connected=True,
                 req_bones=["j_sk_s_b_r", "j_sk_s_c_r"],
                 operations=[
-                    CollectionOperation(bone_name="Skirt_Side.R.001", collection_name="Skirt")
+                    CollectionOperation(bone_name="Skirt_Side.R.001", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Side.R.001", parent=["MCH-Skirt_Middle.R.001"], time="Post")
                 ]
             ),
             ExtensionBone(
@@ -119,7 +122,8 @@ SKIRT_R = BoneGroup(
                 is_connected=True,
                 req_bones=["j_sk_b_b_r", "j_sk_b_c_r"],
                 operations=[
-                    CollectionOperation(bone_name="Skirt_Back.R.001", collection_name="Skirt")
+                    CollectionOperation(bone_name="Skirt_Back.R.001", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Back.R.001", parent=["MCH-Skirt_Back.R.001"], time="Post")
                 ]
             ),
             ExtensionBone(
@@ -149,6 +153,19 @@ SKIRT_R = BoneGroup(
                     ConstraintOperation(bone_name="MCH-thigh_driv_tgt.R", constraint=DampedTrackConstraint(target_bone="ORG-shin.R"), time="Post")
                 ]
             ),
+            ExtensionBone(
+                name="MCH-shin_driv_tgt.R",
+                bone_a="shin.R",
+                parent="thigh.R",
+                start="head",
+                size_factor=0.3,
+                req_bones=["shin.R"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-shin_driv_tgt.R", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-shin_driv_tgt.R", collection_name="MCH", time="Post"),
+                    ConstraintOperation(bone_name="MCH-shin_driv_tgt.R", constraint=DampedTrackConstraint(target_bone="ORG-foot.R"), time="Post")
+                ]
+            ),
             #Driver Bones
             ConnectBone(
                 name="MCH-Skirt_Front.R",
@@ -167,7 +184,7 @@ SKIRT_R = BoneGroup(
                         property=["rotation_quaternion", 1],
                         driver=Driver(
                             type="SCRIPTED",
-                            expression="RotX * sk_auto / (1.2 + abs(RotX) *-0.4) if RotX < 0 else RotX * sk_auto / (2 + abs(RotX) *6)",
+                            expression="((RotX < 0) * (RotX * sk_auto) / (1 + (abs(RotX) - 0.8) * 0.1))",
                             variables=[
                                 TransformChannelVariable(name="RotX", target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
                                 SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
@@ -186,7 +203,22 @@ SKIRT_R = BoneGroup(
                 req_bones=["j_sk_f_b_r", "j_sk_f_c_r"],
                 operations=[
                     RigifyTypeOperation(bone_name="MCH-Skirt_Front.R.001", rigify_type=rigify.types.basic_raw_copy()),
-                    CollectionOperation(bone_name="MCH-Skirt_Front.R.001", collection_name="MCH", time="Post")
+                    CollectionOperation(bone_name="MCH-Skirt_Front.R.001", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Front.R.001",
+                        driver_name="Sk_f_b_r",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX > 0) * (RotX * sk_auto) / (2 + (abs(RotX) - 0.5) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-shin_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                TransformChannelVariable(name="RotXThreshold", target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
                 ]
             ),
             ExtensionBone(
@@ -196,7 +228,7 @@ SKIRT_R = BoneGroup(
                 is_connected=True,
                 axis_type="local",
                 axis="Y",
-                start="tail",
+                start="head",
                 req_bones=["j_sk_f_c_r"],
                 operations=[
                     RigifyTypeOperation(bone_name="MCH-Skirt_Front.R.002", rigify_type=rigify.types.basic_raw_copy()),
@@ -220,7 +252,7 @@ SKIRT_R = BoneGroup(
                         property=["rotation_quaternion", 1],
                         driver=Driver(
                             type="SCRIPTED",
-                            expression="-RotX * sk_auto / (1.2 + abs(RotX) *3) if RotX < 0 else -RotX * sk_auto / (2 + abs(RotX) *6) ",
+                            expression="((RotX < 0) * (-RotX * sk_auto) / (3 + (abs(RotX) - 0.5) * 2))",
                             variables=[
                                 TransformChannelVariable(name="RotX", target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
                                 SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
@@ -240,7 +272,22 @@ SKIRT_R = BoneGroup(
                 req_bones=["j_sk_s_b_r", "j_sk_s_c_r"],
                 operations=[
                     RigifyTypeOperation(bone_name="MCH-Skirt_Middle.R.001", rigify_type=rigify.types.basic_raw_copy()),
-                    CollectionOperation(bone_name="MCH-Skirt_Middle.R.001", collection_name="MCH", time="Post")
+                    CollectionOperation(bone_name="MCH-Skirt_Middle.R.001", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Middle.R.001",
+                        driver_name="Sk_s_b_r",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX > 0) * (-RotX * sk_auto) / (3 + (abs(RotX) - 0.2) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-shin_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                TransformChannelVariable(name="RotXThreshold", target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
                 ]
             ),
             ExtensionBone(
@@ -274,7 +321,7 @@ SKIRT_R = BoneGroup(
                         property=["rotation_quaternion", 1],
                         driver=Driver(
                             type="SCRIPTED",
-                            expression="RotX * sk_auto / (2 + abs(RotX) *6) if RotX < 0 else RotX * sk_auto / (1.2 + abs(RotX) *-0.4)",
+                            expression="((RotX < 0) * (RotX * sk_auto) / (5 + (abs(RotX) - 0.2) * 5)) + ((RotX > 0) * ((RotX * sk_auto) / (1 + (abs(RotX) + 0.1) * 0.2)))",
                             variables=[
                                 TransformChannelVariable(name="RotX", target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
                                 SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
@@ -293,7 +340,22 @@ SKIRT_R = BoneGroup(
                 req_bones=["j_sk_b_b_r", "j_sk_b_c_r"],
                 operations=[
                     RigifyTypeOperation(bone_name="MCH-Skirt_Back.R.001", rigify_type=rigify.types.basic_raw_copy()),
-                    CollectionOperation(bone_name="MCH-Skirt_Back.R.001", collection_name="MCH", time="Post")
+                    CollectionOperation(bone_name="MCH-Skirt_Back.R.001", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Back.R.001",
+                        driver_name="Sk_b_b_r",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX > 0) * (RotX * sk_auto) / (1 + (abs(RotX) + 0.5) * 0.3)) * (abs(RotXThreshold) / (0.5 + abs(RotXThreshold))) if RotXThreshold > 0 else RotX * 0",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-shin_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                TransformChannelVariable(name="RotXThreshold", target_bone="MCH-thigh_driv_tgt.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
                 ]
             ),
             ExtensionBone(
@@ -335,10 +397,11 @@ SKIRT_L = BoneGroup(
                 parent="Spine.001",
                 is_connected=False,
                 req_bones=["j_sk_f_a_l", "j_sk_f_b_l"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_copy_chain(),
-                    b_collection="Skirt (Tweak)"
-                )
+                operations=[
+                    RigifyTypeOperation(bone_name="Skirt_Front.L", rigify_type=rigify.types.basic_copy_chain()),
+                    CollectionOperation(bone_name="Skirt_Front.L", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Front.L", parent=["MCH-Skirt_Front.L"], time="Post")
+                ]
             ),
             ConnectBone(
                 name="Skirt_Front.L.001",
@@ -347,9 +410,10 @@ SKIRT_L = BoneGroup(
                 parent="Skirt_Front.L",
                 is_connected=True,
                 req_bones=["j_sk_f_b_l", "j_sk_f_c_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Front.L.001", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Front.L.001", parent=["MCH-Skirt_Front.L.001"], time="Post")
+                ]
             ),
             ExtensionBone(
                 name="Skirt_Front.L.002",
@@ -360,9 +424,10 @@ SKIRT_L = BoneGroup(
                 axis="Y",
                 start="tail",
                 req_bones=["j_sk_f_c_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Front.L.002", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Front.L.002", parent=["MCH-Skirt_Front.L.002"], time="Post")
+                ]
             ),
             #Side
             ConnectBone(
@@ -372,10 +437,11 @@ SKIRT_L = BoneGroup(
                 parent="Spine.001",
                 is_connected=False,
                 req_bones=["j_sk_s_a_l", "j_sk_s_b_l"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_copy_chain(),
-                    b_collection="Skirt (Tweak)"
-                )
+                operations=[
+                    RigifyTypeOperation(bone_name="Skirt_Side.L", rigify_type=rigify.types.basic_copy_chain()),
+                    CollectionOperation(bone_name="Skirt_Side.L", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Side.L", parent=["MCH-Skirt_Middle.L"], time="Post")
+                ]
             ),
             ConnectBone(
                 name="Skirt_Side.L.001",
@@ -384,9 +450,10 @@ SKIRT_L = BoneGroup(
                 parent="Skirt_Side.L",
                 is_connected=True,
                 req_bones=["j_sk_s_b_l", "j_sk_s_c_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Side.L.001", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Side.L.001", parent=["MCH-Skirt_Middle.L.001"], time="Post")
+                ]
             ),
             ExtensionBone(
                 name="Skirt_Side.L.002",
@@ -397,9 +464,10 @@ SKIRT_L = BoneGroup(
                 axis="Y",
                 start="head",
                 req_bones=["j_sk_s_c_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Side.L.002", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Side.L.002", parent=["MCH-Skirt_Middle.L.002"], time="Post")
+                ]
             ),
             #Back
             ConnectBone(
@@ -409,10 +477,11 @@ SKIRT_L = BoneGroup(
                 parent="Spine.001",
                 is_connected=False,
                 req_bones=["j_sk_b_a_l", "j_sk_b_b_l"],
-                pose_operations=PoseOperations(
-                    rigify_settings=rigify.types.basic_copy_chain(),
-                    b_collection="Skirt (Tweak)"
-                )
+                operations=[
+                    RigifyTypeOperation(bone_name="Skirt_Back.L", rigify_type=rigify.types.basic_copy_chain()),
+                    CollectionOperation(bone_name="Skirt_Back.L", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Back.L", parent=["MCH-Skirt_Back.L"], time="Post")
+                ]
             ),
             ConnectBone(
                 name="Skirt_Back.L.001",
@@ -421,9 +490,10 @@ SKIRT_L = BoneGroup(
                 parent="Skirt_Back.L",
                 is_connected=True,
                 req_bones=["j_sk_b_b_l", "j_sk_b_c_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Back.L.001", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Back.L.001", parent=["MCH-Skirt_Back.L.001"], time="Post")
+                ]
             ),
             ExtensionBone(
                 name="Skirt_Back.L.002",
@@ -434,11 +504,244 @@ SKIRT_L = BoneGroup(
                 axis="Y",
                 start="head",
                 req_bones=["j_sk_b_c_l"],
-                pose_operations=PoseOperations(
-                    b_collection="Skirt"
-                )
+                operations=[
+                    CollectionOperation(bone_name="Skirt_Back.L.002", collection_name="Skirt"),
+                    ParentBoneOperation(bone_name="Skirt_Back.L.002", parent=["MCH-Skirt_Back.L.002"], time="Post")
+                ]
             ),
-        ],
+            #DriverTGT
+            ExtensionBone(
+                name="MCH-thigh_driv_tgt.L",
+                bone_a="thigh.L",
+                parent="Spine.001",
+                start="head",
+                size_factor=0.3,
+                req_bones=["thigh.L"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-thigh_driv_tgt.L", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-thigh_driv_tgt.L", collection_name="MCH", time="Post"),
+                    ConstraintOperation(bone_name="MCH-thigh_driv_tgt.L", constraint=DampedTrackConstraint(target_bone="ORG-shin.L"), time="Post")
+                ]
+            ),
+            ExtensionBone(
+                name="MCH-shin_driv_tgt.L",
+                bone_a="shin.L",
+                parent="thigh.L",
+                start="head",
+                size_factor=0.3,
+                req_bones=["shin.L"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-shin_driv_tgt.L", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-shin_driv_tgt.L", collection_name="MCH", time="Post"),
+                    ConstraintOperation(bone_name="MCH-shin_driv_tgt.L", constraint=DampedTrackConstraint(target_bone="ORG-foot.L"), time="Post")
+                ]
+            ),
+            # Driver Bones
+            ConnectBone(
+                name="MCH-Skirt_Front.L",
+                bone_a="j_sk_f_a_l",
+                bone_b="j_sk_f_b_l",
+                parent="Spine.001",
+                is_connected=False,
+                req_bones=["j_sk_f_a_l", "j_sk_f_b_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.L", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Front.L", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Front.L",
+                        driver_name="Sk_f_a_l",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX < 0) * (RotX * sk_auto) / (1 + (abs(RotX) - 0.8) * 0.1))",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-thigh_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
+                ]
+            ),
+            ConnectBone(
+                name="MCH-Skirt_Front.L.001",
+                bone_a="j_sk_f_b_l",
+                bone_b="j_sk_f_c_l",
+                parent="MCH-Skirt_Front.L",
+                is_connected=True,
+                req_bones=["j_sk_f_b_l", "j_sk_f_c_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.L.001", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Front.L.001", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Front.L.001",
+                        driver_name="Sk_f_b_l",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX > 0) * (RotX * sk_auto) / (2 + (abs(RotX) - 0.5) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-shin_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                TransformChannelVariable(name="RotXThreshold", target_bone="MCH-thigh_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
+                ]
+            ),
+            ExtensionBone(
+                name="MCH-Skirt_Front.L.002",
+                bone_a="j_sk_f_c_l",
+                parent="MCH-Skirt_Front.L.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                req_bones=["j_sk_f_c_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Front.L.002", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Front.L.002", collection_name="MCH", time="Post")
+                ]
+            ),
+            ConnectBone(
+                name="MCH-Skirt_Middle.L",
+                bone_a="j_sk_s_a_l",
+                bone_b="j_sk_s_b_l",
+                parent="Spine.001",
+                is_connected=False,
+                roll=-7,
+                req_bones=["j_sk_s_a_l", "j_sk_s_b_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Middle.L", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Middle.L", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Middle.L",
+                        driver_name="Sk_s_a_l",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX < 0) * (RotX * sk_auto) / (3 + (abs(RotX) - 0.5) * 2))",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-thigh_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
+                ]
+            ),
+            ConnectBone(
+                name="MCH-Skirt_Middle.L.001",
+                bone_a="j_sk_s_b_l",
+                bone_b="j_sk_s_c_l",
+                parent="MCH-Skirt_Middle.L",
+                is_connected=True,
+                roll=-7,
+                req_bones=["j_sk_s_b_l", "j_sk_s_c_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Middle.L.001", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Middle.L.001", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Middle.L.001",
+                        driver_name="Sk_s_b_l",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX > 0) * (RotX * sk_auto) / (3 + (abs(RotX) - 0.2) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-shin_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                TransformChannelVariable(name="RotXThreshold", target_bone="MCH-thigh_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
+                ]
+            ),
+            ExtensionBone(
+                name="MCH-Skirt_Middle.L.002",
+                bone_a="j_sk_s_c_l",
+                parent="MCH-Skirt_Middle.L.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                roll=-7,
+                req_bones=["j_sk_s_c_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Middle.L.002", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Middle.L.002", collection_name="MCH", time="Post")
+                ]
+            ),
+            ConnectBone(
+                name="MCH-Skirt_Back.L",
+                bone_a="j_sk_b_a_l",
+                bone_b="j_sk_b_b_l",
+                parent="Spine.001",
+                is_connected=False,
+                req_bones=["j_sk_b_a_l", "j_sk_b_b_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Back.L", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Back.L", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Back.L",
+                        driver_name="Sk_b_a_l",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX < 0) * (RotX * sk_auto) / (5 + (abs(RotX) - 0.2) * 5)) + ((RotX > 0) * ((RotX * sk_auto) / (1 + (abs(RotX) + 0.1) * 0.2)))",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-thigh_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
+                ]
+            ),
+            ConnectBone(
+                name="MCH-Skirt_Back.L.001",
+                bone_a="j_sk_b_b_l",
+                bone_b="j_sk_b_c_l",
+                parent="MCH-Skirt_Back.L",
+                is_connected=True,
+                req_bones=["j_sk_b_b_l", "j_sk_b_c_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Back.L.001", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Back.L.001", collection_name="MCH", time="Post"),
+                    DriverOperation(
+                        bone_name="MCH-Skirt_Back.L.001",
+                        driver_name="Sk_b_b_l",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="((RotX > 0) * (RotX * sk_auto) / (1 + (abs(RotX) + 0.5) * 0.3)) * (abs(RotXThreshold) / (0.5 + abs(RotXThreshold))) if RotXThreshold > 0 else RotX * 0",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="MCH-shin_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                TransformChannelVariable(name="RotXThreshold", target_bone="MCH-thigh_driv_tgt.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                                SinglePropertyVariable(name= "sk_auto", data_path="skirt_automation")
+                            ],
+                        ),
+                        time="Post"
+                    ),
+                ]
+            ),
+            ExtensionBone(
+                name="MCH-Skirt_Back.L.002",
+                bone_a="j_sk_b_c_l",
+                parent="MCH-Skirt_Back.L.001",
+                is_connected=True,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                req_bones=["j_sk_b_c_l"],
+                operations=[
+                    RigifyTypeOperation(bone_name="MCH-Skirt_Back.L.002", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(bone_name="MCH-Skirt_Back.L.002", collection_name="MCH", time="Post")
+                ]
+            ),
+        ]
 )
 
 def get_rig_module() -> RigModule:
@@ -448,6 +751,5 @@ def get_rig_module() -> RigModule:
         bone_groups=[SKIRT_R, SKIRT_L],
         ui = UI_Collections([
             BoneCollection(name="Skirt", ui=True, color_set="Head", row_index=1, title="Skirt", visible=False),
-            BoneCollection(name="Skirt (Tweak)", ui=True, color_set="Head", row_index=2, title="Skirt (Tweak)", visible=False),
         ])
     )
