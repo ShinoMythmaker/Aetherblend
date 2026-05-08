@@ -7,6 +7,16 @@ def _select_single(obj: bpy.types.Object):
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
 
+def reset_transforms(obj: bpy.types.Object) -> None:
+    """Resets location, rotation, and scale of the given object."""
+    original_mode = obj.mode
+    _select_single(obj)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.location_clear()
+    bpy.ops.object.rotation_clear()
+    bpy.ops.object.scale_clear()
+    bpy.ops.object.mode_set(mode=original_mode)
+
 def find_armature_in_objects(objects):
     """Finds the first armature in the objects imported."""
     for obj in objects:
