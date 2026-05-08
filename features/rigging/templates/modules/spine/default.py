@@ -24,7 +24,6 @@ SPINE = BoneGroup(
                 bone_b="j_kosi",
                 start="tail",
                 end="head",
-                parent="root",
                 is_connected=False,
                 req_bones=["j_kosi"],
                 operations=[
