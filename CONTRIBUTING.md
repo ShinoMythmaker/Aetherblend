@@ -6,6 +6,28 @@ The best way to help AetherBlend right now is by sharing feedback and reporting 
 
 Developers are also welcome to contribute directly by opening a pull request.
 
+## Dependency Sync Workflow
+To make a fresh fork/clone work locally, contributors must run the dependency bundling script from the repository root.
+
+This is required because the [wheels](wheels) folder is not committed to the repository.
+
+Run this from the repository root:
+
+```bash
+python get_dependencies.py
+```
+
+What this does:
+- Downloads the currently selected dependency wheels into [wheels](wheels)
+- Rebuilds the `wheels` list in [blender_manifest.toml](blender_manifest.toml)
+
+When to run it:
+- Immediately after cloning/forking the project
+- Any time [wheels](wheels) is missing or stale
+- After changing `dependencies` in [blender_manifest.toml](blender_manifest.toml)
+
+This helps ensure local testing uses the same bundled artifacts as the release package.
+
 ## Direct Support
 You can directly support Mythmaker Studio on Patreon.
 Supporters in the highest tier (`Mythmaker`) are listed below.
