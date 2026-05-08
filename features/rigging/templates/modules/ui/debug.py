@@ -7,7 +7,7 @@ def get_rig_module() -> RigModule:
         name="Debug",
         type="UI-Addon",
         bone_groups=[],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
                 BoneCollection(name="FFXIV", ui=True, row_index=1, title="FFXIV", visible=False),
                 BoneCollection(name="Linked", ui=True, color_set="Torso_Tweak", row_index=2, title="XIV", visible=False),
                 BoneCollection(name="Unlinked", ui=True, color_set="IVCS", row_index=2, title="-EX", visible=False),

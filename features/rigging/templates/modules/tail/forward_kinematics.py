@@ -72,7 +72,7 @@ def get_rig_module() -> RigModule:
         name="Forward Kinematics",
         type="Generation",
         bone_groups=[TAIL],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="Tail", ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),
         ])
     )

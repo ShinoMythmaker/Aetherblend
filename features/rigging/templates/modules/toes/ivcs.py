@@ -267,7 +267,7 @@ def get_rig_module() -> RigModule:
         name="IVCS",
         type="Generation",
         bone_groups=[IV_TOES_L, IV_TOES_R],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="IVCS_Toes.L", ui=True, color_set="IVCS", row_index=1, title="Toes.L", visible=False),
             BoneCollection(name="IVCS_Toes.R", ui=True, color_set="IVCS", row_index=1, title="Toes.R", visible=False),
         ])

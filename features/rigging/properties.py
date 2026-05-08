@@ -17,6 +17,14 @@ class AETHER_PROP_RigModuleItem(bpy.types.PropertyGroup):
     ) # type: ignore
 
 
+class AETHER_PROP_StringItem(bpy.types.PropertyGroup):
+    value : bpy.props.StringProperty(
+        name="Value",
+        default="",
+        options={'HIDDEN'}
+    ) # type: ignore
+
+
 class AETHER_PROP_Rig(bpy.types.PropertyGroup):
     meta_rig : bpy.props.PointerProperty(
         name="Meta Rig",
@@ -89,9 +97,17 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         default='FULL',
     ) # type: ignore
 
+    ui_flags : bpy.props.CollectionProperty(
+        name="UI Flags",
+        description="Resolved UI flags from the modules used during generation",
+        type=AETHER_PROP_StringItem,
+        options={'HIDDEN'}
+    ) # type: ignore
+
 
 def register():
     bpy.utils.register_class(AETHER_PROP_RigModuleItem)
+    bpy.utils.register_class(AETHER_PROP_StringItem)
     bpy.utils.register_class(AETHER_PROP_Rig)
     bpy.types.Object.aether_rig = bpy.props.PointerProperty(type=AETHER_PROP_Rig)
 
@@ -99,4 +115,5 @@ def unregister():
     if hasattr(bpy.types.Object, 'aether_rig'):
         del bpy.types.Object.aether_rig
     bpy.utils.unregister_class(AETHER_PROP_Rig)
+    bpy.utils.unregister_class(AETHER_PROP_StringItem)
     bpy.utils.unregister_class(AETHER_PROP_RigModuleItem)

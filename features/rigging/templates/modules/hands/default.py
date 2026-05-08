@@ -420,7 +420,7 @@ def get_rig_module() -> RigModule:
         name="Default",
         type="Generation",
         bone_groups=[HAND_L, HAND_R],
-        ui=UI_Collections([ 
+        ui_collections=UI_Collections([ 
             BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=1, title="Fingers.L", visible=False),
             BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=1, title="Fingers.R", visible=False),
         ])

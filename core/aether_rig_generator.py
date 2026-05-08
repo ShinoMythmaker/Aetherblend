@@ -28,6 +28,7 @@ class AetherRigGenerator:
         self.name = name
         self.color_sets = color_sets
         self.overrides = overrides
+        self._active_ui_flags: set[str] = set()
 
         self.set_modules(modules or [])
 
@@ -66,6 +67,7 @@ class AetherRigGenerator:
             pose_ops_stack,
             operation_stack,
         )
+        self._sync_ui_flags_property(armature)
 
         bones_to_delete = self._collect_ffxiv_bone_updates(meta_rig, pose_ops_stack)
         self._remove_edit_bones(meta_rig, bones_to_delete)
@@ -221,6 +223,8 @@ class AetherRigGenerator:
     ) -> rigify.settings.UI_Collections:
         ui_collections = rigify.settings.UI_Collections()
 
+        self._active_ui_flags.clear()
+
         for module_group in self.modules:
             for module in module_group:
                 integrity, module_pose_ops, module_ui_collections, module_new_ops = module.execute(meta_rig, generation_data)
@@ -236,6 +240,8 @@ class AetherRigGenerator:
                 if module_new_ops:
                     for operation in module_new_ops:
                         operation_stack.add_operation(operation)
+
+                self._active_ui_flags.update(module.ui_flags)
 
                 break
 
@@ -262,6 +268,12 @@ class AetherRigGenerator:
                 bones_to_delete.append(link_bone.name)
 
         return bones_to_delete
+
+    def _sync_ui_flags_property(self, armature: bpy.types.Object):
+        armature.aether_rig.ui_flags.clear()
+        for flag in sorted(self._active_ui_flags):
+            item = armature.aether_rig.ui_flags.add()
+            item.value = flag
 
     def _remove_edit_bones(self, rig_object: bpy.types.Object, bone_names: list[str]):
         if not bone_names:
@@ -348,3 +360,4 @@ class AetherRigGenerator:
         armature.aether_rig.rigified = True
         self._set_meta_rig_visibility(meta_rig, visible=False)
         utils.object.select_only(armature)
+        self._active_ui_flags.clear()

@@ -81,7 +81,7 @@ def get_rig_module() -> RigModule:
         name="IVCS Female",
         type="Generation",
         bone_groups=[GENITALS_F],
-        ui = UI_Collections([
+        ui_collections = UI_Collections([
             BoneCollection(name="Genitals (Female)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Female)", visible=False),
         ])
     )
