@@ -3,6 +3,8 @@ import addon_utils
 import collections
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
+from . import template_manager
+from .ui_links import UI_LINKS
 
 
 def _flatten_children(iterable):
@@ -10,6 +12,60 @@ def _flatten_children(iterable):
     for item in iterable:
         yield item
         yield from _flatten_children(item.children)
+
+
+MODULE_TYPE_ICONS = {
+    "Generation": 'GROUP_BONE',
+    "UI-Addon": 'OUTLINER_COLLECTION',
+    "Patch": 'MODIFIER',
+}
+
+def _format_module_family(module_key: str) -> str:
+    family_name = (module_key or '').split('.', 1)[0]
+    return family_name.replace('_', ' ').title() or "Misc"
+
+def _is_group_fallback(aether_rig, index: int) -> bool:
+    modules = getattr(aether_rig, 'modules', None)
+    if not modules or index <= 0 or index >= len(modules):
+        return False
+
+    group_index = getattr(modules[index], 'group_index', -1)
+    if group_index < 0:
+        return False
+
+    return getattr(modules[index - 1], 'group_index', -1) == group_index
+
+class AETHER_UL_RigModules(bpy.types.UIList):
+    """Display the currently selected rig modules in a Blender-style list."""
+    def draw_filter(self, context, layout):
+        # Intentionally draw nothing so Blender does not show the filter/sort footer.
+        pass
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        module = template_manager.AVAILABLE_MODULES.get(item.module_key)
+        if not module:
+            layout.label(text=item.module_key or "Unknown Module", icon='ERROR')
+            return
+
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            family_label = _format_module_family(item.module_key)
+            type_icon = MODULE_TYPE_ICONS.get(module.type, 'QUESTION')
+            is_fallback = _is_group_fallback(data, index)
+
+            split = layout.split(factor=0.72, align=True)
+            left = split.row(align=True)
+            right = split.row(align=True)
+            right.alignment = 'RIGHT'
+
+            if is_fallback:
+                left.label(text="", icon='TRIA_UP')
+
+            left.label(text=family_label, icon=type_icon)
+            right.label(text=module.name)
+        elif self.layout_type == 'GRID':
+            layout.alignment = 'CENTER'
+            layout.label(text="", icon='PROPERTIES')
+
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
     bl_label = "Create Rig"
@@ -65,19 +121,10 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         reset = full_rig_button.column(align=False)
         reset.scale_x = 1.3
         reset.operator("aether.reset_rig", text="", icon="RESTRICT_INSTANCED_ON")
-        
-        col.separator()
-        
-        row = col.row(align=True)
-        
-        meta_col = row.column(align=True)
-        meta_col.operator("aether.generate_meta_rig", text="Meta", icon="OUTLINER_DATA_ARMATURE")
-        
 
-        control_col = row.column(align=True)
-        control_col.enabled = bool(aether_rig.meta_rig)
-        
-        control_col.operator("aether.generate_rigify_rig", text="Control", icon="OUTLINER_OB_ARMATURE")
+        meta_rig_button = col.row(align=True)
+        meta_rig_button.scale_y = 0.95
+        meta_rig_button.operator("aether.generate_meta_rig", text="Generate Meta Rig", icon="ARMATURE_DATA")
 
         row = col.row(align=True)
 
@@ -90,6 +137,67 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         row = layout.row(align=True)
         row.label(text="Colorset", icon='COLOR')
         row.prop(aether_rig, "selected_colorset", text="")
+
+        if template_manager.is_custom_template_selected(aether_rig):
+            modules_box = layout.box()
+
+            header = modules_box.row(align=True)
+            left = header.row(align=True)
+            right = header.row(align=True)
+            right.alignment = 'RIGHT'
+            right.scale_x = 1.25
+
+            left.label(text="Custom Template", icon='MODIFIER')
+            right.menu("AETHER_MT_populate_custom_template_menu", text="Pop.", icon='IMPORT')
+
+            save_row = modules_box.row(align=True)
+            save_row.prop(aether_rig, "custom_template_name", text="Name")
+            save_row.operator("aether.save_custom_template_json", text="", icon='FILE_TICK')
+            save_row.operator("aether.export_custom_template_clipboard", text="", icon='COPYDOWN')
+            save_row.operator("aether.import_custom_template_clipboard", text="", icon='PASTEDOWN')
+            
+
+            row = modules_box.row()
+            list_col = row.column(align=True)
+
+            list_col.template_list(
+                "AETHER_UL_RigModules",
+                "",
+                aether_rig,
+                "modules",
+                aether_rig,
+                "module_index",
+                rows=max(4, min(10, max(1, len(aether_rig.modules))))
+                if len(aether_rig.modules) > 0 else 4,
+                sort_lock=True,
+            )
+
+            has_selection = 0 <= aether_rig.module_index < len(aether_rig.modules)
+            buttons = row.column(align=True)
+
+            buttons.menu("AETHER_MT_add_group_module_menu", text="", icon='ADD')
+
+            add_fallback_col = buttons.column(align=True)
+            add_fallback_col.enabled = has_selection
+            add_fallback_col.menu("AETHER_MT_add_fallback_module_menu", text="", icon='LINKED')
+
+            buttons.separator()
+
+            move_col = buttons.column(align=True)
+            move_col.enabled = has_selection
+
+            move_up = move_col.operator("aether.move_template_module", text="", icon='TRIA_UP')
+            move_up.direction = 'UP'
+
+            move_down = move_col.operator("aether.move_template_module", text="", icon='TRIA_DOWN')
+            move_down.direction = 'DOWN'
+
+            buttons.separator()
+
+            remove_col = buttons.column(align=True)
+            remove_col.enabled = has_selection
+            remove = remove_col.operator("aether.remove_template_module", text="", icon='REMOVE')
+            remove.module_index = aether_rig.module_index
 
 
 class AETHER_PT_RigManipulation(bpy.types.Panel):
@@ -125,7 +233,7 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
             return
         
         row = layout.row(align=True)
-        row.label(text="Inherit Scale", icon='BONE_DATA')
+        row.label(text="Inherit Scale", icon='ORIENTATION_PARENT')
         
         current_text = "Full"
         if aether_rig:
@@ -140,6 +248,16 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
         
         row.operator_menu_enum("aether.set_bone_inherit_scale", "inherit_scale", text=current_text)
 
+        layout.separator()
+
+        row = layout.row(align=True)
+
+        row.label(text="NoAnim Bones", icon='BONE_DATA')
+        row.operator(
+            "aether.delete_no_anim",
+            text="Delete",
+            icon="TRASH", 
+            )
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
     bl_label = "Rig Layers"
@@ -217,7 +335,6 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
             else:
                 row.separator()
 
-
 class AETHER_PT_RigUIPanel(bpy.types.Panel):
     bl_label = "Rig UI"
     bl_idname = "AETHER_PT_rig_ui"
@@ -237,7 +354,6 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         if not armature or armature.type != 'ARMATURE':
             return False
         
-        # Get rig_id from armature custom properties
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return False
@@ -259,37 +375,29 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         if not rig_id:
             return
             
+        aether_rig = getattr(armature, 'aether_rig', None)
+        # if not aether_rig:
+        #     return
+            
         panel_name = "VIEW3D_PT_rig_ui_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
         
+        ## Draw Links
+        flags = [item.value for item in aether_rig.ui_flags]
+            
+        for flag in flags:
+            ui_link = UI_LINKS.get(flag)
+            if not ui_link:
+                continue
+            ui_link.draw(context, self.layout)
+
+        ## Draw Rigify UI
         if panel_class and hasattr(panel_class, 'draw'):
-
-            # layout = self.layout
-            
-            # selected_bones = {bone.name for bone in context.selected_pose_bones or []}
-            
-            # controllers_to_show = []
-            # for bone_name in selected_bones:
-            #     if bone_name in UI_CONTROLLER_MAPPING:
-            #         controllers_to_show.extend(UI_CONTROLLER_MAPPING[bone_name])
-            
-            # seen = set()
-            # unique_controllers = []
-            # for controller in controllers_to_show:
-            #     if controller.name not in seen:
-            #         seen.add(controller.name)
-            #         unique_controllers.append(controller)
-            
-            # if unique_controllers:
-            #     for controller in unique_controllers:
-            #         controller.create_ui(layout, armature)
-
             panel_class.draw(self, context)
         else:
             # Fallback to default behavior if panel not found
             layout = self.layout
             layout.label(text=f"Rig UI panel not found for: {rig_id}")
-       
 
 
 class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
@@ -298,7 +406,7 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 8
+    bl_order = 9
 
     @classmethod
     def poll(cls, context):
@@ -345,6 +453,7 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
             layout.label(text=f"Rig bake settings panel not found for: {rig_id}")
 
 def register():
+    bpy.utils.register_class(AETHER_UL_RigModules)
     bpy.utils.register_class(AETHER_PT_RigCreation)
     bpy.utils.register_class(AETHER_PT_RigManipulation)
     bpy.utils.register_class(AETHER_PT_RigLayersPanel)
@@ -352,8 +461,9 @@ def register():
     bpy.utils.register_class(AETHER_PT_RigBakeSettingsPanel)
 
 def unregister():
-    bpy.utils.unregister_class(AETHER_PT_RigCreation)
-    bpy.utils.unregister_class(AETHER_PT_RigManipulation)
-    bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
-    bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
     bpy.utils.unregister_class(AETHER_PT_RigBakeSettingsPanel)
+    bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
+    bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
+    bpy.utils.unregister_class(AETHER_PT_RigManipulation)
+    bpy.utils.unregister_class(AETHER_PT_RigCreation)
+    bpy.utils.unregister_class(AETHER_UL_RigModules)

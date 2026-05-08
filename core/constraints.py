@@ -11,7 +11,6 @@ class Constraint(ABC):
         """Applies the constraint to the given bone."""
         pass
 
-
 @dataclass(frozen=True)
 class CopyScaleConstraint(Constraint):
     target_bone: str | None = None
@@ -44,7 +43,6 @@ class CopyScaleConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
-
 
 @dataclass(frozen=True)
 class CopyLocationConstraint(Constraint):
@@ -80,7 +78,6 @@ class CopyLocationConstraint(Constraint):
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
 
-
 @dataclass(frozen=True)
 class CopyRotationConstraint(Constraint):
     target_bone: str | None = None
@@ -115,7 +112,6 @@ class CopyRotationConstraint(Constraint):
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
 
-
 @dataclass(frozen=True)
 class CopyTransformsConstraint(Constraint):
     target_bone: str | None = None
@@ -143,7 +139,6 @@ class CopyTransformsConstraint(Constraint):
         constraint.target_space = self.target_space
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence
-
 
 @dataclass(frozen=True)
 class TrackToConstraint(Constraint):
@@ -182,3 +177,24 @@ class TrackToConstraint(Constraint):
             else:
                 print(f"[AetherBlend] Warning: Space object '{self.space_object}' not found for Track To constraint.")
         constraint.influence = self.influence
+
+@dataclass(frozen=True)
+class DampedTrackConstraint(Constraint):
+    target_bone: str
+    track_axis: str = "TRACK_Y"
+    head_tail: float = 0
+    influence: float = 1
+    name: str = "AetherBlend_DampedTrack"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+       constraint = bone.constraints.new(type="DAMPED_TRACK")
+       constraint.name = self.name
+       target_obj = armature
+       if not target_obj:
+           print(f"[AetherBlend] Target object not found for Damped Track constraint.")
+           return
+       constraint.target =  target_obj
+       constraint.subtarget = self.target_bone
+       constraint.track_axis = self.track_axis
+       constraint.influence = self.influence
+       constraint.head_tail = self.head_tail

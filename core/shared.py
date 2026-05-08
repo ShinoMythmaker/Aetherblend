@@ -1,76 +1,22 @@
 import bpy
 
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
+from typing import Literal
+
+
 
 if TYPE_CHECKING:
-    from .generators import BoneGenerator
+    from .bone_generators import BoneGenerator
 
+from .operations import ABOperation, PoseOperations, PoseOperationsStack, TransformLink
 from . import rigify
-from .constraints import Constraint, CopyTransformsConstraint
-from .. import utils
+from .bone_generators import BoneGenerator
 
-
-@dataclass
-class PoseOperations:
-    """Groups all pose mode operations for a single bone."""
-    rigify_settings: 'rigify.types.rigify_type | None' = None
-    constraints: 'list[Constraint] | None' = None
-    b_collection: str | None = None
-
-    def execute(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object):
-        """Executes all pose operations on the given pose bone."""
-        try:
-            if self.rigify_settings:
-                self.rigify_settings.apply(pose_bone, armature)
-            
-            if self.constraints:
-                for constraint in self.constraints:
-                    constraint.apply(pose_bone, armature)
-            
-            if self.b_collection:
-                utils.armature.b_collection.assign_bones(armature, [pose_bone.name], self.b_collection)
-        except Exception as e:
-            print(f"[AetherBlend] Error executing PoseOperations for bone: {e}")
-
-@dataclass
-class TransformLink:
-    """Links a bone to a target for rigging purposes."""
-    target: str
-    bone: str
-    retarget: str | None = None
-
-    def mark_linked(self, armature: bpy.types.Object) -> None:
-        """Marks the bone as linked in the armature's data."""
-        bone = armature.data.bones.get(self.bone)
-        if bone:
-            bone["ab_linked"] = True
-
-    def to_pose_operations(self) -> dict[str, list[PoseOperations]]:
-        """Convert this TransformLink to PoseOperations."""
-        pose_operations_dict: dict[str, list[PoseOperations]] = {}
-        
-        ff_bone = self.bone
-        link_bone = f"LINK-{ff_bone}"
-        if ff_bone not in pose_operations_dict:
-            pose_operations_dict[ff_bone] = []
-        pose_operations_dict[ff_bone].append(
-            PoseOperations(
-                constraints=[CopyTransformsConstraint(link_bone, name=f"AB-LINK@LINK-{ff_bone}", remove_target_shear=True)]
-            )
-        )
-
-        if link_bone not in pose_operations_dict:
-            pose_operations_dict[link_bone] = []
-        pose_operations_dict[link_bone].append(
-            PoseOperations(
-                rigify_settings=rigify.types.basic_raw_copy(True, self.target)
-            )
-        )
-        return pose_operations_dict
-    
-
+ModuleType = Literal["Generator", "Patch","UI-Addon"]
+UI_Type = Literal["checkbox", "slider", "dropdown"]
+  
 class Override(ABC):
     """Overrides properties of a bone."""
     bone: str
@@ -139,20 +85,26 @@ class PropOverride(Override):
         except Exception as e:
             print(f"[AetherBlend] Error applying PropOverride for bone '{pose_bone.name}': {e}")
 
-
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
     name: str
     description: str = ""
-    transform_link: list[TransformLink] | None = None
-    bones: 'list[BoneGenerator] | None' = None
+    transform_link: list[TransformLink] = field(default_factory=list)
+    generators: list[BoneGenerator] = field(default_factory=list)
+    operations: list[ABOperation] = field(default_factory=list)
+
+    def __post_init__(self):
+        # Defensive copies prevent template-level singletons from sharing runtime state.
+        self.transform_link = list(self.transform_link)
+        self.generators = list(self.generators)
+        self.operations = list(self.operations)
     
     def check(self, armature: bpy.types.Object) -> bool:
         """Check if all required bones exist in the armature for this bone group."""
         future_bones = []
         
-        for bone_gen in self.bones:
+        for bone_gen in self.generators:
             future_bones.append(bone_gen.name)
             
             if bone_gen.req_bones:
@@ -166,43 +118,62 @@ class BoneGroup:
                             return False
         return True
     
-    def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str]:
+    def generate(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], list[ABOperation]]:
         """Generate all bones in this group."""
-        generated_bones = []
-        
-        for bone_gen in self.bones:
+
+        generated_bones: list[str] = []
+        generated_operations: list[ABOperation] = list(self.operations)
+
+        for bone_gen in self.generators:
+            # Generators are template singletons; isolate runtime-emitted operations per execution.
+            static_operations = list(bone_gen.operations)
+            bone_gen.operations = []
             new_bones = bone_gen.generate(armature, data=data)
+            runtime_operations = list(bone_gen.operations)
+            bone_gen.operations = static_operations
+
+            if static_operations:
+                generated_operations.extend(static_operations)
+            if runtime_operations:
+                generated_operations.extend(runtime_operations)
             if new_bones:
                 generated_bones.extend(new_bones)
+
+        return generated_bones, generated_operations
         
-        return generated_bones
     
-    def execute(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], dict[str, list[PoseOperations]]]:
+    def execute(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], dict[str, list[PoseOperations]], list[ABOperation]]:
         """Execute the full generation process for this bone group."""
         # Check if bone group can theoriticlly be generated
         if not self.check(armature):
             print(f"[AetherBlend] BoneGroup '{self.name}' check failed - missing required bones")
-            return [], {}
+            return [], {}, []
         
         bpy.ops.object.mode_set(mode='EDIT')
         
-        # Generate bones
-        generated_bones = self.generate(armature, data=data)
+        # Generate bones and collect runtime operations for this execution only.
+        generated_bones, generated_operations = self.generate(armature, data=data)
         
         # Collect Pose Operations
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
 
-        # Add TransformLink operations
+        # # Add TransformLink operations
+        # bpy.ops.object.mode_set(mode='OBJECT')
+        # for link_item in self.transform_link:
+        #     link_item.mark_linked(armature)
+        #     for bone_name, operations in link_item.to_pose_operations().items():
+        #         if bone_name not in pose_operations_dict:
+        #             pose_operations_dict[bone_name] = []
+        #         pose_operations_dict[bone_name].extend(operations)
+
         bpy.ops.object.mode_set(mode='OBJECT')
-        for link_item in self.transform_link or []:
+        for link_item in self.transform_link:
             link_item.mark_linked(armature)
-            for bone_name, operations in link_item.to_pose_operations().items():
-                if bone_name not in pose_operations_dict:
-                    pose_operations_dict[bone_name] = []
-                pose_operations_dict[bone_name].extend(operations)
+            for operation in link_item.to_ABOperation():
+                generated_operations.append(operation)
         
         # Add BoneGenerator pose operations
-        for bone_gen in self.bones:
+        for bone_gen in self.generators:
             # Collect dynamic pose operations (empty dict for most generators)
             dynamic_ops = bone_gen.get_dynamic_pose_operations()
             for bone_name, operations in dynamic_ops.items():
@@ -219,48 +190,104 @@ class BoneGroup:
                         pose_operations_dict[bone_name] = []
                     pose_operations_dict[bone_name].extend(operations)
             
-            # Add static pose operations from the generator
             if bone_gen.pose_operations:
                 if bone_gen.name not in pose_operations_dict:
                     pose_operations_dict[bone_gen.name] = []
                 pose_operations_dict[bone_gen.name].append(bone_gen.pose_operations)
         
-        return generated_bones, pose_operations_dict
+        return generated_bones, pose_operations_dict, generated_operations
     
-@dataclass(frozen=True)
-class AetherRigGenerator:
-    """Generates an armature based on defined bone groups."""
+@dataclass
+class UILink:
+    """Defines a link between a bone or armature property and a UI element"""
+    
+    property_name: str
+    title: str
+    bone_name: str | None = None
+    constraint_name: str | None = None
+    white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show. 
+    ui_type: UI_Type = "checkbox"
+    ui_params: dict | None = None  # Additional parameters for the UI element
+     
+
+    def draw(self, context, layout: bpy.types.UILayout):
+        """Draws the UI element for this link."""
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            return
+
+        # Collect selected pose bones (only available in POSE mode).
+        selected_bones: set[str] = set()
+        if context.mode == 'POSE':
+            try:
+                selected_bones = set(bone.name for bone in (context.selected_pose_bones or []))
+                if context.active_pose_bone:
+                    selected_bones.add(context.active_pose_bone.name)
+            except (AttributeError, TypeError):
+                pass
+
+        # Apply whitelist: skip drawing unless a whitelisted bone is selected.
+        if self.white_list:
+            if not selected_bones.intersection(self.white_list):
+                return
+
+        target = armature.data
+        if self.bone_name:
+            target = armature.pose.bones.get(self.bone_name)
+            if not target:
+                return
+            if self.constraint_name:
+                target = target.constraints.get(self.constraint_name)
+                if not target:
+                    return
+
+        col = layout.column(align=True)
+        if self.ui_type == "checkbox":
+            col.prop(target, "mute", text=self.title)
+        elif self.ui_type == "slider":
+            col.prop(target, self.property_name, text=self.title, slider=True, **(self.ui_params or {}))
+        elif self.ui_type == "dropdown":
+            col.prop(target, self.property_name, text=self.title, **(self.ui_params or {}))
+        else:
+            print(f"[AetherBlend] Unknown UI element type '{self.ui_type}' for UILink '{self.title}'")
+
+        
+    
+
+@dataclass
+class RigModule:
+    """Defines a rig module and its behavior category."""
     name: str
-    color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None
-    ui_collections: 'list[dict[str, rigify.BoneCollection]] | None' = None
-    overrides: 'list[dict[str, Override]] | None' = None
-    bone_groups: 'list[dict[str, list[BoneGroup]]] | None' = None
+    type: ModuleType
+    bone_groups: list[BoneGroup]
+    ui_collections: rigify.settings.UI_Collections | None = None
+    operations: list[ABOperation] = field(default_factory=list)
+    ui_flags: list[str] = field(default_factory=list)
 
-    def getColorSets(self) -> dict[str, rigify.ColorSet]:
-        """Combine all color sets into a single dictionary."""
-        combined: dict[str, rigify.ColorSet] = {}
-        for cs_dict in self.color_sets or []:
-            combined.update(cs_dict)
-        return combined
-    
-    def getUICollections(self) -> dict[str, rigify.BoneCollection]:
-        """Combine all UI collections into a single dictionary."""
-        combined: dict[str, rigify.BoneCollection] = {}
-        for ui_dict in self.ui_collections or []:
-            combined.update(ui_dict)
-        return combined
-    
-    def getOverrides(self) -> dict[str, Override]:
-        """Combine all widget overrides into a single dictionary."""
-        combined: dict[str, Override] = {}
-        for ov_dict in self.overrides or []:
-            combined.update(ov_dict)
-        return combined
-    
-    def getBoneGroups(self) -> dict[str, list[BoneGroup]]:
-        """Combine all bone groups into a single dictionary."""
-        combined: dict[str, list[BoneGroup]] = {}
-        for bg_dict in self.bone_groups or []:
-            combined.update(bg_dict)
-        return combined
+    def execute(self, armature: bpy.types.Object, data: dict) -> tuple[bool, PoseOperationsStack, rigify.settings.UI_Collections | None, list[ABOperation]]:
+        bpy.context.view_layer.objects.active = armature
+        pose_op_stack = PoseOperationsStack()
+        module_operations: list[ABOperation] = list(self.operations)
+        integrity = False
+        if self.type == "Patch" or self.type == "UI-Addon":
+            integrity = True
+        for bone_group in self.bone_groups:
+            bones, pose_ops, operations = bone_group.execute(armature, data)
 
+            if not bones and not pose_ops:
+                continue 
+                
+            integrity = True
+            pose_op_stack.merge(PoseOperationsStack(stack = pose_ops))
+            module_operations.extend(operations or [])
+
+            
+        return integrity, pose_op_stack, self.ui_collections, module_operations
+
+
+@dataclass(frozen=True)
+class Template():
+    """Defines a rig template with its properties and modules."""
+    name: str
+    overrides: 'list[dict[str, Override]] | None'
+    modules: 'list[list[RigModule]]'

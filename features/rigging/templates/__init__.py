@@ -1,34 +1,79 @@
-from ....core.shared import AetherRigGenerator, WidgetOverride
+import importlib
+import pkgutil
+from collections import defaultdict
+
+from ....core.shared import RigModule
 from ....core.rigify import *
 
 
 from .colorsets import *
-from .ui_collections import *
 from .overrides import *
-from .bone_groups import *
+from . import modules as module_root
+
+from .modules import *
 
 
-## Templates
-TEMPLATES = {
-    'Player SFW':   AetherRigGenerator (
-        name = "Player SFW",
-        color_sets=[CS_AETHER_BLEND],
-        ui_collections=[UI_PLAYER_SFW],  
-        overrides=[WO_DEFAULT, PO_DEFAULT],
-        bone_groups = [BG_PLAYER_SFW]
-    ),
-    'Player SFW (IVCS)': AetherRigGenerator(
-        name= "Player SFW (IVCS)",
-        color_sets=[CS_AETHER_BLEND],
-        ui_collections=[UI_PLAYER_SFW_IV],  
-        overrides=[WO_DEFAULT, PO_DEFAULT],
-        bone_groups = [BG_PLAYER_SFW_IV]
-    ),
-    'Player NSFW (IVCS)': AetherRigGenerator(
-        name= "Player NSFW (IVCS)",
-        color_sets=[CS_AETHER_BLEND],
-        ui_collections=[UI_PLAYER_NSFW_IV],  
-        overrides=[WO_NSFW, PO_DEFAULT],
-        bone_groups = [BG_PLAYER_NSFW_IV]
-    ),
-}
+def build_module_registry() -> tuple[
+    dict[str, RigModule],
+    dict[str, dict[str, RigModule]],
+    dict[str, dict[str, RigModule]],
+]:
+    """Auto-discover all rig modules from the modules package and group them by category and family."""
+    available_modules: dict[str, RigModule] = {}
+    modules_by_type: dict[str, dict[str, RigModule]] = defaultdict(dict)
+    modules_by_family: dict[str, dict[str, RigModule]] = defaultdict(dict)
+
+    for module_info in pkgutil.iter_modules(module_root.__path__):
+        if not module_info.ispkg or module_info.name.startswith("_"):
+            continue
+
+        family_name = module_info.name
+        family = importlib.import_module(f"{module_root.__name__}.{family_name}")
+
+        for attr_name in sorted(dir(family)):
+            if attr_name.startswith("_"):
+                continue
+
+            value = getattr(family, attr_name)
+            if not isinstance(value, RigModule):
+                continue
+
+            key = f"{family_name}.{attr_name}"
+            available_modules[key] = value
+            modules_by_type[value.type][key] = value
+            modules_by_family[family_name][key] = value
+
+    sorted_modules = dict(sorted(available_modules.items()))
+    sorted_types = {
+        module_type: dict(sorted(entries.items()))
+        for module_type, entries in sorted(modules_by_type.items())
+    }
+    sorted_families = {
+        family_name: dict(sorted(entries.items()))
+        for family_name, entries in sorted(modules_by_family.items())
+    }
+    return sorted_modules, sorted_types, sorted_families
+
+
+def get_modules_by_type(module_type: str | None = None):
+    """Return all modules grouped by type, or a single type bucket if requested."""
+    if module_type is None:
+        return MODULES_BY_TYPE
+    return MODULES_BY_TYPE.get(module_type, {})
+
+
+def get_modules_by_family(family_name: str | None = None):
+    """Return all modules grouped by family, or a single family bucket if requested."""
+    if family_name is None:
+        return MODULES_BY_FAMILY
+    return MODULES_BY_FAMILY.get(family_name, {})
+
+
+AVAILABLE_MODULES, MODULES_BY_TYPE, MODULES_BY_FAMILY = build_module_registry()
+MODULE_KEYS_BY_ID = {id(module): key for key, module in AVAILABLE_MODULES.items()}
+
+
+def get_module_key(module: RigModule) -> str:
+    """Resolve the registry key for a rig module instance."""
+    return MODULE_KEYS_BY_ID.get(id(module), "")
+

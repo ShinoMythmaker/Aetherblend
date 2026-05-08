@@ -14,7 +14,30 @@ class rigify_type:
         """
         raise NotImplementedError("Subclasses must implement apply()")
 
+    def set_fk_collection (self, rigify_params : bpy.types.PoseBone.rigify_parameters) -> None:
+        
+        try:
+            if self.fk_coll:
+                rigify_params.fk_coll_refs.clear()
+                bpy.ops.pose.rigify_collection_ref_add(prop_name="fk_coll_refs")
+                if len(rigify_params.fk_coll_refs) > 0:
+                    fk_ref = rigify_params.fk_coll_refs[-1]
+                    fk_ref.name = self.fk_coll
+        except Exception as e:
+                print(f"[AetherBlend] Error setting FK collection: {e}")
 
+    def set_tweak_collection (self, rigify_params : bpy.types.PoseBone.rigify_parameters) -> None:   
+
+        try:            
+            if self.tweak_coll:
+                rigify_params.tweak_coll_refs.clear()
+                bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
+                if len(rigify_params.tweak_coll_refs) > 0:
+                    tweak_ref = rigify_params.tweak_coll_refs[-1]
+                    tweak_ref.name = self.tweak_coll
+        except Exception as e:
+                print(f"[AetherBlend] Error setting Tweak collection: {e}")
+        
 @dataclass
 class limbs_leg(rigify_type):
     """Rigify type: limbs.leg - Used for leg rigs."""
@@ -31,25 +54,10 @@ class limbs_leg(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
-            if self.fk_coll:
-                rigify_params.fk_coll_refs.clear()
-                if self.fk_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="fk_coll_refs")
-                    if len(rigify_params.fk_coll_refs) > 0:
-                        fk_ref = rigify_params.fk_coll_refs[-1]
-                        fk_ref.name = self.fk_coll
+            super().set_fk_collection(rigify_params)
+            super().set_tweak_collection(rigify_params)
         except Exception as e:
-            print(f"[AetherBlend] Error setting FK collection: {e}")
-        try:
-            if self.tweak_coll:
-                rigify_params.tweak_coll_refs.clear()
-                if self.tweak_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
-                    if len(rigify_params.tweak_coll_refs) > 0:
-                        tweak_ref = rigify_params.tweak_coll_refs[-1]
-                        tweak_ref.name = self.tweak_coll
-        except Exception as e:
-            print(f"[AetherBlend] Error setting Tweak collection: {e}")
+            print(f"[AetherBlend] Error setting leg collections: {e}")
         
 
 @dataclass
@@ -68,21 +76,8 @@ class limbs_arm(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
-            if self.fk_coll:
-                rigify_params.fk_coll_refs.clear()
-                if self.fk_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="fk_coll_refs")
-                    if len(rigify_params.fk_coll_refs) > 0:
-                        fk_ref = rigify_params.fk_coll_refs[-1]
-                        fk_ref.name = self.fk_coll
-            
-            if self.tweak_coll:
-                rigify_params.tweak_coll_refs.clear()
-                if self.tweak_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
-                    if len(rigify_params.tweak_coll_refs) > 0:
-                        tweak_ref = rigify_params.tweak_coll_refs[-1]
-                        tweak_ref.name = self.tweak_coll
+            super().set_fk_collection(rigify_params)
+            super().set_tweak_collection(rigify_params)
         except Exception as e:
             print(f"[AetherBlend] Error setting arm collections: {e}")
 
@@ -90,7 +85,9 @@ class limbs_arm(rigify_type):
 class limbs_super_finger(rigify_type):
     """Rigify type: limbs.super_finger - Used for finger and toe rigs."""
     tweak_coll: str = None
+    tweak_layers_extra: bool = False
     make_extra_ik_control: bool = False
+    extra_ik_layers_extra: str = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
@@ -102,14 +99,17 @@ class limbs_super_finger(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
-            if self.tweak_coll:
-                rigify_params.tweak_coll_refs.clear()
-                if self.tweak_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
-                    if len(rigify_params.tweak_coll_refs) > 0:
-                        tweak_ref = rigify_params.tweak_coll_refs[-1]
-                        tweak_ref.name = self.tweak_coll
-            
+            super().set_tweak_collection(rigify_params)
+
+            if self.extra_ik_layers_extra:
+                rigify_params.extra_ik_layers_extra = True
+                rigify_params.extra_ik_coll_refs.clear()
+                if self.extra_ik_layers_extra in armature.data.collections:
+                    bpy.ops.pose.rigify_collection_ref_add(prop_name="extra_ik_coll_refs")
+                    if len(rigify_params.extra_ik_coll_refs) > 0:
+                        ik_ref = rigify_params.extra_ik_coll_refs[-1]
+                        ik_ref.name = self.extra_ik_layers_extra
+
             if self.make_extra_ik_control:
                 rigify_params.make_extra_ik_control = self.make_extra_ik_control
         except Exception as e:
@@ -135,6 +135,33 @@ class limbs_super_palm(rigify_type):
         except Exception as e:
             print(f"[AetherBlend] Error setting super palm parameters: {e}")
 
+@dataclass
+class limbs_spline_tentacle(rigify_type):
+    """Rigify type: limbs.spline_tentacle - Used for spline tentacle rigs."""
+
+    fk_coll: str = None
+    tweak_coll: str = None
+    sik_stretch_control: str = None
+
+    def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+        if pose_bone is None:
+            print(f"[AetherBlend] Warning: pose_bone is None")
+            return
+        
+        armature.data.bones.active = pose_bone.bone
+        pose_bone.rigify_type = "limbs.spline_tentacle"
+        rigify_params = pose_bone.rigify_parameters
+
+        try:
+            if self.sik_stretch_control is not None:
+                rigify_params.sik_stretch_control = self.sik_stretch_control
+
+            super().set_fk_collection(rigify_params)
+            super().set_tweak_collection(rigify_params)
+
+        except Exception as e:
+            print(f"[AetherBlend] Error setting spline tentacle parameters: {e}")
+
 
 @dataclass
 class spines_basic_spine(rigify_type):
@@ -153,21 +180,8 @@ class spines_basic_spine(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
-            if self.fk_coll:
-                rigify_params.fk_coll_refs.clear()
-                if self.fk_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="fk_coll_refs")
-                    if len(rigify_params.fk_coll_refs) > 0:
-                        fk_ref = rigify_params.fk_coll_refs[-1]
-                        fk_ref.name = self.fk_coll
-            
-            if self.tweak_coll:
-                rigify_params.tweak_coll_refs.clear()
-                if self.tweak_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
-                    if len(rigify_params.tweak_coll_refs) > 0:
-                        tweak_ref = rigify_params.tweak_coll_refs[-1]
-                        tweak_ref.name = self.tweak_coll
+            super().set_fk_collection(rigify_params)
+            super().set_tweak_collection(rigify_params)
             
             if self.pivot_pos is not None:
                 rigify_params.pivot_pos = self.pivot_pos
@@ -189,15 +203,9 @@ class spines_super_head(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
-            if self.tweak_coll:
-                rigify_params.tweak_coll_refs.clear()
-                if self.tweak_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
-                    if len(rigify_params.tweak_coll_refs) > 0:
-                        tweak_ref = rigify_params.tweak_coll_refs[-1]
-                        tweak_ref.name = self.tweak_coll
+            super().set_tweak_collection(rigify_params)
         except Exception as e:
-            print(f"[AetherBlend] Error setting tweak collection: {e}")
+            print(f"[AetherBlend] Error setting super head parameters: {e}")
 
 @dataclass
 class spines_basic_tail(rigify_type):
@@ -428,15 +436,9 @@ class face_basic_tongue(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
-            if self.tweak_coll:
-                rigify_params.tweak_coll_refs.clear()
-                if self.tweak_coll in armature.data.collections:
-                    bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
-                    if len(rigify_params.tweak_coll_refs) > 0:
-                        tweak_ref = rigify_params.tweak_coll_refs[-1]
-                        tweak_ref.name = self.tweak_coll
+            super().set_tweak_collection(rigify_params)
         except Exception as e:
-            print(f"[AetherBlend] Error setting tweak collection: {e}")
+            print(f"[AetherBlend] Error setting tongue tweak collection: {e}")
 
 @dataclass
 class basic_raw_copy(rigify_type):
@@ -493,6 +495,8 @@ RIGIFY_TYPE_REGISTRY = {
     "limbs.leg": limbs_leg,
     "limbs.arm": limbs_arm,
     "limbs.super_finger": limbs_super_finger,
+    "limbs.super_palm": limbs_super_palm,
+    "limbs.spline_tentacle": limbs_spline_tentacle,
     "spines.basic_spine": spines_basic_spine,
     "spines.super_head": spines_super_head,
     "spines.basic_tail": spines_basic_tail,

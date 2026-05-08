@@ -1,7 +1,7 @@
 import bpy
 from dataclasses import dataclass
 
-@dataclass(frozen=True)
+@dataclass
 class BoneCollection:
     name: str
     ui: bool = False
@@ -28,7 +28,7 @@ class BoneCollection:
             return None, False
         
         coll = armature.data.collections.get(self.name)
-        hide_collections = False
+        show_collection = True
         if coll:
             if self.ui:
                 if self.color_set:
@@ -37,11 +37,32 @@ class BoneCollection:
                 coll.rigify_ui_title = self.title
 
             if not self.visible:
-                hide_collections = True
+                show_collection = False
 
-            return coll,  hide_collections
-        return None, False
+            return coll,  show_collection
+        return None, True
     
+class UI_Collections:
+    collections: list[BoneCollection]
+
+    def __init__(self, collections: list[BoneCollection] | None = None):
+        self.collections = collections if collections else []
+
+    def add(self, diff: 'UI_Collections'):
+        """Adds another UI_Collections to this one, changing row IDs to avoid conflicts."""
+        max_row_index = max((coll.row_index for coll in self.collections), default=0)
+
+        for coll in diff.collections:
+            new_coll = BoneCollection(
+                name=coll.name,
+                ui=coll.ui,
+                color_set=coll.color_set,
+                row_index=coll.row_index + max_row_index + 1,
+                title=coll.title,
+                visible=coll.visible
+            )
+            self.collections.append(new_coll)
+
 @dataclass(frozen=True)
 class ColorSet:
     name: str
