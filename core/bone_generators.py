@@ -433,9 +433,6 @@ class ParallelBone(BoneGenerator):
         
         t = (target_coord_value - start_pos[coord_index]) / direction_vector[coord_index]
         
-        if t < 0:
-            print(f"[AetherBlend] Warning: ParallelBone '{self.name}' requires negative extension (t={t}). This may result in unexpected bone direction.")
-        
         tail_pos = start_pos + direction_vector * t
         
         if self.name in edit_bones:
