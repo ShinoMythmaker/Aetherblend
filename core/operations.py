@@ -57,6 +57,14 @@ class PoseOperationsStack:
                 self.stack[bone_name] = []
             self.stack[bone_name].extend(ops_list)
 
+    def remove_bones(self, bone_names: set[str]) -> None:
+        """Removes queued pose operations for bones that were explicitly deleted."""
+        if not bone_names:
+            return
+
+        for bone_name in bone_names:
+            self.stack.pop(bone_name, None)
+
     def execute(self, armature: bpy.types.Object):
         """Executes all PoseOperations in the stack on the corresponding bones."""
         for bone_name, ops_list in self.stack.items():
@@ -136,6 +144,18 @@ class ABOperationStack:
     def merge(self, other_stack: 'ABOperationStack'):
         for key in self.stack.keys():
             self.stack[key].extend(other_stack.stack[key])
+
+    def remove_bones(self, bone_names: set[str]) -> None:
+        """Removes queued operations that target bones that were explicitly deleted."""
+        if not bone_names:
+            return
+
+        for key, operations in self.stack.items():
+            self.stack[key] = [
+                operation
+                for operation in operations
+                if not (hasattr(operation, "bone_name") and getattr(operation, "bone_name") in bone_names)
+            ]
 
     def applyPrePoseOperations(self, armature: bpy.types.Object):
         self._apply_operations(self.stack['prePOSE'], armature)

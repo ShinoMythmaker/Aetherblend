@@ -71,6 +71,9 @@ class AetherRigGenerator:
 
         bones_to_delete = self._collect_ffxiv_bone_updates(meta_rig, pose_ops_stack)
         self._remove_edit_bones(meta_rig, bones_to_delete)
+        deleted_bones = set(bones_to_delete)
+        pose_ops_stack.remove_bones(deleted_bones)
+        operation_stack.remove_bones(deleted_bones)
 
         visible_collections = self._create_ui_collections(meta_rig, ui_collections)
         self._apply_meta_rig_operations(meta_rig, pose_ops_stack, operation_stack)
