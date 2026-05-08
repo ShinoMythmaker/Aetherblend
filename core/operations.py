@@ -308,8 +308,8 @@ class ParentBoneOperation(ABOperation):
             return
 
         try:
-            editBone.parent = parent_bone
             editBone.use_connect = self.is_connected
+            editBone.parent = parent_bone
         except Exception as e:
             print(f"[AetherBlend] Error applying ParentBoneOperation for bone '{self.bone_name}': {e}")
 
