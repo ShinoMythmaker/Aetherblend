@@ -39,8 +39,8 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
                 if not cplus_dict:
                     raise Exception('Invalid C+ String.')
 
-                if version not in [4, 5]:
-                    raise Exception('Unsupported C+ string (must be version 4 or 5).')
+                if version not in [4, 5, 6]:
+                    raise Exception('Unsupported C+ string (must be version 4, 5, or 6).')
             # MCDF C+ Strings are not compressed, and doesn't have a Version
             else:
                 cplus_dict = json.loads(decoded)
