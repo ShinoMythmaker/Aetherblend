@@ -126,6 +126,8 @@ class AetherRigGenerator:
         cleanup_existing: Callable[[], object] | None,
     ) -> bool:
         bpy.ops.object.mode_set(mode='OBJECT')
+        
+        utils.armature.reset_transforms(armature)
 
         armature.hide_set(False)
         utils.object.select_only(armature)
