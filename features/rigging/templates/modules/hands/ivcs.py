@@ -150,7 +150,7 @@ IV_HAND_R = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["j_hito_b_r", "iv_hito_c_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="index.R.002", collection_name="IVCS.R"),
+            operations=[CollectionOperation(time="Pre", bone_name="index.R.002", collection_name="Fingers.R"),
             ]
         ),
         #Middle
@@ -185,7 +185,7 @@ IV_HAND_R = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["iv_naka_c_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="middle.R.002", collection_name="IVCS.R"),
+            operations=[CollectionOperation(time="Pre", bone_name="middle.R.002", collection_name="Fingers.R"),
             ]
         ),
         #Ring
@@ -220,7 +220,7 @@ IV_HAND_R = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["iv_kusu_c_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="ring.R.002", collection_name="IVCS.R"),
+            operations=[CollectionOperation(time="Pre", bone_name="ring.R.002", collection_name="Fingers.R"),
             ]
         ),
         #Pinky
@@ -255,7 +255,7 @@ IV_HAND_R = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["iv_ko_c_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="pinky.R.002", collection_name="IVCS.R"),
+            operations=[CollectionOperation(time="Pre", bone_name="pinky.R.002", collection_name="Fingers.R"),
             ]
         ),
     ],
@@ -403,7 +403,7 @@ IV_HAND_L = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["iv_hito_c_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="index.L.002", collection_name="IVCS.L")]
+            operations=[CollectionOperation(time="Pre", bone_name="index.L.002", collection_name="Fingers.L")]
         ),
         #Middle
         ConnectBone(
@@ -437,7 +437,7 @@ IV_HAND_L = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["iv_naka_c_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="middle.L.002", collection_name="IVCS.L")]
+            operations=[CollectionOperation(time="Pre", bone_name="middle.L.002", collection_name="Fingers.L")]
         ),
         #Ring
         ConnectBone(
@@ -471,7 +471,7 @@ IV_HAND_L = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["iv_kusu_c_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="ring.L.002", collection_name="IVCS.L")]
+            operations=[CollectionOperation(time="Pre", bone_name="ring.L.002", collection_name="Fingers.L")]
         ),
         #Pinky
         ConnectBone(
@@ -505,7 +505,7 @@ IV_HAND_L = BoneGroup(
             axis="Y",
             start="head",
             req_bones=["iv_ko_c_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="pinky.L.002", collection_name="IVCS.L")]
+            operations=[CollectionOperation(time="Pre", bone_name="pinky.L.002", collection_name="Fingers.L")]
         ),
     ],
 )
@@ -518,8 +518,6 @@ def get_rig_module() -> RigModule:
         ui_collections = UI_Collections([
             BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=1, title="Fingers.L", visible=False),
             BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=1, title="Fingers.R", visible=False),
-            BoneCollection(name="IVCS.L", ui=True, color_set="IVCS", row_index=2, title="IVCS.L", visible=False),
-            BoneCollection(name="IVCS.R", ui=True, color_set="IVCS", row_index=2, title="IVCS.R", visible=False),
         ])
     )
 
