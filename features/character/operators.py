@@ -27,8 +27,9 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     s_merge_skin: BoolProperty(name="Merge Skin", description="Merges all skin objects", default=True)  # type: ignore
     s_merge_by_material: BoolProperty(name="Merge by Material", description="Merges all objects with the same material", default=True)  # type: ignore
     
-    s_import_with_shaders_setting: BoolProperty(name="Import with Meddle Shaders", description="Tries to also import all shaders from meddle shader cache", default=True)  # type: ignore
-        
+    s_import_with_meddle_shaders: BoolProperty(name="Use Meddle Shaders", description="Applies Meddle Shaders to equipment and character features using the Meddle shader cache", default=True)  # type: ignore
+    s_import_with_ffgear_shaders: BoolProperty(name="Use FFGear Shaders", description="Applies FFGear Shaders to equipment using the Meddle shader cache", default=True) # type: ignore
+
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
     s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
     s_create_backup_armature: BoolProperty(name="Create Backup Armature", description="Creates a backup armature for C+ reversion after import", default=True)  # type: ignore
@@ -115,7 +116,11 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         col = box.column(align=True)
         split = col.split(factor=indent)  
         split.label(text=" ")
-        split.prop(self, "s_import_with_shaders_setting")
+        split.prop(self, "s_import_with_meddle_shaders")
+
+        split = col.split(factor=indent)
+        split.label(text=" ")
+        split.prop(self, "s_import_with_ffgear_shaders")
 
         # Armature Section
         box = layout.box()
@@ -184,11 +189,16 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         if self.s_merge_skin:
             imported_objects = utils.object.merge_by_name(imported_objects, 'skin')
           
-        if self.s_import_with_shaders_setting:
+        if self.s_import_with_meddle_shaders:
             try:
                 utils.object.import_meddle_shader(self.filepath, imported_objects)
             except Exception as e:
                 self.report({'ERROR'}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}")
+        if self.s_import_with_ffgear_shaders:
+            try:
+                utils.object.import_ffgear_shader(self.filepath, imported_objects)
+            except Exception as e:
+                self.report({'ERROR'}, f"[AetherBlend] Failed to import FFGear Shaders. Applying default shaders instead: {e}")
 
     
         bpy.ops.object.select_all(action='DESELECT')

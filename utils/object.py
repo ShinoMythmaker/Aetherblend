@@ -157,6 +157,23 @@ def import_meddle_shader(filepath, imported_objects):
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")
 
+def import_ffgear_shader(filepath, imported_objects):
+    """Imports FFGear shaders for the given objects."""
+    for obj in imported_objects:
+        try:
+            if obj and obj.type == "MESH": 
+                obj.select_set(True)
+        except ReferenceError:
+            print(f"Skipping deleted object: {obj}")  
+        
+    character_directory = os.path.dirname(filepath)
+    ffgear_cache_directory = os.path.join(character_directory, "cache","")
+
+    try:
+        bpy.ops.ffgear.meddle_setup('EXEC_DEFAULT', directory = ffgear_cache_directory, filepath = ffgear_cache_directory, use_selected=True)
+    except Exception as e:
+        print(f"[AetherBlend] Failed to append FFGear shaders: {e}")
+
 def remove_shapekey(obj: bpy.types.Object, shapekey_name: str, enable_backup: bool = False, backup_shapekey_name: str = None) -> None:
     """
     Removes the specified shapekey from the object if it exists, or handles backup unmuting.
