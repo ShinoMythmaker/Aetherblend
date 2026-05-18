@@ -5,9 +5,9 @@ from ...utils.ui_visibility import visible_in_current_area
 
 
 
-class AETHER_PT_ffxiv_to_blend(bpy.types.Panel):
-    bl_label = "FFXIV to Blend"
-    bl_idname = "AETHER_PT_ffxiv_to_blend"
+class AETHER_PT_shaders(bpy.types.Panel):
+    bl_label = "Shaders"
+    bl_idname = "AETHER_PT_shaders"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'AetherBlend'
@@ -31,12 +31,14 @@ class AETHER_PT_ffxiv_to_blend(bpy.types.Panel):
 
         # create button for setting up iris node group
         row = layout.row()
-        row.operator("aether.setup_iris", text="Set Up Iris Node Group", icon='NODETREE')
+        row.operator("aether.shader_iris", text="AB Iris Shader", icon='NODETREE')
+        row = layout.row()
+        row.operator("aether.shader_limbal", text="AB Limbal Shader", icon='NODETREE')
 
 
 def register():
-    bpy.utils.register_class(AETHER_PT_ffxiv_to_blend)
+    bpy.utils.register_class(AETHER_PT_shaders)
 
 def unregister():
-    bpy.utils.unregister_class(AETHER_PT_ffxiv_to_blend)
+    bpy.utils.unregister_class(AETHER_PT_shaders)
         
