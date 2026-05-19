@@ -33,6 +33,32 @@ def get_value_from_material_property(material, property_name, default=None):
     return default
 
 
+def connect_sockets(node_tree: bpy.types.NodeTree, group_node: bpy.types.Node, input_dict: dict, output_dict: dict):
+    for output_name, connections in output_dict.items():
+        output_socket = group_node.outputs.get(output_name)
+        if not output_socket:
+            continue
+
+        for target_node_label, target_socket_name in connections:
+            target_socket = get_socket_by_node_label(node_tree, target_node_label, target_socket_name)
+            if not target_socket:
+                continue
+            print(f"Connecting {group_node.name} '{output_name}' to {target_node_label} '{target_socket_name}'")    
+            node_tree.links.new(output_socket, target_socket)
+    
+    for input_name, connections in input_dict.items():
+        input_socket = group_node.inputs.get(input_name)
+        if not input_socket:
+            continue
+
+        for target_node_label, target_socket_name in connections:
+            target_socket = get_socket_by_node_label(node_tree, target_node_label, target_socket_name)
+            if not target_socket:
+                continue
+            print(f"Connecting {group_node.name} '{input_name}' to {target_node_label} '{target_socket_name}'")
+            node_tree.links.new(target_socket, input_socket)
+
+
 def apply_material_property_to_socket(input_socket, material_prop):
     """Apply a material custom property to a node input socket default value."""
     if material_prop is None:
@@ -64,12 +90,17 @@ def apply_material_property_to_socket(input_socket, material_prop):
         input_socket.default_value[idx] = source_values[idx]
     
 
-def get_socket_by_name(node_tree, node_label, socket_name):
-    for node in node_tree.nodes:
+def get_socket_by_node_label(group_node, node_label, socket_name):
+    for node in group_node.nodes:
+        print(f"Checking node '{node.name}' with label '{node.label}' for socket '{socket_name}'")
         if node.label == node_label:
+            print(f"Found node '{node.name}' matching label '{node_label}'")
             for socket in node.inputs:
+                print(f"Checking input socket '{socket.name}'")
                 if socket.name == socket_name:
+                    print(f"Found input socket '{socket.name}' matching '{socket_name}'")
                     return socket
+    print(f"Socket '{socket_name}' not found in node group '{group_node.name}' for node label '{node_label}'")
     return None
 
 
