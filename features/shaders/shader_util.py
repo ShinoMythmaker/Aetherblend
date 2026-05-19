@@ -16,7 +16,7 @@ def append_node_group(group_name):
             raise ValueError(f"Node group '{group_name}' not found in {_NODE_GROUPS_BLEND}")
     return bpy.data.node_groups[group_name]
 
-def add_node_group_to_node_tree(material, node_group):
+def add_node_group_to_node_tree(material: bpy.types.Material, node_group: bpy.types.NodeTree) -> bpy.types.Node:
     if not material.node_tree:
         raise ValueError(f"Material '{material.name}' does not have a node tree.")
 
@@ -27,37 +27,43 @@ def add_node_group_to_node_tree(material, node_group):
     group_node.name = node_group.name
     return group_node
 
-def get_value_from_material_property(material, property_name, default=None):
+def remove_group_node_from_node_tree(node_tree: bpy.types.NodeTree, group_node_name: str):
+    group_node = node_tree.nodes.get(group_node_name)
+    if group_node:
+        node_tree.nodes.remove(group_node)
+
+def get_value_from_material_property(material: bpy.types.Material, property_name: str, default=None):
     if property_name in material:
         return material[property_name]
     return default
 
-
 def connect_sockets(node_tree: bpy.types.NodeTree, group_node: bpy.types.Node, input_dict: dict, output_dict: dict):
+    ###########
+    # Connect Outputs
+    ###########
     for output_name, connections in output_dict.items():
         output_socket = group_node.outputs.get(output_name)
         if not output_socket:
             continue
 
         for target_node_label, target_socket_name in connections:
-            target_socket = get_socket_by_node_label(node_tree, target_node_label, target_socket_name)
+            target_socket = get_input_socket_by_node_name(node_tree, target_node_label, target_socket_name)
             if not target_socket:
-                continue
-            print(f"Connecting {group_node.name} '{output_name}' to {target_node_label} '{target_socket_name}'")    
+                continue    
             node_tree.links.new(output_socket, target_socket)
-    
+    ############
+    # Connect Inputs
+    ############
     for input_name, connections in input_dict.items():
         input_socket = group_node.inputs.get(input_name)
         if not input_socket:
             continue
 
         for target_node_label, target_socket_name in connections:
-            target_socket = get_socket_by_node_label(node_tree, target_node_label, target_socket_name)
+            target_socket = get_output_socket_by_node_name(node_tree, target_node_label, target_socket_name)
             if not target_socket:
                 continue
-            print(f"Connecting {group_node.name} '{input_name}' to {target_node_label} '{target_socket_name}'")
             node_tree.links.new(target_socket, input_socket)
-
 
 def apply_material_property_to_socket(input_socket, material_prop):
     """Apply a material custom property to a node input socket default value."""
@@ -89,20 +95,29 @@ def apply_material_property_to_socket(input_socket, material_prop):
     for idx in range(min(target_len, len(source_values))):
         input_socket.default_value[idx] = source_values[idx]
     
-
-def get_socket_by_node_label(group_node, node_label, socket_name):
-    for node in group_node.nodes:
-        print(f"Checking node '{node.name}' with label '{node.label}' for socket '{socket_name}'")
+def get_socket_by_node_label(node_tree, node_label, socket_name):
+    for node in node_tree.nodes:
         if node.label == node_label:
-            print(f"Found node '{node.name}' matching label '{node_label}'")
             for socket in node.inputs:
-                print(f"Checking input socket '{socket.name}'")
                 if socket.name == socket_name:
-                    print(f"Found input socket '{socket.name}' matching '{socket_name}'")
                     return socket
-    print(f"Socket '{socket_name}' not found in node group '{group_node.name}' for node label '{node_label}'")
     return None
 
+def get_input_socket_by_node_name(node_tree, node_name, socket_name):
+    for node in node_tree.nodes:
+        if node.name == node_name:
+            for socket in node.inputs:
+                if socket.name == socket_name:
+                    return socket
+    return None
+
+def get_output_socket_by_node_name(node_tree, node_name, socket_name):
+    for node in node_tree.nodes:
+        if node.name == node_name:
+            for socket in node.outputs:
+                if socket.name == socket_name:
+                    return socket
+    return None
 
 def refresh_shader_dependency_state(context, objects, material):
     """Force evaluation so object-property-driven shader nodes update immediately."""
@@ -137,7 +152,6 @@ def refresh_shader_dependency_state(context, objects, material):
     scene = context.scene
     scene.frame_set(scene.frame_current)
     context.view_layer.update()
-
 
 def find_material_by_property(
     meshes: list[bpy.types.Object],

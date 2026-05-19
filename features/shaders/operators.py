@@ -8,10 +8,13 @@ _IRIS_SHADER_INPUT_CONNECTIONS = {}
 
 _IRIS_SHADER_OUTPUT_CONNECTIONS = {
     "Vector": [
-        ("g_SamplerDiffuse_PngCachePath", "Vector"),
-        ("g_SamplerNormal_PngCachePath", "Vector"),
-        ("g_SamplerMask_PngCachePath", "Vector")
+        ("Image Texture.001", "Vector"),
+        ("Image Texture", "Vector"),
+        ("Image Texture.002", "Vector")
     ],
+    "Limbal UV": [
+        ("[AetherBlend] Limbal Rings", "UVMap"),
+    ]
 }
 
 _IRIS_SHADER_CUSTOM_PROPERTIES = [
@@ -20,10 +23,10 @@ _IRIS_SHADER_CUSTOM_PROPERTIES = [
     ("Pupil Scale", 0.0)
 ]
 
-
 _LIMBAL_SHADER_INPUT_CONNECTIONS = {
     "UVMap": [
-        ("UVMap", "UV"),
+        ("UV Map", "UV"),
+        ("[AetherBlend] Eye Scaling", "Limbal UV"),
     ],
 }
 
@@ -35,9 +38,6 @@ _LIMBAL_SHADER_OUTPUT_CONNECTIONS = {
         ("Principled BSDF", "Emission Strength")
     ],
 }
-
-
-
 
 
 class AETHER_OT_S_Iris(bpy.types.Operator):
@@ -147,16 +147,9 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             eye_material = eyes[0][1]
 
             #####
-            # Add needed Custom Properties to Meshes
-            #####
-            # for obj, material in eyes:
-            #     for prop_name, default_value in _IRIS_SHADER_CUSTOM_PROPERTIES:
-            #         if prop_name not in obj:
-            #             obj[prop_name] = default_value
-
-            #####
             # Append Node Group and Add to Material
             #####
+            shader_util.remove_group_node_from_node_tree(eye_material.node_tree, self.group_name)
             node_group = shader_util.append_node_group(self.group_name)
             group_node = shader_util.add_node_group_to_node_tree(eye_material, node_group)
 
@@ -182,8 +175,8 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             #####
             # Style 
             #####
-            # group_node.location = (-1100, -600)
-            # group_node.width = 300
+            group_node.location = (-0, -1450)
+            group_node.width = 220
 
             shader_util.refresh_shader_dependency_state(
                 context,
