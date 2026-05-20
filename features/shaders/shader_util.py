@@ -1,6 +1,8 @@
+import os
+import bpy
 from pathlib import Path
 
-import bpy
+
 
 _ASSET_DIR = Path(__file__).resolve().parents[2] / "assets" / "blend"
 _NODE_GROUPS_BLEND = _ASSET_DIR / "node_groups.blend"
@@ -173,3 +175,38 @@ def find_material_by_property(
                 materials.add((mesh, material))
 
     return list(materials)
+
+def import_ffgear_shader(filepath, objects):
+    """Imports FFGear shaders for the given objects."""
+    for obj in objects:
+        try:
+            if obj and obj.type == "MESH": 
+                obj.select_set(True)
+        except ReferenceError:
+            print(f"Skipping deleted object: {obj}")  
+        
+    character_directory = os.path.dirname(filepath)
+    ffgear_cache_directory = os.path.join(character_directory, "cache","")
+
+    try:
+        bpy.ops.ffgear.meddle_setup('EXEC_DEFAULT', directory = ffgear_cache_directory, filepath = ffgear_cache_directory, use_selected=True)
+    except Exception as e:
+        print(f"[AetherBlend] Failed to append FFGear shaders: {e}")
+
+def import_meddle_shader(filepath, objects):
+    """Imports Meddle shaders for the given objects."""
+    for obj in objects:
+        try:
+            if obj and obj.type == "MESH": 
+                obj.select_set(True)
+        except ReferenceError:
+            print(f"Skipping deleted object: {obj}")  
+        
+    character_directory = os.path.dirname(filepath)
+    meddle_cache_directory = os.path.join(character_directory, "cache","")
+
+    try:
+        bpy.ops.meddle.import_shaders('EXEC_DEFAULT')  
+        bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)  
+    except Exception as e:
+        print(f"[AetherBlend] Failed to append Meddle shaders: {e}")

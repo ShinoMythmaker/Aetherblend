@@ -3,6 +3,7 @@ from typing import ClassVar
 
 from . import shader_util
 from ...utils.armature import find_meshes
+from ...preferences import get_preferences
 
 _IRIS_SHADER_INPUT_CONNECTIONS = {}
 
@@ -189,11 +190,95 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             self.report({'ERROR'}, str(e))
         return {'FINISHED'}
     
+class AETHER_OT_S_FFGear(bpy.types.Operator):
+    bl_idname = "aether.shader_ffgear"
+    bl_label = "Set Up FFGEAR"
+
+    filter_glob: bpy.props.StringProperty(default="*.nofilesplease", options={'HIDDEN'}) #type: ignore
+    filepath: bpy.props.StringProperty(subtype="FILE_PATH") #type: ignore
+
+    def invoke(self, context, event):
+        prefs = get_preferences()
+        if prefs.default_meddle_import_path:
+            self.filepath = prefs.default_meddle_import_path
+
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        try:
+            armature = context.active_object
+            if not armature or armature.type != 'ARMATURE':
+                self.report({'ERROR'}, "Please select an armature object.")
+                return {'CANCELLED'}
+            
+            # Get affected Meshes
+            meshes = find_meshes(armature)
+
+            # Reroute to FFGear Operator
+            shader_util.import_ffgear_shader(self.filepath, meshes)
+
+            # Making sure only rig is selcted afterwards
+            for obj in context.selected_objects:
+                obj.select_set(False)
+            
+            armature.select_set(True)
+        
+            self.report({'INFO'}, f"FFGEAR shader imported successfully.")
+        except ValueError as e:
+            self.report({'ERROR'}, str(e))
+        return {'FINISHED'}
+
+class AETHER_OT_S_Meddle(bpy.types.Operator):
+    bl_idname = "aether.shader_meddle"
+    bl_label = "Set Up Meddle"
+
+    filter_glob: bpy.props.StringProperty(default="*.nofilesplease", options={'HIDDEN'}) #type: ignore
+    filepath: bpy.props.StringProperty(subtype="FILE_PATH") #type: ignore
+
+    def invoke(self, context, event):
+        prefs = get_preferences()
+        if prefs.default_meddle_import_path:
+            self.filepath = prefs.default_meddle_import_path
+
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+    def execute(self, context):
+        try:
+            armature = context.active_object
+            if not armature or armature.type != 'ARMATURE':
+                self.report({'ERROR'}, "Please select an armature object.")
+                return {'CANCELLED'}
+            
+            # Get affected Meshes
+            meshes = find_meshes(armature)
+
+            # Reroute to Meddle Operator
+            shader_util.import_meddle_shader(self.filepath, meshes)
+
+            # Making sure only rig is selcted afterwards
+            for obj in context.selected_objects:
+                obj.select_set(False)
+            
+            armature.select_set(True)
+        
+            self.report({'INFO'}, f"Meddle shader imported successfully.")
+        except ValueError as e:
+            self.report({'ERROR'}, str(e))
+        return {'FINISHED'}
+
+
+
 
 def register():
     bpy.utils.register_class(AETHER_OT_S_Iris)
     bpy.utils.register_class(AETHER_OT_S_Limbal)
-
+    bpy.utils.register_class(AETHER_OT_S_FFGear)
+    bpy.utils.register_class(AETHER_OT_S_Meddle)
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_S_Iris)
     bpy.utils.unregister_class(AETHER_OT_S_Limbal)
+    bpy.utils.unregister_class(AETHER_OT_S_FFGear)
+    bpy.utils.unregister_class(AETHER_OT_S_Meddle)
+    

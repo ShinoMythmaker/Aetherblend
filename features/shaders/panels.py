@@ -31,9 +31,15 @@ class AETHER_PT_shaders(bpy.types.Panel):
 
         # create button for setting up iris node group
         row = layout.row()
+        row.operator("aether.shader_meddle", text="Meddle Shader", icon='NODETREE')
+        row = layout.row()
+        row.operator("aether.shader_ffgear", text="FFGEAR Shader", icon='NODETREE')
+        row = layout.row()
         row.operator("aether.shader_iris", text="AB Iris Shader", icon='NODETREE')
         row = layout.row()
         row.operator("aether.shader_limbal", text="AB Limbal Shader", icon='NODETREE')
+        
+        
 
 
 def register():
