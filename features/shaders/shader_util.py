@@ -189,9 +189,16 @@ def import_ffgear_shader(filepath, objects):
     ffgear_cache_directory = os.path.join(character_directory, "cache","")
 
     try:
-        bpy.ops.ffgear.meddle_setup('EXEC_DEFAULT', directory = ffgear_cache_directory, filepath = ffgear_cache_directory, use_selected=True)
+        result = bpy.ops.ffgear.meddle_setup(
+            'EXEC_DEFAULT',
+            directory=ffgear_cache_directory,
+            filepath=ffgear_cache_directory,
+            use_selected=True,
+        )
+        return 'FINISHED' in result
     except Exception as e:
         print(f"[AetherBlend] Failed to append FFGear shaders: {e}")
+        return False
 
 def import_meddle_shader(filepath, objects):
     """Imports Meddle shaders for the given objects."""
@@ -206,7 +213,9 @@ def import_meddle_shader(filepath, objects):
     meddle_cache_directory = os.path.join(character_directory, "cache","")
 
     try:
-        bpy.ops.meddle.import_shaders('EXEC_DEFAULT')  
-        bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)  
+        result_import = bpy.ops.meddle.import_shaders('EXEC_DEFAULT')
+        result_apply = bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)
+        return ('FINISHED' in result_import) and ('FINISHED' in result_apply)
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")
+        return False

@@ -1,6 +1,7 @@
 import bpy
 
 from ...properties.tab_prop import get_active_tab
+from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
 
 
@@ -29,15 +30,27 @@ class AETHER_PT_shaders(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        # create button for setting up iris node group
-        row = layout.row()
-        row.operator("aether.shader_meddle", text="Meddle Shader", icon='NODETREE')
-        row = layout.row()
-        row.operator("aether.shader_ffgear", text="FFGEAR Shader", icon='NODETREE')
-        row = layout.row()
-        row.operator("aether.shader_iris", text="AB Iris Shader", icon='NODETREE')
-        row = layout.row()
-        row.operator("aether.shader_limbal", text="AB Limbal Shader", icon='NODETREE')
+        has_meddle = addon_dependencies.is_addon_enabled(module_name="meddle", display_name="Meddle Tools")
+        has_ffgear = addon_dependencies.is_addon_enabled(module_name="ffgear", display_name="FFGear")
+
+        def draw_action_row(label: str, operator_id: str, *, enabled: bool):
+            row = layout.row(align=True)
+            split = row.split(factor=0.88, align=True)
+
+            left = split.row(align=True)
+            left.label(text=label, icon='ERROR' if not enabled else 'BLANK1')
+
+            right = split.row(align=True)
+            right.alignment = 'RIGHT'
+            right.enabled = enabled
+            right.operator(operator_id, text="", icon='NODETREE')
+
+        draw_action_row("Meddle Shader", "aether.shader_meddle", enabled=has_meddle)
+        draw_action_row("FFGear Shader", "aether.shader_ffgear", enabled=has_ffgear)
+
+        # AB Iris/Limbal rely on Meddle-import shader context.
+        draw_action_row("AB Iris Shader", "aether.shader_iris", enabled=has_meddle)
+        draw_action_row("AB Limbal Shader", "aether.shader_limbal", enabled=has_meddle)
         
         
 

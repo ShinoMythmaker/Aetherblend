@@ -4,6 +4,8 @@ from pathlib import Path
 import os
 import json
 
+from .utils import addon_dependencies
+
 TOGGLE_ITEMS = [('ON', "Enable", ""), ('OFF', "Disable", "")]
 GITHUB_URL = "https://github.com/ShinoMythmaker/Aetherblend"
 DISCORD_URL = "https://discord.gg/NEF7TdXGqH"
@@ -236,6 +238,47 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             split.label(text=label)
             toggle = split.row(align=True)
             toggle.prop(self, prop_name, expand=True)
+
+        dependency_col = layout.column(align=True)
+        dependency_col.label(text="External Add-ons", icon='PLUGIN')
+        for entry in addon_dependencies.REQUIRED_ADDONS:
+            addon_name = entry.get("name") or entry.get("module") or "Unknown add-on"
+            module_name = entry.get("module")
+            enabled = addon_dependencies.is_addon_enabled(
+                module_name=module_name,
+                display_name=entry.get("name"),
+            )
+
+            row = dependency_col.row(align=True)
+            split = row.split(factor=0.72, align=True)
+
+            left = split.row(align=True)
+            left.label(text=addon_name, icon='CHECKMARK' if enabled else 'ERROR')
+
+            right = split.row(align=True)
+            right.alignment = 'RIGHT'
+            right.ui_units_x = 10.0
+
+            action_row = right.row(align=True)
+            action_row.scale_y = 1.15
+
+            is_rigify = (module_name == "rigify") or (addon_name.lower() == "rigify")
+            if is_rigify and not enabled:
+                op = action_row.operator("preferences.addon_enable", text="Enable", icon='CHECKMARK')
+                op.module = "rigify"
+            elif is_rigify:
+                action_row.label(text="Built-in", icon='BLENDER')
+            else:
+                url = addon_dependencies.get_addon_support_url(
+                    module_name=module_name,
+                    display_name=entry.get("name"),
+                )
+                if url:
+                    action_row.operator("wm.url_open", text="GitHub", icon='URL').url = url
+                else:
+                    action_row.label(text="No Link", icon='INFO')
+
+        layout.separator()
 
         row = layout.row()
         row.prop(self, "tabs", expand=True)

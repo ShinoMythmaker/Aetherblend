@@ -6,6 +6,7 @@ import bpy
 from bpy.props import BoolProperty, StringProperty, EnumProperty
 
 from ... import utils
+from ...utils import addon_dependencies
 from ...utils.axis_conversion import AXIS_ITEMS
 from ...preferences import get_preferences
 from ...properties.tab_prop import set_active_tab
@@ -28,6 +29,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     s_merge_by_material: BoolProperty(name="Merge by Material", description="Merges all objects with the same material", default=True)  # type: ignore
     
     s_import_with_meddle_shaders: BoolProperty(name="Use Meddle Shaders", description="Applies Meddle Shaders to equipment and character features using the Meddle shader cache", default=True)  # type: ignore
+    s_import_ab_iris_shader: BoolProperty(name="AB Iris Shader", description="Apply the built-in AetherBlend Iris shader setup after Meddle shader import", default=True)  # type: ignore
+    s_import_ab_limbal_shader: BoolProperty(name="AB Limbal Shader", description="Apply the built-in AetherBlend Limbal shader setup after Meddle shader import", default=False)  # type: ignore
     s_import_with_ffgear_shaders: BoolProperty(name="Use FFGear Shaders", description="Applies FFGear Shaders to equipment using the Meddle shader cache", default=True) # type: ignore
 
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
@@ -62,6 +65,13 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         prefs = get_preferences()
         if prefs.default_meddle_import_path:
             self.filepath = prefs.default_meddle_import_path
+
+        if not addon_dependencies.is_addon_enabled(module_name="meddle", display_name="Meddle Tools"):
+            self.s_import_with_meddle_shaders = False
+            self.s_import_ab_iris_shader = False
+            self.s_import_ab_limbal_shader = False
+        if not addon_dependencies.is_addon_enabled(module_name="ffgear", display_name="FFGear"):
+            self.s_import_with_ffgear_shaders = False
 
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
@@ -113,14 +123,39 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         row = box.row()
         row.label(text="Shaders", icon="SHADING_RENDERED")
 
+        has_meddle = addon_dependencies.is_addon_enabled(module_name="meddle", display_name="Meddle Tools")
+        has_ffgear = addon_dependencies.is_addon_enabled(module_name="ffgear", display_name="FFGear")
+
         col = box.column(align=True)
-        split = col.split(factor=indent)  
+        split = col.split(factor=indent)
+        left = split.row(align=True)
+        left.alignment = 'RIGHT'
+        left.label(text="", icon='BLANK1' if has_meddle else 'ERROR')
+
+        meddle_toggle = split.row(align=True)
+        meddle_toggle.enabled = has_meddle
+        meddle_toggle.prop(self, "s_import_with_meddle_shaders")
+
+        split = col.split(factor=indent_nested)
         split.label(text=" ")
-        split.prop(self, "s_import_with_meddle_shaders")
+        iris_toggle = split.row(align=True)
+        iris_toggle.enabled = has_meddle and self.s_import_with_meddle_shaders
+        iris_toggle.prop(self, "s_import_ab_iris_shader")
+
+        split = col.split(factor=indent_nested)
+        split.label(text=" ")
+        limbal_toggle = split.row(align=True)
+        limbal_toggle.enabled = has_meddle and self.s_import_with_meddle_shaders
+        limbal_toggle.prop(self, "s_import_ab_limbal_shader")
 
         split = col.split(factor=indent)
-        split.label(text=" ")
-        split.prop(self, "s_import_with_ffgear_shaders")
+        left = split.row(align=True)
+        left.alignment = 'RIGHT'
+        left.label(text="", icon='BLANK1' if has_ffgear else 'ERROR')
+
+        ffgear_toggle = split.row(align=True)
+        ffgear_toggle.enabled = has_ffgear
+        ffgear_toggle.prop(self, "s_import_with_ffgear_shaders")
 
         # Armature Section
         box = layout.box()
@@ -189,14 +224,20 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         if self.s_merge_skin:
             imported_objects = utils.object.merge_by_name(imported_objects, 'skin')
           
+        meddle_shader_ok = False
         if self.s_import_with_meddle_shaders:
             try:
-                utils.object.import_meddle_shader(self.filepath, imported_objects)
+                ok = utils.object.import_meddle_shader(self.filepath, imported_objects)
+                meddle_shader_ok = bool(ok)
+                if not ok:
+                    self.report({'WARNING'}, "[AetherBlend] Meddle shader import skipped or failed; keeping default shaders")
             except Exception as e:
                 self.report({'ERROR'}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}")
         if self.s_import_with_ffgear_shaders:
             try:
-                utils.object.import_ffgear_shader(self.filepath, imported_objects)
+                ok = utils.object.import_ffgear_shader(self.filepath, imported_objects)
+                if not ok:
+                    self.report({'WARNING'}, "[AetherBlend] FFGear shader import skipped or failed; keeping default shaders")
             except Exception as e:
                 self.report({'ERROR'}, f"[AetherBlend] Failed to import FFGear Shaders. Applying default shaders instead: {e}")
 
@@ -256,6 +297,22 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
                 aether_rig.selected_template = template_manager.get_default_template_name()
 
             utils.object.select_only(armature)
+
+            if meddle_shader_ok and self.s_import_ab_iris_shader:
+                try:
+                    result = bpy.ops.aether.shader_iris('EXEC_DEFAULT')
+                    if 'FINISHED' not in result:
+                        self.report({'WARNING'}, "[AetherBlend] AB Iris shader setup did not finish")
+                except Exception as e:
+                    self.report({'WARNING'}, f"[AetherBlend] AB Iris shader setup failed: {e}")
+
+            if meddle_shader_ok and self.s_import_ab_limbal_shader:
+                try:
+                    result = bpy.ops.aether.shader_limbal('EXEC_DEFAULT')
+                    if 'FINISHED' not in result:
+                        self.report({'WARNING'}, "[AetherBlend] AB Limbal shader setup did not finish")
+                except Exception as e:
+                    self.report({'WARNING'}, f"[AetherBlend] AB Limbal shader setup failed: {e}")
         
         self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
         
