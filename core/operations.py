@@ -341,7 +341,7 @@ class DriverOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
     bone_name: str = field(default=None, kw_only=True)
     driver_name: str
-    property: tuple[str, int]
+    property: tuple[str, int] | str
     driver: Driver
     data: str | None = None ## Optional for referencing data blocks
 
@@ -361,7 +361,7 @@ class DriverOperation(ABOperation):
         try:
             self.driver.apply(target, self.property, armature)
         except Exception as e:
-            print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
+            print(f"[AetherBlend] Error applying DriverOperation for target '{target.name if hasattr(target, 'name') else target}': {e}")
 
 @dataclass()
 class CustomPropertyOperation(ABOperation):
