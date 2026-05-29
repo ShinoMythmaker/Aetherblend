@@ -57,11 +57,14 @@ class AetherRigGenerator:
             return None
 
         meta_rig = self._create_meta_rig(armature)
-        pose_ops_stack, operation_stack = self._build_operation_stacks(meta_rig)
+
+        generation_data = self._build_generation_data(armature)
+
+        pose_ops_stack, operation_stack = self._build_operation_stacks(meta_rig, generation_data)
 
         self._configure_meta_rig(armature, meta_rig)
 
-        generation_data = self._build_generation_data(armature)
+        
         ui_collections = self._run_generator_modules(
             meta_rig,
             generation_data,
@@ -248,7 +251,7 @@ class AetherRigGenerator:
         collections.move(unlinked_coll.index, 1)
         collections.move(ffxiv_coll.index, 2)
 
-    def _build_operation_stacks(self, meta_rig: bpy.types.Object) -> tuple[PoseOperationsStack, ABOperationStack]:
+    def _build_operation_stacks(self, meta_rig: bpy.types.Object, generation_data: dict | None = None) -> tuple[PoseOperationsStack, ABOperationStack]:
         pose_ops_stack = PoseOperationsStack()
         operation_stack = ABOperationStack()
 
@@ -257,6 +260,8 @@ class AetherRigGenerator:
 
         for operation in _DEFAULT_OPERATIONS:
             operation_stack.add_operation(operation)
+            if generation_data:
+                operation_stack.generation_data = generation_data
 
         return pose_ops_stack, operation_stack
 
@@ -289,11 +294,20 @@ class AetherRigGenerator:
             property_value="characterocclusion.shpk",
         )
 
+        iris_object = utils.object.find_by_armature_and_material_property(
+            armature=armature,
+            property_name="ShaderPackage",
+            property_value="iris.shpk",
+        )
+
         if not eye_occlusion_objects:
-            return None
+            print(f"[AetherBlend] Warning: No eye occlusion objects found for armature '{armature.name}'.")
+        if not iris_object:
+            print(f"[AetherBlend] Warning: No iris object found for armature '{armature.name}'.")
 
         return {
-            "eye_occlusion": eye_occlusion_objects[0],
+            "eye_occlusion": eye_occlusion_objects[0] if eye_occlusion_objects else None,
+            "iris": iris_object[0] if iris_object else None,
             "ffxiv_armature": armature,
         }
 
