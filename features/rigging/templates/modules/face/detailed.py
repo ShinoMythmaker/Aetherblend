@@ -490,9 +490,20 @@ LEFT_EYE = BoneGroup(
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabdn_01_l"], 
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002", collection_name="Face (Secondary)")]
+            
         ),
-
-
+        #Anchor Bone for closing eyes
+        ExtensionBone(
+            name="lid.B.L.002.anchor",
+            bone_a="lid.B.L.002",
+            axis_type="local",
+            axis="Y",
+            start="head",
+            parent="lid.B.L.002",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002.anchor", collection_name="MCH"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.002.anchor", rigify_type=rigify.types.basic_raw_copy())
+            ]
+        ),
         CopyBone(
             name="Eye.L",
             source_bone="j_f_eyepuru_l",
@@ -548,7 +559,18 @@ LEFT_EYE = BoneGroup(
             req_bones=["lid.B.L", "lid.B.L.002"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001", collection_name="Face (Secondary)")]
         ),
-
+        #Anchor Bone for closing eyes
+        ExtensionBone(
+            name="lid.B.L.001.anchor",
+            bone_a="lid.B.L.001",
+            axis_type="local",
+            axis="Y",
+            start="head",
+            parent="lid.B.L.001",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001.anchor", collection_name="MCH"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.001.anchor", rigify_type=rigify.types.basic_raw_copy())
+            ]
+        ),
         BridgeBone(
             name="lid.B.L.003",
             bone_a="lid.B.L.002",
@@ -558,8 +580,18 @@ LEFT_EYE = BoneGroup(
             req_bones=["lid.B.L.002", "lid.T.L"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003", collection_name="Face (Secondary)")]
         ),
-
-
+        #Anchor Bone for closing eyes
+        ExtensionBone(
+            name="lid.B.L.003.anchor",
+            bone_a="lid.B.L.003",
+            axis_type="local",
+            axis="Y",
+            start="head",
+            parent="lid.B.L.003",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003.anchor", collection_name="MCH"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.003.anchor", rigify_type=rigify.types.basic_raw_copy())
+            ]
+        ),
         ConnectBone(
             name="eye_tracker.B.L.001",
             bone_a="j_f_mabdn_03in_l",
@@ -668,7 +700,7 @@ RIGHT_EYE = BoneGroup(
         TransformLink(target="MCH-Eye.R", bone="j_f_eyepuru_r"),
     ],
     generators=[
-        ## Skin Bone, Basicly Corner Bones for the eyes
+        ## Skin Bone, Basically Corner Bones for the eyes
         SkinBone(
             name="lid.T.R", 
             bone_a="j_f_mabup_02out_r", 
@@ -699,6 +731,18 @@ RIGHT_EYE = BoneGroup(
             mesh_restriction="eye_occlusion",
             req_bones=["j_f_mabdn_01_r"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002", collection_name="Face (Secondary)")]
+        ),
+        #Anchor Bone for closing eyes
+        ExtensionBone(
+            name="lid.B.R.002.anchor",
+            bone_a="lid.B.R.002",
+            axis_type="local",
+            axis="Y",
+            start="head",
+            parent="lid.B.R.002",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002.anchor", collection_name="MCH"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.002.anchor", rigify_type=rigify.types.basic_raw_copy())
+            ]
         ),
         CopyBone(
             name="Eye.R",
@@ -732,11 +776,23 @@ RIGHT_EYE = BoneGroup(
             name="lid.B.R.001",
             bone_a="lid.B.R",
             bone_b="lid.B.R.002",
-            offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)),
+            offset_factor=mathutils.Vector((0.002, 0.0, 0.001)),
             is_connected=True,
             parent="Eye.R",
             req_bones=["lid.B.R", "lid.B.R.002"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001", collection_name="Face (Secondary)")]
+        ),
+        #Anchor Bone for closing eyes
+        ExtensionBone(
+            name="lid.B.R.001.anchor",
+            bone_a="lid.B.R.001",
+            axis_type="local",
+            axis="Y",
+            start="head",
+            parent="lid.B.R.001",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001.anchor", collection_name="MCH"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.001.anchor", rigify_type=rigify.types.basic_raw_copy())
+            ]
         ),
         BridgeBone(
             name="lid.B.R.003",
@@ -747,7 +803,18 @@ RIGHT_EYE = BoneGroup(
             req_bones=["lid.B.R.002", "lid.T.R"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003", collection_name="Face (Secondary)")]
         ),
-
+        #Anchor Bone for closing eyes
+        ExtensionBone(
+            name="lid.B.R.003.anchor",
+            bone_a="lid.B.R.003",
+            axis_type="local",
+            axis="Y",
+            start="head",
+            parent="lid.B.R.003",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003.anchor", collection_name="MCH"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.003.anchor", rigify_type=rigify.types.basic_raw_copy())
+            ]
+        ),
         ConnectBone(
             name="eye_tracker.B.R.001",
             bone_a="j_f_mabdn_03in_r",
