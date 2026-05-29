@@ -48,7 +48,7 @@ _LIMBAL_SHADER_OUTPUT_CONNECTIONS = {
 }
 
 # socket, material_prop, index (if applicable)
-_IRIS_SHADER_CUSTOM_PROPERTIES = []
+_IRIS_SHADER_CUSTOM_MAPPINGS = []
 
 _LIMBAL_SHADER_CUSTOM_MAPPING = [
     ("left_iris_limbal_ring_intensity", "LeftIrisColor", 3),
@@ -108,7 +108,7 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
             #### 
             # Apply custom Mapping
             ####
-            shader_util.pop_custom_mappings(eye_material, group_node, _IRIS_SHADER_CUSTOM_PROPERTIES)
+            shader_util.pop_custom_mappings(eye_material, group_node, _IRIS_SHADER_CUSTOM_MAPPINGS)
 
             #####
             ## Connect node group

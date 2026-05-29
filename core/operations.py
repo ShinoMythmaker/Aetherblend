@@ -81,6 +81,7 @@ class PoseOperationsStack:
 class ABOperation(ABC):
     mode: ClassVar[Mode] = "POSE"
     time: Time = field(default="Pre", kw_only=True)
+    data_dict: dict = field(default=None, kw_only=True)  # Optional dictionary for storing data references needed by the operation.
 
     @abstractmethod
     def apply(self, armature: bpy.types.Object):
@@ -338,22 +339,29 @@ class ParentBoneOperation(ABOperation):
 @dataclass()
 class DriverOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
-
-    bone_name: str
+    bone_name: str = field(default=None, kw_only=True)
     driver_name: str
-    bone_name: str
     property: tuple[str, int]
     driver: Driver
+    data: str | None = None ## Optional for referencing data blocks
 
     def apply(self, armature: bpy.types.Object):
         """Applies the driver operation to the given pose bone."""
         if not self._switch_mode():
             return
-        poseBone = self._getPoseBone(self.bone_name, armature)
+        target = None
+        if self.data is None and self.bone_name is not None:          
+            poseBone = self._getPoseBone(self.bone_name, armature)
+            target = poseBone
+        elif self.data is not None:
+            data_block = self.data_dict.get(self.data) if self.data_dict else None
+            if data_block is None:
+                return
+            target = data_block
         if not poseBone:
             return
         try:
-            self.driver.apply(poseBone, self.property, armature)
+            self.driver.apply(target, self.property, armature)
         except Exception as e:
             print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
 
@@ -387,7 +395,7 @@ class WidgetOperation(ABOperation):
     """Overrides the widget of a bone."""
     mode: ClassVar[Mode] = "POSE"
     time : Time = field(default="Post", kw_only=True)
-    
+
     bone_name: str
     custom_object: str | None = None
     translation: tuple[float, float, float] = (0.0, 0.0, 0.0)
