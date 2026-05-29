@@ -1,5 +1,5 @@
 from ......core.generators import ConnectBone, ExtensionBone
-from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
+from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
 from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
@@ -83,5 +83,11 @@ def get_rig_module() -> RigModule:
         bone_groups=[GENITALS_F],
         ui_collections = UI_Collections([
             BoneCollection(name="Genitals (Female)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Female)", visible=False),
-        ])
+        ]),
+        operations=[
+            WidgetOperation(bone_name="Clitoris", scale_factor=0.2),
+            WidgetOperation(bone_name="Vulva.R", scale_factor=0.2),
+            WidgetOperation(bone_name="Vulva.L", scale_factor=0.2),
+            WidgetOperation(bone_name="Vulva", scale_factor=0.2)
+        ]
     )

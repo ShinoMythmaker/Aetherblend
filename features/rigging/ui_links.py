@@ -17,7 +17,7 @@ UI_LINKS: dict[str, UILink] = {
     "Skirt Automation": UILink(
         property_name="skirt_automation",
         title="Skirt Automation",
-        white_list=["Skirt_Front.R", "Skirt_Front.R.001", "Skirt_Front.R.002", "Skirt_Side.R", "Skirt_Side.R.001", "Skirt_Side.R.002", "Skirt_Back.R", "Skirt_Back.R.001", "Skirt_Back.R.002"
+        white_list=["Skirt_Front.R", "Skirt_Front.R.001", "Skirt_Front.R.002", "Skirt_Side.R", "Skirt_Side.R.001", "Skirt_Side.R.002", "Skirt_Back.R", "Skirt_Back.R.001", "Skirt_Back.R.002",
                     "Skirt_Front.L", "Skirt_Front.L.001", "Skirt_Front.L.002", "Skirt_Side.L", "Skirt_Side.L.001", "Skirt_Side.L.002", "Skirt_Back.L", "Skirt_Back.L.001", "Skirt_Back.L.002",
                     "foot_ik.R", "foot_ik.L"],
         ui_type="slider",      

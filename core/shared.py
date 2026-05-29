@@ -289,5 +289,4 @@ class RigModule:
 class Template():
     """Defines a rig template with its properties and modules."""
     name: str
-    overrides: 'list[dict[str, Override]] | None'
     modules: 'list[list[RigModule]]'

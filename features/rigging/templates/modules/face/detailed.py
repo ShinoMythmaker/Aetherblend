@@ -1,7 +1,7 @@
 import mathutils
 
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation
+from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation
 from ......core.bone_generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -847,6 +847,23 @@ def get_rig_module() -> RigModule:
             BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=0, title="Face (Primary)", visible=False),
             BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=0, title="Face (Secondary)", visible=False),
             BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-        ])
+        ]),
+        operations=[
+            #Left Face
+            WidgetOperation(bone_name="Cheek.T.L",scale_factor=0.3,),
+            WidgetOperation(bone_name="Cheek.T.L.001",scale_factor=0.3,),
+            WidgetOperation(bone_name="Cheek.B.L.001",scale_factor=0.3,),
+            WidgetOperation(bone_name="Cheek.B.L",scale_factor=0.3,),
+            WidgetOperation(bone_name="Nose.L",scale_factor=0.3,),
+            WidgetOperation(bone_name="Nostril.L",scale_factor=0.2,),    
+            WidgetOperation(bone_name="Nose",scale_factor=0.2,),
+            #Right Face
+            WidgetOperation(bone_name="Cheek.T.R",scale_factor=0.3,),
+            WidgetOperation(bone_name="Cheek.T.R.001",scale_factor=0.3,),
+            WidgetOperation(bone_name="Cheek.B.R.001",scale_factor=0.3,),
+            WidgetOperation(bone_name="Cheek.B.R",scale_factor=0.3,),
+            WidgetOperation(bone_name="Nose.R",scale_factor=0.3,),
+            WidgetOperation(bone_name="Nostril.R",scale_factor=0.2,),
+        ]
     )
 

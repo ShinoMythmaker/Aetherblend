@@ -14,6 +14,8 @@ from .. import utils
 Mode = Literal["POSE", "EDIT"]
 Time = Literal["Pre", "Post"]
 
+_WGTS = "WGTS"
+
 @dataclass
 class PoseOperations:
     """Groups all pose mode operations for a single bone."""
@@ -75,7 +77,7 @@ class PoseOperationsStack:
             else:
                 print(f"[AetherBlend] PoseOperationsStack: Bone '{bone_name}' not found in armature.")
 
-@dataclass(frozen=True)
+@dataclass()
 class ABOperation(ABC):
     mode: ClassVar[Mode] = "POSE"
     time: Time = field(default="Pre", kw_only=True)
@@ -193,7 +195,7 @@ class ABOperationStack:
         for operation in operations:
             operation.apply(armature)
 
-@dataclass(frozen=True)
+@dataclass()
 class ConstraintOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
@@ -212,7 +214,7 @@ class ConstraintOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying ConstraintOperation for bone '{self.bone_name}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class RigifyTypeOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
@@ -282,7 +284,7 @@ class TransformLink:
 
         return ops
 
-@dataclass(frozen=True)
+@dataclass()
 class CollectionOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
@@ -301,7 +303,7 @@ class CollectionOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying CollectionOperation for bone '{self.bone_name}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class ParentBoneOperation(ABOperation):
     bone_name: str
     parent: tuple[str, ...]
@@ -333,7 +335,7 @@ class ParentBoneOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying ParentBoneOperation for bone '{self.bone_name}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class DriverOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
@@ -355,7 +357,7 @@ class DriverOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class CustomPropertyOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
@@ -379,6 +381,100 @@ class CustomPropertyOperation(ABOperation):
 
         except Exception as e:
             print(f"[AetherBlend] Error applying CustomPropertyOperation for armature. : {e}")
+
+@dataclass()
+class WidgetOperation(ABOperation):
+    """Overrides the widget of a bone."""
+    mode: ClassVar[Mode] = "POSE"
+    time : Time = field(default="Post", kw_only=True)
+    
+    bone_name: str
+    custom_object: str | None = None
+    translation: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    rotation: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    scale: tuple[float, float, float] = (1.0, 1.0, 1.0)
+    scale_factor: float = 1.0
+    override_transform: str | None = None  # Bone Name
+    affect_gizmo: bool = False
+    use_as_pivot: bool = False
+    scale_to_bone_length: bool = True
+    wireframe: bool = False
+    wire_width: float = 1.0
+
+
+    def apply(self, armature: bpy.types.Object) -> None:
+        """Applies the widget override to the given pose bone."""
+        pose_bone = armature.pose.bones.get(self.bone_name)
+        if not pose_bone:
+            print(f"[AetherBlend] WidgetOperation bone '{self.bone_name}' not found in armature.")
+            return
+        
+        
+        
+        scale = (self.scale[0] * self.scale_factor, self.scale[1] * self.scale_factor, self.scale[2] * self.scale_factor)
+
+        try:
+            custom_object_name = None
+            if self.custom_object:
+                custom_object_name = self._searchWGTS(armature, self.custom_object)
+            if self.custom_object and not custom_object_name:
+                print(f"[AetherBlend] WidgetOperation custom object '{self.custom_object}' not found in WGTS collection of armature '{armature.name}'.")
+            else:
+                custom_shape_obj = bpy.data.objects.get(custom_object_name) if custom_object_name else None
+                if custom_shape_obj:
+                    pose_bone.custom_shape = custom_shape_obj
+            pose_bone.custom_shape_translation = self.translation
+            pose_bone.custom_shape_rotation_euler = self.rotation
+            pose_bone.custom_shape_scale_xyz = scale
+            pose_bone.custom_shape_transform = self.override_transform
+            pose_bone.use_transform_at_custom_shape = self.affect_gizmo      ## 5.0
+            pose_bone.use_transform_around_custom_shape = self.use_as_pivot  ## 5.0
+            pose_bone.use_custom_shape_bone_size = self.scale_to_bone_length
+            ##pose_bone.show_wire = self.wireframe  ## 5.0
+            pose_bone.custom_shape_wire_width = self.wire_width
+        except Exception as e:
+            print(f"[AetherBlend] Error applying WidgetOperation for bone '{pose_bone.name}': {e}")
+
+    @staticmethod
+    def _searchWGTS(armature, name: str) -> str | None:
+        """Searches for a widget object in the WGTS collection of the armature."""
+        normalized_name = WidgetOperation._normalizeWidgetName(name)
+        if not normalized_name:
+            return None
+
+        local_collections: list[bpy.types.Collection] = []
+        for armature_collection in armature.users_collection:
+            local_collections.extend(utils.collection.collection_tree(armature_collection))
+
+        matcher = lambda object_name: normalized_name in WidgetOperation._normalizeWidgetName(object_name)
+
+        found_name = utils.collection.find_object_name_in_prefixed_collections(
+            local_collections,
+            _WGTS,
+            matcher,
+        )
+        if found_name:
+            return found_name
+
+        # Fallback: search all WGTS collections in the blend file.
+        global_collections = [collection for collection in bpy.data.collections if collection.name.upper().startswith("WGTS")]
+        found_name = utils.collection.find_object_name_in_prefixed_collections(
+            global_collections,
+            _WGTS,
+            matcher,
+        )
+        if found_name:
+            return found_name
+
+        print(f"[AetherBlend] WidgetOperation: No matching WGTS widget '{name}' found for armature '{armature.name}'.")
+        return None
+
+    @staticmethod
+    def _normalizeWidgetName(name: str) -> str:
+        normalized_name = name.strip().lower()
+        for separator in (".", "_", "-", " "):
+            normalized_name = normalized_name.replace(separator, "")
+        return normalized_name
 
     
 

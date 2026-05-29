@@ -15,6 +15,10 @@ def get_rig_module() -> RigModule:
         ui_collections = UI_Collections([
             BoneCollection(name="Genitals (Male)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Male)", visible=False),
             BoneCollection(name="Genitals (Female)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Female)", visible=False),
-        ])
+        ]),
+        operations=[
+            *female_module.operations,
+            *male_module.operations
+        ]
     )
     return rig_module

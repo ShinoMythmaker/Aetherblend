@@ -68,7 +68,7 @@ class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
 
             state = rig_generator.generate_meta_rig(
                 armature,
-                cleanup_existing=lambda: bpy.ops.aether.clean_up_rig(),
+                cleanup_existing=lambda: bpy.ops.aether.reset_rig(),
             )
             if not state:
                 self.report({'ERROR'}, "Meta rig generation failed")
@@ -114,7 +114,7 @@ class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
 
             state = rig_generator.generate_meta_rig(
                 armature,
-                cleanup_existing=lambda: bpy.ops.aether.clean_up_rig(),
+                cleanup_existing=lambda: bpy.ops.aether.reset_rig(),
             )
             if not state:
                 self.report({'ERROR'}, "Meta rig generation failed")

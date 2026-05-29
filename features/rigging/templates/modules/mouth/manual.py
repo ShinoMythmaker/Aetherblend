@@ -1,7 +1,7 @@
 import mathutils
 
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation
+from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation
 from ......core.generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -401,5 +401,18 @@ def get_rig_module() -> RigModule:
             BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=0, title="Face (Primary)", visible=True),
             BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=0, title="Face (Secondary)", visible=False),
             BoneCollection(name="Face (Misc)", ui=True, color_set="Face_Secondary", row_index=1, title="Face (Misc)", visible=False),
-        ])
+        ]),
+        operations=[
+            WidgetOperation(bone_name="Teeth.T", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
+            WidgetOperation(bone_name="Teeth.B", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
+            WidgetOperation(bone_name="jaw_master_mouth", scale=[0.6, 1, 0.3]),
+            WidgetOperation(bone_name="Lip.T.R.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.T.R.Middle.001", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.L.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.L.Middle.001", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.R.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.R.Middle.001", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.T.L.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.T.L.Middle.001", scale_factor=0.1),
+            ]
     )
