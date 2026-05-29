@@ -30,7 +30,7 @@ class Driver():
     use_self: bool | None = None
     variables: list[DriverVariable] = field(default=None, kw_only=True)
     
-    def apply(self, target: bpy.types.PoseBone, property: tuple[str, int], armature: bpy.types.Object) -> None:
+    def apply(self, target: bpy.types.PoseBone | bpy.types.Object, property: tuple[str, int], armature: bpy.types.Object) -> None:
         """Applies the driver to the given bone."""
 
         driver = target.driver_add(property[0], property[1])

@@ -81,7 +81,6 @@ class PoseOperationsStack:
 class ABOperation(ABC):
     mode: ClassVar[Mode] = "POSE"
     time: Time = field(default="Pre", kw_only=True)
-    data_dict: dict = field(default=None, kw_only=True)  # Optional dictionary for storing data references needed by the operation.
 
     @abstractmethod
     def apply(self, armature: bpy.types.Object):
@@ -131,6 +130,7 @@ class ABOperation(ABC):
 
 class ABOperationStack:
     STACK_KEYS : ClassVar[tuple[str, ...]] = ('prePOSE', 'postPOSE', 'preEDIT', 'postEDIT')
+    generation_data: dict | None = None
 
     def __init__(self):
         self.stack: dict[str, list[ABOperation]] = {
@@ -161,7 +161,7 @@ class ABOperationStack:
             ]
 
     def applyPrePoseOperations(self, armature: bpy.types.Object):
-        self._apply_operations(self.stack['prePOSE'], armature)
+        self._apply_operations(self.stack['prePOSE'], armature,)
 
     def applyPostPoseOperations(self, armature: bpy.types.Object):
         self._apply_operations(self.stack['postPOSE'], armature)
@@ -194,7 +194,7 @@ class ABOperationStack:
             return
 
         for operation in operations:
-            operation.apply(armature)
+            operation.apply(armature, self.generation_data)
 
 @dataclass()
 class ConstraintOperation(ABOperation):
@@ -203,7 +203,7 @@ class ConstraintOperation(ABOperation):
     bone_name: str
     constraint: Constraint
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the constraint operation to the given pose bone."""
         if not self._switch_mode():
             return
@@ -222,7 +222,7 @@ class RigifyTypeOperation(ABOperation):
     bone_name: str
     rigify_type: rigify.types.rigify_type
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the Rigify type operation to the given pose bone."""
         if not self._switch_mode():
             return
@@ -292,7 +292,7 @@ class CollectionOperation(ABOperation):
     bone_name: str
     collection_name: str
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the collection operation to the given pose bone."""
         if not self._switch_mode():
             return
@@ -312,7 +312,7 @@ class ParentBoneOperation(ABOperation):
     
     mode: ClassVar[Mode] = "EDIT"
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the parent bone operation to the given edit bone."""
         if not self._switch_mode():
             return
@@ -345,16 +345,16 @@ class DriverOperation(ABOperation):
     driver: Driver
     data: str | None = None ## Optional for referencing data blocks
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the driver operation to the given pose bone."""
         if not self._switch_mode():
             return
-        target = None
+        target = armature
         if self.data is None and self.bone_name is not None:          
             poseBone = self._getPoseBone(self.bone_name, armature)
             target = poseBone
         elif self.data is not None:
-            data_block = self.data_dict.get(self.data) if self.data_dict else None
+            data_block = data_dict.get(self.data) if data_dict else None
             if data_block is None:
                 return
             target = data_block
@@ -372,7 +372,7 @@ class CustomPropertyOperation(ABOperation):
     property: CustomProperty
     bone_name: str | None = None
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Creates a custom property for a given bone or armature"""
         if not self._switch_mode():
             return
@@ -410,7 +410,7 @@ class WidgetOperation(ABOperation):
     wire_width: float = 1.0
 
 
-    def apply(self, armature: bpy.types.Object) -> None:
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None) -> None:
         """Applies the widget override to the given pose bone."""
         pose_bone = armature.pose.bones.get(self.bone_name)
         if not pose_bone:
