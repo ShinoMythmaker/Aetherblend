@@ -34,9 +34,15 @@ def remove_group_node_from_node_tree(node_tree: bpy.types.NodeTree, group_node_n
     if group_node:
         node_tree.nodes.remove(group_node)
 
-def get_value_from_material_property(material: bpy.types.Material, property_name: str, default=None):
+def get_value_from_material_property(material: bpy.types.Material, property_name: str, default=None, index: int | None = None):
     if property_name in material:
-        return material[property_name]
+        value = material[property_name]
+        if index is not None:
+            try:
+                return value[index]
+            except (TypeError, IndexError):
+                return default
+        return value
     return default
 
 def connect_sockets(node_tree: bpy.types.NodeTree, group_node: bpy.types.Node, input_dict: dict, output_dict: dict):
@@ -175,6 +181,31 @@ def find_material_by_property(
                 materials.add((mesh, material))
 
     return list(materials)
+
+def pop_default_mappings(material, group_node):
+    inputs = group_node.inputs
+    for input in inputs:
+        material_prop = get_value_from_material_property(material, input.name)
+        if material_prop is not None:
+            apply_material_property_to_socket(input, material_prop)
+
+def pop_custom_mappings(material, group_node, mapping: list[tuple[str, str, int | None]]):
+    for target_socket_name, material_prop_name, index in mapping:
+                input = group_node.inputs.get(target_socket_name)
+                if input is None:
+                    print(f"[AetherBlend] Warning: Target socket '{target_socket_name}' not found in node group '{group_node.name}'. Skipping custom mapping for this socket.")
+                    continue
+
+                material_prop = get_value_from_material_property(material, material_prop_name, index=index)
+
+                if material_prop is not None:
+                    apply_material_property_to_socket(input, material_prop)
+                else:
+                    print(f"[AetherBlend] Warning: Material property '{material_prop_name}' not found in material '{material.name}'. Skipping custom mapping for this socket.")
+                    continue
+
+
+
 
 def import_ffgear_shader(filepath, objects):
     """Imports FFGear shaders for the given objects."""

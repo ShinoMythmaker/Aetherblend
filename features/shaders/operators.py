@@ -1,11 +1,14 @@
 import bpy 
-from typing import ClassVar
+from typing import ClassVar, Mapping
 
 from . import shader_util
 from ...utils import addon_dependencies
 from ...utils.armature import find_meshes
 from ...preferences import get_preferences
 
+
+
+# root socket: (target node name, target socket name)
 _IRIS_SHADER_INPUT_CONNECTIONS = {}
 
 _IRIS_SHADER_OUTPUT_CONNECTIONS = {
@@ -30,6 +33,9 @@ _LIMBAL_SHADER_INPUT_CONNECTIONS = {
         ("UV Map", "UV"),
         ("[AetherBlend] Eye Scaling", "Limbal UV"),
     ],
+    "vertex_color": [
+        ("Color Attribute", "Color"),
+    ]
 }
 
 _LIMBAL_SHADER_OUTPUT_CONNECTIONS = {
@@ -40,6 +46,16 @@ _LIMBAL_SHADER_OUTPUT_CONNECTIONS = {
         ("Principled BSDF", "Emission Strength")
     ],
 }
+
+# socket, material_prop, index (if applicable)
+_IRIS_SHADER_CUSTOM_PROPERTIES = []
+
+_LIMBAL_SHADER_CUSTOM_MAPPING = [
+    ("left_iris_limbal_ring_intensity", "LeftIrisColor", 3),
+    ("right_iris_limbal_ring_intensity", "RightIrisColor", 3)
+]
+
+
 class AETHER_OT_S_Iris(bpy.types.Operator):
     """Apply AetherBlend Iris node-group setup to iris materials."""
 
@@ -87,11 +103,12 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
             #####
             # Apply material properties to node group inputs
             #####
-            inputs = group_node.inputs
-            for input in inputs:
-                material_prop = shader_util.get_value_from_material_property(eye_material, input.name)
-                if material_prop is not None:
-                    shader_util.apply_material_property_to_socket(input, material_prop)
+            shader_util.pop_default_mappings(eye_material, group_node)
+
+            #### 
+            # Apply custom Mapping
+            ####
+            shader_util.pop_custom_mappings(eye_material, group_node, _IRIS_SHADER_CUSTOM_PROPERTIES)
 
             #####
             ## Connect node group
@@ -160,11 +177,12 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             #####
             # Apply material properties to node group inputs
             #####
-            inputs = group_node.inputs
-            for input in inputs:
-                material_prop = shader_util.get_value_from_material_property(eye_material, input.name)
-                if material_prop is not None:
-                    shader_util.apply_material_property_to_socket(input, material_prop)
+            shader_util.pop_default_mappings(eye_material, group_node)
+
+            #### 
+            # Apply custom Mapping
+            ####
+            shader_util.pop_custom_mappings(eye_material, group_node, _LIMBAL_SHADER_CUSTOM_MAPPING)
 
             #####
             ## Connect node group
