@@ -1,9 +1,10 @@
-from . import arms, ears, face, genitals, hair, hands, legs, skirt, spine, tail, toes, mouth, ui
+from . import arms, ears, face, iris, genitals, hair, hands, legs, skirt, spine, tail, toes, mouth, ui
 
 __all__ = [
     "ui",
     "ears",
     "face",
+    "iris",
     "mouth",
     "arms",
     "genitals",
