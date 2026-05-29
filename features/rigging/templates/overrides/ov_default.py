@@ -1,10 +1,4 @@
-from .....core.shared import WidgetOverride, PropOverride
-
-
-WO_NSFW = {
-        #root
-        "root": WidgetOverride(bone="root", scale_factor=0.2),
-    }
+from .....core.shared import PropOverride
 
 PO_DEFAULT = {
         "ik_stretch_arm_l": PropOverride(bone="upper_arm_parent.L", property_name="IK_Stretch", value=0),
