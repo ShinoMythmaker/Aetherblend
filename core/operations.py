@@ -358,8 +358,6 @@ class DriverOperation(ABOperation):
             if data_block is None:
                 return
             target = data_block
-        if not poseBone:
-            return
         try:
             self.driver.apply(target, self.property, armature)
         except Exception as e:
