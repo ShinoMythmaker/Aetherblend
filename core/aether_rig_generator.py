@@ -1,13 +1,19 @@
-import bpy
 
+
+import bpy
+from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable
 
 from . import rigify
-from .operations import ABOperationStack, PoseOperations, PoseOperationsStack
-from .shared import Override, RigModule
+from .operations import ABOperationStack, PoseOperations, PoseOperationsStack, WidgetOperation
+from .shared import RigModule
 from .. import utils
 
+_ASSET_DIR = Path(__file__).resolve().parents[1] / "assets" / "blend"
+_WGTS_FILE = _ASSET_DIR / "wgts.blend"
+_WGTS_PREFIX = "AB_WGT_"
+_WGTS_COLLECTION_NAME = "WGTS"
 
 @dataclass
 class RigGenerationState:
@@ -16,28 +22,23 @@ class RigGenerationState:
     visible_collections: list[bpy.types.BoneCollection]
     operation_stack: ABOperationStack
 
+_DEFAULT_OPERATIONS = [
+    WidgetOperation(bone_name="root", scale_factor=0.2)
+]
+
 
 class AetherRigGenerator:
     """Generates an armature based on ordered module priority groups."""
     name: str
     modules: 'list[list[RigModule]]'
     color_sets: 'dict[str, rigify.ColorSet]'
-    overrides: 'list[dict[str, Override]] | None' = None
 
-    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, overrides: 'list[dict[str, Override]] | None' = None, modules: 'list[list[RigModule]] | None' = None):
+    def __init__(self, name: str, color_sets: 'list[dict[str, rigify.ColorSet]] | None' = None, modules: 'list[list[RigModule]] | None' = None):
         self.name = name
         self.color_sets = color_sets
-        self.overrides = overrides
         self._active_ui_flags: set[str] = set()
 
         self.set_modules(modules or [])
-
-    def getOverrides(self) -> dict[str, Override]:
-        """Combine all widget overrides into a single dictionary."""
-        combined: dict[str, Override] = {}
-        for ov_dict in self.overrides or []:
-            combined.update(ov_dict)
-        return combined
 
     def set_modules(self, modules: 'list[list[RigModule]]'):
         """Store the already-resolved module priority groups."""
@@ -102,9 +103,9 @@ class AetherRigGenerator:
 
         utils.object.select_only(armature)
         self._set_all_collections_visibility(armature, visible=True)
+        self._append_widgets(armature)
         self._apply_post_generation_operations(armature, state.operation_stack)
         self._update_deform_bones(armature)
-        self._apply_widget_overrides(armature)
         self._hide_generated_collections(armature, state.visible_collections)
         self._finalize_generated_rig(armature, meta_rig)
         return True
@@ -147,6 +148,80 @@ class AetherRigGenerator:
             return False
 
         return True
+    
+    def _append_widgets(self, armature: bpy.types.Object):
+        """Append widget objects from wgts.blend and place them in the armature's WGTS collection."""
+        def _base_object_name(object_name: str) -> str:
+            # Blender duplicate suffixes use the pattern ".001", ".002", etc.
+            if len(object_name) > 4 and object_name[-4] == "." and object_name[-3:].isdigit():
+                return object_name[:-4]
+            return object_name
+
+        def _widgets_by_base() -> dict[str, bpy.types.Object]:
+            """Return one widget object per base name, preferring non-suffixed names."""
+            widgets: dict[str, bpy.types.Object] = {}
+            for obj in bpy.data.objects:
+                if not obj.name.startswith(_WGTS_PREFIX):
+                    continue
+
+                base_name = _base_object_name(obj.name)
+                current = widgets.get(base_name)
+                if current is None or current.name != base_name:
+                    widgets[base_name] = obj
+            return widgets
+
+        if not _WGTS_FILE.exists():
+            print(f"[AetherBlend] Widget source file not found: {_WGTS_FILE}")
+            return
+
+        armature_collection = utils.collection.get_collection(armature)
+        if not armature_collection:
+            print(f"[AetherBlend] Could not resolve collection for armature '{armature.name}'.")
+            return
+
+        wgts_collection = None
+        for collection in utils.collection.collection_tree(armature_collection):
+            if collection.name.upper().startswith(_WGTS_COLLECTION_NAME):
+                wgts_collection = collection
+                break
+
+        if not wgts_collection:
+            print(
+                f"[AetherBlend] No WGTS collection found under armature collection '{armature_collection.name}' "
+                f"for armature '{armature.name}'. Skipping widget append."
+            )
+            return
+
+        with bpy.data.libraries.load(str(_WGTS_FILE), link=False) as (data_from, _):
+            widget_names = [name for name in data_from.objects if name and name.startswith(_WGTS_PREFIX)]
+
+        if not widget_names:
+            print(f"[AetherBlend] No widget objects found in '{_WGTS_FILE.name}'.")
+            return
+
+        widget_base_names = {_base_object_name(name) for name in widget_names}
+        existing_widgets = _widgets_by_base()
+
+        missing_widget_names = [
+            name
+            for name in widget_names
+            if _base_object_name(name) not in existing_widgets
+        ]
+
+        if missing_widget_names:
+            with bpy.data.libraries.load(str(_WGTS_FILE), link=False) as (_, data_to):
+                data_to.objects = missing_widget_names
+
+            existing_widgets = _widgets_by_base()
+
+        widgets_to_link = [
+            obj
+            for base_name, obj in existing_widgets.items()
+            if base_name in widget_base_names and all(existing is not obj for existing in wgts_collection.objects)
+        ]
+
+        if widgets_to_link:
+            utils.collection.link_to_collection(widgets_to_link, wgts_collection)
 
     def _create_meta_rig(self, armature: bpy.types.Object) -> bpy.types.Object:
         meta_rig = utils.armature.duplicate(armature)
@@ -179,6 +254,9 @@ class AetherRigGenerator:
 
         for bone in meta_rig.data.bones:
             pose_ops_stack.add(bone.name, PoseOperations(rigify_settings=rigify.types.basic_raw_copy(True)))
+
+        for operation in _DEFAULT_OPERATIONS:
+            operation_stack.add_operation(operation)
 
         return pose_ops_stack, operation_stack
 
@@ -347,11 +425,6 @@ class AetherRigGenerator:
         ffxiv_bone_names = set(utils.armature.b_collection.get_bones(armature, "FFXIV").keys())
         for bone in armature.data.bones.values():
             bone.use_deform = bone.name in ffxiv_bone_names
-
-    def _apply_widget_overrides(self, armature: bpy.types.Object):
-        bpy.ops.object.mode_set(mode='POSE')
-        for widget in self.getOverrides().values():
-            widget.execute(armature)
 
     def _hide_generated_collections(self, armature: bpy.types.Object, visible_collections: list[bpy.types.BoneCollection]):
         self._set_all_collections_visibility(armature, visible=False)

@@ -2,7 +2,6 @@ from ...core.aether_rig_generator import AetherRigGenerator
 from ...core.shared import RigModule, Template
 from ...preferences import get_default_custom_template_path, get_preferences
 from .templates import AVAILABLE_MODULES, CS_COLORSETS, get_module_key
-from .templates.overrides import WO_DEFAULT, WO_NSFW, PO_DEFAULT
 from pathlib import Path
 import bpy
 import json
@@ -12,12 +11,6 @@ import re
 ## For Dropdowns
 CUSTOM_TEMPLATE_NAME = 'Custom'
 _TEMPLATE_JSON_DIR = Path(__file__).resolve().parent / "templates" / "json"
-_DEFAULT_OVERRIDE_KEYS = ["WO_DEFAULT", "PO_DEFAULT"]
-_OVERRIDES_BY_KEY = {
-    "WO_DEFAULT": WO_DEFAULT,
-    "WO_NSFW": WO_NSFW,
-    "PO_DEFAULT": PO_DEFAULT,
-}
 ## Defaults
 DEFAULT_TEMPLATE_NAME = 'Dynamic'
 DEFAULT_COLORSET_NAME = 'AetherBlend'
@@ -65,7 +58,6 @@ def _load_template_definitions() -> dict[str, dict]:
 
             templates[template_name] = {
                 "name": template_name,
-                "override_keys": data.get("override_keys"),
                 "module_keys": module_keys,
                 "path": str(file_path),
             }
@@ -163,21 +155,6 @@ def delete_custom_template_file(template_path: str) -> bool:
         return False
 
 
-def _resolve_overrides(definition: dict) -> list | None:
-    """Resolve override objects declared in template JSON."""
-    override_keys = definition.get("override_keys")
-    if not isinstance(override_keys, list):
-        override_keys = _DEFAULT_OVERRIDE_KEYS
-
-    resolved: list = []
-    for override_key in override_keys:
-        override = _OVERRIDES_BY_KEY.get(override_key)
-        if override is not None:
-            resolved.append(override)
-
-    return resolved or None
-
-
 def _template_from_definition(template_name: str, definition: dict) -> Template | None:
     """Build a runtime Template object from one JSON definition."""
     module_groups: list[list[RigModule]] = []
@@ -196,9 +173,8 @@ def _template_from_definition(template_name: str, definition: dict) -> Template 
 
     if not module_groups:
         return None
-
-    overrides = _resolve_overrides(definition)
-    return Template(name=template_name, overrides=overrides, modules=module_groups)
+    
+    return Template(name=template_name, modules=module_groups)
 
 
 def _get_template_from_json(template_name: str) -> Template | None:
@@ -361,7 +337,6 @@ def get_rig_generator(aether_rig):
     return AetherRigGenerator(
         name=generator_name,
         color_sets=color_sets,
-        overrides=template.overrides,
         modules=modules,
     )
 

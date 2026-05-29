@@ -1,5 +1,5 @@
 from ......core.bone_generators import ConnectBone, ExtensionBone
-from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation
+from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
 from ......core.constraints import CopyLocationConstraint
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -78,6 +78,7 @@ SPINE = BoneGroup(
                 operations=[
                             RigifyTypeOperation(time="Pre", bone_name="Chest.R", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
                             CollectionOperation(time="Pre", bone_name="Chest.R", collection_name="Torso"),
+                            WidgetOperation(bone_name="Chest.R", translation=[0.0, 0.05, 0.0]),
                             ]
             ),
             ExtensionBone(
@@ -93,6 +94,7 @@ SPINE = BoneGroup(
                 operations=[
                             RigifyTypeOperation(time="Pre", bone_name="Chest.L", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
                             CollectionOperation(time="Pre", bone_name="Chest.L", collection_name="Torso"),
+                            WidgetOperation(bone_name="Chest.L", translation=[0.0, 0.05, 0.0]),
                             ]
             ),
         ],
