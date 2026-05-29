@@ -30,7 +30,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     
     s_import_with_meddle_shaders: BoolProperty(name="Use Meddle Shaders", description="Applies Meddle Shaders to equipment and character features using the Meddle shader cache", default=True)  # type: ignore
     s_import_ab_iris_shader: BoolProperty(name="AB Iris Shader", description="Apply the built-in AetherBlend Iris shader setup after Meddle shader import", default=True)  # type: ignore
-    s_import_ab_limbal_shader: BoolProperty(name="AB Limbal Shader", description="Apply the built-in AetherBlend Limbal shader setup after Meddle shader import", default=False)  # type: ignore
+    s_import_ab_limbal_shader: BoolProperty(name="AB Limbal Shader", description="Apply the built-in AetherBlend Limbal shader setup after Meddle shader import", default=True)  # type: ignore
     s_import_with_ffgear_shaders: BoolProperty(name="Use FFGear Shaders", description="Applies FFGear Shaders to equipment using the Meddle shader cache", default=True) # type: ignore
 
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
