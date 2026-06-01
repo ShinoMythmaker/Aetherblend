@@ -395,6 +395,7 @@ class WidgetOperation(ABOperation):
     time : Time = field(default="Post", kw_only=True)
 
     bone_name: str
+    color_set: str | None = None
     custom_object: str | None = None
     translation: tuple[float, float, float] = (0.0, 0.0, 0.0)
     rotation: tuple[float, float, float] = (0.0, 0.0, 0.0)
@@ -420,6 +421,8 @@ class WidgetOperation(ABOperation):
         scale = (self.scale[0] * self.scale_factor, self.scale[1] * self.scale_factor, self.scale[2] * self.scale_factor)
 
         try:
+            if self.color_set:
+                pose_bone.color.palette = self.color_set
             custom_object_name = None
             if self.custom_object:
                 custom_object_name = self._searchWGTS(armature, self.custom_object)
@@ -481,6 +484,54 @@ class WidgetOperation(ABOperation):
         for separator in (".", "_", "-", " "):
             normalized_name = normalized_name.replace(separator, "")
         return normalized_name
+    
+
+@dataclass()
+class BoneRestrictionOperation(ABOperation):
+    mode: ClassVar[Mode] = "POSE"
+
+    bone_name: str
+    lock_location: tuple[bool, bool, bool] | bool = False
+    lock_rotation: tuple[bool, bool, bool] | bool = False
+    lock_scale: tuple[bool, bool, bool] | bool = False
+    inherit_location: bool = True
+    inherit_rotation: bool = True
+    inherit_scale: Literal["FULL", "FIX_SHEAR", "ALIGNED", "AVERAGE", "NONE", "NONE_LEGACY"] = "FULL"
+
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
+        """Applies the bone restriction to the given pose bone."""
+        if not self._switch_mode():
+            return
+        poseBone = self._getPoseBone(self.bone_name, armature)
+        dataBone = armature.data.bones.get(self.bone_name)
+        if not poseBone:
+            return
+        
+        if isinstance(self.lock_location, bool):
+            lock_location = (self.lock_location, self.lock_location, self.lock_location)
+        else:            
+            lock_location = self.lock_location
+
+        if isinstance(self.lock_rotation, bool):
+            lock_rotation = (self.lock_rotation, self.lock_rotation, self.lock_rotation)
+        else:            
+            lock_rotation = self.lock_rotation
+
+        if isinstance(self.lock_scale, bool):
+            lock_scale = (self.lock_scale, self.lock_scale, self.lock_scale)
+        else:            
+            lock_scale = self.lock_scale
+
+        try:
+            poseBone.lock_location = lock_location
+            poseBone.lock_rotation = lock_rotation
+            poseBone.lock_scale = lock_scale
+            dataBone.use_local_location = self.inherit_location
+            dataBone.use_inherit_rotation = self.inherit_rotation
+            dataBone.inherit_scale = self.inherit_scale
+            # Add more restriction types as needed
+        except Exception as e:
+            print(f"[AetherBlend] Error applying BoneRestrictionOperation for bone '{self.bone_name}': {e}")
 
     
 

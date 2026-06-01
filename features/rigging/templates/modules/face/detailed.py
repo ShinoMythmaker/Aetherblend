@@ -1,7 +1,7 @@
 import mathutils
 
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation
+from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation, BoneRestrictionOperation
 from ......core.bone_generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -496,12 +496,14 @@ LEFT_EYE = BoneGroup(
         ExtensionBone(
             name="lid.B.L.002.anchor",
             bone_a="lid.B.L.002",
-            axis_type="local",
-            axis="Y",
+            axis_type="global",
+            axis="Z",
             start="head",
             parent="lid.B.L.002",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002.anchor", collection_name="MCH"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.002.anchor", rigify_type=rigify.types.basic_raw_copy())
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002.anchor", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.002.anchor", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.B.L.002.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.B.L.002.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
             ]
         ),
         CopyBone(
@@ -563,12 +565,14 @@ LEFT_EYE = BoneGroup(
         ExtensionBone(
             name="lid.B.L.001.anchor",
             bone_a="lid.B.L.001",
-            axis_type="local",
-            axis="Y",
+            axis_type="global",
+            axis="Z",
             start="head",
             parent="lid.B.L.001",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001.anchor", collection_name="MCH"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.001.anchor", rigify_type=rigify.types.basic_raw_copy())
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001.anchor", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.001.anchor", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.B.L.001.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.B.L.001.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
             ]
         ),
         BridgeBone(
@@ -584,12 +588,14 @@ LEFT_EYE = BoneGroup(
         ExtensionBone(
             name="lid.B.L.003.anchor",
             bone_a="lid.B.L.003",
-            axis_type="local",
-            axis="Y",
+            axis_type="global",
+            axis="Z",
             start="head",
             parent="lid.B.L.003",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003.anchor", collection_name="MCH"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.003.anchor", rigify_type=rigify.types.basic_raw_copy())
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003.anchor", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.003.anchor", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.B.L.003.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.B.L.003.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
             ]
         ),
         ConnectBone(
@@ -736,12 +742,14 @@ RIGHT_EYE = BoneGroup(
         ExtensionBone(
             name="lid.B.R.002.anchor",
             bone_a="lid.B.R.002",
-            axis_type="local",
-            axis="Y",
+            axis_type="global",
+            axis="Z",
             start="head",
             parent="lid.B.R.002",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002.anchor", collection_name="MCH"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.002.anchor", rigify_type=rigify.types.basic_raw_copy())
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002.anchor", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.002.anchor", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.B.R.002.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.B.R.002.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
             ]
         ),
         CopyBone(
@@ -786,12 +794,14 @@ RIGHT_EYE = BoneGroup(
         ExtensionBone(
             name="lid.B.R.001.anchor",
             bone_a="lid.B.R.001",
-            axis_type="local",
-            axis="Y",
+            axis_type="global",
+            axis="Z",
             start="head",
             parent="lid.B.R.001",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001.anchor", collection_name="MCH"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.001.anchor", rigify_type=rigify.types.basic_raw_copy())
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001.anchor", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.001.anchor", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.B.R.001.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.B.R.001.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
             ]
         ),
         BridgeBone(
@@ -807,12 +817,14 @@ RIGHT_EYE = BoneGroup(
         ExtensionBone(
             name="lid.B.R.003.anchor",
             bone_a="lid.B.R.003",
-            axis_type="local",
-            axis="Y",
+            axis_type="global",
+            axis="Z",
             start="head",
             parent="lid.B.R.003",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003.anchor", collection_name="MCH"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.003.anchor", rigify_type=rigify.types.basic_raw_copy())
+            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003.anchor", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.003.anchor", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.B.R.003.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.B.R.003.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
             ]
         ),
         ConnectBone(
