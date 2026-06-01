@@ -1,6 +1,8 @@
 from . import b_collection
 
 import bpy
+from mathutils import Vector
+from types import SimpleNamespace
 
 def _select_single(obj: bpy.types.Object):
     bpy.ops.object.select_all(action='DESELECT')
@@ -156,3 +158,227 @@ def join(src: bpy.types.Object, target: bpy.types.Object) -> None:
     target.select_set(True)
     bpy.context.view_layer.objects.active = target
     bpy.ops.object.join()
+
+
+def _set_mode(obj: bpy.types.Object, mode: str) -> str:
+    original_mode = obj.mode
+    if original_mode != mode:
+        bpy.ops.object.mode_set(mode=mode)
+    return original_mode
+
+
+def _restore_mode(obj: bpy.types.Object, mode: str) -> None:
+    if obj.mode != mode:
+        bpy.ops.object.mode_set(mode=mode)
+
+
+def _get_data_bones(armature: bpy.types.Object, bone_names: list[str]) -> list[bpy.types.Bone]:
+    return [armature.data.bones.get(name) for name in bone_names if armature.data.bones.get(name)]
+
+
+def _get_pose_bones(armature: bpy.types.Object, bone_names: list[str]) -> list[bpy.types.PoseBone]:
+    return [armature.pose.bones.get(name) for name in bone_names if armature.pose.bones.get(name)]
+
+
+def get_bone_visibility(armature: bpy.types.Object, bone_names: list[str]) -> dict[str, tuple[bool, bool]]:
+    visibility: dict[str, tuple[bool, bool]] = {}
+    for bone_name in bone_names:
+        bone = armature.data.bones.get(bone_name)
+        if bone:
+            visibility[bone_name] = (bone.hide, bone.hide_select)
+    return visibility
+
+
+def restore_visibility(armature: bpy.types.Object, visibility: dict[str, tuple[bool, bool]]) -> None:
+    for bone_name, (hide, hide_select) in visibility.items():
+        bone = armature.data.bones.get(bone_name)
+        if bone:
+            bone.hide = hide
+            bone.hide_select = hide_select
+
+
+def exist(armature: bpy.types.Object, bone_names: list[str]) -> bool:
+    return all(armature.data.bones.get(name) is not None for name in bone_names)
+
+
+def _iter_channelbag_fcurves(action, anim_data):
+    """Yield (channelbag, fcurve) pairs, supporting both legacy and Blender 4.4+ layered actions."""
+    # Legacy actions (Blender < 4.4) expose fcurves directly on the action.
+    legacy_fcurves = getattr(action, "fcurves", None)
+    if legacy_fcurves is not None:
+        for fc in legacy_fcurves:
+            yield action.fcurves, fc
+        return
+
+    # Layered action format (Blender 4.4+).
+    slot = getattr(anim_data, "action_slot", None)
+    for layer in getattr(action, "layers", ()):
+        for strip in getattr(layer, "strips", ()):
+            try:
+                channelbag = strip.channelbag(slot) if slot else None
+            except Exception:
+                channelbag = None
+            if channelbag:
+                for fc in channelbag.fcurves:
+                    yield channelbag.fcurves, fc
+
+
+def delete_keyframes(armature: bpy.types.Object, bone_names: list[str]) -> None:
+    anim_data = getattr(armature, "animation_data", None)
+    action = getattr(anim_data, "action", None) if anim_data else None
+    if not action:
+        return
+
+    data_paths = set()
+    for bone_name in bone_names:
+        base = f'pose.bones["{bone_name}"]'
+        for suffix in ("location", "rotation_euler", "rotation_quaternion", "scale"):
+            data_paths.add(f"{base}.{suffix}")
+
+    to_remove = [
+        (fcurves_coll, fc)
+        for fcurves_coll, fc in _iter_channelbag_fcurves(action, anim_data)
+        if fc.data_path in data_paths
+    ]
+    for fcurves_coll, fc in to_remove:
+        fcurves_coll.remove(fc)
+
+
+def select_edit(armature: bpy.types.Object, bone_names: list[str]) -> None:
+    original_mode = _set_mode(armature, 'EDIT')
+    bpy.ops.armature.select_all(action='DESELECT')
+    for bone_name in bone_names:
+        bone = armature.data.edit_bones.get(bone_name)
+        if bone:
+            bone.select = True
+            bone.select_head = True
+            bone.select_tail = True
+    _restore_mode(armature, original_mode)
+    _set_mode(armature, 'POSE')
+    bpy.ops.pose.select_all(action='DESELECT')
+    for bone_name in bone_names:
+        pose_bone = armature.pose.bones.get(bone_name)
+        if pose_bone:
+            pose_bone.select = True
+
+
+def add_constraint_copy_rotation(source_bone_names: list[str], armature: bpy.types.Object, target_bone_names: list[str], overwrite: bool = False) -> None:
+    for source_name, target_name in zip(source_bone_names, target_bone_names):
+        pose_bone = armature.pose.bones.get(source_name)
+        if not pose_bone:
+            continue
+        if overwrite:
+            for constraint in [c for c in pose_bone.constraints if c.type == 'COPY_ROTATION' and c.name == 'spring']:
+                pose_bone.constraints.remove(constraint)
+        constraint = pose_bone.constraints.new('COPY_ROTATION')
+        constraint.name = 'spring'
+        constraint.target = armature
+        constraint.subtarget = target_name
+        constraint.mix_mode = 'REPLACE'
+        constraint.use_x = True
+        constraint.use_y = True
+        constraint.use_z = True
+
+
+def remove_copy_rotation_constraints(armature: bpy.types.Object, bone_names: list[str]) -> None:
+    for bone_name in bone_names:
+        pose_bone = armature.pose.bones.get(bone_name)
+        if not pose_bone:
+            continue
+        for constraint in [c for c in pose_bone.constraints if c.type == 'COPY_ROTATION']:
+            pose_bone.constraints.remove(constraint)
+
+
+def bone_chain(armature: bpy.types.Object, reference_bone_names: list[str], prefix: str = "", parent_bone: str | None = None) -> list[str]:
+    if not reference_bone_names:
+        return []
+
+    original_mode = _set_mode(armature, 'EDIT')
+    edit_bones = armature.data.edit_bones
+    created: list[str] = []
+    previous_name: str | None = None
+
+    for index, reference_name in enumerate(reference_bone_names):
+        source_bone = edit_bones.get(reference_name)
+        if not source_bone:
+            continue
+
+        new_name = f"{prefix}{reference_name}"
+        if edit_bones.get(new_name):
+            edit_bones.remove(edit_bones[new_name])
+
+        new_bone = edit_bones.new(new_name)
+        new_bone.head = source_bone.head.copy()
+        new_bone.tail = source_bone.tail.copy()
+        new_bone.roll = source_bone.roll
+
+        if previous_name:
+            new_bone.parent = edit_bones.get(previous_name)
+            new_bone.use_connect = False
+        elif parent_bone:
+            new_bone.parent = edit_bones.get(parent_bone)
+            new_bone.use_connect = False
+
+        created.append(new_name)
+        previous_name = new_name
+
+    _restore_mode(armature, original_mode)
+    return created
+
+
+def bone_on_local_axis_x(armature: bpy.types.Object, reference_bone_name: str, parent_bone: str | None = None, prefix: str = "") -> str | None:
+    original_mode = _set_mode(armature, 'EDIT')
+    edit_bones = armature.data.edit_bones
+    source_bone = edit_bones.get(reference_bone_name)
+    if not source_bone:
+        _restore_mode(armature, original_mode)
+        return None
+
+    new_name = f"{prefix}{reference_bone_name}"
+    if edit_bones.get(new_name):
+        edit_bones.remove(edit_bones[new_name])
+
+    new_bone = edit_bones.new(new_name)
+    new_bone.head = source_bone.head.copy()
+    local_x = source_bone.matrix.to_3x3().col[0].normalized()
+    new_bone.tail = new_bone.head + local_x * max(source_bone.length, 0.001)
+    new_bone.roll = source_bone.roll
+
+    if parent_bone:
+        new_bone.parent = edit_bones.get(parent_bone)
+        new_bone.use_connect = False
+
+    _restore_mode(armature, original_mode)
+    return new_name
+
+
+def reset_bone_transforms(armature: bpy.types.Object, bone_names: list[str]) -> None:
+    """Reset pose-bone location/rotation/scale to rest for each named bone."""
+    original_mode = armature.mode
+    _set_mode(armature, 'POSE')
+    for bone_name in bone_names:
+        pose_bone = armature.pose.bones.get(bone_name)
+        if pose_bone:
+            pose_bone.location = (0.0, 0.0, 0.0)
+            pose_bone.rotation_euler = (0.0, 0.0, 0.0)
+            pose_bone.rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
+            pose_bone.scale = (1.0, 1.0, 1.0)
+    _set_mode(armature, original_mode)
+
+
+bone = SimpleNamespace(
+    get_bone_visibility=get_bone_visibility,
+    restore_visibility=restore_visibility,
+    exist=exist,
+    delete_keyframes=delete_keyframes,
+    select_edit=select_edit,
+    add_constraint_copy_rotation=add_constraint_copy_rotation,
+    remove_copy_rotation_constraints=remove_copy_rotation_constraints,
+    reset_transforms=reset_bone_transforms,
+)
+
+
+generate = SimpleNamespace(
+    bone_chain=bone_chain,
+    bone_on_local_axis_x=bone_on_local_axis_x,
+)
