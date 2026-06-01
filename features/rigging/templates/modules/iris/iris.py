@@ -9,12 +9,14 @@ from ......core.constraints import CopyScaleConstraint
 IRIS_CONTROLS = BoneGroup(
     name="Iris Controls",
     transform_link = [
-        TransformLink(target="DEF-Iris.L", bone="j_f_irisprm_l", retarget="DEF", constraint=CopyScaleConstraint(target_bone="Iris.L", axis=(True, True, True), target_space="LOCAL", owner_space="LOCAL")),
-        TransformLink(target="DEF-Iris.R", bone="j_f_irisprm_r", retarget="DEF", constraint=CopyScaleConstraint(target_bone="Iris.R", axis=(True, True, True), target_space="LOCAL", owner_space="LOCAL")),
+        TransformLink(target="DEF-Iris", bone="j_f_irisprm_l", retarget="DEF", constraint=CopyScaleConstraint(target_bone="Iris", axis=(True, False, True), target_space="LOCAL", owner_space="LOCAL")),
+        TransformLink(target="DEF-Pupil", bone="j_f_irisprm_l", retarget="DEF", constraint=CopyScaleConstraint(target_bone="Pupil", axis=(False, True, False), target_space="LOCAL", owner_space="LOCAL")),
+        TransformLink(target="DEF-Iris", bone="j_f_irisprm_r", retarget="DEF", constraint=CopyScaleConstraint(target_bone="Iris", axis=(True, False, True), target_space="LOCAL", owner_space="LOCAL")),
+        TransformLink(target="DEF-Pupil", bone="j_f_irisprm_r", retarget="DEF", constraint=CopyScaleConstraint(target_bone="Pupil", axis=(False, True, False), target_space="LOCAL", owner_space="LOCAL")),
     ],
     generators=[
         ExtensionBone(
-            name="Iris.L",
+            name="Iris",
             bone_a="Eye.L",
             axis="Y",
             axis_type="local",
@@ -22,10 +24,10 @@ IRIS_CONTROLS = BoneGroup(
             parent="Eye.L",
             req_bones=["Eye.L"],
             operations=[
-               RigifyTypeOperation(bone_name="Iris.L", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-               CollectionOperation(bone_name="Iris.L", collection_name="Face (Primary)"),
+               RigifyTypeOperation(bone_name="Iris", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
+               CollectionOperation(bone_name="Iris", collection_name="Face (Primary)"),
                DriverOperation(
-                   driver_name="Iris.L Scale X",
+                   driver_name="Iris Scale X",
                    data="iris",
                    property='["Eye Scale X"]',
                    driver=Driver(
@@ -38,7 +40,7 @@ IRIS_CONTROLS = BoneGroup(
                    time="Post",
                ),
                DriverOperation(
-                   driver_name="Iris.L Scale Y",
+                   driver_name="Iris Scale Y",
                    data="iris",
                    property='["Eye Scale Y"]',
                    driver=Driver(
@@ -51,8 +53,22 @@ IRIS_CONTROLS = BoneGroup(
                    ),
                    time="Post",
                ),
+            ]
+        ),
+        ExtensionBone(
+            name="Pupil",
+            bone_a="Eye.L",
+            axis="Y",
+            axis_type="local",
+            start="tail",
+            size_factor=0.5,
+            parent="Eye.L",
+            req_bones=["Eye.L"],
+            operations=[
+               RigifyTypeOperation(bone_name="Pupil", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
+               CollectionOperation(bone_name="Pupil", collection_name="Face (Primary)"),
                DriverOperation(
-                   driver_name="Iris.L Scale Z",
+                   driver_name="Iris Scale Z",
                    data="iris",
                    property='["Pupil Scale"]',
                    driver=Driver(
@@ -61,23 +77,11 @@ IRIS_CONTROLS = BoneGroup(
                        variables=[
                            TransformChannelVariable(name="iris_z", target_bone="j_f_irisprm_l", transform_type="SCALE_Y", transform_space="LOCAL_SPACE"),
                            #Don't mind that it's taking the Y scale, it works
+                           #Admittedly this could be hella confusing on the user end if you haven't seen the code but I'll just write it in the wiki and call people stupid if they haven't read that -Oats
                        ]
                    ),
                    time="Post",
-               )
-            ]
-        ),
-        ExtensionBone(
-            name="Iris.R",
-            bone_a="Eye.R",
-            axis="Y",
-            axis_type="local",
-            start="tail",
-            parent="Eye.R",
-            req_bones=["Eye.R"],
-            operations=[
-               RigifyTypeOperation(bone_name="Iris.R", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-               CollectionOperation(bone_name="Iris.R", collection_name="Face (Primary)"),
+               ),
             ]
         ),
     ]
