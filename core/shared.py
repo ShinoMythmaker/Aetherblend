@@ -201,15 +201,26 @@ class BoneGroup:
 class UILink:
     """Defines a link between a bone or armature property and a UI element"""
     
-    property_name: str
     title: str
+    property_name: str | None = None
     bone_name: str | None = None
     constraint_name: str | None = None
     white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show. 
-    ui_type: UI_Type = "checkbox"
+    ui_type: UI_Type | None = "checkbox"
     ui_params: dict | None = None  # Additional parameters for the UI element
+    overrite: Literal["EyeLidControl"] | None = None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)
      
+    def eye_lid_control_draw(self, context, layout: bpy.types.UILayout):
 
+        armature = context.active_object
+        rig_props = armature.aether_rig
+        if rig_props.eye_lid_edit_mode:
+            layout.operator("aether.eyelid_offset_edit_end", text="Exit Eye Lid Edit Mode", icon='CANCEL')
+        else:
+            layout.operator("aether.eyelid_offset_edit_start", text="Enter Eye Lid Edit Mode", icon='EDITMODE_HLT')
+     
+        return
+    
     def draw(self, context, layout: bpy.types.UILayout):
         """Draws the UI element for this link."""
         armature = context.active_object
@@ -230,6 +241,10 @@ class UILink:
         if self.white_list:
             if not selected_bones.intersection(self.white_list):
                 return
+            
+        if self.overrite == "EyeLidControl":
+            self.eye_lid_control_draw(context, layout)
+            return
 
         target = armature.data
         if self.bone_name:
@@ -252,8 +267,6 @@ class UILink:
             print(f"[AetherBlend] Unknown UI element type '{self.ui_type}' for UILink '{self.title}'")
 
         
-    
-
 @dataclass
 class RigModule:
     """Defines a rig module and its behavior category."""

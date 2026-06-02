@@ -1,4 +1,5 @@
 import bpy
+import math
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -340,6 +341,7 @@ class ParentBoneOperation(ABOperation):
 class DriverOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
     bone_name: str = field(default=None, kw_only=True)
+    constraint_name: str = field(default=None, kw_only=True)
     driver_name: str
     property: tuple[str, int] | str
     driver: Driver
@@ -353,6 +355,10 @@ class DriverOperation(ABOperation):
         if self.data is None and self.bone_name is not None:          
             poseBone = self._getPoseBone(self.bone_name, armature)
             target = poseBone
+            if self.constraint_name is not None:
+                constraint = poseBone.constraints.get(self.constraint_name)
+                if constraint:
+                    target = constraint
         elif self.data is not None:
             data_block = data_dict.get(self.data) if data_dict else None
             if data_block is None:
@@ -420,6 +426,8 @@ class WidgetOperation(ABOperation):
         
         scale = (self.scale[0] * self.scale_factor, self.scale[1] * self.scale_factor, self.scale[2] * self.scale_factor)
 
+        degree = [math.radians(self.rotation[0]), math.radians(self.rotation[1]), math.radians(self.rotation[2])] 
+
         try:
             if self.color_set:
                 pose_bone.color.palette = self.color_set
@@ -433,7 +441,7 @@ class WidgetOperation(ABOperation):
                 if custom_shape_obj:
                     pose_bone.custom_shape = custom_shape_obj
             pose_bone.custom_shape_translation = self.translation
-            pose_bone.custom_shape_rotation_euler = self.rotation
+            pose_bone.custom_shape_rotation_euler = degree
             pose_bone.custom_shape_scale_xyz = scale
             pose_bone.custom_shape_transform = self.override_transform
             pose_bone.use_transform_at_custom_shape = self.affect_gizmo      ## 5.0

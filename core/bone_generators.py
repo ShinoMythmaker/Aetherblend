@@ -295,9 +295,15 @@ class ExtensionBone(BoneGenerator):
         if not direction_vector:
             print(f"[AetherBlend] Invalid axis configuration for ExtensionBone '{self.name}': axis_type='{self.axis_type}', axis='{self.axis}'.")
             return None
+
+        try:
+            size_factor = float(self.size_factor)
+        except (TypeError, ValueError):
+            print(f"[AetherBlend] Invalid size_factor value for ExtensionBone '{self.name}': {self.size_factor!r}.")
+            return None
         
         ref_bone_length = bone_a_ref.length if bone_a_ref.length > 0 else 1.0
-        extension_length = ref_bone_length * self.size_factor
+        extension_length = ref_bone_length * size_factor
         tail_pos = start_pos + direction_vector.normalized() * extension_length
         
         
@@ -345,7 +351,63 @@ class CopyBone(BoneGenerator):
         
         created_name = new_bone.name
         return [created_name]
-    
+
+
+@dataclass
+class OffsetBone(BoneGenerator):
+    """Create a bone at a giving offset from a source bone."""
+    bone_a: str
+    offset: mathutils.Vector = field(default_factory=lambda: mathutils.Vector((0.0, 0.0, 0.0)))
+    size_factor: float = 1.0
+
+    def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
+        """Generates the OffsetBone at the given offset from bone_a."""
+        if not armature:
+            print(f"[AetherBlend] Invalid armature provided for OffsetBone '{self.name}'.")
+            return None
+        
+        edit_bones = armature.data.edit_bones
+        bone_a_ref = edit_bones.get(self.bone_a)
+
+        if not bone_a_ref:
+            print(f"[AetherBlend] Reference bone '{self.bone_a}' not found for OffsetBone '{self.name}'.")
+            return None
+
+        try:
+            offset_vector = mathutils.Vector(self.offset)
+            if len(offset_vector) != 3:
+                offset_vector = offset_vector.to_3d()
+        except Exception:
+            print(f"[AetherBlend] Invalid offset value for OffsetBone '{self.name}': {self.offset!r}.")
+            return None
+
+        try:
+            size_factor = float(self.size_factor)
+        except (TypeError, ValueError):
+            print(f"[AetherBlend] Invalid size_factor value for OffsetBone '{self.name}': {self.size_factor!r}.")
+            return None
+
+        offset_in_armature = bone_a_ref.matrix.to_3x3() @ offset_vector
+
+        ref_bone_vector = bone_a_ref.tail - bone_a_ref.head
+        scaled_bone_vector = ref_bone_vector * size_factor
+
+        head_pos = bone_a_ref.head + offset_in_armature
+        tail_pos = head_pos + scaled_bone_vector
+        
+        if self.name in edit_bones:
+            edit_bones.remove(edit_bones[self.name])
+
+        new_bone = edit_bones.new(self.name)
+        new_bone.head = head_pos
+        new_bone.tail = tail_pos
+        new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
+
+        self._set_parent(new_bone, edit_bones)
+        
+        created_name = new_bone.name
+        return [created_name]
+
 @dataclass
 class ParallelBone(BoneGenerator):
     """Creates a bone extending from a source bone along an axis until it reaches a target coordinate."""
