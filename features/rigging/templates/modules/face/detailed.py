@@ -11,8 +11,6 @@ from ......core import rigify
 HEAD = BoneGroup(
     name="Head",
     transform_link= [
-        TransformLink(target="DEF-Neck", bone="j_kubi"),
-        TransformLink(target="DEF-Head", bone="j_kao"),
         TransformLink(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
         TransformLink(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
         TransformLink(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
@@ -28,27 +26,6 @@ HEAD = BoneGroup(
         TransformLink(target="DEF-Nostril.L", bone="j_f_hana_l"),
     ],
     generators=[
-        ConnectBone(
-            name="Neck",
-            bone_a="j_kubi",
-            bone_b="j_kao",
-            req_bones=["j_kubi", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Neck", parent=["Spine.004", "j_sebo_c"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Neck", rigify_type=rigify.types.spines_super_head()),
-                        CollectionOperation(time="Pre", bone_name="Neck", collection_name="Head"),
-            ]
-        ),
-        ExtensionBone(
-            name="Head",
-            bone_a="j_kao",
-            axis_type="armature",
-            axis="Z",
-            size_factor=20.0,
-            parent="Neck",
-            is_connected=True,
-            req_bones=["j_kao"],
-            operations=[CollectionOperation(time="Pre", bone_name="Head", collection_name="Head")]
-        ),
         #Cheek Right
         ConnectBone(
             name="Cheek.B.R",
