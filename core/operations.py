@@ -1,5 +1,6 @@
 import bpy
 import math
+import mathutils
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -402,6 +403,9 @@ class WidgetOperation(ABOperation):
 
     bone_name: str
     color_set: str | None = None
+    custom_color_normal: tuple[float, float, float] | None = None
+    custom_color_select: tuple[float, float, float] | None = None
+    custom_color_active: tuple[float, float, float] | None = None
     custom_object: str | None = None
     translation: tuple[float, float, float] = (0.0, 0.0, 0.0)
     rotation: tuple[float, float, float] = (0.0, 0.0, 0.0)
@@ -431,15 +435,21 @@ class WidgetOperation(ABOperation):
         try:
             if self.color_set:
                 pose_bone.color.palette = self.color_set
-            custom_object_name = None
+                if self.color_set == "CUSTOM":
+                    if self.custom_color_normal:
+                        pose_bone.color.custom.normal =  mathutils.Color(self.custom_color_normal)
+                    if self.custom_color_select:
+                        pose_bone.color.custom.select = mathutils.Color(self.custom_color_select)
+                    if self.custom_color_active:
+                        pose_bone.color.custom.active = mathutils.Color(self.custom_color_active)
             if self.custom_object:
                 custom_object_name = self._searchWGTS(armature, self.custom_object)
-            if self.custom_object and not custom_object_name:
-                print(f"[AetherBlend] WidgetOperation custom object '{self.custom_object}' not found in WGTS collection of armature '{armature.name}'.")
-            else:
                 custom_shape_obj = bpy.data.objects.get(custom_object_name) if custom_object_name else None
-                if custom_shape_obj:
-                    pose_bone.custom_shape = custom_shape_obj
+
+                # Always reassign the custom shape when a custom object is requested.
+                pose_bone.custom_shape = custom_shape_obj
+                if not custom_shape_obj:
+                    print(f"[AetherBlend] WidgetOperation custom object '{self.custom_object}' not found in WGTS collection of armature '{armature.name}'.")
             pose_bone.custom_shape_translation = self.translation
             pose_bone.custom_shape_rotation_euler = degree
             pose_bone.custom_shape_scale_xyz = scale
@@ -455,15 +465,17 @@ class WidgetOperation(ABOperation):
     @staticmethod
     def _searchWGTS(armature, name: str) -> str | None:
         """Searches for a widget object in the WGTS collection of the armature."""
-        normalized_name = WidgetOperation._normalizeWidgetName(name)
-        if not normalized_name:
+        search_name = name.strip()
+        if not search_name:
             return None
+
+        expected_widget_name = search_name if search_name.startswith("AB_WGT_") else f"AB_WGT_{search_name}"
 
         local_collections: list[bpy.types.Collection] = []
         for armature_collection in armature.users_collection:
             local_collections.extend(utils.collection.collection_tree(armature_collection))
 
-        matcher = lambda object_name: normalized_name in WidgetOperation._normalizeWidgetName(object_name)
+        matcher = lambda object_name: object_name == expected_widget_name
 
         found_name = utils.collection.find_object_name_in_prefixed_collections(
             local_collections,
@@ -483,7 +495,7 @@ class WidgetOperation(ABOperation):
         if found_name:
             return found_name
 
-        print(f"[AetherBlend] WidgetOperation: No matching WGTS widget '{name}' found for armature '{armature.name}'.")
+        print(f"[AetherBlend] WidgetOperation: No matching WGTS widget '{expected_widget_name}' found for armature '{armature.name}'.")
         return None
 
     @staticmethod
@@ -499,6 +511,7 @@ class BoneRestrictionOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
     bone_name: str
+    hide_select: bool = False
     lock_location: tuple[bool, bool, bool] | bool = False
     lock_rotation: tuple[bool, bool, bool] | bool = False
     lock_scale: tuple[bool, bool, bool] | bool = False
@@ -512,9 +525,9 @@ class BoneRestrictionOperation(ABOperation):
             return
         poseBone = self._getPoseBone(self.bone_name, armature)
         dataBone = armature.data.bones.get(self.bone_name)
-        if not poseBone:
+        if not poseBone or not dataBone:
             return
-        
+        dataBone.hide_select = self.hide_select
         if isinstance(self.lock_location, bool):
             lock_location = (self.lock_location, self.lock_location, self.lock_location)
         else:            
@@ -540,6 +553,31 @@ class BoneRestrictionOperation(ABOperation):
             # Add more restriction types as needed
         except Exception as e:
             print(f"[AetherBlend] Error applying BoneRestrictionOperation for bone '{self.bone_name}': {e}")
+
+@dataclass()
+class PoseBoneOperation(ABOperation):
+    """Poses a bone by setting its location, rotation, and scale."""
+    mode: ClassVar[Mode] = "POSE"
+    time : Time = field(default="Post", kw_only=True)
+
+    bone_name: str
+    location: tuple[float, float, float] | None = None
+    rotation: tuple[float, float, float] | None = None
+    scale: tuple[float, float, float] | None = None
+
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
+        """Poses a bone by setting its location, rotation, and scale."""
+        if not self._switch_mode():
+            return
+        poseBone = self._getPoseBone(self.bone_name, armature)
+        if not poseBone:
+            return
+        if self.location:
+            poseBone.location = self.location
+        if self.rotation:
+            poseBone.rotation_euler = [math.radians(angle) for angle in self.rotation]
+        if self.scale:
+            poseBone.scale = self.scale
 
     
 

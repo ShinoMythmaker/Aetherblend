@@ -1,8 +1,8 @@
 import mathutils
 
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation, BoneRestrictionOperation, ConstraintOperation, DriverOperation
-from ......core.constraints import CopyLocationConstraint
+from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation, BoneRestrictionOperation, ConstraintOperation, DriverOperation, PoseBoneOperation
+from ......core.constraints import CopyLocationConstraint, CopyScaleConstraint, LimitLocationConstraint
 from ......core.drivers import TransformChannelVariable, Driver, SinglePropertyVariable
 from ......core.bone_generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone, OffsetBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
@@ -494,20 +494,6 @@ LEFT_EYE = BoneGroup(
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002", collection_name="Face (Secondary)")]
             
         ),
-        #Anchor Bone for closing eyes
-        ExtensionBone(
-            name="lid.B.L.002.anchor",
-            bone_a="lid.B.L.002",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.L.002",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002.anchor", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.002.anchor", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.B.L.002.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.B.L.002.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
         CopyBone(
             name="Eye.L",
             source_bone="j_f_eyepuru_l",
@@ -563,20 +549,7 @@ LEFT_EYE = BoneGroup(
             req_bones=["lid.B.L", "lid.B.L.002"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001", collection_name="Face (Secondary)")]
         ),
-        #Anchor Bone for closing eyes
-        ExtensionBone(
-            name="lid.B.L.001.anchor",
-            bone_a="lid.B.L.001",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.L.001",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001.anchor", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.001.anchor", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.B.L.001.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.B.L.001.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
+
         BridgeBone(
             name="lid.B.L.003",
             bone_a="lid.B.L.002",
@@ -585,20 +558,6 @@ LEFT_EYE = BoneGroup(
             is_connected=False,
             req_bones=["lid.B.L.002", "lid.T.L"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003", collection_name="Face (Secondary)")]
-        ),
-        #Anchor Bone for closing eyes
-        ExtensionBone(
-            name="lid.B.L.003.anchor",
-            bone_a="lid.B.L.003",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.L.003",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003.anchor", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.L.003.anchor", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.B.L.003.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.B.L.003.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
         ),
         ConnectBone(
             name="eye_tracker.B.L.001",
@@ -693,45 +652,6 @@ LEFT_EYE = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="Upper.Lid.L.Glue", collection_name="MCH")
             ]
         ),
-
-        #### Eye Lid Controllers
-
-        OffsetBone(
-            name="Lid.Ctrl.L",
-            bone_a="Eye.L",
-            offset=(0.01, 0.015, 0.035),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lid.Ctrl.L", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Lid.Ctrl.L", collection_name="Eyes_Anchors"),
-                        WidgetOperation(time="Post", bone_name="Lid.Ctrl.L", color_set="THEME01", custom_object="Pointer", rotation=(0.0,90.0,90.0), scale=(2.0,2.0,2.0), wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl.L", lock_location=True, lock_rotation=True, lock_scale=True),
-                        ParentBoneOperation(time="Post", bone_name="Lid.Ctrl.L", parent=["head"])
-            ]
-        ),
-        OffsetBone(
-            name="Lid.Ctrl.L.001",
-            bone_a="Eye.L",
-            offset=(-0.01, 0.015, 0.035),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lid.Ctrl.L.001", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Lid.Ctrl.L.001", collection_name="Eyes_Anchors"),
-                        WidgetOperation(time="Post", bone_name="Lid.Ctrl.L.001", color_set="THEME01", custom_object="Pointer", rotation=(0.0,90.0,90.0), scale=(2.0,2.0,2.0), wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl.L.001", lock_location=True, lock_rotation=True, lock_scale=True),
-                        ParentBoneOperation(time="Post", bone_name="Lid.Ctrl.L.001", parent=["head"])
-            ]
-        ),
-        OffsetBone(
-            name="Lid.Ctrl.L.Master",
-            bone_a="Eye.L",
-            offset=(0.01, 0.015, 0.035),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lid.Ctrl.L.Master", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Lid.Ctrl.L.Master", collection_name="Eyes_Anchors"),
-                        WidgetOperation(time="Post", bone_name="Lid.Ctrl.L.Master", color_set="THEME03", custom_object="Pointer", rotation=(180.0,90.0,90.0), scale=(2.0,2.0,2.0), wire_width=2.0, translation=(-0.002, 0.0, 0.0)),
-                        BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl.L.Master", lock_location=(True, True, False), lock_rotation=True, lock_scale=True),
-                        ParentBoneOperation(time="Post", bone_name="Lid.Ctrl.L.Master", parent=["head"])
-            ]
-        ),
     ]
 )  
 
@@ -779,20 +699,6 @@ RIGHT_EYE = BoneGroup(
             req_bones=["j_f_mabdn_01_r"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002", collection_name="Face (Secondary)")]
         ),
-        #Anchor Bone for closing eyes
-        ExtensionBone(
-            name="lid.B.R.002.anchor",
-            bone_a="lid.B.R.002",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.R.002",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002.anchor", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.002.anchor", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.B.R.002.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.B.R.002.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
         CopyBone(
             name="Eye.R",
             source_bone="j_f_eyepuru_r",
@@ -831,20 +737,6 @@ RIGHT_EYE = BoneGroup(
             req_bones=["lid.B.R", "lid.B.R.002"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001", collection_name="Face (Secondary)")]
         ),
-        #Anchor Bone for closing eyes
-        ExtensionBone(
-            name="lid.B.R.001.anchor",
-            bone_a="lid.B.R.001",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.R.001",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001.anchor", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.001.anchor", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.B.R.001.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.B.R.001.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
         BridgeBone(
             name="lid.B.R.003",
             bone_a="lid.B.R.002",
@@ -853,20 +745,6 @@ RIGHT_EYE = BoneGroup(
             is_connected=False,
             req_bones=["lid.B.R.002", "lid.T.R"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003", collection_name="Face (Secondary)")]
-        ),
-        #Anchor Bone for closing eyes
-        ExtensionBone(
-            name="lid.B.R.003.anchor",
-            bone_a="lid.B.R.003",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.R.003",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003.anchor", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.B.R.003.anchor", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.B.R.003.anchor", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.B.R.003.anchor", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
         ),
         ConnectBone(
             name="eye_tracker.B.R.001",
@@ -958,15 +836,539 @@ RIGHT_EYE = BoneGroup(
     ]
 )
 
+
+_IrisMinOut = 0.7
+_IrisMaxOut = 1.5
+_PupilMinOut = 0.5
+_PupilMaxOut = 2.3
+
+EYES_CONTROLS = BoneGroup(
+    name="Eyes Controls",
+    generators=[
+        #####
+        # Iris Sliders
+        #####
+        OffsetBone(
+            name="Iris.Ctrl.Master",
+            bone_a="Eye.L",
+            offset=(0.0025, 0.015, 0.051),
+            parent="Eye.L",
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Iris.Ctrl.Master", rigify_type=rigify.types.basic_raw_copy()),
+                        CollectionOperation(time="Pre", bone_name="Iris.Ctrl.Master", collection_name="Eyes (Macro)"),
+                        WidgetOperation(time="Post", bone_name="Iris.Ctrl.Master", custom_object="IrisSliderFrame", rotation=(90.0,-90.0,180.0), wire_width=1.2, scale_to_bone_length=False, 
+                                        color_set="CUSTOM", custom_color_normal=(0.443137, 0.541176, 1.0), custom_color_select=(0.443137, 0.541176, 1.0), custom_color_active=(0.443137, 0.541176, 1.0)),
+                        ParentBoneOperation(time="Post", bone_name="Iris.Ctrl.Master", parent=["head"]),
+                        PoseBoneOperation(time="Post", bone_name="Iris.Ctrl.Master",scale=(0.007, 0.007, 0.007)),
+                        BoneRestrictionOperation(time="Post", bone_name="Iris.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True),
+            ]
+        ),
+        OffsetBone(
+            name="Iris.Ctrl",
+            bone_a="Eye.L",
+            offset=(0.0025, 0.015, 0.051),
+            parent="Eye.L",
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Iris.Ctrl", rigify_type=rigify.types.basic_raw_copy()),
+                        CollectionOperation(time="Pre", bone_name="Iris.Ctrl", collection_name="Eyes (Macro)"),
+                        WidgetOperation(time="Post", bone_name="Iris.Ctrl", custom_object="Slider", rotation=(90.0,-90.0, 180.0), wire_width=1.3, scale_to_bone_length=False),
+                        BoneRestrictionOperation(time="Post", bone_name="Iris.Ctrl", lock_location=(True, True, False), lock_rotation=True, lock_scale=True),
+                        ParentBoneOperation(time="Post", bone_name="Iris.Ctrl", parent=["Iris.Ctrl.Master"]),
+                        ConstraintOperation(
+                            bone_name="Iris.Ctrl",
+                            time="Post",
+                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1)),
+
+            ]
+        ),
+        #####
+        # Pupil Sliders
+        #####
+        OffsetBone(
+            name="Pupil.Ctrl.Master",
+            bone_a="Eye.L",
+            offset=(0.0025, 0.015, 0.058),
+            parent="Eye.L",
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Pupil.Ctrl.Master", rigify_type=rigify.types.basic_raw_copy()),
+                        CollectionOperation(time="Pre", bone_name="Pupil.Ctrl.Master", collection_name="Eyes (Macro)"),
+                        WidgetOperation(time="Post", bone_name="Pupil.Ctrl.Master", custom_object="PupilSliderFrame", rotation=(90.0,-90.0,180.0), wire_width=1.2, scale_to_bone_length=False, 
+                                        color_set="CUSTOM", custom_color_normal=(0.443137, 0.541176, 1.0), custom_color_select=(0.443137, 0.541176, 1.0), custom_color_active=(0.443137, 0.541176, 1.0)),
+                        ParentBoneOperation(time="Post", bone_name="Pupil.Ctrl.Master", parent=["head"]),
+                        PoseBoneOperation(time="Post", bone_name="Pupil.Ctrl.Master",scale=(0.007, 0.007, 0.007)),
+                        BoneRestrictionOperation(time="Post", bone_name="Pupil.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True),
+            ]
+        ),
+        OffsetBone(
+            name="Pupil.Ctrl",
+            bone_a="Eye.L",
+            offset=(0.0025, 0.015, 0.058),
+            parent="Eye.L",
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Pupil.Ctrl", rigify_type=rigify.types.basic_raw_copy()),
+                        CollectionOperation(time="Pre", bone_name="Pupil.Ctrl", collection_name="Eyes (Macro)"),
+                        WidgetOperation(time="Post", bone_name="Pupil.Ctrl", custom_object="Slider", rotation=(90.0,-90.0, 180.0), wire_width=1.3, scale_to_bone_length=False),
+                        BoneRestrictionOperation(time="Post", bone_name="Pupil.Ctrl", lock_location=(True, True, False), lock_rotation=True, lock_scale=True),
+                        ParentBoneOperation(time="Post", bone_name="Pupil.Ctrl", parent=["Pupil.Ctrl.Master"]),
+                        ConstraintOperation(
+                            bone_name="Pupil.Ctrl",
+                            time="Post",
+                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1)),
+
+            ]
+        ),
+
+        #####
+        # Anchor bones for EyeLid Control
+        #####
+        # - Left Eye
+        ExtensionBone(
+            name="lid.anchor.B.L.002",
+            bone_a="lid.B.L.002",
+            axis_type="global",
+            axis="Z",
+            start="head",
+            parent="lid.B.L.002",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.L.002", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.L.002", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.anchor.B.L.002", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.L.002", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
+            ]
+        ),
+        ExtensionBone(
+            name="lid.anchor.B.L.001",
+            bone_a="lid.B.L.001",
+            axis_type="global",
+            axis="Z",
+            start="head",
+            parent="lid.B.L.001",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.L.001", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.L.001", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.anchor.B.L.001", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.L.001", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
+            ]
+        ),
+        ExtensionBone(
+            name="lid.anchor.B.L.003",
+            bone_a="lid.B.L.003",
+            axis_type="global",
+            axis="Z",
+            start="head",
+            parent="lid.B.L.003",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.L.003", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.L.003", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.anchor.B.L.003", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.L.003", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
+            ]
+        ),
+        # - Right Eye 
+        ExtensionBone(
+            name="lid.anchor.B.R.002",
+            bone_a="lid.B.R.002",
+            axis_type="global",
+            axis="Z",
+            start="head",
+            parent="lid.B.R.002",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.R.002", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.R.002", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.anchor.B.R.002", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.R.002", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
+            ]
+        ),
+        ExtensionBone(
+            name="lid.anchor.B.R.001",
+            bone_a="lid.B.R.001",
+            axis_type="global",
+            axis="Z",
+            start="head",
+            parent="lid.B.R.001",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.R.001", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.R.001", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.anchor.B.R.001", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.R.001", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
+            ]
+        ),
+        ExtensionBone(
+            name="lid.anchor.B.R.003",
+            bone_a="lid.B.R.003",
+            axis_type="global",
+            axis="Z",
+            start="head",
+            parent="lid.B.R.003",
+            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.R.003", collection_name="Eyes_Anchors"),
+                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.R.003", rigify_type=rigify.types.basic_raw_copy()),
+                        WidgetOperation(time="Post", bone_name="lid.anchor.B.R.003", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
+                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.R.003", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
+            ]
+        ),
+    
+        #####
+        # EyeLid Controllers
+        #####
+        OffsetBone(
+            name="Lid.Ctrl.Master",
+            bone_a="Eye.L",
+            offset=(0.01, 0.015, 0.035),
+            parent="Eye.L",
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Lid.Ctrl.Master", rigify_type=rigify.types.basic_raw_copy()),
+                        CollectionOperation(time="Pre", bone_name="Lid.Ctrl.Master", collection_name="Eyes (Macro)"),
+                        WidgetOperation(time="Post", bone_name="Lid.Ctrl.Master", custom_object="EyeTriangle", rotation=(90.0,0.0,0.0), wire_width=1.2, scale_to_bone_length=False, 
+                                        color_set="CUSTOM", custom_color_normal=(1.0, 0.435294, 0.733333), custom_color_select=(1.0, 0.435294, 0.733333), custom_color_active=(1.0, 0.435294, 0.733333)),
+                        ParentBoneOperation(time="Post", bone_name="Lid.Ctrl.Master", parent=["head"]),
+                        PoseBoneOperation(time="Post", bone_name="Lid.Ctrl.Master",scale=(0.015, 0.015, 0.015)),
+                        BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True),
+            ]
+        ),
+        OffsetBone(
+            name="Lid.Ctrl",
+            bone_a="Eye.L",
+            offset=(0.01, 0.015, 0.035),
+            parent="Eye.L",
+            operations=[RigifyTypeOperation(time="Pre", bone_name="Lid.Ctrl", rigify_type=rigify.types.basic_raw_copy()),
+                        CollectionOperation(time="Pre", bone_name="Lid.Ctrl", collection_name="Eyes (Macro)"),
+                        WidgetOperation(time="Post", bone_name="Lid.Ctrl", custom_object="Circle", rotation=(180.0,90.0,90.0), scale=(0.08,0.08,0.08), wire_width=1.3, scale_to_bone_length=False),
+                        BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl", lock_location=(False, True, False), lock_rotation=True, lock_scale=True),
+                        ParentBoneOperation(time="Post", bone_name="Lid.Ctrl", parent=["Lid.Ctrl.Master"]),
+            ]
+        ),
+    ],
+    operations=[
+        #####
+        # Constraints for Eyelid Control
+        #####
+        # - Left Eye
+        ConstraintOperation(
+            bone_name="lid.T.L.003",
+            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.L.001", influence=0.0, name="AB_EyeLidControl"),
+            time="Post"
+        ),
+        ConstraintOperation(
+            bone_name="lid.T.L.002",
+            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.L.002", influence=0.0, name="AB_EyeLidControl"),
+            time="Post"
+        ),
+        ConstraintOperation(
+            bone_name="lid.T.L.001",
+            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.L.003", influence=0.0, name="AB_EyeLidControl"),
+            time="Post"
+        ),
+        # - Right Eye
+        ConstraintOperation(
+            bone_name="lid.T.R.003",
+            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.R.001", influence=0.0, name="AB_EyeLidControl"),
+            time="Post"
+        ),
+        ConstraintOperation(
+            bone_name="lid.T.R.002",
+            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.R.002", influence=0.0, name="AB_EyeLidControl"),
+            time="Post"
+        ),
+        ConstraintOperation(
+            bone_name="lid.T.R.001",
+            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.R.003", influence=0.0, name="AB_EyeLidControl"),
+            time="Post"
+        ),
+
+        #####
+        # Drivers for Eyelid Control
+        #####
+        # - Left Eye
+        DriverOperation(
+            driver_name="EyeLidControl_lid.T.L.003",
+            time="Post",
+            bone_name="lid.T.L.003",
+            constraint_name="AB_EyeLidControl",
+            property="influence",
+            driver=Driver(
+                type="SCRIPTED",
+                expression="min(1, max(0, (-y / 1) - max(0, x / 0.667)))",
+                variables=[
+                    TransformChannelVariable(
+                        name="x",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_X",
+                        transform_space="LOCAL_SPACE"
+                    ),
+                    TransformChannelVariable(
+                        name="y",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_Z",
+                        transform_space="LOCAL_SPACE"
+                    )
+                ]
+            )
+        ),
+        DriverOperation(
+            driver_name="EyeLidControl_lid.T.L.002",
+            time="Post",
+            bone_name="lid.T.L.002",
+            constraint_name="AB_EyeLidControl",
+            property="influence",
+            driver=Driver(
+                type="SCRIPTED",
+                expression="min(1, max(0, (-y / 1) - max(0, x / 0.667)))",
+                variables=[
+                    TransformChannelVariable(
+                        name="x",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_X",
+                        transform_space="LOCAL_SPACE"
+                    ),
+                    TransformChannelVariable(
+                        name="y",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_Z",
+                        transform_space="LOCAL_SPACE"
+                    )
+                ]
+            )
+        ),
+        DriverOperation(
+            driver_name="EyeLidControl_lid.T.L.001",
+            time="Post",
+            bone_name="lid.T.L.001",
+            constraint_name="AB_EyeLidControl",
+            property="influence",
+            driver=Driver(
+                type="SCRIPTED",
+                expression="min(1, max(0, (-y / 1) - max(0, x / 0.667)))",
+                variables=[
+                    TransformChannelVariable(
+                        name="x",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_X",
+                        transform_space="LOCAL_SPACE"
+                    ),
+                    TransformChannelVariable(
+                        name="y",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_Z",
+                        transform_space="LOCAL_SPACE"
+                    )
+                ]
+            )
+        ),
+        # - Right Eye
+        DriverOperation(
+            driver_name="EyeLidControl_lid.T.R.003",
+            time="Post",
+            bone_name="lid.T.R.003",
+            constraint_name="AB_EyeLidControl",
+            property="influence",
+            driver=Driver(
+                type="SCRIPTED",
+                expression="min(1, max(0, (-y / 1) - max(0, -x / 0.667)))",
+                variables=[
+                    TransformChannelVariable(
+                        name="x",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_X",
+                        transform_space="LOCAL_SPACE"
+                    ),
+                    TransformChannelVariable(
+                        name="y",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_Z",
+                        transform_space="LOCAL_SPACE"
+                    )
+                ]
+            )
+        ),
+        DriverOperation(
+            driver_name="EyeLidControl_lid.T.R.002",
+            time="Post",
+            bone_name="lid.T.R.002",
+            constraint_name="AB_EyeLidControl",
+            property="influence",
+            driver=Driver(
+                type="SCRIPTED",
+                expression="min(1, max(0, (-y / 1) - max(0, -x / 0.667)))",
+                variables=[
+                    TransformChannelVariable(
+                        name="x",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_X",
+                        transform_space="LOCAL_SPACE"
+                    ),
+                    TransformChannelVariable(
+                        name="y",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_Z",
+                        transform_space="LOCAL_SPACE"
+                    )
+                ]
+            )
+        ),
+        DriverOperation(
+            driver_name="EyeLidControl_lid.T.R.001",
+            time="Post",
+            bone_name="lid.T.R.001",
+            constraint_name="AB_EyeLidControl",
+            property="influence",
+            driver=Driver(
+                type="SCRIPTED",
+                expression="min(1, max(0, (-y / 1) - max(0, -x / 0.667)))",
+                variables=[
+                    TransformChannelVariable(
+                        name="x",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_X",
+                        transform_space="LOCAL_SPACE"
+                    ),
+                    TransformChannelVariable(
+                        name="y",
+                        target_bone="Lid.Ctrl",
+                        transform_type="LOC_Z",
+                        transform_space="LOCAL_SPACE"
+                    )
+                ]
+            )
+        ),
+    
+        #####
+        # Iris and Pupil Drivers
+        #####
+        # - Driver for the Object property to drive the Shader
+        DriverOperation(
+            driver_name="Iris Scale X",
+            data="iris",
+            property='["Eye Scale X"]',
+            driver=Driver(
+                type="SCRIPTED",
+                expression="1/iris_x",
+                variables=[
+                    TransformChannelVariable(name="iris_x", target_bone="j_f_irisprm_l", transform_type="SCALE_X", transform_space="LOCAL_SPACE"),
+                ]
+            ),
+            time="Post",
+        ),
+        DriverOperation(
+            driver_name="Iris Scale Y",
+            data="iris",
+            property='["Eye Scale Y"]',
+            driver=Driver(
+                type="SCRIPTED",
+                expression="1/iris_y",
+                variables=[
+                    TransformChannelVariable(name="iris_y", target_bone="j_f_irisprm_l", transform_type="SCALE_Z", transform_space="LOCAL_SPACE"),
+                    #Don't mind that it's taking the Z scale, it works
+                ]
+            ),
+            time="Post",
+        ),
+        DriverOperation(
+            driver_name="Iris Scale Z",
+            data="iris",
+            property='["Pupil Scale"]',
+            driver=Driver(
+                type="SCRIPTED",
+                expression="iris_z-1",
+                variables=[
+                    TransformChannelVariable(name="iris_z", target_bone="j_f_irisprm_l", transform_type="SCALE_Y", transform_space="LOCAL_SPACE"),
+                    #Don't mind that it's taking the Y scale, it works
+                    #Admittedly this could be hella confusing on the user end if you haven't seen the code but I'll just write it in the wiki and call people stupid if they haven't read that -Oats
+                    #Yes - Shino
+                ]
+            ),
+            time="Post",
+        ),
+
+        # - Driver on the FFXIV Iris Control Bones to map from our Sliders (This is is based on a trust me bro basis and i will not explain it thx, explained it anyway)
+        ## Quick math for expressions example 1 + (0.3 * var if var < 0 else 0.5 * var)
+        ## 1 - 0.3 is our min outpuut 
+        ## 1 + 0.5 is our max output
+        ## Your welcome -Shino
+        ## Also look ive made helper Variables so you dont have to edit all expressions the whole time.
+        # - Left Side
+        DriverOperation(
+            driver_name="Iris.Ctrl Scale X L",
+            time="Post",
+            bone_name="j_f_irisprm_l",
+            property=("scale", 0),
+            driver=Driver(
+                type="SCRIPTED",
+                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
+                variables=[
+                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
+                ]
+            )
+        ),
+        DriverOperation(
+            driver_name="Iris.Ctrl Scale Z L",
+            time="Post",
+            bone_name="j_f_irisprm_l",
+            property=("scale", 2),
+            driver=Driver(
+                type="SCRIPTED",
+                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
+                variables=[
+                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
+                ]
+            )
+        ),
+        DriverOperation(
+            driver_name="Pupil.Ctrl Scale Y L",
+            time="Post",
+            bone_name="j_f_irisprm_l",
+            property=("scale", 1),
+            driver=Driver(
+                type="SCRIPTED",
+                expression=f"1 + ({1-_PupilMinOut} * var if var < 0 else {_PupilMaxOut-1} * var)",
+                variables=[
+                    TransformChannelVariable(name="var", target_bone="Pupil.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
+                ]
+            )
+        ),
+        # - Right Side
+        DriverOperation(
+            driver_name="Iris.Ctrl Scale X R",
+            time="Post",
+            bone_name="j_f_irisprm_r",
+            property=("scale", 0),
+            driver=Driver(
+                type="SCRIPTED",
+                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
+                variables=[
+                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
+                ]
+            )
+        ),
+        DriverOperation(
+            driver_name="Iris.Ctrl Scale Z R",
+            time="Post",
+            bone_name="j_f_irisprm_r",
+            property=("scale", 2),
+            driver=Driver(
+                type="SCRIPTED",
+                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
+                variables=[
+                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
+                ]
+            )
+        ),   
+        DriverOperation(
+            driver_name="Pupil.Ctrl Scale Y R",
+            time="Post",
+            bone_name="j_f_irisprm_r",
+            property=("scale", 1),
+            driver=Driver(
+                type="SCRIPTED",
+                expression=f"1 + ({1-_PupilMinOut} * var if var < 0 else {_PupilMaxOut-1} * var)",
+                variables=[
+                    TransformChannelVariable(name="var", target_bone="Pupil.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
+                ]
+            )
+        ),
+    ]
+)
+
 def get_rig_module() -> RigModule:
     return RigModule(
         name="Default",
         type="Generation",
-        bone_groups=[HEAD, BROW, LEFT_EYE, RIGHT_EYE],
+        bone_groups=[HEAD, BROW, LEFT_EYE, RIGHT_EYE, EYES_CONTROLS],
         ui_collections = UI_Collections([
-            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=0, title="Face (Primary)", visible=False),
-            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=0, title="Face (Secondary)", visible=False),
-            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
+            BoneCollection(name="Head", ui=True, color_set="Head", row_index=0, title="Head"),
+            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=1, title="Face (Primary)", visible=True),
+            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=1, title="Face (Secondary)", visible=False),
+            BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=2, title="Eyes (Macro)", visible=True),
+            BoneCollection(name="Eyes_Anchors", ui=True, color_set="Face_Primary", row_index=2, title="->Adjust", visible=False),
         ]),
         operations=[
             #Left Face
@@ -983,83 +1385,7 @@ def get_rig_module() -> RigModule:
             WidgetOperation(bone_name="Cheek.B.R.001",scale_factor=0.3,),
             WidgetOperation(bone_name="Cheek.B.R",scale_factor=0.3,),
             WidgetOperation(bone_name="Nose.R",scale_factor=0.3,),
-            WidgetOperation(bone_name="Nostril.R",scale_factor=0.2,),
-
-            ## Constraints for eyelid controls 
-            ConstraintOperation(
-                bone_name="lid.T.L.003",
-                constraint= CopyLocationConstraint(target_bone="lid.B.L.001.anchor", influence=0.0, name="EyeLidControl"),
-                time="Post"
-            ),
-            ConstraintOperation(
-                bone_name="lid.T.L.002",
-                constraint= CopyLocationConstraint(target_bone="lid.B.L.002.anchor", influence=0.0, name="EyeLidControl"),
-                time="Post"
-            ),
-            ConstraintOperation(
-                bone_name="lid.T.L.001",
-                constraint= CopyLocationConstraint(target_bone="lid.B.L.003.anchor", influence=0.0, name="EyeLidControl"),
-                time="Post"
-            ),
-            ## Driver Operations 
-            DriverOperation(
-                driver_name="EyeLidControl_lid.T.L.003",
-                time="Post",
-                bone_name="lid.T.L.003",
-                constraint_name="EyeLidControl",
-                property="influence",
-                driver=Driver(
-                    type="SCRIPTED",
-                    expression="clamp((var - 0) / ((-0.02) - 0), 0.0, 1.0)",
-                    variables=[
-                        TransformChannelVariable(
-                            name="var",
-                            target_bone="Lid.Ctrl.L.Master",
-                            transform_type="LOC_Z",
-                            transform_space="LOCAL_SPACE"
-                        )
-                    ]
-                )
-            ),
-            DriverOperation(
-                driver_name="EyeLidControl_lid.T.L.002",
-                time="Post",
-                bone_name="lid.T.L.002",
-                constraint_name="EyeLidControl",
-                property="influence",
-                driver=Driver(
-                    type="SCRIPTED",
-                    expression="clamp((var - 0) / ((-0.02) - 0), 0.0, 1.0)",
-                    variables=[
-                        TransformChannelVariable(
-                            name="var",
-                            target_bone="Lid.Ctrl.L.Master",
-                            transform_type="LOC_Z",
-                            transform_space="LOCAL_SPACE"
-                        )
-                    ]
-                )
-            ),
-            DriverOperation(
-                driver_name="EyeLidControl_lid.T.L.001",
-                time="Post",
-                bone_name="lid.T.L.001",
-                constraint_name="EyeLidControl",
-                property="influence",
-                driver=Driver(
-                    type="SCRIPTED",
-                    expression="clamp((var - 0) / ((-0.02) - 0), 0.0, 1.0)",
-                    variables=[
-                        TransformChannelVariable(
-                            name="var",
-                            target_bone="Lid.Ctrl.L.Master",
-                            transform_type="LOC_Z",
-                            transform_space="LOCAL_SPACE"
-                        )
-                    ]
-                )
-            )
-        ],
-        ui_flags=["Eye Lid Edit Mode"]
+            WidgetOperation(bone_name="Nostril.R",scale_factor=0.2,),   
+        ]
     )
 
