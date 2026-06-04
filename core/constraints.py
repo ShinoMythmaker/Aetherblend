@@ -234,5 +234,6 @@ class LimitLocationConstraint(Constraint):
         constraint.max_x = self.max_x
         constraint.max_y = self.max_y
         constraint.max_z = self.max_z
+        constraint.use_transform_limit = self.use_transform_limit
         constraint.owner_space = self.owner_space
         constraint.influence = self.influence

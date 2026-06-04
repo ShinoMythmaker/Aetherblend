@@ -875,7 +875,7 @@ EYES_CONTROLS = BoneGroup(
                         ConstraintOperation(
                             bone_name="Iris.Ctrl",
                             time="Post",
-                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1)),
+                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1, use_transform_limit=True)),
 
             ]
         ),
@@ -909,7 +909,7 @@ EYES_CONTROLS = BoneGroup(
                         ConstraintOperation(
                             bone_name="Pupil.Ctrl",
                             time="Post",
-                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1)),
+                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1, use_transform_limit=True)),
 
             ]
         ),
@@ -1025,6 +1025,10 @@ EYES_CONTROLS = BoneGroup(
                         WidgetOperation(time="Post", bone_name="Lid.Ctrl", custom_object="Circle", rotation=(180.0,90.0,90.0), scale=(0.08,0.08,0.08), wire_width=1.3, scale_to_bone_length=False),
                         BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl", lock_location=(False, True, False), lock_rotation=True, lock_scale=True),
                         ParentBoneOperation(time="Post", bone_name="Lid.Ctrl", parent=["Lid.Ctrl.Master"]),
+                        ConstraintOperation(
+                            bone_name="Lid.Ctrl",
+                            time="Post",
+                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=0,use_min_x=True, min_x=-0.667, use_max_x=True, max_x=0.667, use_transform_limit=True)),
             ]
         ),
     ],
