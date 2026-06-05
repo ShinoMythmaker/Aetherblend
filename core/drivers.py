@@ -44,6 +44,9 @@ class Driver():
         if self.use_self is not None:
             driver.driver.use_self = self.use_self
 
+        while driver.driver.variables:
+            driver.driver.variables.remove(driver.driver.variables[0])
+
         for variable in self.variables:
             variable.add(driver, armature)
 
