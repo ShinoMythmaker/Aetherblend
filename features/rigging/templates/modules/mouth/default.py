@@ -1,7 +1,7 @@
 import mathutils
 
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation
+from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation
 from ......core.generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -22,14 +22,14 @@ MOUTH_AUTO = BoneGroup(
         TransformLink(target="DEF-Lip.B.L.001", bone="j_f_dlip_01_l"),
         TransformLink(target="DEF-Lip.B.L.002", bone="j_f_dmlip_01_l"),
         TransformLink(target="DEF-Lip.B.L.003", bone="j_f_dslip_l"),
-        TransformLink(target="Lip.T.L.001", bone="j_f_ulip_02_l"),
-        TransformLink(target="Lip.T.L.002", bone="j_f_umlip_02_l"),
-        TransformLink(target="Lip.T.R.001", bone="j_f_ulip_02_r"),
-        TransformLink(target="Lip.T.R.002", bone="j_f_umlip_02_r"),
-        TransformLink(target="Lip.B.L.001", bone="j_f_dlip_02_l"),
-        TransformLink(target="Lip.B.L.002", bone="j_f_dmlip_02_l"),
-        TransformLink(target="Lip.B.R.001", bone="j_f_dlip_02_r"),
-        TransformLink(target="Lip.B.R.002", bone="j_f_dmlip_02_r"),
+        TransformLink(target="Lip.T.L.Middle", bone="j_f_ulip_02_l"),
+        TransformLink(target="Lip.T.L.Middle.001", bone="j_f_umlip_02_l"),
+        TransformLink(target="Lip.T.R.Middle", bone="j_f_ulip_02_r"),
+        TransformLink(target="Lip.T.R.Middle.001", bone="j_f_umlip_02_r"),
+        TransformLink(target="Lip.B.L.Middle", bone="j_f_dlip_02_l"),
+        TransformLink(target="Lip.B.L.Middle.001", bone="j_f_dmlip_02_l"),
+        TransformLink(target="Lip.B.R.Middle", bone="j_f_dlip_02_r"),
+        TransformLink(target="Lip.B.R.Middle.001", bone="j_f_dmlip_02_r"),
         TransformLink(target="DEF-Teeth.T", bone="j_f_hagukiup"),
         TransformLink(target="DEF-Teeth.B", bone="j_f_hagukidn"),
         TransformLink(target="DEF-Tongue", bone="j_f_bero_01"),
@@ -174,7 +174,55 @@ MOUTH_AUTO = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="Lip.B.R.003", collection_name="Face")
                         ]
         ),
-
+        #Secondary Bones
+        ConnectBone(
+            name="Lip.T.R.Middle",
+            bone_a="j_f_ulip_02_r",
+            bone_b="j_kao",
+            parent="Lip.T.R.001",
+            is_connected=False,
+            req_bones=["j_f_ulip_02_r", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.T.R.Middle", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.Middle", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+                        ]
+        ),
+        ConnectBone(
+            name="Lip.T.R.Middle.001",
+            bone_a="j_f_umlip_02_r",
+            bone_b="j_kao",
+            parent="Lip.T.R.002",
+            is_connected=False,
+            req_bones=["j_f_umlip_02_r", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.T.R.Middle.001", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.Middle.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+                        ]
+        ),
+        ConnectBone(
+            name="Lip.B.R.Middle",
+            bone_a="j_f_dlip_02_r",
+            bone_b="j_kao",
+            parent="Lip.B.R.001",
+            is_connected=False,
+            req_bones=["j_f_dlip_02_r", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.B.R.Middle", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.R.Middle", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+                        ]
+        ),
+        ConnectBone(
+            name="Lip.B.R.Middle.001",
+            bone_a="j_f_dmlip_02_r",
+            bone_b="j_kao",
+            parent="Lip.B.R.002",
+            is_connected=False,
+            req_bones=["j_f_dmlip_02_r", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.B.R.Middle.001", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.R.Middle.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+                        ]
+        ),
         #Left Mouth
         ConnectBone(
             name="Lip.T.L",
@@ -305,6 +353,55 @@ MOUTH_AUTO = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="Teeth.B", collection_name="Face (Misc)")
             ]
         ),
+        #Secondary Bones
+        ConnectBone(
+            name="Lip.T.L.Middle",
+            bone_a="j_f_ulip_02_l",
+            bone_b="j_kao",
+            parent="Lip.T.L.001",
+            is_connected=False,
+            req_bones=["j_f_ulip_02_l", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.T.L.Middle", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.Middle", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+                        ]
+        ),
+        ConnectBone(
+            name="Lip.T.L.Middle.001",
+            bone_a="j_f_umlip_02_l",
+            bone_b="j_kao",
+            parent="Lip.T.L.002",
+            is_connected=False,
+            req_bones=["j_f_umlip_02_l", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.T.L.Middle.001", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.Middle.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+            ]
+        ),
+        ConnectBone(
+            name="Lip.B.L.Middle",
+            bone_a="j_f_dlip_02_l",
+            bone_b="j_kao",
+            parent="Lip.B.L.001",
+            is_connected=False,
+            req_bones=["j_f_dlip_02_l", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.B.L.Middle", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.L.Middle", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+            ]
+        ),
+        ConnectBone(
+            name="Lip.B.L.Middle.001",
+            bone_a="j_f_dmlip_02_l",
+            bone_b="j_kao",
+            parent="Lip.B.L.002",
+            is_connected=False,
+            req_bones=["j_f_dmlip_02_l", "j_kao"],
+            operations=[
+                        CollectionOperation(time="Pre", bone_name="Lip.B.L.Middle.001", collection_name="Face (Secondary)"),
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.L.Middle.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Mouth.Center"))
+            ]
+        ),
         #Tongue
         ConnectBone(
             name="Tongue",
@@ -395,8 +492,21 @@ def get_rig_module() -> RigModule:
         type="Generation",
         bone_groups=[MOUTH_AUTO],
         ui_collections = UI_Collections([
-            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=0, title="Face (Primary)", visible=True),
-            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=0, title="Face (Secondary)", visible=False),
-            BoneCollection(name="Face (Misc)", ui=True, color_set="Face_Secondary", row_index=1, title="Face (Misc)", visible=False),
-        ])
+            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=1, title="Face (Primary)", visible=True),
+            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=1, title="Face (Secondary)", visible=False),
+            BoneCollection(name="Face (Misc)", ui=True, color_set="Face_Secondary", row_index=2, title="Face (Misc)", visible=False),
+        ]),
+        operations=[
+            WidgetOperation(bone_name="Teeth.T", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
+            WidgetOperation(bone_name="Teeth.B", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
+            WidgetOperation(bone_name="jaw_master_mouth", scale=[0.6, 1, 0.3]),
+            WidgetOperation(bone_name="Lip.T.R.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.T.R.Middle.001", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.L.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.L.Middle.001", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.R.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.B.R.Middle.001", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.T.L.Middle", scale_factor=0.1),
+            WidgetOperation(bone_name="Lip.T.L.Middle.001", scale_factor=0.1),
+            ]
     )

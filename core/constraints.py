@@ -198,3 +198,42 @@ class DampedTrackConstraint(Constraint):
        constraint.track_axis = self.track_axis
        constraint.influence = self.influence
        constraint.head_tail = self.head_tail
+
+@dataclass(frozen=True)
+class LimitLocationConstraint(Constraint):
+    use_min_x: bool = False
+    use_min_y: bool = False
+    use_min_z: bool = False
+    use_max_x: bool = False
+    use_max_y: bool = False
+    use_max_z: bool = False
+    min_x: float = 0.0
+    min_y: float = 0.0
+    min_z: float = 0.0
+    max_x: float = 0.0
+    max_y: float = 0.0
+    max_z: float = 0.0
+    use_transform_limit: bool = False
+    owner_space: str = "LOCAL"
+    influence: float = 1.0
+    name: str = "AetherBlend_LimitLocation"
+
+    def apply(self, bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+        """Applies the Limit Location constraint to the given bone."""
+        constraint = bone.constraints.new(type='LIMIT_LOCATION')
+        constraint.name = self.name
+        constraint.use_min_x = self.use_min_x
+        constraint.use_min_y = self.use_min_y
+        constraint.use_min_z = self.use_min_z
+        constraint.use_max_x = self.use_max_x
+        constraint.use_max_y = self.use_max_y
+        constraint.use_max_z = self.use_max_z
+        constraint.min_x = self.min_x
+        constraint.min_y = self.min_y
+        constraint.min_z = self.min_z
+        constraint.max_x = self.max_x
+        constraint.max_y = self.max_y
+        constraint.max_z = self.max_z
+        constraint.use_transform_limit = self.use_transform_limit
+        constraint.owner_space = self.owner_space
+        constraint.influence = self.influence

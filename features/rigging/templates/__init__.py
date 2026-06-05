@@ -7,7 +7,6 @@ from ....core.rigify import *
 
 
 from .colorsets import *
-from .overrides import *
 from . import modules as module_root
 
 from .modules import *

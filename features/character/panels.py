@@ -1,15 +1,6 @@
 import bpy
-import addon_utils
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
-
-def _check_for_meddle():
-    """Check if Meddle Tools addon is installed and enabled"""
-    addon_module = [m for m in addon_utils.modules() if m.bl_info.get('name') == "Meddle Tools"]
-    if not addon_module:
-        return False
-    addon_enabled = addon_utils.check(addon_module[0].__name__)[0]
-    return addon_enabled
 
 class AETHER_PT_ImportPanel(bpy.types.Panel):
     bl_label = "Import"
@@ -26,21 +17,13 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        if not _check_for_meddle():
-            layout = self.layout
-            box = layout.box()
-            box.label(text="Missing Meddle Tools addon", icon='ERROR')
-            return None
-
-
         row = layout.row(align=True)
         row.operator("aether.character_import", text="Import Character", icon = "IMPORT")
 
 
 def menu_func_import(self, context):
     """Add the import operator to the File > Import menu"""
-    if _check_for_meddle():
-        self.layout.operator("aether.character_import", text="FFXIV Character (Meddle)")
+    self.layout.operator("aether.character_import", text="FFXIV Character (Meddle)")
 
 def register():
     bpy.utils.register_class(AETHER_PT_ImportPanel)

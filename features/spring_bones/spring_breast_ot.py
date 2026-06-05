@@ -2,7 +2,7 @@ import bpy
 import mathutils
 from ...utils import armature as rig_utils
 from ...data.constants import xiv_breast_bone_r, xiv_breast_bone_l, sb_breast_collection, sb_breast_parent_bone, spring_prefix, spring_bone_collection
-from ..spring_bones_ot import end_spring_bone
+from .spring_bones_ot import end_spring_bone
 
 class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
     """Generate spring breast bones for the active armature object."""
@@ -15,6 +15,7 @@ class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
+        spring_breast_path = f"{spring_bone_collection}/{sb_breast_collection}"
 
         bpy.ops.object.mode_set(mode='EDIT')
 
@@ -23,8 +24,8 @@ class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
 
 
         # Delete existing spring breast collection if it exists
-        if armature.data.collections.get(sb_breast_collection):
-            rig_utils.b_collection.delete_with_bones(armature, sb_breast_collection)
+        if armature.data.collections.get(spring_breast_path):
+            rig_utils.b_collection.delete_with_bones(armature, spring_breast_path)
 
         # reset xiv_breast_bones
         rig_utils.bone.delete_keyframes(armature, xiv_breast_bone_r)
@@ -44,6 +45,7 @@ class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
         print(f"[AetherBlend] Generating spring breasts for {xiv_breast_bone_r} and {spring_bone_r}")
         print(f"[AetherBlend] Generating spring breasts for {xiv_breast_bone_l} and {spring_bone_l}")
 
+        bpy.ops.object.mode_set(mode='POSE')
 
         # Assign to collection
         rig_utils.b_collection.assign_bones(armature, [spring_bone_r, spring_bone_l], f"{spring_bone_collection}/{sb_breast_collection}")
@@ -90,10 +92,12 @@ class AETHER_OT_Bake_Spring_Breasts(bpy.types.Operator):
         context.scene.ab_sb_global_spring_frame = False 
         context.scene.ab_sb_global_spring = False 
 
-        start_frame, end_frame = rig_utils.get_frame_range(armature)
+        start_frame = context.scene.frame_start
+        end_frame = context.scene.frame_end
         reference_bones = xiv_breast_bone_r + xiv_breast_bone_l
 
         original_visibility = rig_utils.bone.get_bone_visibility(armature, reference_bones)
+        rig_utils.bone.restore_visibility(armature, {bone_name: (False, False) for bone_name in reference_bones})
 
         # Select only the reference bones before baking
         rig_utils.bone.select_edit(armature, reference_bones)
@@ -138,6 +142,7 @@ class AETHER_OT_Delete_Spring_Breasts(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
+        spring_breast_path = f"{spring_bone_collection}/{sb_breast_collection}"
         
         # Disable Spring Bones
         context.scene.ab_sb_global_spring_frame = False 
@@ -154,7 +159,7 @@ class AETHER_OT_Delete_Spring_Breasts(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Delete the spring bone collection and all bones within
-        rig_utils.b_collection.delete_with_bones(armature, sb_breast_collection)
+        rig_utils.b_collection.delete_with_bones(armature, spring_breast_path)
 
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, "[AetherBlend] Spring breasts deleted.")

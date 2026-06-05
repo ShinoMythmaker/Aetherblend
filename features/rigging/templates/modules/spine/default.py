@@ -1,5 +1,5 @@
 from ......core.bone_generators import ConnectBone, ExtensionBone
-from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation
+from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
 from ......core.constraints import CopyLocationConstraint
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -15,6 +15,8 @@ SPINE = BoneGroup(
             TransformLink(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
             TransformLink(target="DEF-Chest.R", bone="j_mune_r"),
             TransformLink(target="DEF-Chest.L", bone="j_mune_l"),
+            TransformLink(target="DEF-Neck", bone="j_kubi"),
+            TransformLink(target="DEF-Head", bone="j_kao"),
         ],
         generators = [
             #Spine
@@ -72,12 +74,13 @@ SPINE = BoneGroup(
                 start="head",
                 axis_type="local",
                 axis="Y",
-                roll=-48,
+                roll=132,
                 parent="Spine.003",
                 req_bones=["j_mune_r"],
                 operations=[
                             RigifyTypeOperation(time="Pre", bone_name="Chest.R", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
                             CollectionOperation(time="Pre", bone_name="Chest.R", collection_name="Torso"),
+                            WidgetOperation(bone_name="Chest.R", translation=[0.0, 0.05, 0.0]),
                             ]
             ),
             ExtensionBone(
@@ -93,8 +96,30 @@ SPINE = BoneGroup(
                 operations=[
                             RigifyTypeOperation(time="Pre", bone_name="Chest.L", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
                             CollectionOperation(time="Pre", bone_name="Chest.L", collection_name="Torso"),
+                            WidgetOperation(bone_name="Chest.L", translation=[0.0, 0.05, 0.0]),
                             ]
             ),
+            ConnectBone(
+            name="Neck",
+            bone_a="j_kubi",
+            bone_b="j_kao",
+            req_bones=["j_kubi", "j_kao"],
+            operations=[ParentBoneOperation(time="Pre", bone_name="Neck", parent=["Spine.004", "j_sebo_c"], is_connected=False),
+                        RigifyTypeOperation(time="Pre", bone_name="Neck", rigify_type=rigify.types.spines_super_head()),
+                        CollectionOperation(time="Pre", bone_name="Neck", collection_name="Head"),
+            ]
+        ),
+        ExtensionBone(
+            name="Head",
+            bone_a="j_kao",
+            axis_type="armature",
+            axis="Z",
+            size_factor=20.0,
+            parent="Neck",
+            is_connected=True,
+            req_bones=["j_kao"],
+            operations=[CollectionOperation(time="Pre", bone_name="Head", collection_name="Head")]
+        ),
         ],
 )
 
@@ -104,8 +129,9 @@ def get_rig_module() -> RigModule:
         type="Generation",
         bone_groups=[SPINE],
         ui_collections = UI_Collections([
-            BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=1, title="Torso"),
-            BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=2, title="Tweak", visible=False),
+            BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=2, title="Torso"),
+            BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=3, title="Tweak", visible=False),
+            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
         ])
     )
     

@@ -373,49 +373,30 @@ def update_bone(self, context):
     deps = bpy.context.evaluated_depsgraph_get()
     #update collection
         #delete all
-    if len(scene.ab_sb_spring_bones) > 0:
-        i = len(scene.ab_sb_spring_bones)
-        while i >= 0:          
-            scene.ab_sb_spring_bones.remove(i)
-            i -= 1
-        
+    while len(scene.ab_sb_spring_bones) > 0:
+        scene.ab_sb_spring_bones.remove(len(scene.ab_sb_spring_bones) - 1)
+
         # mesh colliders
-    if len(scene.ab_sb_mesh_colliders) > 0:
-        i = len(scene.ab_sb_mesh_colliders)
-        while i >= 0:          
-            scene.ab_sb_mesh_colliders.remove(i)
-            i -= 1
+    while len(scene.ab_sb_mesh_colliders) > 0:
+        scene.ab_sb_mesh_colliders.remove(len(scene.ab_sb_mesh_colliders) - 1)
             
         
     for pbone in armature.pose.bones:
-        # are the properties there?
-        if len(pbone.keys()) == 0:           
-            continue            
-        if not 'ab_sb_bone_spring' in pbone.keys() and not 'ab_sb_bone_collider' in pbone.keys():
+        # RNA-registered properties: access directly (they don't appear in pbone.keys())
+        is_spring_bone = pbone.ab_sb_bone_spring
+        is_collider_bone = pbone.ab_sb_bone_collider
+
+        if not is_spring_bone and not is_collider_bone:
             continue
-            
-        is_spring_bone = False
-        is_collider_bone = False
-        rotation_enabled =  False
-        is_colliding = True
-        
-        if 'ab_sb_bone_spring' in pbone.keys():
-            if pbone.get("ab_sb_bone_spring") == False:
-                # remove old spring constraints
-                spring_cns = pbone.constraints.get("spring")
-                if spring_cns:
-                    pbone.constraints.remove(spring_cns)   
-                
-            else:
-                is_spring_bone = True
-                
-        if 'ab_sb_bone_collider' in pbone.keys():        
-            is_collider_bone = pbone.get("ab_sb_bone_collider")
-                
-        if 'ab_sb_bone_rot' in pbone.keys():           
-            rotation_enabled = pbone.get("ab_sb_bone_rot") 
-        if 'ab_sb_collide' in pbone.keys():
-            is_colliding = pbone.get('ab_sb_collide')
+
+        # remove stale spring constraint when spring is disabled
+        if not is_spring_bone:
+            spring_cns = pbone.constraints.get("spring")
+            if spring_cns:
+                pbone.constraints.remove(spring_cns)
+
+        rotation_enabled = pbone.ab_sb_bone_rot
+        is_colliding = pbone.ab_sb_collide
             
         #print("iterating on", pbone.name)
         if is_spring_bone or is_collider_bone:
@@ -499,7 +480,7 @@ def update_bone(self, context):
                 empty.matrix_world = mat
                 
             #create constraints
-            if pbone['ab_sb_bone_spring'] == True:
+            if pbone.ab_sb_bone_spring == True:
                 #set_active_object(armature.name)
                 #bpy.ops.object.mode_set(mode='POSE')
                 spring_cns = pbone.constraints.get("spring")
@@ -533,14 +514,21 @@ def end_spring_bone(context, self):
     if context.scene.ab_sb_global_spring:
         #print("GOING TO CLOSE TIMER...")        
         wm = context.window_manager
-        wm.event_timer_remove(self.timer_handler)
+        timer_handler = getattr(self, "timer_handler", None)
+        if timer_handler is not None:
+            wm.event_timer_remove(timer_handler)
         #print("CLOSE TIMER")
       
         context.scene.ab_sb_global_spring = False
     
-    for item in context.scene.ab_sb_spring_bones:        
-        
-        active_bone = bpy.context.active_object.pose.bones.get(item.name)
+    active_object = context.active_object
+    if not active_object or active_object.type != 'ARMATURE':
+        print("[AetherBlend][SB] --End--")
+        return
+
+    for item in list(context.scene.ab_sb_spring_bones):        
+
+        active_bone = active_object.pose.bones.get(item.name)
         if active_bone == None:
             continue
             
@@ -608,13 +596,19 @@ class AETHER_OT_Spring_Modal(bpy.types.Operator):
         #print("GOING TO CLOSE TIMER...")
         
         wm = context.window_manager
-        wm.event_timer_remove(self.timer_handler)
+        if self.timer_handler is not None:
+            wm.event_timer_remove(self.timer_handler)
         #print("CLOSED TIMER")
           
         context.scene.ab_sb_global_spring = False
         
-        for item in context.scene.ab_sb_spring_bones:        
-            active_bone = bpy.context.active_object.pose.bones.get(item.name)
+        active_object = context.active_object
+        if not active_object or active_object.type != 'ARMATURE':
+            print("[AetherBlend][SB] --End--")
+            return
+
+        for item in list(context.scene.ab_sb_spring_bones):        
+            active_bone = active_object.pose.bones.get(item.name)
             if active_bone == None:
                 continue
                 
@@ -792,7 +786,7 @@ class mesh_collec(bpy.types.PropertyGroup):
     test : bpy.props.StringProperty(default="")     # type: ignore
     
     
-classes = (AETHER_PT_ui, AETHER_PT_Object_Ui, bones_collec, mesh_collec, AETHER_OT_Spring_Modal, AETHER_OT_Spring, AETHER_OT_Select_Bone)
+classes = (bones_collec, mesh_collec, AETHER_OT_Spring_Modal, AETHER_OT_Spring, AETHER_OT_Select_Bone)
         
 def register():
     from bpy.utils import register_class
@@ -800,7 +794,8 @@ def register():
     for cls in classes:
         register_class(cls)   
         
-    bpy.app.handlers.frame_change_post.append(spring_bone_frame_mode)
+    if spring_bone_frame_mode not in bpy.app.handlers.frame_change_post:
+        bpy.app.handlers.frame_change_post.append(spring_bone_frame_mode)
     
     bpy.types.Scene.ab_sb_spring_bones = bpy.props.CollectionProperty(type=bones_collec)  
     bpy.types.Scene.ab_sb_mesh_colliders = bpy.props.CollectionProperty(type=mesh_collec)       
@@ -829,7 +824,8 @@ def unregister():
     for cls in reversed(classes):
         unregister_class(cls)   
     
-    bpy.app.handlers.frame_change_post.remove(spring_bone_frame_mode) 
+    if spring_bone_frame_mode in bpy.app.handlers.frame_change_post:
+        bpy.app.handlers.frame_change_post.remove(spring_bone_frame_mode) 
     
     del bpy.types.Scene.ab_sb_spring_bones  
     del bpy.types.Scene.ab_sb_mesh_colliders

@@ -11,7 +11,7 @@ RotationMode = Literal['AUTO', 'XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX', 'QUATER
 SpaceType = Literal['WORLD_SPACE', 'TRANSFORM_SPACE', 'LOCAL_SPACE']
 ContextProperty = Literal['ACTIVE_VIEW_LAYER', 'ACTIVE_SCENE']
 
-@dataclass(frozen=True)
+@dataclass()
 class DriverVariable(ABC):
     """Abstract base class for driver variables."""
     name: str
@@ -30,16 +30,21 @@ class Driver():
     use_self: bool | None = None
     variables: list[DriverVariable] = field(default=None, kw_only=True)
     
-    def apply(self, pose_bone: bpy.types.PoseBone, property: tuple[str, int], armature: bpy.types.Object) -> None:
+    def apply(self, target: bpy.types.PoseBone | bpy.types.Object | bpy.types.Constraint, property: tuple[str, int] | str, armature: bpy.types.Object) -> None:
         """Applies the driver to the given bone."""
-
-        driver = pose_bone.driver_add(property[0], property[1])
+        if isinstance(property, str):
+            driver = target.driver_add(property)
+        else:
+            driver = target.driver_add(property[0], property[1])
 
         if self.expression is not None:
             driver.driver.expression = self.expression
 
         if self.use_self is not None:
             driver.driver.use_self = self.use_self
+
+        while driver.driver.variables:
+            driver.driver.variables.remove(driver.driver.variables[0])
 
         for variable in self.variables:
             variable.add(driver, armature)
@@ -48,7 +53,7 @@ class Driver():
 # Driver Variables 
 ####################################################
 
-@dataclass(frozen=True)
+@dataclass()
 class TransformChannelVariable(DriverVariable):
     """Driver variable for a transform channel."""
     type: ClassVar[VariableType] = 'TRANSFORMS'
@@ -92,7 +97,7 @@ class TransformChannelVariable(DriverVariable):
 
         return driver
 
-@dataclass(frozen=True)
+@dataclass()
 class SinglePropertyVariable(DriverVariable):
     """Driver variable for a single property"""
 

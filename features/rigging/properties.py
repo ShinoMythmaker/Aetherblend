@@ -104,6 +104,12 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         options={'HIDDEN'}
     ) # type: ignore
 
+    eye_lid_edit_mode : bpy.props.BoolProperty(
+        name="Eye Lid Edit Mode",
+        description="Whether the armature is in eye lid edit mode or not",
+        default=False
+    ) # type: ignore
+
 
 def register():
     bpy.utils.register_class(AETHER_PROP_RigModuleItem)

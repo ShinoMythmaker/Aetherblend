@@ -2,6 +2,7 @@ from ......core.generators import ConnectBone, ExtensionBone
 from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
 from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
+from ......core.rigify.settings import UI_Collections, BoneCollection
 
 GENITALS_M = BoneGroup(
     name="Male Genitals",
@@ -112,9 +113,11 @@ GENITALS_M = BoneGroup(
 )
 
 def get_rig_module() -> RigModule:
-    rig_module = RigModule(
+    return RigModule(
         name="IVCS Male",
         type="Generation",
-        bone_groups=[GENITALS_M]
+        bone_groups=[GENITALS_M],
+        ui_collections = UI_Collections([
+            BoneCollection(name="Genitals (Male)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Male)", visible=False),
+        ])
     )
-    return rig_module

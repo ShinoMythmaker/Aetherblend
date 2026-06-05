@@ -2,6 +2,8 @@ import bpy
 from collections import defaultdict
 import os
 
+from . import addon_dependencies
+
 
 def ensure_mode(mode: str = 'OBJECT'):
     """Switches Blender mode only when required."""
@@ -64,14 +66,16 @@ def find_by_armature_and_material_property(
     armature: bpy.types.Object,
     property_name: str,
     property_value=None,
-) -> list[bpy.types.Object]:
+) -> list[bpy.types.Object] | None:
     """Finds objects driven by an armature and matching a material property filter."""
-    return [
-        obj
-        for obj in bpy.data.objects
-        if uses_armature(obj, armature)
-        and has_material_property(obj, property_name, property_value)
-    ]
+    objects = []
+    for obj in bpy.data.objects:
+        try:
+            if uses_armature(obj, armature) and has_material_property(obj, property_name, property_value):
+                objects.append(obj)
+        except ReferenceError:
+            print(f"[AetherBlend] Skipping deleted object: {obj}")
+    return objects if len(objects) > 0 else None
 
 
 def merge_by_material(objects):
@@ -141,6 +145,10 @@ def merge_by_name(objects, name_filter):
 
 def import_meddle_shader(filepath, imported_objects):
     """Imports Meddle shaders for the given objects."""
+    if not addon_dependencies.is_addon_enabled(module_name="meddle", display_name="Meddle Tools"):
+        print("[AetherBlend] Meddle Tools add-on is not enabled")
+        return False
+
     for obj in imported_objects:
         try:
             if obj and obj.type == "MESH": 
@@ -152,10 +160,40 @@ def import_meddle_shader(filepath, imported_objects):
     meddle_cache_directory = os.path.join(character_directory, "cache","")
 
     try:
-        bpy.ops.meddle.import_shaders('EXEC_DEFAULT')  
-        bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)  
+        result_import = bpy.ops.meddle.import_shaders('EXEC_DEFAULT')
+        result_apply = bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)
+        return ('FINISHED' in result_import) and ('FINISHED' in result_apply)
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")
+        return False
+
+def import_ffgear_shader(filepath, imported_objects):
+    """Imports FFGear shaders for the given objects."""
+    if not addon_dependencies.is_addon_enabled(module_name="ffgear", display_name="FFGear"):
+        print("[AetherBlend] FFGear add-on is not enabled")
+        return False
+
+    for obj in imported_objects:
+        try:
+            if obj and obj.type == "MESH": 
+                obj.select_set(True)
+        except ReferenceError:
+            print(f"Skipping deleted object: {obj}")  
+        
+    character_directory = os.path.dirname(filepath)
+    ffgear_cache_directory = os.path.join(character_directory, "cache","")
+
+    try:
+        result = bpy.ops.ffgear.meddle_setup(
+            'EXEC_DEFAULT',
+            directory=ffgear_cache_directory,
+            filepath=ffgear_cache_directory,
+            use_selected=True,
+        )
+        return 'FINISHED' in result
+    except Exception as e:
+        print(f"[AetherBlend] Failed to append FFGear shaders: {e}")
+        return False
 
 def remove_shapekey(obj: bpy.types.Object, shapekey_name: str, enable_backup: bool = False, backup_shapekey_name: str = None) -> None:
     """

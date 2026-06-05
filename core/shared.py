@@ -17,74 +17,6 @@ from .bone_generators import BoneGenerator
 ModuleType = Literal["Generator", "Patch","UI-Addon"]
 UI_Type = Literal["checkbox", "slider", "dropdown"]
   
-class Override(ABC):
-    """Overrides properties of a bone."""
-    bone: str
-
-    def execute(self, armature: bpy.types.Object) -> None:
-        """Applies the override to the given edit bone."""
-        pass
-
-@dataclass
-class WidgetOverride(Override):
-    """Overrides the widget of a bone."""
-    bone: str
-    custom_object: str | None = None
-    translation: tuple[float, float, float] = (0.0, 0.0, 0.0)
-    rotation: tuple[float, float, float] = (0.0, 0.0, 0.0)
-    scale: tuple[float, float, float] = (1.0, 1.0, 1.0)
-    scale_factor: float = 1.0
-    override_transform: str | None = None  # Bone Name
-    affect_gizmo: bool = False
-    use_as_pivot: bool = False
-    scale_to_bone_length: bool = True
-    wireframe: bool = False
-    wire_width: float = 1.0
-
-
-    def execute(self, armature: bpy.types.Object) -> None:
-        """Applies the widget override to the given pose bone."""
-        pose_bone = armature.pose.bones.get(self.bone)
-        if not pose_bone:
-            print(f"[AetherBlend] WidgetOverride bone '{self.bone}' not found in armature.")
-            return
-        
-        scale = (self.scale[0] * self.scale_factor, self.scale[1] * self.scale_factor, self.scale[2] * self.scale_factor)
-
-        try:
-            if self.custom_object:
-                pose_bone.custom_shape = self.custom_object
-            pose_bone.custom_shape_translation = self.translation
-            pose_bone.custom_shape_rotation_euler = self.rotation
-            pose_bone.custom_shape_scale_xyz = scale
-            pose_bone.custom_shape_transform = self.override_transform
-            pose_bone.use_transform_at_custom_shape = self.affect_gizmo      ## 5.0
-            pose_bone.use_transform_around_custom_shape = self.use_as_pivot  ## 5.0
-            pose_bone.use_custom_shape_bone_size = self.scale_to_bone_length
-            ##pose_bone.show_wire = self.wireframe  ## 5.0
-            pose_bone.custom_shape_wire_width = self.wire_width
-        except Exception as e:
-            print(f"[AetherBlend] Error applying WidgetOverride for bone '{pose_bone.name}': {e}")
-
-@dataclass
-class PropOverride(Override):
-    """Overrides a custom property of a bone."""
-    bone: str
-    property_name: str
-    value: float | int | str | bool
-
-    def execute(self, armature: bpy.types.Object) -> None:
-        """Applies the property override to the given pose bone."""
-        pose_bone = armature.pose.bones.get(self.bone)
-        if not pose_bone:
-            print(f"[AetherBlend] PropOverride bone '{self.bone}' not found in armature.")
-            return
-        
-        try:
-            pose_bone[self.property_name] = self.value
-        except Exception as e:
-            print(f"[AetherBlend] Error applying PropOverride for bone '{pose_bone.name}': {e}")
-
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
@@ -100,13 +32,17 @@ class BoneGroup:
         self.generators = list(self.generators)
         self.operations = list(self.operations)
     
-    def check(self, armature: bpy.types.Object) -> bool:
+    def check(self, armature: bpy.types.Object, data: dict | None = None) -> bool:
         """Check if all required bones exist in the armature for this bone group."""
         future_bones = []
         
         for bone_gen in self.generators:
             future_bones.append(bone_gen.name)
-            
+            if bone_gen.data_key is not None:
+                data_value = data.get(bone_gen.data_key) if data else None
+                if data_value is None:
+                    print(f"[AetherBlend] Error Code: DEMON")
+                    return False
             if bone_gen.req_bones:
                 for req_bone in bone_gen.req_bones:
                     # Check if bone will be created in this group or already exists
@@ -145,7 +81,7 @@ class BoneGroup:
     def execute(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], dict[str, list[PoseOperations]], list[ABOperation]]:
         """Execute the full generation process for this bone group."""
         # Check if bone group can theoriticlly be generated
-        if not self.check(armature):
+        if not self.check(armature, data=data):
             print(f"[AetherBlend] BoneGroup '{self.name}' check failed - missing required bones")
             return [], {}, []
         
@@ -201,15 +137,26 @@ class BoneGroup:
 class UILink:
     """Defines a link between a bone or armature property and a UI element"""
     
-    property_name: str
     title: str
+    property_name: str | None = None
     bone_name: str | None = None
     constraint_name: str | None = None
     white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show. 
-    ui_type: UI_Type = "checkbox"
+    ui_type: UI_Type | None = "checkbox"
     ui_params: dict | None = None  # Additional parameters for the UI element
+    override: Literal["EyeLidControl"] | None = None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)
      
+    def eye_lid_control_draw(self, context, layout: bpy.types.UILayout):
 
+        armature = context.active_object
+        rig_props = armature.aether_rig
+        if rig_props.eye_lid_edit_mode:
+            layout.operator("aether.eyelid_offset_edit_end", text="Exit Eye Lid Edit Mode", icon='CANCEL')
+        else:
+            layout.operator("aether.eyelid_offset_edit_start", text="Enter Eye Lid Edit Mode", icon='EDITMODE_HLT')
+     
+        return
+    
     def draw(self, context, layout: bpy.types.UILayout):
         """Draws the UI element for this link."""
         armature = context.active_object
@@ -230,6 +177,10 @@ class UILink:
         if self.white_list:
             if not selected_bones.intersection(self.white_list):
                 return
+            
+        if self.override == "EyeLidControl":
+            self.eye_lid_control_draw(context, layout)
+            return
 
         target = armature.data
         if self.bone_name:
@@ -252,8 +203,6 @@ class UILink:
             print(f"[AetherBlend] Unknown UI element type '{self.ui_type}' for UILink '{self.title}'")
 
         
-    
-
 @dataclass
 class RigModule:
     """Defines a rig module and its behavior category."""
@@ -289,5 +238,4 @@ class RigModule:
 class Template():
     """Defines a rig template with its properties and modules."""
     name: str
-    overrides: 'list[dict[str, Override]] | None'
     modules: 'list[list[RigModule]]'

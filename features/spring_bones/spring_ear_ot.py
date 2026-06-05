@@ -1,7 +1,7 @@
 import bpy
 from ...utils import armature as rig_utils
 from ...data.constants import xiv_ear_bone_l, xiv_ear_bone_r, sb_ear_target_bone_l, sb_ear_target_bone_r, sb_ear_parent_bone, sb_ears_collection, spring_prefix, spring_bone_collection
-from ..spring_bones_ot import end_spring_bone
+from .spring_bones_ot import end_spring_bone
 
 class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
     """Generate spring ear bones for the active armature object."""
@@ -15,6 +15,7 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
+        spring_ears_path = f"{spring_bone_collection}/{sb_ears_collection}"
         
         context.scene.ab_sb_global_spring_frame = False 
         context.scene.ab_sb_global_spring = False 
@@ -29,8 +30,8 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
         original_visibility = rig_utils.bone.get_bone_visibility(armature, referenece_bones_l + referenece_bones_r)
 
         # Delete existing spring bones collection if it exists
-        if armature.data.collections.get(sb_ears_collection):
-            rig_utils.b_collection.delete_with_bones(armature, sb_ears_collection)
+        if armature.data.collections.get(spring_ears_path):
+            rig_utils.b_collection.delete_with_bones(armature, spring_ears_path)
 
         # reset xiv_ear_bones
         rig_utils.bone.delete_keyframes(armature, xiv_ear_bone_l)
@@ -44,6 +45,8 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
         spring_bones_l = rig_utils.generate.bone_chain(armature, referenece_bones_l, prefix=spring_prefix, parent_bone=sb_ear_parent_bone)
         spring_bones_r = rig_utils.generate.bone_chain(armature, referenece_bones_r, prefix=spring_prefix, parent_bone=sb_ear_parent_bone)
 
+        bpy.ops.object.mode_set(mode='POSE')
+        
         # Check if spring bones is an empty array
         if not spring_bones_l or not spring_bones_r:
             self.report({'ERROR'}, "[AetherBlend] No spring bones generated. Missing reference bones.")
@@ -93,11 +96,13 @@ class AETHER_OT_Bake_Spring_Ears(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
 
-        start_frame, end_frame = rig_utils.get_frame_range(armature)
+        start_frame = context.scene.frame_start
+        end_frame = context.scene.frame_end
 
         reference_bones = xiv_ear_bone_r + xiv_ear_bone_l
 
         original_visibility = rig_utils.bone.get_bone_visibility(armature, reference_bones)
+        rig_utils.bone.restore_visibility(armature, {bone_name: (False, False) for bone_name in reference_bones})
 
         # Select only the reference bones before baking
         rig_utils.bone.select_edit(armature, reference_bones)
@@ -140,6 +145,7 @@ class AETHER_OT_Delete_Spring_Ears(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
+        spring_ears_path = f"{spring_bone_collection}/{sb_ears_collection}"
         
         # Disable Spring Bones
         context.scene.ab_sb_global_spring_frame = False 
@@ -156,7 +162,7 @@ class AETHER_OT_Delete_Spring_Ears(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Delete the spring bone collection and all bones within
-        rig_utils.b_collection.delete_with_bones(armature, sb_ears_collection)
+        rig_utils.b_collection.delete_with_bones(armature, spring_ears_path)
 
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, "[AetherBlend] Spring ears deleted.")

@@ -2,11 +2,20 @@ import bpy
 import time
 
 from ... import utils
+from ...utils import addon_dependencies
 from . import template_manager
 from ...preferences import get_preferences
 from ...properties.tab_prop import set_active_tab
 
 class _ArmatureSelectionHelpers:
+    def _require_addon(self, *, module_name: str | None = None, display_name: str | None = None) -> bool:
+        if addon_dependencies.is_addon_enabled(module_name=module_name, display_name=display_name):
+            return True
+
+        addon_name = display_name or module_name or "required add-on"
+        self.report({'ERROR'}, f"Enable {addon_name} in Blender Preferences > Add-ons")
+        return False
+
     def _resolve_source_armature(self, armature: bpy.types.Object | None) -> bpy.types.Object | None:
         if not armature or armature.type != 'ARMATURE':
             return armature
@@ -41,6 +50,9 @@ class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        if not self._require_addon(module_name="rigify", display_name="Rigify"):
+            return {'CANCELLED'}
+
         time_start = time.time()
         bpy.context.window.cursor_set('WAIT')
 
@@ -56,7 +68,7 @@ class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
 
             state = rig_generator.generate_meta_rig(
                 armature,
-                cleanup_existing=lambda: bpy.ops.aether.clean_up_rig(),
+                cleanup_existing=lambda: bpy.ops.aether.reset_rig(),
             )
             if not state:
                 self.report({'ERROR'}, "Meta rig generation failed")
@@ -84,6 +96,9 @@ class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        if not self._require_addon(module_name="rigify", display_name="Rigify"):
+            return {'CANCELLED'}
+
         time_start = time.time()
         bpy.context.window.cursor_set('WAIT')
 
@@ -99,7 +114,7 @@ class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
 
             state = rig_generator.generate_meta_rig(
                 armature,
-                cleanup_existing=lambda: bpy.ops.aether.clean_up_rig(),
+                cleanup_existing=lambda: bpy.ops.aether.reset_rig(),
             )
             if not state:
                 self.report({'ERROR'}, "Meta rig generation failed")

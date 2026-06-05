@@ -1,4 +1,6 @@
 import bpy
+import math
+import mathutils
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -13,6 +15,8 @@ from .. import utils
 
 Mode = Literal["POSE", "EDIT"]
 Time = Literal["Pre", "Post"]
+
+_WGTS = "WGTS"
 
 @dataclass
 class PoseOperations:
@@ -75,7 +79,7 @@ class PoseOperationsStack:
             else:
                 print(f"[AetherBlend] PoseOperationsStack: Bone '{bone_name}' not found in armature.")
 
-@dataclass(frozen=True)
+@dataclass()
 class ABOperation(ABC):
     mode: ClassVar[Mode] = "POSE"
     time: Time = field(default="Pre", kw_only=True)
@@ -128,6 +132,7 @@ class ABOperation(ABC):
 
 class ABOperationStack:
     STACK_KEYS : ClassVar[tuple[str, ...]] = ('prePOSE', 'postPOSE', 'preEDIT', 'postEDIT')
+    generation_data: dict | None = None
 
     def __init__(self):
         self.stack: dict[str, list[ABOperation]] = {
@@ -158,7 +163,7 @@ class ABOperationStack:
             ]
 
     def applyPrePoseOperations(self, armature: bpy.types.Object):
-        self._apply_operations(self.stack['prePOSE'], armature)
+        self._apply_operations(self.stack['prePOSE'], armature,)
 
     def applyPostPoseOperations(self, armature: bpy.types.Object):
         self._apply_operations(self.stack['postPOSE'], armature)
@@ -191,16 +196,16 @@ class ABOperationStack:
             return
 
         for operation in operations:
-            operation.apply(armature)
+            operation.apply(armature, self.generation_data)
 
-@dataclass(frozen=True)
+@dataclass()
 class ConstraintOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
     bone_name: str
     constraint: Constraint
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the constraint operation to the given pose bone."""
         if not self._switch_mode():
             return
@@ -212,14 +217,14 @@ class ConstraintOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying ConstraintOperation for bone '{self.bone_name}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class RigifyTypeOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
     bone_name: str
     rigify_type: rigify.types.rigify_type
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the Rigify type operation to the given pose bone."""
         if not self._switch_mode():
             return
@@ -282,14 +287,14 @@ class TransformLink:
 
         return ops
 
-@dataclass(frozen=True)
+@dataclass()
 class CollectionOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
     bone_name: str
     collection_name: str
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the collection operation to the given pose bone."""
         if not self._switch_mode():
             return
@@ -301,7 +306,7 @@ class CollectionOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying CollectionOperation for bone '{self.bone_name}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class ParentBoneOperation(ABOperation):
     bone_name: str
     parent: tuple[str, ...]
@@ -309,7 +314,7 @@ class ParentBoneOperation(ABOperation):
     
     mode: ClassVar[Mode] = "EDIT"
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the parent bone operation to the given edit bone."""
         if not self._switch_mode():
             return
@@ -333,36 +338,46 @@ class ParentBoneOperation(ABOperation):
         except Exception as e:
             print(f"[AetherBlend] Error applying ParentBoneOperation for bone '{self.bone_name}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class DriverOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
-
-    bone_name: str
+    bone_name: str = field(default=None, kw_only=True)
+    constraint_name: str = field(default=None, kw_only=True)
     driver_name: str
-    bone_name: str
-    property: tuple[str, int]
+    property: tuple[str, int] | str
     driver: Driver
+    data: str | None = None ## Optional for referencing data blocks
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the driver operation to the given pose bone."""
         if not self._switch_mode():
             return
-        poseBone = self._getPoseBone(self.bone_name, armature)
-        if not poseBone:
-            return
+        target = armature
+        if self.data is None and self.bone_name is not None:          
+            poseBone = self._getPoseBone(self.bone_name, armature)
+            target = poseBone
+            if self.constraint_name is not None:
+                constraint = poseBone.constraints.get(self.constraint_name)
+                if constraint:
+                    target = constraint
+        elif self.data is not None:
+            data_block = data_dict.get(self.data) if data_dict else None
+            if data_block is None:
+                return
+            target = data_block
         try:
-            self.driver.apply(poseBone, self.property, armature)
+            self.driver.apply(target, self.property, armature)
         except Exception as e:
-            print(f"[AetherBlend] Error applying DriverOperation for bone '{self.bone_name}': {e}")
+            print(f"[AetherBlend] Error applying DriverOperation for target '{target.name if hasattr(target, 'name') else target}': {e}")
 
-@dataclass(frozen=True)
+@dataclass()
 class CustomPropertyOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
     property: CustomProperty
     bone_name: str | None = None
 
-    def apply(self, armature: bpy.types.Object):
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Creates a custom property for a given bone or armature"""
         if not self._switch_mode():
             return
@@ -379,6 +394,226 @@ class CustomPropertyOperation(ABOperation):
 
         except Exception as e:
             print(f"[AetherBlend] Error applying CustomPropertyOperation for armature. : {e}")
+
+@dataclass()
+class WidgetOperation(ABOperation):
+    """Overrides the widget of a bone."""
+    mode: ClassVar[Mode] = "POSE"
+    time : Time = field(default="Post", kw_only=True)
+
+    bone_name: str
+    color_set: str | None = None
+    custom_color_normal: tuple[float, float, float] | None = None
+    custom_color_select: tuple[float, float, float] | None = None
+    custom_color_active: tuple[float, float, float] | None = None
+    custom_object: str | None = None
+    translation: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    rotation: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    scale: tuple[float, float, float] = (1.0, 1.0, 1.0)
+    scale_factor: float = 1.0
+    override_transform: str | None = None  # Bone Name
+    affect_gizmo: bool = False
+    use_as_pivot: bool = False
+    scale_to_bone_length: bool = True
+    wireframe: bool = False
+    wire_width: float = 1.0
+
+
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None) -> None:
+        """Applies the widget override to the given pose bone."""
+        pose_bone = armature.pose.bones.get(self.bone_name)
+        if not pose_bone:
+            print(f"[AetherBlend] WidgetOperation bone '{self.bone_name}' not found in armature.")
+            return
+        
+        
+        
+        scale = (self.scale[0] * self.scale_factor, self.scale[1] * self.scale_factor, self.scale[2] * self.scale_factor)
+
+        degree = [math.radians(self.rotation[0]), math.radians(self.rotation[1]), math.radians(self.rotation[2])] 
+
+        try:
+            if self.color_set:
+                pose_bone.color.palette = self.color_set
+                if self.color_set == "CUSTOM":
+                    if self.custom_color_normal:
+                        pose_bone.color.custom.normal =  mathutils.Color(self.custom_color_normal)
+                    if self.custom_color_select:
+                        pose_bone.color.custom.select = mathutils.Color(self.custom_color_select)
+                    if self.custom_color_active:
+                        pose_bone.color.custom.active = mathutils.Color(self.custom_color_active)
+            if self.custom_object:
+                custom_object_name = self._searchWGTS(armature, self.custom_object)
+                custom_shape_obj = bpy.data.objects.get(custom_object_name) if custom_object_name else None
+
+                # Always reassign the custom shape when a custom object is requested.
+                pose_bone.custom_shape = custom_shape_obj
+                if not custom_shape_obj:
+                    print(f"[AetherBlend] WidgetOperation custom object '{self.custom_object}' not found in WGTS collection of armature '{armature.name}'.")
+            pose_bone.custom_shape_translation = self.translation
+            pose_bone.custom_shape_rotation_euler = degree
+            pose_bone.custom_shape_scale_xyz = scale
+            pose_bone.custom_shape_transform = self.override_transform
+            pose_bone.use_transform_at_custom_shape = self.affect_gizmo      ## 5.0
+            pose_bone.use_transform_around_custom_shape = self.use_as_pivot  ## 5.0
+            pose_bone.use_custom_shape_bone_size = self.scale_to_bone_length
+            ##pose_bone.show_wire = self.wireframe  ## 5.0
+            pose_bone.custom_shape_wire_width = self.wire_width
+        except Exception as e:
+            print(f"[AetherBlend] Error applying WidgetOperation for bone '{pose_bone.name}': {e}")
+
+    @staticmethod
+    def _searchWGTS(armature, name: str) -> str | None:
+        """Searches for a widget object in the WGTS collection of the armature."""
+        search_name = name.strip()
+        if not search_name:
+            return None
+
+        expected_widget_name = search_name if search_name.startswith("AB_WGT_") else f"AB_WGT_{search_name}"
+
+        local_collections: list[bpy.types.Collection] = []
+        for armature_collection in armature.users_collection:
+            local_collections.extend(utils.collection.collection_tree(armature_collection))
+
+        matcher = lambda object_name: object_name == expected_widget_name
+
+        found_name = utils.collection.find_object_name_in_prefixed_collections(
+            local_collections,
+            _WGTS,
+            matcher,
+        )
+        if found_name:
+            return found_name
+
+        # Fallback: search all WGTS collections in the blend file.
+        global_collections = [collection for collection in bpy.data.collections if collection.name.upper().startswith("WGTS")]
+        found_name = utils.collection.find_object_name_in_prefixed_collections(
+            global_collections,
+            _WGTS,
+            matcher,
+        )
+        if found_name:
+            return found_name
+
+        print(f"[AetherBlend] WidgetOperation: No matching WGTS widget '{expected_widget_name}' found for armature '{armature.name}'.")
+        return None
+
+    @staticmethod
+    def _normalizeWidgetName(name: str) -> str:
+        normalized_name = name.strip().lower()
+        for separator in (".", "_", "-", " "):
+            normalized_name = normalized_name.replace(separator, "")
+        return normalized_name
+    
+
+@dataclass()
+class BoneRestrictionOperation(ABOperation):
+    mode: ClassVar[Mode] = "POSE"
+
+    bone_name: str
+    hide_select: bool | None = None
+    lock_location: tuple[bool, bool, bool] | bool | None = None
+    lock_rotation: tuple[bool, bool, bool] | bool | None = None
+    lock_scale: tuple[bool, bool, bool] | bool | None = None
+    inherit_location: bool | None = None
+    inherit_rotation: bool | None = None
+    inherit_scale: Literal["FULL", "FIX_SHEAR", "ALIGNED", "AVERAGE", "NONE", "NONE_LEGACY"] | None = None
+
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
+        """Applies the bone restriction to the given pose bone."""
+        if not self._switch_mode():
+            return
+        poseBone = self._getPoseBone(self.bone_name, armature)
+        dataBone = armature.data.bones.get(self.bone_name)
+        if not poseBone or not dataBone:
+            return
+        if self.hide_select is not None:
+            dataBone.hide_select = self.hide_select
+        if isinstance(self.lock_location, bool):
+            lock_location = (self.lock_location, self.lock_location, self.lock_location)
+        else:            
+            lock_location = self.lock_location
+
+        if isinstance(self.lock_rotation, bool):
+            lock_rotation = (self.lock_rotation, self.lock_rotation, self.lock_rotation)
+        else:            
+            lock_rotation = self.lock_rotation
+
+        if isinstance(self.lock_scale, bool):
+            lock_scale = (self.lock_scale, self.lock_scale, self.lock_scale)
+        else:            
+            lock_scale = self.lock_scale
+
+        try:
+            if self.lock_location is not None:
+                poseBone.lock_location = lock_location
+            if self.lock_rotation is not None:
+                poseBone.lock_rotation = lock_rotation
+            if self.lock_scale is not None:
+                poseBone.lock_scale = lock_scale
+            if self.inherit_location is not None:
+                dataBone.use_local_location = self.inherit_location
+            if self.inherit_rotation is not None:
+                dataBone.use_inherit_rotation = self.inherit_rotation
+            if self.inherit_scale is not None:
+                dataBone.inherit_scale = self.inherit_scale
+            # Add more restriction types as needed
+        except Exception as e:
+            print(f"[AetherBlend] Error applying BoneRestrictionOperation for bone '{self.bone_name}': {e}")
+
+@dataclass()
+class PoseBoneOperation(ABOperation):
+    """Poses a bone by setting its location, rotation, and scale."""
+    mode: ClassVar[Mode] = "POSE"
+    time : Time = field(default="Post", kw_only=True)
+
+    bone_name: str
+    location: tuple[float, float, float] | None = None
+    rotation: tuple[float, float, float] | None = None
+    scale: tuple[float, float, float] | None = None
+
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
+        """Poses a bone by setting its location, rotation, and scale."""
+        if not self._switch_mode():
+            return
+        poseBone = self._getPoseBone(self.bone_name, armature)
+        if not poseBone:
+            return
+        if self.location:
+            poseBone.location = self.location
+        if self.rotation:
+            poseBone.rotation_euler = [math.radians(angle) for angle in self.rotation]
+        if self.scale:
+            poseBone.scale = self.scale
+
+
+@dataclass
+class PropOverrideOperation(ABOperation):
+    """Overrides a custom property of a bone."""
+    mode: ClassVar[Mode] = "POSE"
+    time : Time = field(default="Post", kw_only=True)
+
+    bone_name: str
+    property_name: str
+    value: float | int | str | bool
+
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None) -> None:
+        """Applies the property override to the given pose bone."""
+        if not self._switch_mode():
+            return
+        poseBone = self._getPoseBone(self.bone_name, armature)
+        if not poseBone:
+            return
+        ## Alternatively in the futuire we could use data dict in here to target properties from speicifc objects
+        ## however im too lazye to implement that rn, an example is in the driver opoperation - Shino
+        if not poseBone:
+            print(f"[AetherBlend] PropOverride bone '{self.bone_name}' not found in armature.")
+            return
+        
+        try:
+            poseBone[self.property_name] = self.value
+        except Exception as e:
+            print(f"[AetherBlend] Error applying PropOverride for bone '{poseBone.name}': {e}")
 
     
 

@@ -1,5 +1,6 @@
 import bpy
 from dataclasses import dataclass
+from typing import Any
 
 class rigify_type:
     """Base class for rigify types."""
@@ -14,7 +15,7 @@ class rigify_type:
         """
         raise NotImplementedError("Subclasses must implement apply()")
 
-    def set_fk_collection (self, rigify_params : bpy.types.PoseBone.rigify_parameters) -> None:
+    def set_fk_collection (self, rigify_params: Any) -> None:
         
         try:
             if self.fk_coll:
@@ -26,7 +27,7 @@ class rigify_type:
         except Exception as e:
                 print(f"[AetherBlend] Error setting FK collection: {e}")
 
-    def set_tweak_collection (self, rigify_params : bpy.types.PoseBone.rigify_parameters) -> None:   
+    def set_tweak_collection (self, rigify_params: Any) -> None:
 
         try:            
             if self.tweak_coll:

@@ -5,6 +5,7 @@ import json
 
 from . import template_manager
 from .templates import get_modules_by_family
+from ...core.operations import BoneRestrictionOperation
 
 
 MODULE_TYPE_ICONS = {
@@ -26,7 +27,6 @@ def _encode_template_clipboard_payload(payload: dict) -> str:
     json_payload = json.dumps(payload, separators=(",", ":"), ensure_ascii=False)
     encoded = base64.urlsafe_b64encode(json_payload.encode("utf-8")).decode("ascii")
     return f"{_TEMPLATE_CLIPBOARD_PREFIX}{encoded}"
-
 
 def _decode_template_clipboard_payload(clipboard_text: str) -> dict:
     """Decode a versioned Base64 token; fallback to legacy raw JSON clipboard content."""
@@ -91,7 +91,6 @@ def _draw_family_module_menu(layout, mode: str, family_name: str) -> None:
             operator.mode = mode
             operator.module_key = key
 
-
 def _build_family_menu_class(mode: str, family_name: str):
     """Create a dedicated submenu class for one module family."""
     menu_idname = _get_family_menu_idname(mode, family_name)
@@ -109,7 +108,6 @@ def _build_family_menu_class(mode: str, family_name: str):
             "draw": draw,
         },
     )
-
 
 def _get_group_bounds(modules, index: int) -> tuple[int, int]:
     """Return the contiguous bounds for the selected fallback group."""
@@ -129,7 +127,6 @@ def _get_group_bounds(modules, index: int) -> tuple[int, int]:
         end += 1
 
     return start, end
-
 
 def _reindex_module_groups(aether_rig) -> None:
     """Normalize stored group indices so they match the current UI list order."""
@@ -153,11 +150,9 @@ def _reindex_module_groups(aether_rig) -> None:
 
         previous_group_index = group_index
 
-
 def _get_next_group_index(modules) -> int:
     """Return a temporary group index that will not collide with existing groups."""
     return max((getattr(item, 'group_index', -1) for item in modules), default=-1) + 1
-
 
 def _insert_module_item(aether_rig, module_key: str, insert_index: int, group_index: int) -> int:
     """Insert a module entry at the requested UI position."""
@@ -173,7 +168,6 @@ def _insert_module_item(aether_rig, module_key: str, insert_index: int, group_in
 
     return insert_index
 
-
 class AETHER_MT_Add_Group_Module_Menu(bpy.types.Menu):
     bl_idname = "AETHER_MT_add_group_module_menu"
     bl_label = "Add Group"
@@ -186,7 +180,6 @@ class AETHER_MT_Add_Group_Module_Menu(bpy.types.Menu):
                 text=_format_family_name(family_name),
                 icon='FILE_FOLDER',
             )
-
 
 class AETHER_MT_Add_Fallback_Module_Menu(bpy.types.Menu):
     bl_idname = "AETHER_MT_add_fallback_module_menu"
@@ -201,7 +194,6 @@ class AETHER_MT_Add_Fallback_Module_Menu(bpy.types.Menu):
                 icon='FILE_FOLDER',
             )
 
-
 class AETHER_MT_Populate_Custom_Template_Menu(bpy.types.Menu):
     bl_idname = "AETHER_MT_populate_custom_template_menu"
     bl_label = "Populate Custom Modules"
@@ -215,7 +207,6 @@ class AETHER_MT_Populate_Custom_Template_Menu(bpy.types.Menu):
                 icon='PRESET',
             )
             operator.template_name = template_name
-
 
 class AETHER_OT_Add_Template_Module(bpy.types.Operator):
     bl_idname = "aether.add_template_module"
@@ -278,7 +269,6 @@ class AETHER_OT_Add_Template_Module(bpy.types.Operator):
         aether_rig.module_index = inserted_index
         return {'FINISHED'}
 
-
 class AETHER_OT_Populate_Custom_Template(bpy.types.Operator):
     bl_idname = "aether.populate_custom_template"
     bl_label = "Populate Custom Template"
@@ -310,7 +300,6 @@ class AETHER_OT_Populate_Custom_Template(bpy.types.Operator):
         template_manager.populate_modules_from_template(aether_rig, self.template_name)
         aether_rig.module_index = 0 if aether_rig.modules else 0
         return {'FINISHED'}
-
 
 class AETHER_OT_Save_Custom_Template_JSON(bpy.types.Operator):
     bl_idname = "aether.save_custom_template_json"
@@ -358,7 +347,6 @@ class AETHER_OT_Save_Custom_Template_JSON(bpy.types.Operator):
         self.report({'INFO'}, f"Saved template JSON: {file_path.name}")
         return {'FINISHED'}
 
-
 class AETHER_OT_Export_Custom_Template_Clipboard(bpy.types.Operator):
     bl_idname = "aether.export_custom_template_clipboard"
     bl_label = "Export Custom Template to Clipboard"
@@ -399,7 +387,6 @@ class AETHER_OT_Export_Custom_Template_Clipboard(bpy.types.Operator):
         context.window_manager.clipboard = _encode_template_clipboard_payload(payload)
         self.report({'INFO'}, "Copied custom template token to clipboard")
         return {'FINISHED'}
-
 
 class AETHER_OT_Import_Custom_Template_Clipboard(bpy.types.Operator):
     bl_idname = "aether.import_custom_template_clipboard"
@@ -463,7 +450,6 @@ class AETHER_OT_Import_Custom_Template_Clipboard(bpy.types.Operator):
         aether_rig.module_index = 0 if aether_rig.modules else 0
         self.report({'INFO'}, "Imported custom template from clipboard token")
         return {'FINISHED'}
-
 
 class AETHER_OT_Move_Template_Module(bpy.types.Operator):
     bl_idname = "aether.move_template_module"
@@ -538,7 +524,6 @@ class AETHER_OT_Move_Template_Module(bpy.types.Operator):
         aether_rig.module_index = moved_index
         return {'FINISHED'}
 
-
 class AETHER_OT_Remove_Template_Module(bpy.types.Operator):
     bl_idname = "aether.remove_template_module"
     bl_label = "Remove Template Module"
@@ -571,7 +556,6 @@ class AETHER_OT_Remove_Template_Module(bpy.types.Operator):
         aether_rig.module_index = min(self.module_index, len(aether_rig.modules) - 1)
 
         return {'FINISHED'}
-
 
 class AETHER_OT_Solo_Bone_Collections(bpy.types.Operator):
     bl_idname = "aether.solo_bone_collections"
@@ -615,6 +599,63 @@ class AETHER_OT_Solo_Bone_Collections(bpy.types.Operator):
         return {'FINISHED'}
 
 
+######
+# UI Links 
+######
+
+class AETHER_OT_EyeLidOffsetEditStart(bpy.types.Operator):
+    bl_idname = "aether.eyelid_offset_edit_start"
+    bl_label = "Start Editing Eye Lid Offset"
+    bl_description = "Begin interactively editing the eye lid control offset by dragging in the 3D view"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    
+
+    def execute(self, context):
+
+        armature = context.active_object
+        rig_props = armature.aether_rig
+        rig_props.eye_lid_edit_mode = True
+        # now unsolo every collection and only solo the EyesAnchors collections
+        for collection in armature.data.collections:
+            collection.is_solo = False
+        collection = armature.data.collections.get("Eyes_Anchors")
+        if collection:
+            collection.is_solo = True
+
+        RestrictedBones = ["lid.anchor.B.L.001","lid.anchor.B.L.002","lid.anchor.B.L.003","lid.anchor.B.R.001","lid.anchor.B.R.002","lid.anchor.B.R.003"]
+        armature = context.active_object
+        for bone_name in RestrictedBones:
+            RestrictOp = BoneRestrictionOperation(time="Post", bone_name=bone_name, lock_location=[False, False, False], lock_rotation=[False, False, False], lock_scale=[False, False, False])
+            RestrictOp.apply(armature=armature) 
+
+        return {'FINISHED'}
+    
+class AETHER_OT_EyeLidOffsetEditEnd(bpy.types.Operator):
+    bl_idname = "aether.eyelid_offset_edit_end"
+    bl_label = "End Editing Eye Lid Offset"
+    bl_description = "Finish interactively editing the eye lid control offset and apply the changes"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        # This operator is a placeholder to signal the end of interactive editing for eye lid controls. The actual logic to finalize the changes would be implemented in the draw method of the UILink with overrite="EyeLidControl".
+        armature = context.active_object
+        rig_props = armature.aether_rig
+        rig_props.eye_lid_edit_mode = False
+
+        collection = armature.data.collections.get("Eyes_Anchors")
+        if collection:
+            collection.is_solo = False
+            
+        RestrictedBones = ["lid.anchor.B.L.001","lid.anchor.B.L.002","lid.anchor.B.L.003","lid.anchor.B.R.001","lid.anchor.B.R.002","lid.anchor.B.R.003"]
+        armature = context.active_object
+        for bone_name in RestrictedBones:
+            RestrictOp = BoneRestrictionOperation(time="Post", bone_name=bone_name, lock_location=[True, True, True], lock_rotation=[True, True, True], lock_scale=[True, True, True])
+            RestrictOp.apply(armature=armature) 
+
+        return {'FINISHED'}
+
+
 def register():
     global _DYNAMIC_ADD_MENU_CLASSES
 
@@ -638,10 +679,14 @@ def register():
     bpy.utils.register_class(AETHER_OT_Move_Template_Module)
     bpy.utils.register_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.register_class(AETHER_OT_Solo_Bone_Collections)
+    bpy.utils.register_class(AETHER_OT_EyeLidOffsetEditStart)
+    bpy.utils.register_class(AETHER_OT_EyeLidOffsetEditEnd)
 
 def unregister():
     global _DYNAMIC_ADD_MENU_CLASSES
 
+    bpy.utils.unregister_class(AETHER_OT_EyeLidOffsetEditEnd)
+    bpy.utils.unregister_class(AETHER_OT_EyeLidOffsetEditStart)
     bpy.utils.unregister_class(AETHER_OT_Solo_Bone_Collections)
     bpy.utils.unregister_class(AETHER_OT_Remove_Template_Module)
     bpy.utils.unregister_class(AETHER_OT_Move_Template_Module)

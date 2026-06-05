@@ -1,7 +1,7 @@
 import bpy
-import addon_utils
 import collections
 from ...properties.tab_prop import get_active_tab
+from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
 from . import template_manager
 from .ui_links import UI_LINKS
@@ -91,7 +91,7 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         )
 
     def draw(self, context):
-        addon_enabled = addon_utils.check("rigify")[0]
+        addon_enabled = addon_dependencies.is_addon_enabled(module_name="rigify")
         if not addon_enabled:
             layout = self.layout
             box = layout.box()

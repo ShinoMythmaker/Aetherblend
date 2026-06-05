@@ -1,6 +1,6 @@
 from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
-from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
+from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
 
@@ -74,5 +74,12 @@ def get_rig_module() -> RigModule:
         bone_groups=[TAIL],
         ui_collections = UI_Collections([
             BoneCollection(name="Tail", ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),
-        ])
+        ]),
+        operations=[
+            WidgetOperation(bone_name="Tail-end", scale_factor=0.5),
+            WidgetOperation(bone_name="Tail-end01", scale_factor=0.5),
+            WidgetOperation(bone_name="Tail-mid01", scale_factor=0.5),
+            WidgetOperation(bone_name="Tail-start01", scale_factor=0.5),
+            WidgetOperation(bone_name="Tail-master", scale_factor=0.5),
+        ]
     )
