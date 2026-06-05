@@ -1,5 +1,5 @@
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import ParentBoneOperation, ConstraintOperation, CollectionOperation, RigifyTypeOperation
+from ......core.operations import ParentBoneOperation, ConstraintOperation, CollectionOperation, PropOverrideOperation, RigifyTypeOperation
 from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -170,6 +170,10 @@ def get_rig_module() -> RigModule:
             BoneCollection(name="Arm.R (IK)", ui=True, color_set="IK_Right", row_index=1, title="Arm IK.R"),
             BoneCollection(name="Arm.R (FK)", ui=True, color_set="FK_Right", row_index=2, title="Arm FK.R", visible=False),
             BoneCollection(name="Arm.R (Tweak)", ui=True, color_set="Tweak_Right", row_index=3, title="Tweak.R", visible=False),
-        ])
+        ]),
+        operations=[
+            PropOverrideOperation(bone_name="upper_arm_parent.L", property_name="IK_Stretch", value=0),
+            PropOverrideOperation(bone_name="upper_arm_parent.R", property_name="IK_Stretch", value=0),
+        ]
     )
     

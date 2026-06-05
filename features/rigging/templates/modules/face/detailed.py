@@ -1,7 +1,7 @@
 import mathutils
 
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation, BoneRestrictionOperation, ConstraintOperation, DriverOperation, PoseBoneOperation
+from ......core.operations import CollectionOperation, ParentBoneOperation, PropOverrideOperation, RigifyTypeOperation, WidgetOperation, BoneRestrictionOperation, ConstraintOperation, DriverOperation, PoseBoneOperation
 from ......core.constraints import CopyLocationConstraint, CopyScaleConstraint, LimitLocationConstraint
 from ......core.drivers import TransformChannelVariable, Driver, SinglePropertyVariable
 from ......core.bone_generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone, OffsetBone
@@ -1351,6 +1351,9 @@ def get_rig_module() -> RigModule:
             BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=2, title="Eyes (Macro)", visible=True),
         ]),
         operations=[
+            #Head 
+            PropOverrideOperation(bone_name="head", property_name="head_follow", value=1),
+
             #Left Face
             WidgetOperation(bone_name="Cheek.T.L",scale_factor=0.3,),
             WidgetOperation(bone_name="Cheek.T.L.001",scale_factor=0.3,),

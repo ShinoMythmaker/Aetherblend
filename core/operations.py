@@ -586,5 +586,34 @@ class PoseBoneOperation(ABOperation):
         if self.scale:
             poseBone.scale = self.scale
 
+
+@dataclass
+class PropOverrideOperation(ABOperation):
+    """Overrides a custom property of a bone."""
+    mode: ClassVar[Mode] = "POSE"
+    time : Time = field(default="Post", kw_only=True)
+
+    bone_name: str
+    property_name: str
+    value: float | int | str | bool
+
+    def apply(self, armature: bpy.types.Object, data_dict: dict | None = None) -> None:
+        """Applies the property override to the given pose bone."""
+        if not self._switch_mode():
+            return
+        poseBone = self._getPoseBone(self.bone_name, armature)
+        if not poseBone:
+            return
+        ## Alternatively in the futuire we could use data dict in here to target properties from speicifc objects
+        ## however im too lazye to implement that rn, an example is in the driver opoperation - Shino
+        if not poseBone:
+            print(f"[AetherBlend] PropOverride bone '{self.bone_name}' not found in armature.")
+            return
+        
+        try:
+            poseBone[self.property_name] = self.value
+        except Exception as e:
+            print(f"[AetherBlend] Error applying PropOverride for bone '{poseBone.name}': {e}")
+
     
 
