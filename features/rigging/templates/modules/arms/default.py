@@ -1,8 +1,9 @@
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import ParentBoneOperation, ConstraintOperation, CollectionOperation, PropOverrideOperation, RigifyTypeOperation
+from ......core.operations import ParentBoneOperation, ConstraintOperation, CollectionOperation, PropOverrideOperation, RigifyTypeOperation, DriverOperation, WidgetOperation
 from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
+from ......core.drivers import TransformChannelVariable, Driver, SinglePropertyVariable
 
 ARM_R = BoneGroup(
         name="Right Arm",
@@ -13,9 +14,68 @@ ARM_R = BoneGroup(
             TransformLink(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
             TransformLink(target="DEF-clavicle.R", bone="j_sako_r"),
             TransformLink(target="DEF-forearm.R.001", bone="n_hte_r"),
-            TransformLink(target="DEF-elbow.R", bone="n_hhiji_r")
+            TransformLink(target="DEF-elbow.R", bone="n_hhiji_r"),
+            TransformLink(target="DEF-pauldron.R", bone="n_kataarmor_r"),
+            TransformLink(target="DEF-pauldron.L", bone="n_kataarmor_l")
             ],
         generators = [
+            #Right Pauldron
+            ExtensionBone(
+                name="MCH-pauldron.R",
+                bone_a="n_kataarmor_r",
+                size_factor=1,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                parent="Spine.004",
+                req_bones=["n_kataarmor_r"],
+                operations=[
+                    RigifyTypeOperation(time="Pre", bone_name="MCH-pauldron.R", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(time="Post", bone_name="MCH-pauldron.R", collection_name="MCH"),
+                    DriverOperation(
+                        time="Post",
+                        bone_name="MCH-pauldron.R",
+                        driver_name="pauldron_rot_X",
+                        property=["rotation_quaternion", 3],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="RotX",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="DEF-upper_arm.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                            ]
+                        )
+                    ),
+                    DriverOperation(
+                        time="Post",
+                        bone_name="MCH-pauldron.R",
+                        driver_name="pauldron_rot_X",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="-RotZ",
+                            variables=[
+                                TransformChannelVariable(name="RotZ", target_bone="DEF-upper_arm.R", transform_type="ROT_Z", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                            ]
+                        )
+                    )
+                ]
+            ),
+
+            ExtensionBone(
+                name="pauldron.R",
+                bone_a="n_kataarmor_r",
+                size_factor=1,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                parent="MCH-pauldron.R",
+                req_bones=["n_kataarmor_r"],
+                operations=[
+                    RigifyTypeOperation(time="Pre", bone_name="pauldron.R", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
+                    CollectionOperation(time="Pre", bone_name="pauldron.R", collection_name="Arm.R (Tweak)"),
+                    WidgetOperation(time="Post", bone_name="pauldron.R", custom_object="Pauldron", rotation=(0, 0, 0), wire_width=1, scale_to_bone_length=True),
+                ]
+            ),
             #Right Clavicle
             ConnectBone(
                 name="clavicle.R",
@@ -92,6 +152,62 @@ ARM_L = BoneGroup(
             TransformLink(target="DEF-elbow.L", bone="n_hhiji_l")
             ],
         generators = [
+            #Left Pauldron
+            ExtensionBone(
+                name="MCH-pauldron.L",
+                bone_a="n_kataarmor_l",
+                size_factor=1,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                parent="Spine.004",
+                req_bones=["n_kataarmor_l"],
+                operations=[
+                    RigifyTypeOperation(time="Pre", bone_name="MCH-pauldron.L", rigify_type=rigify.types.basic_raw_copy()),
+                    CollectionOperation(time="Post", bone_name="MCH-pauldron.L", collection_name="MCH"),
+                    DriverOperation(
+                        time="Post",
+                        bone_name="MCH-pauldron.L",
+                        driver_name="pauldron_rot_X",
+                        property=["rotation_quaternion", 3],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="-RotX",
+                            variables=[
+                                TransformChannelVariable(name="RotX", target_bone="DEF-upper_arm.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                            ]
+                        )
+                    ),
+                    DriverOperation(
+                        time="Post",
+                        bone_name="MCH-pauldron.L",
+                        driver_name="pauldron_rot_X",
+                        property=["rotation_quaternion", 1],
+                        driver=Driver(
+                            type="SCRIPTED",
+                            expression="RotZ",
+                            variables=[
+                                TransformChannelVariable(name="RotZ", target_bone="DEF-upper_arm.L", transform_type="ROT_Z", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
+                            ]
+                        )
+                    )
+                ]
+            ),
+            ExtensionBone(
+                name="pauldron.L",
+                bone_a="n_kataarmor_l",
+                size_factor=1,
+                axis_type="local",
+                axis="Y",
+                start="head",
+                parent="MCH-pauldron.L",
+                req_bones=["n_kataarmor_l"],
+                operations=[
+                    RigifyTypeOperation(time="Pre", bone_name="pauldron.L", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
+                    CollectionOperation(time="Pre", bone_name="pauldron.L", collection_name="Arm.L (Tweak)"),
+                    WidgetOperation(time="Post", bone_name="pauldron.L", custom_object="Pauldron", rotation=(0, 0, 0), wire_width=1, scale_to_bone_length=True,)
+                ]
+            ),
             #Left Clavicle
             ConnectBone(
                 name="clavicle.L",
