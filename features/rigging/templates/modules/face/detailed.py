@@ -1349,7 +1349,6 @@ def get_rig_module() -> RigModule:
             BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=1, title="Face (Primary)", visible=True),
             BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=1, title="Face (Secondary)", visible=False),
             BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=2, title="Eyes (Macro)", visible=True),
-            BoneCollection(name="Eyes_Anchors", ui=True, color_set="Face_Primary", row_index=2, title="->Adjust", visible=False),
         ]),
         operations=[
             #Left Face
@@ -1367,6 +1366,7 @@ def get_rig_module() -> RigModule:
             WidgetOperation(bone_name="Cheek.B.R",scale_factor=0.3,),
             WidgetOperation(bone_name="Nose.R",scale_factor=0.3,),
             WidgetOperation(bone_name="Nostril.R",scale_factor=0.2,),   
-        ]
+        ],
+        ui_flags = ["Eye Lid Edit Mode"],
     )
 

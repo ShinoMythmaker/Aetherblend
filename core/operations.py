@@ -511,13 +511,13 @@ class BoneRestrictionOperation(ABOperation):
     mode: ClassVar[Mode] = "POSE"
 
     bone_name: str
-    hide_select: bool = False
-    lock_location: tuple[bool, bool, bool] | bool = False
-    lock_rotation: tuple[bool, bool, bool] | bool = False
-    lock_scale: tuple[bool, bool, bool] | bool = False
-    inherit_location: bool = True
-    inherit_rotation: bool = True
-    inherit_scale: Literal["FULL", "FIX_SHEAR", "ALIGNED", "AVERAGE", "NONE", "NONE_LEGACY"] = "FULL"
+    hide_select: bool | None = None
+    lock_location: tuple[bool, bool, bool] | bool | None = None
+    lock_rotation: tuple[bool, bool, bool] | bool | None = None
+    lock_scale: tuple[bool, bool, bool] | bool | None = None
+    inherit_location: bool | None = None
+    inherit_rotation: bool | None = None
+    inherit_scale: Literal["FULL", "FIX_SHEAR", "ALIGNED", "AVERAGE", "NONE", "NONE_LEGACY"] | None = None
 
     def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
         """Applies the bone restriction to the given pose bone."""
@@ -527,7 +527,8 @@ class BoneRestrictionOperation(ABOperation):
         dataBone = armature.data.bones.get(self.bone_name)
         if not poseBone or not dataBone:
             return
-        dataBone.hide_select = self.hide_select
+        if self.hide_select is not None:
+            dataBone.hide_select = self.hide_select
         if isinstance(self.lock_location, bool):
             lock_location = (self.lock_location, self.lock_location, self.lock_location)
         else:            
@@ -544,12 +545,18 @@ class BoneRestrictionOperation(ABOperation):
             lock_scale = self.lock_scale
 
         try:
-            poseBone.lock_location = lock_location
-            poseBone.lock_rotation = lock_rotation
-            poseBone.lock_scale = lock_scale
-            dataBone.use_local_location = self.inherit_location
-            dataBone.use_inherit_rotation = self.inherit_rotation
-            dataBone.inherit_scale = self.inherit_scale
+            if self.lock_location is not None:
+                poseBone.lock_location = lock_location
+            if self.lock_rotation is not None:
+                poseBone.lock_rotation = lock_rotation
+            if self.lock_scale is not None:
+                poseBone.lock_scale = lock_scale
+            if self.inherit_location is not None:
+                dataBone.use_local_location = self.inherit_location
+            if self.inherit_rotation is not None:
+                dataBone.use_inherit_rotation = self.inherit_rotation
+            if self.inherit_scale is not None:
+                dataBone.inherit_scale = self.inherit_scale
             # Add more restriction types as needed
         except Exception as e:
             print(f"[AetherBlend] Error applying BoneRestrictionOperation for bone '{self.bone_name}': {e}")

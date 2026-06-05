@@ -208,7 +208,7 @@ class UILink:
     white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show. 
     ui_type: UI_Type | None = "checkbox"
     ui_params: dict | None = None  # Additional parameters for the UI element
-    overrite: Literal["EyeLidControl"] | None = None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)
+    override: Literal["EyeLidControl"] | None = None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)
      
     def eye_lid_control_draw(self, context, layout: bpy.types.UILayout):
 
@@ -242,7 +242,7 @@ class UILink:
             if not selected_bones.intersection(self.white_list):
                 return
             
-        if self.overrite == "EyeLidControl":
+        if self.override == "EyeLidControl":
             self.eye_lid_control_draw(context, layout)
             return
 

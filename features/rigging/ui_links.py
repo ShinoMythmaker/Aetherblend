@@ -21,7 +21,12 @@ UI_LINKS: dict[str, UILink] = {
                     "Skirt_Front.L", "Skirt_Front.L.001", "Skirt_Front.L.002", "Skirt_Side.L", "Skirt_Side.L.001", "Skirt_Side.L.002", "Skirt_Back.L", "Skirt_Back.L.001", "Skirt_Back.L.002",
                     "foot_ik.R", "foot_ik.L"],
         ui_type="slider",      
-    )
+    ),
+    "Eye Lid Edit Mode": UILink(
+        title="Eye Lid Edit Mode",
+        white_list=["lid.anchor.B.L.001","lid.anchor.B.L.002","lid.anchor.B.L.003","lid.anchor.B.R.001","lid.anchor.B.R.002","lid.anchor.B.R.003", "lid.B.R", "lid.B.L","lid.B.L.001", "lid.B.L.002", "lid.B.R.001", "lid.B.R.002", "lid.T.L", "lid.T.R", "lid.T.L.001", "lid.T.L.002", "lid.T.R.001", "lid.T.R.002"], 
+        override="EyeLidControl",   
+    ),
 }
 
 
