@@ -26,6 +26,7 @@ class BoneGenerator(ABC):
     pose_operations: 'PoseOperations | None' = field(default=None, kw_only=True)
     operations: list[ABOperation] = field(default_factory=list, kw_only=True)
     is_optional: bool = field(default=False, kw_only=True)
+    data_key: str | None = field(default=None, kw_only=True)
 
     @abstractmethod
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
@@ -515,7 +516,6 @@ class ParallelBone(BoneGenerator):
 class SkinBone(BoneGenerator):
     bone_a: str
     size_factor: float = 1.0
-    mesh_restriction: str | None = None
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the SkinBone at the highest weighted vertex position for bone_a."""
@@ -527,7 +527,7 @@ class SkinBone(BoneGenerator):
         ffxiv_armature = None
         if data is not None:
             try:
-                skin_data_item = data.get(self.mesh_restriction)
+                skin_data_item = data.get(self.data_key)
                 if skin_data_item.type == 'MESH':
                     skin = skin_data_item
 

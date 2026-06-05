@@ -441,7 +441,7 @@ LEFT_EYE = BoneGroup(
         SkinBone(
             name="lid.T.L", 
             bone_a="j_f_mabup_02out_l", 
-            mesh_restriction="eye_occlusion",
+            data_key="eye_occlusion",
             req_bones=["j_f_mabup_02out_l"],
             operations=[RigifyTypeOperation(time="Pre", bone_name="lid.T.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True)),
                          CollectionOperation(time="Pre", bone_name="lid.T.L", collection_name="Face (Secondary)")
@@ -450,14 +450,14 @@ LEFT_EYE = BoneGroup(
         SkinBone(
             name="lid.T.L.002", 
             bone_a="j_f_mabup_01_l", 
-            mesh_restriction="eye_occlusion",
+            data_key="eye_occlusion",
             req_bones=["j_f_mabup_01_l"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.002", collection_name="Face (Secondary)")]
         ),
         SkinBone(
             name="lid.B.L", 
             bone_a="j_f_mabdn_03in_l", 
-            mesh_restriction="eye_occlusion", 
+            data_key="eye_occlusion", 
             req_bones=["j_f_mabdn_03in_l"],
             operations=[RigifyTypeOperation(time="Pre", bone_name="lid.B.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head")),
                          CollectionOperation(time="Pre", bone_name="lid.B.L", collection_name="Face (Secondary)")
@@ -466,7 +466,7 @@ LEFT_EYE = BoneGroup(
         SkinBone(
             name="lid.B.L.002", 
             bone_a="j_f_mabdn_01_l", 
-            mesh_restriction="eye_occlusion",
+            data_key="eye_occlusion",
             req_bones=["j_f_mabdn_01_l"], 
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002", collection_name="Face (Secondary)")]
             
@@ -648,7 +648,7 @@ RIGHT_EYE = BoneGroup(
         SkinBone(
             name="lid.T.R", 
             bone_a="j_f_mabup_02out_r", 
-            mesh_restriction="eye_occlusion",
+            data_key="eye_occlusion",
             req_bones=["j_f_mabup_02out_r"],
             operations=[RigifyTypeOperation(time="Pre", bone_name="lid.T.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True)), 
                         CollectionOperation(time="Pre", bone_name="lid.T.R", collection_name="Face (Secondary)")
@@ -657,14 +657,14 @@ RIGHT_EYE = BoneGroup(
         SkinBone(
             name="lid.T.R.002", 
             bone_a="j_f_mabup_01_r", 
-            mesh_restriction="eye_occlusion",
+            data_key="eye_occlusion",
             req_bones=["j_f_mabup_01_r"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.002", collection_name="Face (Secondary)")]
         ),
         SkinBone(
             name="lid.B.R", 
             bone_a="j_f_mabdn_03in_r", 
-            mesh_restriction="eye_occlusion", 
+            data_key="eye_occlusion", 
             req_bones=["j_f_mabdn_03in_r"],
             operations=[RigifyTypeOperation(time="Pre", bone_name="lid.B.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head")), 
                         CollectionOperation(time="Pre", bone_name="lid.B.R", collection_name="Face (Secondary)")]
@@ -672,7 +672,7 @@ RIGHT_EYE = BoneGroup(
         SkinBone(
             name="lid.B.R.002",
             bone_a="j_f_mabdn_01_r",
-            mesh_restriction="eye_occlusion",
+            data_key="eye_occlusion",
             req_bones=["j_f_mabdn_01_r"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002", collection_name="Face (Secondary)")]
         ),

@@ -32,13 +32,17 @@ class BoneGroup:
         self.generators = list(self.generators)
         self.operations = list(self.operations)
     
-    def check(self, armature: bpy.types.Object) -> bool:
+    def check(self, armature: bpy.types.Object, data: dict | None = None) -> bool:
         """Check if all required bones exist in the armature for this bone group."""
         future_bones = []
         
         for bone_gen in self.generators:
             future_bones.append(bone_gen.name)
-            
+            if bone_gen.data_key is not None:
+                data_value = data.get(bone_gen.data_key) if data else None
+                if data_value is None:
+                    print(f"[AetherBlend] Error Code: DEMON")
+                    return False
             if bone_gen.req_bones:
                 for req_bone in bone_gen.req_bones:
                     # Check if bone will be created in this group or already exists
@@ -77,7 +81,7 @@ class BoneGroup:
     def execute(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], dict[str, list[PoseOperations]], list[ABOperation]]:
         """Execute the full generation process for this bone group."""
         # Check if bone group can theoriticlly be generated
-        if not self.check(armature):
+        if not self.check(armature, data=data):
             print(f"[AetherBlend] BoneGroup '{self.name}' check failed - missing required bones")
             return [], {}, []
         
