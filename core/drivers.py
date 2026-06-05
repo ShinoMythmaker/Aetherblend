@@ -32,7 +32,6 @@ class Driver():
     
     def apply(self, target: bpy.types.PoseBone | bpy.types.Object | bpy.types.Constraint, property: tuple[str, int] | str, armature: bpy.types.Object) -> None:
         """Applies the driver to the given bone."""
-        print(f"[AetherBlend] Applying driver to target '{target.name if hasattr(target, 'name') else target}' with property '{property}'")
         if isinstance(property, str):
             driver = target.driver_add(property)
         else:

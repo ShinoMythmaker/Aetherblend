@@ -66,14 +66,16 @@ def find_by_armature_and_material_property(
     armature: bpy.types.Object,
     property_name: str,
     property_value=None,
-) -> list[bpy.types.Object]:
+) -> list[bpy.types.Object] | None:
     """Finds objects driven by an armature and matching a material property filter."""
-    return [
-        obj
-        for obj in bpy.data.objects
-        if uses_armature(obj, armature)
-        and has_material_property(obj, property_name, property_value)
-    ]
+    objects = []
+    for obj in bpy.data.objects:
+        try:
+            if uses_armature(obj, armature) and has_material_property(obj, property_name, property_value):
+                objects.append(obj)
+        except ReferenceError:
+            print(f"[AetherBlend] Skipping deleted object: {obj}")
+    return objects if len(objects) > 0 else None
 
 
 def merge_by_material(objects):
