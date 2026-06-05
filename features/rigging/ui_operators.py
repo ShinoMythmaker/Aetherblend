@@ -5,6 +5,7 @@ import json
 
 from . import template_manager
 from .templates import get_modules_by_family
+from ...core.operations import BoneRestrictionOperation
 
 
 MODULE_TYPE_ICONS = {
@@ -608,8 +609,10 @@ class AETHER_OT_EyeLidOffsetEditStart(bpy.types.Operator):
     bl_description = "Begin interactively editing the eye lid control offset by dragging in the 3D view"
     bl_options = {'REGISTER', 'UNDO'}
 
+    
+
     def execute(self, context):
-        # This operator is a placeholder to trigger the custom UI drawing for eye lid controls defined in the UILink with overrite="EyeLidControl". The actual interactive editing logic would be implemented in the draw method of that UILink.
+
         armature = context.active_object
         rig_props = armature.aether_rig
         rig_props.eye_lid_edit_mode = True
@@ -619,6 +622,12 @@ class AETHER_OT_EyeLidOffsetEditStart(bpy.types.Operator):
         collection = armature.data.collections.get("Eyes_Anchors")
         if collection:
             collection.is_solo = True
+
+        RestrictedBones = ["lid.anchor.B.L.001","lid.anchor.B.L.002","lid.anchor.B.L.003","lid.anchor.B.R.001","lid.anchor.B.R.002","lid.anchor.B.R.003"]
+        armature = context.active_object
+        for bone_name in RestrictedBones:
+            RestrictOp = BoneRestrictionOperation(time="Post", bone_name=bone_name, lock_location=[False, False, False], lock_rotation=[False, False, False], lock_scale=[False, False, False])
+            RestrictOp.apply(armature=armature) 
 
         return {'FINISHED'}
     
@@ -637,6 +646,13 @@ class AETHER_OT_EyeLidOffsetEditEnd(bpy.types.Operator):
         collection = armature.data.collections.get("Eyes_Anchors")
         if collection:
             collection.is_solo = False
+            
+        RestrictedBones = ["lid.anchor.B.L.001","lid.anchor.B.L.002","lid.anchor.B.L.003","lid.anchor.B.R.001","lid.anchor.B.R.002","lid.anchor.B.R.003"]
+        armature = context.active_object
+        for bone_name in RestrictedBones:
+            RestrictOp = BoneRestrictionOperation(time="Post", bone_name=bone_name, lock_location=[True, True, True], lock_rotation=[True, True, True], lock_scale=[True, True, True])
+            RestrictOp.apply(armature=armature) 
+
         return {'FINISHED'}
 
 
