@@ -1345,10 +1345,10 @@ def get_rig_module() -> RigModule:
         type="Generation",
         bone_groups=[HEAD, BROW, LEFT_EYE, RIGHT_EYE, EYES_CONTROLS],
         ui_collections = UI_Collections([
-            BoneCollection(name="Head", ui=True, color_set="Head", row_index=0, title="Head"),
-            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=1, title="Face (Primary)", visible=True),
-            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=1, title="Face (Secondary)", visible=False),
-            BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=2, title="Eyes (Macro)", visible=True),
+            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
+            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=2, title="Face (Primary)", visible=True),
+            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=2, title="Face (Secondary)", visible=False),
+            BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=3, title="Eyes (Macro)", visible=True),
         ]),
         operations=[
             #Head 
