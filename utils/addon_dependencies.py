@@ -82,15 +82,19 @@ def is_addon_enabled(*, module_name: str | None = None, display_name: str | None
         candidates.append(module_name)
     if display_name:
         resolved_module = _module_name_for_entry({"name": display_name})
+        # This module name can for example be: bl_ext.raw_githubusercontent_com.FFGear
         if resolved_module and resolved_module not in candidates:
-            candidates.append(resolved_module)
+            last_part_of_module_name = resolved_module.split(".")[-1]
+            candidates.append(_normalize_addon_name(last_part_of_module_name))
+    # candidates is now ["ffgear", "ffgear"] or ["meddle", "meddletools"], etc. Second entry depends on what the module is actually named, and is generally more accurate.
 
     if not candidates:
         return False
 
-    for candidate in candidates:
-        enabled, _loaded = addon_utils.check(candidate)
-        if enabled:
+    for module in addon_utils.modules():
+        name:str = module.__name__
+        last_part_of_module_name = name.split(".")[-1]
+        if _normalize_addon_name(last_part_of_module_name) in candidates:
             return True
 
     return False
