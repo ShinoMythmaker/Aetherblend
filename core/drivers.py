@@ -60,6 +60,7 @@ class TransformChannelVariable(DriverVariable):
 
     
     target_bone: str | None = None
+    target_object: bpy.types.Object | None = None
     transform_type: TransformType | None = None
     rotation_mode: RotationMode | None = None
     transform_space: SpaceType | None = None
@@ -74,8 +75,10 @@ class TransformChannelVariable(DriverVariable):
 
         d_target = var.targets[0]
 
-        if armature is not None:
+        if armature is not None and self.target_object is None:
             d_target.id = armature
+        elif self.target_object is not None:
+            d_target.id = self.target_object
         else:
             print(f"[AetherBlend] Warning: Armature not found for driver variable '{self.name}'. Driver may not work as expected.")
             return driver
