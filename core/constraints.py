@@ -115,6 +115,7 @@ class CopyRotationConstraint(Constraint):
 @dataclass(frozen=True)
 class CopyTransformsConstraint(Constraint):
     target_bone: str | None = None
+    target_object: bpy.types.Object | None = None
     head_tail: float = 0.0
     remove_target_shear: bool = False
     mix_mode: str = "REPLACE"
@@ -127,7 +128,10 @@ class CopyTransformsConstraint(Constraint):
         """Applies the Copy Transforms constraint to the given bone."""
         constraint = bone.constraints.new(type='COPY_TRANSFORMS')
         constraint.name = self.name
-        target_obj = armature
+        if self.target_object:
+            target_obj = self.target_object
+        else:
+            target_obj = armature
         if not target_obj:
             print(f"[AetherBlend] Target object not found for Copy Transforms constraint.")
             return
