@@ -3,10 +3,19 @@ from ......core.operations import ParentBoneOperation, RigifyTypeOperation, Coll
 from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
-# IVCS color values as raw sRGB (0-1), matching pose_bone.color.custom expectations
-_IVCS_NORMAL = (0.8, 0.6745, 1.0)
-_IVCS_SELECT = (1.0, 1.0, 1.0)
-_IVCS_ACTIVE = (1.0, 0.9059, 0.7059)
+from ......features.rigging.templates.colorsets.cs_aetherblend import CS_AETHER_BLEND
+
+def _hex_to_srgb(hex_color: str) -> tuple:
+    """Converts a hex color string to raw sRGB (0-1) without linear conversion.
+    pose_bone.color.custom expects sRGB values, unlike rigify_colors which expects linear."""
+    hex_color = hex_color.lstrip('#')
+    lv = len(hex_color)
+    return tuple(int(hex_color[i:i + lv // 3], 16) / 255.0 for i in range(0, lv, lv // 3))
+
+_IVCS = CS_AETHER_BLEND["ivcs"]
+_IVCS_NORMAL = _hex_to_srgb(_IVCS.normal)
+_IVCS_SELECT = _hex_to_srgb(_IVCS.select)
+_IVCS_ACTIVE = _hex_to_srgb(_IVCS.active)
 
 def _ivcs_widget(bone_name: str, scale_factor: float = 0.5) -> WidgetOperation:
     return WidgetOperation(
