@@ -25,7 +25,7 @@ GENITALS_M = BoneGroup(
             is_connected=False,
             req_bones=["iv_ochinko_a", "iv_ochinko_b"],
             operations=[
-                RigifyTypeOperation(bone_name="Penis", rigify_type=rigify.types.skin_stretchy_chain()),
+                RigifyTypeOperation(bone_name="Penis", rigify_type=rigify.types.limbs_spline_tentacle(sik_stretch_control="MANUAL_STRETCH")),
                 CollectionOperation(bone_name="Penis", collection_name="Genitals (Male)")
             ]
         ),
