@@ -1,31 +1,8 @@
 from ......core.generators import ConnectBone, ExtensionBone
-from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
+from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
 from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......features.rigging.templates.colorsets.cs_aetherblend import CS_AETHER_BLEND
-
-def _hex_to_srgb(hex_color: str) -> tuple:
-    """Converts a hex color string to raw sRGB (0-1) without linear conversion.
-    pose_bone.color.custom expects sRGB values, unlike rigify_colors which expects linear."""
-    hex_color = hex_color.lstrip('#')
-    lv = len(hex_color)
-    return tuple(int(hex_color[i:i + lv // 3], 16) / 255.0 for i in range(0, lv, lv // 3))
-
-_IVCS = CS_AETHER_BLEND["ivcs"]
-_IVCS_NORMAL = _hex_to_srgb(_IVCS.normal)
-_IVCS_SELECT = _hex_to_srgb(_IVCS.select)
-_IVCS_ACTIVE = _hex_to_srgb(_IVCS.active)
-
-def _ivcs_widget(bone_name: str, scale_factor: float = 0.5) -> WidgetOperation:
-    return WidgetOperation(
-        bone_name=bone_name,
-        scale_factor=scale_factor,
-        color_set="CUSTOM",
-        custom_color_normal=_IVCS_NORMAL,
-        custom_color_select=_IVCS_SELECT,
-        custom_color_active=_IVCS_ACTIVE,
-    )
 
 GENITALS_M = BoneGroup(
     name="Male Genitals",
@@ -48,8 +25,8 @@ GENITALS_M = BoneGroup(
             is_connected=False,
             req_bones=["iv_ochinko_a", "iv_ochinko_b"],
             operations=[
-                RigifyTypeOperation(time="Pre", bone_name="Penis", rigify_type=rigify.types.limbs_spline_tentacle(sik_stretch_control="MANUAL_STRETCH")),
-                CollectionOperation(time="Pre", bone_name="Penis", collection_name="AB-Meta"),
+                RigifyTypeOperation(bone_name="Penis", rigify_type=rigify.types.limbs_spline_tentacle(sik_stretch_control="MANUAL_STRETCH")),
+                CollectionOperation(bone_name="Penis", collection_name="Genitals (Male)")
             ]
         ),
         ConnectBone(
@@ -60,7 +37,7 @@ GENITALS_M = BoneGroup(
             is_connected=True,
             req_bones=["iv_ochinko_b", "iv_ochinko_c"],
             operations=[
-                CollectionOperation(bone_name="Penis.001", collection_name="AB-Meta"),
+                CollectionOperation(bone_name="Penis.001", collection_name="Genitals (Male)")
             ]
         ),
         ConnectBone(
@@ -71,7 +48,7 @@ GENITALS_M = BoneGroup(
             is_connected=True,
             req_bones=["iv_ochinko_c", "iv_ochinko_d"],
             operations=[
-                CollectionOperation(bone_name="Penis.002", collection_name="AB-Meta"),
+                CollectionOperation(bone_name="Penis.002", collection_name="Genitals (Male)")
             ],
         ),
         ConnectBone(
@@ -82,7 +59,7 @@ GENITALS_M = BoneGroup(
             is_connected=True,
             req_bones=["iv_ochinko_d", "iv_ochinko_e"],
             operations=[
-                CollectionOperation(bone_name="Penis.003", collection_name="AB-Meta"),
+                CollectionOperation(bone_name="Penis.003", collection_name="Genitals (Male)")
             ]
         ),
         ConnectBone(
@@ -93,7 +70,7 @@ GENITALS_M = BoneGroup(
             is_connected=True,
             req_bones=["iv_ochinko_e", "iv_ochinko_f"],
             operations=[
-                CollectionOperation(bone_name="Penis.004", collection_name="AB-Meta"),
+                CollectionOperation(bone_name="Penis.004", collection_name="Genitals (Male)")
             ],
         ),
         ExtensionBone(
@@ -103,7 +80,7 @@ GENITALS_M = BoneGroup(
             is_connected=True,
             req_bones=["iv_ochinko_f"],
             operations=[
-                CollectionOperation(bone_name="Penis.005", collection_name="AB-Meta"),
+                CollectionOperation(bone_name="Penis.005", collection_name="Genitals (Male)")
             ]
         ),
         ExtensionBone(
@@ -142,20 +119,5 @@ def get_rig_module() -> RigModule:
         bone_groups=[GENITALS_M],
         ui_collections = UI_Collections([
             BoneCollection(name="Genitals (Male)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Male)", visible=False),
-            BoneCollection(name="AB-Meta", ui=False, color_set="IVCS", row_index=2, title="", visible=False),
-        ]),
-        operations=[
-            CollectionOperation(time="Post", bone_name="Penis-master", collection_name="Genitals (Male)"),
-            CollectionOperation(time="Post", bone_name="Penis-start01", collection_name="Genitals (Male)"),
-            CollectionOperation(time="Post", bone_name="Penis-mid01", collection_name="Genitals (Male)"),
-            CollectionOperation(time="Post", bone_name="Penis-end01", collection_name="Genitals (Male)"),
-            CollectionOperation(time="Post", bone_name="Penis-end", collection_name="Genitals (Male)"),
-            CollectionOperation(time="Post", bone_name="Penis-end-twist", collection_name="Genitals (Male)"),
-            _ivcs_widget("Penis-master"),
-            _ivcs_widget("Penis-start01"),
-            _ivcs_widget("Penis-mid01"),
-            _ivcs_widget("Penis-end01"),
-            _ivcs_widget("Penis-end"),
-            _ivcs_widget("Penis-end-twist"),
-        ]
+        ])
     )
