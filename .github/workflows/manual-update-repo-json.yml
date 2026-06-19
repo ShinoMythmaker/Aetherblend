@@ -1,0 +1,75 @@
+name: Manual Update repo.json
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to use (for example v0.3.1). Leave empty to use latest published release."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update-repo-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release tag
+        id: resolve_tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          INPUT_RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+        run: |
+          if [ -n "$INPUT_RELEASE_TAG" ]; then
+            echo "release_tag=$INPUT_RELEASE_TAG" >> "$GITHUB_OUTPUT"
+            echo "Using provided tag: $INPUT_RELEASE_TAG"
+            exit 0
+          fi
+
+          latest_tag=$(curl -fsSL \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq -r '.tag_name')
+
+          if [ -z "$latest_tag" ] || [ "$latest_tag" = "null" ]; then
+            echo "Unable to resolve latest release tag"
+            exit 1
+          fi
+
+          echo "release_tag=$latest_tag" >> "$GITHUB_OUTPUT"
+          echo "Using latest release tag: $latest_tag"
+
+      - name: Sync default branch
+        run: |
+          git fetch origin ${{ github.event.repository.default_branch }}
+          git checkout ${{ github.event.repository.default_branch }}
+          git pull --rebase origin ${{ github.event.repository.default_branch }}
+
+      - name: Run blender-repo-json-action
+        uses: ShinoMythmaker/blender-repo-json-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.resolve_tag.outputs.release_tag }}
+
+      - name: Commit and push repo.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- repo.json; then
+            echo "No repo.json changes to commit"
+            exit 0
+          fi
+
+          git add repo.json
+          git commit -m "Manual update repo.json for release ${{ steps.resolve_tag.outputs.release_tag }}"
+          git pull --rebase origin ${{ github.event.repository.default_branch }}
+          git push origin HEAD:${{ github.event.repository.default_branch }}

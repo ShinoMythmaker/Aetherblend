@@ -7,7 +7,7 @@
       "id": "AetherBlend",
       "name": "AetherBlend",
       "tagline": "AetherBlend: Effortless FFXIV Workflows in Blender",
-      "version": "0.3.0",
+      "version": "0.3.3",
       "type": "add-on",
       "maintainer": "Shino Mythmaker, Oats",
       "license": [
@@ -25,9 +25,9 @@
         "Import-Export",
         "3D-View"
       ],
-      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.0/Aetherblend-v0.3.0.zip",
-      "archive_size": 32742433,
-      "archive_hash": "sha256:096d3418bd4686bdfb2386cb6396f7b7c6fe1b3cadf18f2924fd408ab1625a7c"
+      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.3/Aetherblend-v0.3.3.zip",
+      "archive_size": 33763604,
+      "archive_hash": "sha256:a78f0ca514fb5252e637e53c8a4f755283c4432de1ade3cd56910ad0f3781ea1"
     }
   ]
 }
