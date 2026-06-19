@@ -20,6 +20,9 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
         row = layout.row(align=True)
         row.operator("aether.character_import", text="Import Character", icon = "IMPORT")
 
+        row = layout.row(align=True)
+        row.operator("aether.anim_import", text="Import Animation", icon = "IMPORT")
+
 
 def menu_func_import(self, context):
     """Add the import operator to the File > Import menu"""

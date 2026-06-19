@@ -120,6 +120,21 @@ SPINE = BoneGroup(
             req_bones=["j_kao"],
             operations=[CollectionOperation(time="Pre", bone_name="Head", collection_name="Head")]
         ),
+        # This bone serves zero purposes outside of receiving n_hara's transforms when retargeting - Oats
+        ExtensionBone(
+            name="n_hara_retarget",
+            bone_a="n_hara",
+            axis_type="local",
+            axis="Y",
+            start="head",
+            size_factor=0.5,
+            parent="", #Will default to root this way
+            req_bones=["n_hara"],
+            operations=[
+                RigifyTypeOperation(bone_name="n_hara_retarget", rigify_type=rigify.types.basic_raw_copy()),
+                CollectionOperation(bone_name="n_hara_retarget", collection_name="MCH")
+            ]
+        )
         ],
 )
 
