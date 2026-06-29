@@ -2,6 +2,9 @@ import bpy
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
 
+from ...preferences import is_set_enabled, get_preferences
+
+
 class AETHER_PT_ImportPanel(bpy.types.Panel):
     bl_label = "Import"
     bl_idname = "AETHER_PT_import_panel"
@@ -17,11 +20,15 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        row = layout.row(align=True)
-        row.operator("aether.character_import", text="Import Character", icon = "IMPORT")
+        ffxiv_set = is_set_enabled('FFXIV')
+        if ffxiv_set:
+            row = layout.row(align=True)
+            row.operator("aether.character_import", text="FFXIV Character", icon = "IMPORT")
 
-        row = layout.row(align=True)
-        row.operator("aether.anim_import", text="Import Animation", icon = "IMPORT")
+            row = layout.row(align=True)
+            row.operator("aether.anim_import", text="Import Animation", icon = "IMPORT")
+        
+        
 
 
 def menu_func_import(self, context):

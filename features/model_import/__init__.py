@@ -1,7 +1,7 @@
-from . import operators
+from . import ffxiv_character_ot
 from . import panels
 
-modules = (operators, panels)
+modules = (ffxiv_character_ot, panels)
 
 def register():
     for mod in modules:
