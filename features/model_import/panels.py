@@ -1,4 +1,6 @@
 import bpy
+
+from ...utils import addon_dependencies
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
 
@@ -20,13 +22,25 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        ffxiv_set = is_set_enabled('FFXIV')
-        if ffxiv_set:
+        if is_set_enabled('FFXIV'):
             row = layout.row(align=True)
             row.operator("aether.character_import", text="FFXIV Character", icon = "IMPORT")
 
             row = layout.row(align=True)
             row.operator("aether.anim_import", text="Import Animation", icon = "IMPORT")
+
+        if is_set_enabled('VRM'):
+            seperator = layout.row()
+            addon_enabled = addon_dependencies.is_addon_enabled(module_name="vrm")
+            if not addon_enabled:
+                layout = self.layout
+                box = layout.box()
+                box.label(text="VRM addon is not enabled", icon='ERROR')
+                return None
+            else:
+                row = layout.row(align=True)
+                row.operator("aether.vrm_import", text="Import VRM", icon = "IMPORT")
+
         
         
 

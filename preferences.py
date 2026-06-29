@@ -345,7 +345,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             toggle = split.row(align=True)
             toggle.prop(self, prop_name, expand=True)
 
-        active_feature_sets = self.get_enabled_feature_sets()
+        active_feature_sets =  self.get_enabled_feature_sets()
 
         dependency_col = layout.column(align=True)
         dependency_col.label(text="Dependency Add-ons", icon='PLUGIN')
