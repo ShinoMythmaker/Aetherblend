@@ -35,11 +35,11 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
         layout = self.layout
         col = layout.column(align=True)
 
-        if armature.data.collections.get("FFXIV") is None:
+        if armature.data.collections.get("Original") is None:   ## This check should later be not needed, the Original Bone col should not be a requirement for rig manipulation. Instead we should use deform bones
             box = col.box()
             box_row = box.row()
             box_row.alignment = 'CENTER'
-            box_row.label(text="Missing FFXIV Bone Collection", icon="ERROR")
+            box_row.label(text="Missing Original Bone Collection", icon="ERROR")
         else:
 
             import_row = col.row(align=True)
@@ -115,7 +115,7 @@ class AETHER_PT_CustomizePlus_AxisConversion(bpy.types.Panel):
             armature is not None
             and armature.type == 'ARMATURE'
             and getattr(armature, 'aether_cplus', None)
-            and armature.data.collections.get("FFXIV") is not None
+            and armature.data.collections.get("Original") is not None
         )
 
     def draw(self, context):

@@ -524,14 +524,14 @@ class SkinBone(BoneGenerator):
             return None
         
         skin = None
-        ffxiv_armature = None
+        original_armature = None
         if data is not None:
             try:
                 skin_data_item = data.get(self.data_key)
                 if skin_data_item.type == 'MESH':
                     skin = skin_data_item
 
-                ffxiv_armature = data.get("ffxiv_armature")
+                original_armature = data.get("original_armature")
             except Exception:
                 pass
                 
@@ -542,7 +542,7 @@ class SkinBone(BoneGenerator):
             print(f"[AetherBlend] Reference bone '{self.bone_a}' not found in source armature for SkinBone '{self.name}'.")
             return None
         
-        world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, ffxiv_armature, mesh=skin)
+        world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, original_armature, mesh=skin)
         
         if world_co is None:
             print(f"[AetherBlend] No vertices found with weights for bone '{self.bone_a}'. Skipping SkinBone '{self.name}'.")

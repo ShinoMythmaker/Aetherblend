@@ -66,7 +66,7 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
 
         utils.armature.unparent_all_bones(armature)
 
-        ffxiv_bones = utils.armature.b_collection.get_pose_bones(armature, "FFXIV")
+        original_bones = utils.armature.b_collection.get_pose_bones(armature, "Original") ## Should be changed later to DEF bones
 
         # Read the axis settings the user configured on this armature's C+ panel
         primary_axis = settings.cplus_primary_axis
@@ -76,7 +76,7 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         utils.axis_conversion.revert_bone_axis_on_armature(armature, primary_axis, secondary_axis)
 
         # Step 2: Apply C+ transforms (bones are now in Y/X orientation)
-        decoder.apply_transforms(armature, scale_dict, rot_dict, pos_dict, ffxiv_bones)
+        decoder.apply_transforms(armature, scale_dict, rot_dict, pos_dict, original_bones)
 
         utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
         utils.armature.new_rest_pose(armature)
@@ -110,9 +110,9 @@ class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
             return {'CANCELLED'}
 
         bone_collections = armature.data.collections
-        ffxiv_col = bone_collections.get('FFXIV')
-        if not ffxiv_col:
-            self.report({'ERROR'}, "[AetherBlend] No FFXIV bone collection found.")
+        original_col = bone_collections.get('Original')
+        if not original_col:
+            self.report({'ERROR'}, "[AetherBlend] No Original bone collection found.")
             return {'CANCELLED'}
 
         # Delete old backup if it exists
@@ -172,15 +172,15 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
         backup.hide_set(False)
         backup.hide_viewport = False
         
-        # Get FFXIV bones from both armatures
-        ffxiv_col = armature.data.collections.get('FFXIV')
-        if not ffxiv_col:
-            self.report({'ERROR'}, "[AetherBlend] No FFXIV bone collection found.")
+        # Get Original bones from both armatures
+        original_col = armature.data.collections.get('Original')
+        if not original_col:
+            self.report({'ERROR'}, "[AetherBlend] No Original bone collection found.")
             backup.hide_set(True)
             backup.hide_viewport = True 
             return {'CANCELLED'}
         
-        ffxiv_bone_names = [b.name for b in ffxiv_col.bones]
+        original_bone_names = [b.name for b in original_col.bones]
         
         # Copy bone transforms from backup to current armature
         # First, enter edit mode on backup to get bone data
@@ -190,7 +190,7 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
         
         # Store backup bone transforms
         bone_data = {}
-        for bone_name in ffxiv_bone_names:
+        for bone_name in original_bone_names:
             backup_bone = backup.data.edit_bones.get(bone_name)
             if backup_bone:
                 bone_data[bone_name] = {

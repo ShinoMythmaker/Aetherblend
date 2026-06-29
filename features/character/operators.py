@@ -42,21 +42,21 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
     # Bone Axis Orientation (FBX-style)
     primary_bone_axis: EnumProperty(
         name="Primary Bone Axis",
-        description="Primary axis for bone orientation (the bone's length direction). For FFXIV characters from Meddle, use X",
+        description="Primary axis for bone orientation (the bone's length direction).",
         items=AXIS_ITEMS,
         default='X',
     )  # type: ignore
     
     secondary_bone_axis: EnumProperty(
         name="Secondary Bone Axis",
-        description="Secondary axis for bone orientation (determines bone roll). For FFXIV characters from Meddle, use Y",
+        description="Secondary axis for bone orientation (determines bone roll).",
         items=AXIS_ITEMS,
         default='Y',
     )  # type: ignore
     
     use_bone_axis_conversion: BoolProperty(
         name="Use Bone Axis Conversion",
-        description="Apply bone axis conversion (similar to FBX import). Required for FFXIV characters from Meddle",
+        description="Apply bone axis conversion (similar to FBX import).",
         default=True
     )  # type: ignore
     
@@ -264,7 +264,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.armature.select_all(action='SELECT')
-            bpy.ops.armature.assign_to_collection(new_collection_name="FFXIV")
+            bpy.ops.armature.assign_to_collection(new_collection_name="Original")
             bpy.ops.object.mode_set(mode='OBJECT')
             
             # Pre-populate C+ axis settings to match what was used during import

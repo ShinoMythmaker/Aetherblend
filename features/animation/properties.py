@@ -10,7 +10,7 @@ class AetherAnimationExportProperties(bpy.types.PropertyGroup):
     # Pose Export Axis Orientation
     pose_primary_axis: EnumProperty(
         name="Primary Pose Axis",
-        description="Primary axis for pose export orientation. For FFXIV characters from Meddle, use -Z",
+        description="Primary axis for pose export orientation.",
         items=(
             ('X', "X Axis", ""),
             ('Y', "Y Axis", ""),
@@ -24,7 +24,7 @@ class AetherAnimationExportProperties(bpy.types.PropertyGroup):
     
     pose_secondary_axis: EnumProperty(
         name="Secondary Pose Axis",
-        description="Secondary axis for pose export orientation. For FFXIV characters from Meddle, use Y",
+        description="Secondary axis for pose export orientation.",
         items=(
             ('X', "X Axis", ""),
             ('Y', "Y Axis", ""),
