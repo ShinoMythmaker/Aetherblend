@@ -1,6 +1,6 @@
 from ......core.bone_generators import ConnectBone, ExtensionBone
 from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
-from ......core.constraints import CopyLocationConstraint
+from ......core.constraints import CopyLocationConstraint, CopyTransformsConstraint
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
@@ -17,6 +17,10 @@ SPINE = BoneGroup(
             TransformLink(target="DEF-Chest.L", bone="j_mune_l"),
             TransformLink(target="DEF-Neck", bone="j_kubi"),
             TransformLink(target="DEF-Head", bone="j_kao"),
+        ],
+        operations = [
+            ## Scuffed root bone implementation ? since when has CopyTransformConstraint a BEFORE_FULL mix mode ? - Shino
+            ConstraintOperation(time="Post", bone_name="n_root", constraint=CopyTransformsConstraint(target_bone="root", target_space="WORLD", owner_space="WORLD", mix_mode="BEFORE_FULL", influence=1.0)),
         ],
         generators = [
             #Spine
@@ -140,7 +144,7 @@ SPINE = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Default",
+        name="XIV-Default",
         type="Generation",
         bone_groups=[SPINE],
         ui_collections = UI_Collections([

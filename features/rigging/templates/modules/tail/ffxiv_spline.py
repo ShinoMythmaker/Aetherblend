@@ -4,8 +4,8 @@ from ......core.operations import ParentBoneOperation, RigifyTypeOperation, Coll
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
 
-TAIL = BoneGroup(
-    name="Tail",
+TAIL_SPLINE = BoneGroup(
+    name="Spline Tail",
     transform_link= [
         TransformLink(target="DEF-Tail", bone="n_sippo_a"),
         TransformLink(target="DEF-Tail.001", bone="n_sippo_b"),
@@ -22,7 +22,7 @@ TAIL = BoneGroup(
             is_connected=False,
             req_bones=["n_sippo_a", "n_sippo_b"],
             operations=[ParentBoneOperation(time="Pre", bone_name="Tail", parent=["Spine.001", "j_kosi"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Tail", rigify_type=rigify.types.basic_copy_chain()),
+                        RigifyTypeOperation(time="Pre", bone_name="Tail", rigify_type=rigify.types.limbs_spline_tentacle(sik_stretch_control = "MANUAL_STRETCH")),
                         CollectionOperation(time="Pre", bone_name="Tail", collection_name="Tail"),
             ]
         ),
@@ -69,9 +69,9 @@ TAIL = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Forward Kinematics",
+        name="XIV-Spline",
         type="Generation",
-        bone_groups=[TAIL],
+        bone_groups=[TAIL_SPLINE],
         ui_collections = UI_Collections([
             BoneCollection(name="Tail", ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),
         ]),

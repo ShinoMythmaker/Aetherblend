@@ -66,7 +66,7 @@ VIERA_EARS = BoneGroup(
 
 def get_rig_module() -> RigModule:
     rig_module = RigModule(
-        name="Viera D",
+        name="XIV-Viera D",
         type="Generation",
         bone_groups=[VIERA_EARS]
     )

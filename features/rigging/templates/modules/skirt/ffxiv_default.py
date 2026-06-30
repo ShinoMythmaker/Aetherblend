@@ -820,7 +820,7 @@ SKIRT_L = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Default",
+        name="XIV-Default",
         type="Generation",
         bone_groups=[SKIRT_R, SKIRT_L],
         ui_collections = UI_Collections([

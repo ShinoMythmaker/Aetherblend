@@ -325,7 +325,7 @@ class ExtensionBone(BoneGenerator):
 @dataclass
 class CopyBone(BoneGenerator):
     """Creates a bone by copying the transform of an existing bone."""
-    source_bone: str
+    bone_a: str
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates a copy of the source bone."""
@@ -334,10 +334,10 @@ class CopyBone(BoneGenerator):
             return None
         
         edit_bones = armature.data.edit_bones
-        source_bone_ref = edit_bones.get(self.source_bone)
+        source_bone_ref = edit_bones.get(self.bone_a)
 
         if not source_bone_ref:
-            print(f"[AetherBlend] Source bone '{self.source_bone}' not found for CopyBone '{self.name}'.")
+            print(f"[AetherBlend] Source bone '{self.bone_a}' not found for CopyBone '{self.name}'.")
             return None
         
         if self.name in edit_bones:

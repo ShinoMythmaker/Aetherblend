@@ -473,7 +473,7 @@ LEFT_EYE = BoneGroup(
         ),
         CopyBone(
             name="Eye.L",
-            source_bone="j_f_eyepuru_l",
+            bone_a="j_f_eyepuru_l",
             req_bones=["j_f_eyepuru_l"],
             parent="Head",
             operations=[
@@ -678,7 +678,7 @@ RIGHT_EYE = BoneGroup(
         ),
         CopyBone(
             name="Eye.R",
-            source_bone="j_f_eyepuru_r",
+            bone_a="j_f_eyepuru_r",
             req_bones=["j_f_eyepuru_r"],
             parent="Head",
             operations=[RigifyTypeOperation(time="Pre", bone_name="Eye.R", rigify_type=rigify.types.face_skin_eye()), 
@@ -1341,7 +1341,7 @@ EYES_CONTROLS = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Default",
+        name="XIV-Default",
         type="Generation",
         bone_groups=[HEAD, BROW, LEFT_EYE, RIGHT_EYE, EYES_CONTROLS],
         ui_collections = UI_Collections([

@@ -44,7 +44,7 @@ MIQO_EARS = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Miqo",
+        name="XIV-Miqo",
         type="Generation",
         bone_groups=[MIQO_EARS],
         ui_collections = UI_Collections([

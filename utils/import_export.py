@@ -28,3 +28,14 @@ def import_model(filepath: str, pack_images=True, disable_bone_shape=False, merg
     imported_objs = [obj for obj in bpy.context.scene.objects if obj not in scene_objects]
 
     return imported_objs
+
+
+def import_vrm(filepath: str):
+    """Imports a VRM file. Returns list of imported objects."""
+        
+    scene_objects = set(bpy.context.scene.objects)
+    bpy.ops.import_scene.vrm(filepath=filepath,)
+
+    imported_objs = [obj for obj in bpy.context.scene.objects if obj not in scene_objects]
+
+    return imported_objs

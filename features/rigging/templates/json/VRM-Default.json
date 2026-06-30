@@ -1,0 +1,21 @@
+{
+    "name": "VRM-Default",
+    "module_keys": [
+        [
+            "spine.vrm_default"
+        ],
+        [
+            "arms.vrm_default"
+        ],
+        [
+            "hands.vrm_ivcs",
+            "hands.vrm_default"
+        ],
+        [
+            "legs.vrm_default"
+        ],
+        [
+            "ui.debug"
+        ]
+    ]
+}

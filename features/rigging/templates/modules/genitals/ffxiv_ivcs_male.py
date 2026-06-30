@@ -114,7 +114,7 @@ GENITALS_M = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="IVCS Male",
+        name="XIV-IVCS Male",
         type="Generation",
         bone_groups=[GENITALS_M],
         ui_collections = UI_Collections([

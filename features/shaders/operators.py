@@ -318,6 +318,28 @@ class AETHER_OT_S_Meddle(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class AETHER_OT_VRM_ToggleOutline(bpy.types.Operator):
+    """Toggle the visibility of MToon Outline shaders in the imported VRM model."""
+    bl_idname = "aether.vrm_toggle_outline"
+    bl_label = "Toggle MToon Outline Visibility"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        armature = context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Select an armature")
+            return {'CANCELLED'}
+
+        # Get all object childs from armature
+        all_objects = armature.children_recursive
+
+        # Toggle visibility of MToon Outline shaders
+        for obj in all_objects:
+            for mod in obj.modifiers:
+                if "MToon Outline" in mod.name:
+                    mod.show_viewport = not mod.show_viewport
+
+        return {'FINISHED'}
 
 
 def register():
@@ -325,9 +347,12 @@ def register():
     bpy.utils.register_class(AETHER_OT_S_Limbal)
     bpy.utils.register_class(AETHER_OT_S_FFGear)
     bpy.utils.register_class(AETHER_OT_S_Meddle)
+    bpy.utils.register_class(AETHER_OT_VRM_ToggleOutline)
+
 def unregister():
     bpy.utils.unregister_class(AETHER_OT_S_Iris)
     bpy.utils.unregister_class(AETHER_OT_S_Limbal)
     bpy.utils.unregister_class(AETHER_OT_S_FFGear)
     bpy.utils.unregister_class(AETHER_OT_S_Meddle)
+    bpy.utils.unregister_class(AETHER_OT_VRM_ToggleOutline)
     

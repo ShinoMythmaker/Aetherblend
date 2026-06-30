@@ -394,7 +394,7 @@ MOUTH_MANUAL = BoneGroup(
 )
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Manual",
+        name="XIV-Manual",
         type="Generation",
         bone_groups=[MOUTH_MANUAL],
         ui_collections = UI_Collections([

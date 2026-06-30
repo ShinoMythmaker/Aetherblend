@@ -38,7 +38,7 @@ HAIR = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Default",
+        name="XIV-Default",
         type="Generation",
         bone_groups=[HAIR],
         ui_collections=UI_Collections([

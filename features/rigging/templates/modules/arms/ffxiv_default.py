@@ -276,7 +276,7 @@ ARM_L = BoneGroup(
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Default",
+        name="XIV-Default",
         type="Generation",
         bone_groups=[ARM_L, ARM_R],
         ui_collections = UI_Collections([

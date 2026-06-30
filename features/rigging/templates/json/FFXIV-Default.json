@@ -1,0 +1,46 @@
+{
+    "name": "FFXIV-Default",
+    "module_keys": [
+        [
+            "ears.ffxiv_miqo",
+            "ears.ffxiv_viera"
+        ],
+        [
+            "hair.ffxiv_default"
+        ],
+        [
+            "face.ffxiv_detailed"
+        ],
+        [
+            "mouth.ffxiv_default"
+        ],
+        [
+            "spine.ffxiv_default"
+        ],
+        [
+            "arms.ffxiv_default"
+        ],
+        [
+            "hands.ffxiv_ivcs",
+            "hands.ffxiv_default"
+        ],
+        [
+            "legs.ffxiv_default"
+        ],
+        [
+            "toes.ffxiv_ivcs"
+        ],
+        [
+            "skirt.ffxiv_default"
+        ],
+        [
+            "tail.ffxiv_spline"
+        ],
+        [
+            "genitals.ffxiv_ivcs_both"
+        ],
+        [
+            "ui.debug"
+        ]
+    ]
+}

@@ -1,11 +1,10 @@
-from ......core.bone_generators import ConnectBone, ExtensionBone, CopyBone
+from ......core.generators import ConnectBone, ExtensionBone, CopyBone
 from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
+from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
 from ......core.rigify.settings import UI_Collections, BoneCollection
 
-
-HAND_R = BoneGroup(
+IV_HAND_R = BoneGroup(
     name="Right Hand",
     transform_link= [
         TransformLink(target="DEF-thumb.R", bone="j_oya_a_r"),
@@ -18,6 +17,10 @@ HAND_R = BoneGroup(
         TransformLink(target="DEF-ring.R.001", bone="j_kusu_b_r"),
         TransformLink(target="DEF-pinky.R", bone="j_ko_a_r"),
         TransformLink(target="DEF-pinky.R.001", bone="j_ko_b_r"),
+        TransformLink(target="DEF-index.R.002", bone="iv_hito_c_r"),
+        TransformLink(target="DEF-middle.R.002", bone="iv_naka_c_r"),
+        TransformLink(target="DEF-ring.R.002", bone="iv_kusu_c_r"),
+        TransformLink(target="DEF-pinky.R.002", bone="iv_ko_c_r"),
     ],
     generators=[
         #Palm Control - Very cool stuff, thank you rigify - Oats
@@ -25,6 +28,7 @@ HAND_R = BoneGroup(
             name="palm.01.R",
             bone_a="j_hito_a_r",
             parent="hand.R",
+            is_connected=False,
             axis_type="local",
             axis="Y",
             start="head",
@@ -39,6 +43,7 @@ HAND_R = BoneGroup(
             name="palm.02.R",
             bone_a="j_naka_a_r",
             parent="hand.R",
+            is_connected=False,
             axis_type="local",
             axis="Y",
             start="head",
@@ -52,6 +57,7 @@ HAND_R = BoneGroup(
             name="palm.03.R",
             bone_a="j_kusu_a_r",
             parent="hand.R",
+            is_connected=False,
             axis_type="local",
             axis="Y",
             start="head",
@@ -65,6 +71,7 @@ HAND_R = BoneGroup(
             name="palm.04.R",
             bone_a="j_ko_a_r",
             parent="hand.R",
+            is_connected=False,
             axis_type="local",
             axis="Y",
             start="head",
@@ -77,9 +84,9 @@ HAND_R = BoneGroup(
         #Thumb
         CopyBone(
             name="DEF-thumb_master.R",
-            source_bone="j_oya_a_r",
+            bone_a="j_oya_a_r",
             parent="hand.R",
-            req_bones=["j_oya_a_r"],
+            req_bones=["hand.R", "j_oya_a_r"],
             operations=[ParentBoneOperation(time="Pre", bone_name="DEF-thumb_master.R", parent=["hand.R", "j_te_r"], is_connected=False),
                         RigifyTypeOperation(time="Pre", bone_name="DEF-thumb_master.R", rigify_type=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")),
                         CollectionOperation(time="Pre", bone_name="DEF-thumb_master.R", collection_name="DEF")
@@ -123,16 +130,27 @@ HAND_R = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="index.R", collection_name="Fingers.R"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="index.R.001",
             bone_a="j_hito_b_r",
+            bone_b="iv_hito_c_r",
             parent="index.R",
+            is_connected=True,
+            req_bones=["j_hito_b_r", "iv_hito_c_r"],
+            pose_operations=PoseOperations(
+                b_collection="Fingers.R",
+            )
+        ),
+        ExtensionBone(
+            name="index.R.002",
+            bone_a="iv_hito_c_r",
+            parent="index.R.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_hito_b_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="index.R.001", collection_name="Fingers.R"),
+            req_bones=["j_hito_b_r", "iv_hito_c_r"],
+            operations=[CollectionOperation(time="Pre", bone_name="index.R.002", collection_name="Fingers.R"),
             ]
         ),
         #Middle
@@ -144,20 +162,30 @@ HAND_R = BoneGroup(
             roll=135,
             is_connected=False,
             req_bones=["j_naka_a_r", "j_naka_b_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="middle.R", rigify_type=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.R (IK)")),
+           operations=[RigifyTypeOperation(time="Pre", bone_name="middle.R", rigify_type=rigify.types.limbs_super_finger(make_extra_ik_control=True, extra_ik_layers_extra="Fingers.R (IK)")),
                         CollectionOperation(time="Pre", bone_name="middle.R", collection_name="Fingers.R"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="middle.R.001",
             bone_a="j_naka_b_r",
+            bone_b="iv_naka_c_r",
             parent="middle.R",
+            is_connected=True,
+            req_bones=["j_naka_b_r", "iv_naka_c_r"],
+            operations=[CollectionOperation(time="Pre", bone_name="middle.R.001", collection_name="Fingers.R"),
+            ]
+        ),
+        ExtensionBone(
+            name="middle.R.002",
+            bone_a="iv_naka_c_r",
+            parent="middle.R.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_naka_b_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="middle.R.001", collection_name="Fingers.R"),
+            req_bones=["iv_naka_c_r"],
+            operations=[CollectionOperation(time="Pre", bone_name="middle.R.002", collection_name="Fingers.R"),
             ]
         ),
         #Ring
@@ -173,16 +201,26 @@ HAND_R = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="ring.R", collection_name="Fingers.R"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="ring.R.001",
             bone_a="j_kusu_b_r",
+            bone_b="iv_kusu_c_r",
             parent="ring.R",
+            is_connected=True,
+            req_bones=["j_kusu_b_r", "iv_kusu_c_r"],
+            operations=[CollectionOperation(time="Pre", bone_name="ring.R.001", collection_name="Fingers.R"),
+            ]
+        ),
+        ExtensionBone(
+            name="ring.R.002",
+            bone_a="iv_kusu_c_r",
+            parent="ring.R.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_kusu_b_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="ring.R.001", collection_name="Fingers.R"),
+            req_bones=["iv_kusu_c_r"],
+            operations=[CollectionOperation(time="Pre", bone_name="ring.R.002", collection_name="Fingers.R"),
             ]
         ),
         #Pinky
@@ -198,23 +236,33 @@ HAND_R = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="pinky.R", collection_name="Fingers.R"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="pinky.R.001",
             bone_a="j_ko_b_r",
+            bone_b="iv_ko_c_r",
             parent="pinky.R",
+            is_connected=True,
+            req_bones=["j_ko_b_r", "iv_ko_c_r"],
+            operations=[CollectionOperation(time="Pre", bone_name="pinky.R.001", collection_name="Fingers.R"),
+            ]
+        ),
+        ExtensionBone(
+            name="pinky.R.002",
+            bone_a="iv_ko_c_r",
+            parent="pinky.R.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_ko_b_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="pinky.R.001", collection_name="Fingers.R"),
+            req_bones=["iv_ko_c_r"],
+            operations=[CollectionOperation(time="Pre", bone_name="pinky.R.002", collection_name="Fingers.R"),
             ]
         ),
     ],
 )
 
-HAND_L = BoneGroup(
-        name="Left Hand",
+IV_HAND_L = BoneGroup(
+    name="Left Hand with IVCS bones",
     transform_link= [
         TransformLink(target="DEF-thumb.L", bone="j_oya_a_l"),
         TransformLink(target="DEF-thumb.L.001", bone="j_oya_b_l"),
@@ -226,6 +274,10 @@ HAND_L = BoneGroup(
         TransformLink(target="DEF-ring.L.001", bone="j_kusu_b_l"),
         TransformLink(target="DEF-pinky.L", bone="j_ko_a_l"),
         TransformLink(target="DEF-pinky.L.001", bone="j_ko_b_l"),
+        TransformLink(target="DEF-index.L.002", bone="iv_hito_c_l"),
+        TransformLink(target="DEF-middle.L.002", bone="iv_naka_c_l"),
+        TransformLink(target="DEF-ring.L.002", bone="iv_kusu_c_l"),
+        TransformLink(target="DEF-pinky.L.002", bone="iv_ko_c_l"),
     ],
     generators=[
         #Palm Control - Very cool stuff, thank you rigify - Oats
@@ -247,7 +299,7 @@ HAND_L = BoneGroup(
         ExtensionBone(
             name="palm.02.L",
             bone_a="j_naka_a_l",
-            parent=["hand.L", "j_te_l"],
+            parent="hand.L",
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -255,11 +307,12 @@ HAND_L = BoneGroup(
             roll=-135,
             req_bones=["j_naka_a_l"],
             operations=[CollectionOperation(time="Pre", bone_name="palm.02.L", collection_name="Fingers.L")]
+
         ),
         ExtensionBone(
             name="palm.03.L",
             bone_a="j_kusu_a_l",
-            parent=["hand.L", "j_te_l"],
+            parent="hand.L",
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -267,11 +320,12 @@ HAND_L = BoneGroup(
             roll=-135,
             req_bones=["j_kusu_a_l"],
             operations=[CollectionOperation(time="Pre", bone_name="palm.03.L", collection_name="Fingers.L")]
+
         ),
         ExtensionBone(
             name="palm.04.L",
             bone_a="j_ko_a_l",
-            parent=["hand.L", "j_te_l"],
+            parent="hand.L",
             is_connected=False,
             axis_type="local",
             axis="Y",
@@ -283,14 +337,15 @@ HAND_L = BoneGroup(
         #Thumb
         CopyBone(
             name="DEF-thumb_master.L",
-            source_bone="j_oya_a_l",
-            parent=["hand.L"],
-            req_bones=["j_oya_a_l"],
+            bone_a="j_oya_a_l",
+            parent="hand.L",
+            req_bones=["hand.L", "j_oya_a_l"],
             operations=[ParentBoneOperation(time="Pre", bone_name="DEF-thumb_master.L", parent=["hand.L", "j_te_l"], is_connected=False),
                         RigifyTypeOperation(time="Pre", bone_name="DEF-thumb_master.L", rigify_type=rigify.types.basic_raw_copy(relink_constraints=True, parent="DEF")),
                         CollectionOperation(time="Pre", bone_name="DEF-thumb_master.L", collection_name="DEF")
             ]
         ),
+
         ConnectBone(
             name="thumb.L",
             bone_a="j_oya_a_l",
@@ -329,16 +384,26 @@ HAND_L = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="index.L", collection_name="Fingers.L"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="index.L.001",
             bone_a="j_hito_b_l",
+            bone_b="iv_hito_c_l",
             parent="index.L",
+            is_connected=True,
+            req_bones=["j_hito_b_l", "iv_hito_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="index.L.001", collection_name="Fingers.L")]
+
+        ),
+        ExtensionBone(
+            name="index.L.002",
+            bone_a="iv_hito_c_l",
+            parent="index.L.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_hito_b_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="index.L.001", collection_name="Fingers.L")]
+            req_bones=["iv_hito_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="index.L.002", collection_name="Fingers.L")]
         ),
         #Middle
         ConnectBone(
@@ -353,16 +418,26 @@ HAND_L = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="middle.L", collection_name="Fingers.L"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="middle.L.001",
             bone_a="j_naka_b_l",
+            bone_b="iv_naka_c_l",
             parent="middle.L",
+            is_connected=True,
+            req_bones=["j_naka_b_l", "iv_naka_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="middle.L.001", collection_name="Fingers.L")]
+
+        ),
+        ExtensionBone(
+            name="middle.L.002",
+            bone_a="iv_naka_c_l",
+            parent="middle.L.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_naka_b_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="middle.L.001", collection_name="Fingers.L")]
+            req_bones=["iv_naka_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="middle.L.002", collection_name="Fingers.L")]
         ),
         #Ring
         ConnectBone(
@@ -377,16 +452,26 @@ HAND_L = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="ring.L", collection_name="Fingers.L"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="ring.L.001",
             bone_a="j_kusu_b_l",
+            bone_b="iv_kusu_c_l",
             parent="ring.L",
+            is_connected=True,
+            req_bones=["j_kusu_b_l", "iv_kusu_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="ring.L.001", collection_name="Fingers.L")]
+
+        ),
+        ExtensionBone(
+            name="ring.L.002",
+            bone_a="iv_kusu_c_l",
+            parent="ring.L.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_kusu_b_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="ring.L.001", collection_name="Fingers.L")]
+            req_bones=["iv_kusu_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="ring.L.002", collection_name="Fingers.L")]
         ),
         #Pinky
         ConnectBone(
@@ -401,27 +486,38 @@ HAND_L = BoneGroup(
                         CollectionOperation(time="Pre", bone_name="pinky.L", collection_name="Fingers.L"),
             ]
         ),
-        ExtensionBone(
+        ConnectBone(
             name="pinky.L.001",
             bone_a="j_ko_b_l",
+            bone_b="iv_ko_c_l",
             parent="pinky.L",
+            is_connected=True,
+            req_bones=["j_ko_b_l", "iv_ko_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="pinky.L.001", collection_name="Fingers.L")]
+
+        ),
+        ExtensionBone(
+            name="pinky.L.002",
+            bone_a="iv_ko_c_l",
+            parent="pinky.L.001",
             is_connected=True,
             axis_type="local",
             axis="Y",
             start="head",
-            req_bones=["j_ko_b_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="pinky.L.001", collection_name="Fingers.L")]
+            req_bones=["iv_ko_c_l"],
+            operations=[CollectionOperation(time="Pre", bone_name="pinky.L.002", collection_name="Fingers.L")]
         ),
     ],
 )
 
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Default",
+        name="XIV-IVCS",
         type="Generation",
-        bone_groups=[HAND_L, HAND_R],
-        ui_collections=UI_Collections([ 
+        bone_groups=[IV_HAND_L, IV_HAND_R],
+        ui_collections = UI_Collections([
             BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=1, title="Fingers.L", visible=False),
             BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=1, title="Fingers.R", visible=False),
         ])
     )
+

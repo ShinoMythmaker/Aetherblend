@@ -488,7 +488,7 @@ MOUTH_AUTO = BoneGroup(
 )
 def get_rig_module() -> RigModule:
     return RigModule(
-        name="Automated",
+        name="XIV-Automated",
         type="Generation",
         bone_groups=[MOUTH_AUTO],
         ui_collections = UI_Collections([
