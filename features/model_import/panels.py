@@ -26,8 +26,8 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
             row = layout.row(align=True)
             row.operator("aether.character_import", text="FFXIV Character", icon = "IMPORT")
 
-            row = layout.row(align=True)
-            row.operator("aether.anim_import", text="Import Animation", icon = "IMPORT")
+            # row = layout.row(align=True)
+            # row.operator("aether.anim_import", text="FFXIV Animation", icon = "IMPORT")
 
         if is_set_enabled('VRM'):
             seperator = layout.row()
@@ -39,7 +39,7 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
                 return None
             else:
                 row = layout.row(align=True)
-                row.operator("aether.vrm_import", text="Import VRM", icon = "IMPORT")
+                row.operator("aether.vrm_import", text="VRM", icon = "IMPORT")
 
         
         

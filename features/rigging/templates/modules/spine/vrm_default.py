@@ -1,5 +1,5 @@
 from ......core.bone_generators import ConnectBone, ExtensionBone, CopyBone
-from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
+from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation, BoneRestrictionOperation
 from ......core.constraints import CopyLocationConstraint, CopyTransformsConstraint
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -141,9 +141,17 @@ def get_rig_module() -> RigModule:
         type="Generation",
         bone_groups=[SPINE],
         ui_collections = UI_Collections([
-            BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=2, title="Torso"),
-            BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=3, title="Tweak", visible=False),
             BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-        ])
+            BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=2, title="Torso"),
+        ]),
+        operations = [
+            BoneRestrictionOperation(time="Post", bone_name="tweak_Spine.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="tweak_Spine.002", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="tweak_Spine.003", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="tweak_Spine.004", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="tweak_Spine.005", hide_select=True, hide=True),
+
+            BoneRestrictionOperation(time="Post", bone_name="tweak_Neck", hide_select=True, hide=True),
+        ]
     )
     

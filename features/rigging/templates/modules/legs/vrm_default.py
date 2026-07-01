@@ -1,6 +1,6 @@
 from ......core.rigify.settings import UI_Collections, BoneCollection
 from ......core.bone_generators import ConnectBone, CopyBone, ExtensionBone, ParallelBone
-from ......core.operations import ParentBoneOperation, PropOverrideOperation, RigifyTypeOperation, CollectionOperation, ConstraintOperation
+from ......core.operations import BoneRestrictionOperation, ParentBoneOperation, PropOverrideOperation, RigifyTypeOperation, CollectionOperation, ConstraintOperation
 from ......core.constraints import DampedTrackConstraint
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -32,44 +32,78 @@ LEG_R = BoneGroup(
                 operations=[CollectionOperation(time="Pre", bone_name="shin.R", collection_name="Leg.R (IK)")]
             ),
 
+            ## Helper Bones for proper Foot gen
+            ParallelBone(
+                name="heel_pivot.R.helper",
+                bone_a="shin.R",
+                bone_b="Root",
+                parent="shin.R",
+                is_connected=False,
+                axis_type="armature",
+                axis="Z",
+                start="tail",
+                end="head",
+                coordinate="Z",
+                req_bones=["shin.R"],
+                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.R.helper", collection_name="Leg.R (IK)")]
+            ),
+            ParallelBone(
+                name="foot.R.helper",
+                bone_a="J_Bip_R_Foot",
+                bone_b="Root",
+                parent="J_Bip_R_Foot",
+                is_connected=False,
+                axis_type="armature",
+                axis="Z",
+                start="tail",
+                end="head",
+                coordinate="Z",
+                req_bones=["J_Bip_R_Foot"],
+                operations=[CollectionOperation(time="Pre", bone_name="foot.R.helper", collection_name="Leg.R (IK)")]
+            ),
 
-            CopyBone(
+            ParallelBone(
+                name="toe.R.helper",
+                bone_a="J_Bip_R_ToeBase",
+                bone_b="J_Bip_R_ToeBase",
+                parent="J_Bip_R_ToeBase",
+                is_connected=False,
+                axis_type="armature",
+                axis="Z",
+                start="tail",
+                end="head",
+                coordinate="Z",
+                req_bones=["J_Bip_R_ToeBase"],
+                operations=[CollectionOperation(time="Pre", bone_name="toe.R.helper", collection_name="Leg.R (IK)")]
+            ),
+
+            ## Foot and Heel
+            ConnectBone(
                 name="foot.R", 
                 bone_a="J_Bip_R_Foot", 
+                bone_b="J_Bip_R_ToeBase",
                 parent="shin.R",
+                end="head",
                 is_connected=True,
                 req_bones=["J_Bip_R_Foot"],
                 operations=[CollectionOperation(time="Pre", bone_name="foot.R", collection_name="Leg.R (IK)")]
             ),
-            CopyBone(
+            ConnectBone(
                 name="toe.R",
                 bone_a="J_Bip_R_ToeBase",
+                bone_b="toe.R.helper",
                 parent="foot.R",
+                end="tail",
                 is_connected=True,
                 req_bones=["J_Bip_R_ToeBase"],
                 operations=[CollectionOperation(time="Pre", bone_name="toe.R", collection_name="Leg.R (IK)")]
-            ),
-
-            ParallelBone(
-                name="heel_pivot.R.helper",
-                bone_a="toe.R",
-                bone_b="shin.R",
-                parent="shin.R",
-                is_connected=False,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                end="tail",
-                coordinate="Y",
-                req_bones=["toe.R", "shin.R"],
-                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.R.helper", collection_name="Leg.R (IK)")]
             ),
             ExtensionBone(
                 name="heel_pivot.R",
                 bone_a="heel_pivot.R.helper",
                 parent="foot.R",
                 is_connected=False,
-                axis_type="local",
+                axis_type="armature",
                 axis="Y",
                 size_factor=1.0,
                 req_bones=["heel_pivot.R.helper"],
@@ -105,44 +139,78 @@ LEG_L = BoneGroup(
                 operations=[CollectionOperation(time="Pre", bone_name="shin.L", collection_name="Leg.L (IK)")]
             ),
 
+            ## Helper Bones for proper Foot gen
+            ParallelBone(
+                name="heel_pivot.L.helper",
+                bone_a="shin.L",
+                bone_b="Root",
+                parent="shin.L",
+                is_connected=False,
+                axis_type="armature",
+                axis="Z",
+                start="tail",
+                end="head",
+                coordinate="Z",
+                req_bones=["shin.L"],
+                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.L.helper", collection_name="Leg.L (IK)")]
+            ),
+            ParallelBone(
+                name="foot.L.helper",
+                bone_a="J_Bip_L_Foot",
+                bone_b="Root",
+                parent="J_Bip_L_Foot",
+                is_connected=False,
+                axis_type="armature",
+                axis="Z",
+                start="tail",
+                end="head",
+                coordinate="Z",
+                req_bones=["J_Bip_L_Foot"],
+                operations=[CollectionOperation(time="Pre", bone_name="foot.L.helper", collection_name="Leg.L (IK)")]
+            ),
 
-            CopyBone(
+            ParallelBone(
+                name="toe.L.helper",
+                bone_a="J_Bip_L_ToeBase",
+                bone_b="J_Bip_L_ToeBase",
+                parent="J_Bip_L_ToeBase",
+                is_connected=False,
+                axis_type="armature",
+                axis="Z",
+                start="tail",
+                end="head",
+                coordinate="Z",
+                req_bones=["J_Bip_L_ToeBase"],
+                operations=[CollectionOperation(time="Pre", bone_name="toe.L.helper", collection_name="Leg.L (IK)")]
+            ),
+
+            ## Foot and Heel
+            ConnectBone(
                 name="foot.L", 
                 bone_a="J_Bip_L_Foot", 
+                bone_b="J_Bip_L_ToeBase",
                 parent="shin.L",
+                end="head",
                 is_connected=True,
                 req_bones=["J_Bip_L_Foot"],
                 operations=[CollectionOperation(time="Pre", bone_name="foot.L", collection_name="Leg.L (IK)")]
             ),
-            CopyBone(
+            ConnectBone(
                 name="toe.L",
                 bone_a="J_Bip_L_ToeBase",
+                bone_b="toe.L.helper",
                 parent="foot.L",
+                end="tail",
                 is_connected=True,
                 req_bones=["J_Bip_L_ToeBase"],
                 operations=[CollectionOperation(time="Pre", bone_name="toe.L", collection_name="Leg.L (IK)")]
-            ),
-
-            ParallelBone(
-                name="heel_pivot.L.helper",
-                bone_a="toe.L",
-                bone_b="shin.L",
-                parent="shin.L",
-                is_connected=False,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                end="tail",
-                coordinate="Y",
-                req_bones=["toe.L", "shin.L"],
-                operations=[CollectionOperation(time="Pre", bone_name="heel_pivot.L.helper", collection_name="Leg.L (IK)")]
             ),
             ExtensionBone(
                 name="heel_pivot.L",
                 bone_a="heel_pivot.L.helper",
                 parent="foot.L",
                 is_connected=False,
-                axis_type="local",
+                axis_type="armature",
                 axis="Y",
                 size_factor=1.0,
                 req_bones=["heel_pivot.L.helper"],
@@ -159,13 +227,21 @@ def get_rig_module() -> RigModule:
         ui_collections = UI_Collections([
             BoneCollection(name="Leg.L (IK)", ui=True, color_set="IK_Left", row_index=1, title="Leg IK.L"),
             BoneCollection(name="Leg.L (FK)", ui=True, color_set="FK_Left", row_index=2, title="Leg FK.L", visible=False),
-            BoneCollection(name="Leg.L (Tweak)", ui=True, color_set="Tweak_Left", row_index=3, title="Tweak.L", visible=False),
             BoneCollection(name="Leg.R (IK)", ui=True, color_set="IK_Right", row_index=1, title="Leg IK.R"),
             BoneCollection(name="Leg.R (FK)", ui=True, color_set="FK_Right", row_index=2, title="Leg FK.R", visible=False),
-            BoneCollection(name="Leg.R (Tweak)", ui=True, color_set="Tweak_Right", row_index=3, title="Tweak.R", visible=False),
         ]),
         operations=[
             PropOverrideOperation(bone_name="thigh_parent.L", property_name="IK_Stretch", value=0),
             PropOverrideOperation(bone_name="thigh_parent.R", property_name="IK_Stretch", value=0),
+            BoneRestrictionOperation(time="Post", bone_name="thigh_tweak.L", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="thigh_tweak.R", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="thigh_tweak.L.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="thigh_tweak.R.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="shin_tweak.L", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="shin_tweak.R", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="shin_tweak.L.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="shin_tweak.R.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="foot_tweak.L", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="foot_tweak.R", hide_select=True, hide=True),
         ]
     )

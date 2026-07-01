@@ -1,5 +1,5 @@
 from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import ParentBoneOperation, ConstraintOperation, CollectionOperation, PropOverrideOperation, RigifyTypeOperation, DriverOperation, WidgetOperation
+from ......core.operations import BoneRestrictionOperation, ParentBoneOperation, ConstraintOperation, CollectionOperation, PropOverrideOperation, RigifyTypeOperation, DriverOperation, WidgetOperation
 from ......core.bone_generators import ConnectBone, ExtensionBone, CopyBone
 from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
@@ -123,14 +123,26 @@ def get_rig_module() -> RigModule:
         ui_collections = UI_Collections([
             BoneCollection(name="Arm.L (IK)", ui=True, color_set="IK_Left", row_index=1, title="Arm IK.L"),
             BoneCollection(name="Arm.L (FK)", ui=True, color_set="FK_Left", row_index=2, title="Arm FK.L", visible=False),
-            BoneCollection(name="Arm.L (Tweak)", ui=True, color_set="Tweak_Left", row_index=3, title="Tweak.L", visible=False),
             BoneCollection(name="Arm.R (IK)", ui=True, color_set="IK_Right", row_index=1, title="Arm IK.R"),
             BoneCollection(name="Arm.R (FK)", ui=True, color_set="FK_Right", row_index=2, title="Arm FK.R", visible=False),
-            BoneCollection(name="Arm.R (Tweak)", ui=True, color_set="Tweak_Right", row_index=3, title="Tweak.R", visible=False),
         ]),
         operations=[
             PropOverrideOperation(bone_name="upper_arm_parent.L", property_name="IK_Stretch", value=0),
             PropOverrideOperation(bone_name="upper_arm_parent.R", property_name="IK_Stretch", value=0),
+
+            WidgetOperation(bone_name="hand_ik.L", scale=(2,2,2)),
+            WidgetOperation(bone_name="hand_ik.R", scale=(2,2,2)),
+
+            BoneRestrictionOperation(time="Post", bone_name="upper_arm_tweak.L", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="upper_arm_tweak.R", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="upper_arm_tweak.L.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="upper_arm_tweak.R.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="forearm_tweak.L", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="forearm_tweak.R", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="forearm_tweak.L.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="forearm_tweak.R.001", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="hand_tweak.L", hide_select=True, hide=True),
+            BoneRestrictionOperation(time="Post", bone_name="hand_tweak.R", hide_select=True, hide=True),
         ]
     )
     

@@ -512,6 +512,7 @@ class BoneRestrictionOperation(ABOperation):
 
     bone_name: str
     hide_select: bool | None = None
+    hide: bool | None = None
     lock_location: tuple[bool, bool, bool] | bool | None = None
     lock_rotation: tuple[bool, bool, bool] | bool | None = None
     lock_scale: tuple[bool, bool, bool] | bool | None = None
@@ -529,6 +530,9 @@ class BoneRestrictionOperation(ABOperation):
             return
         if self.hide_select is not None:
             dataBone.hide_select = self.hide_select
+        if self.hide is not None:
+            poseBone.hide = self.hide
+            dataBone.hide = self.hide
         if isinstance(self.lock_location, bool):
             lock_location = (self.lock_location, self.lock_location, self.lock_location)
         else:            
