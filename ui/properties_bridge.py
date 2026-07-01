@@ -2,7 +2,7 @@ import bpy
 
 from .info_panel import AETHER_PT_InfoPanel
 from ..features.animation.panels import AETHER_PT_ExportPanel
-from ..features.character.panels import AETHER_PT_ImportPanel
+from ..features.model_import.panels import AETHER_PT_ImportPanel
 from ..features.cplus.panels import AETHER_PT_CustomizePlus
 from ..features.rigging.panels import (
     AETHER_PT_RigBakeSettingsPanel,

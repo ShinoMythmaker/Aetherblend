@@ -8,9 +8,9 @@ def get_rig_module() -> RigModule:
         type="UI-Addon",
         bone_groups=[],
         ui_collections = UI_Collections([
-                BoneCollection(name="FFXIV", ui=True, row_index=1, title="FFXIV", visible=False),
-                BoneCollection(name="Linked", ui=True, color_set="Torso_Tweak", row_index=2, title="XIV", visible=False),
-                BoneCollection(name="Unlinked", ui=True, color_set="IVCS", row_index=2, title="-EX", visible=False),
+                BoneCollection(name="Original", ui=True, row_index=1, title="Original", visible=False),
+                BoneCollection(name="Linked", ui=True, color_set="Torso_Tweak", row_index=2, title="Linked", visible=False),
+                BoneCollection(name="Unlinked", ui=True, color_set="IVCS", row_index=2, title="Unlinked", visible=False),
                 BoneCollection(name="LINK", ui=True,color_set="Torso",row_index=3, title="LINK", visible=False),
                 BoneCollection(name="MCH", ui=True,  row_index=3, title="MCH", visible=False),
                 BoneCollection(name="DEF", ui=True,  row_index=3, title="DEF", visible=False),

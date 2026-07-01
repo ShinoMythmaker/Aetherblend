@@ -37,14 +37,14 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
     
     pose_primary_axis: bpy.props.EnumProperty(
         name="Primary Axis",
-        description="Primary axis for pose export orientation. For FFXIV characters from Meddle, use -Z",
+        description="Primary axis for pose export orientation.",
         items=AXIS_ITEMS,
         default='X',
     ) # type: ignore
     
     pose_secondary_axis: bpy.props.EnumProperty(
         name="Secondary Axis",
-        description="Secondary axis for pose export orientation. For FFXIV characters from Meddle, use Y",
+        description="Secondary axis for pose export orientation.",
         items=AXIS_ITEMS,
         default='Y',
     ) # type: ignore
@@ -286,12 +286,12 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             "Bones": {}
         }
         
-        ffxiv_col = armature.data.collections.get('FFXIV')
-        if not ffxiv_col:
-            self.report({'ERROR'}, "FFXIV bone collection not found")
+        original_col = armature.data.collections.get('Original')
+        if not original_col:
+            self.report({'ERROR'}, "Original bone collection not found")
             return {'CANCELLED'}
             
-        selected_bones = [bone.name for bone in ffxiv_col.bones]
+        selected_bones = [bone.name for bone in original_col.bones]
         for bone_name in selected_bones:
             clean_bone_name = re.sub(r"\.\d+$", "", bone_name)
             bone = armature.pose.bones.get(bone_name)

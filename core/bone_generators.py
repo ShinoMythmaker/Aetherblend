@@ -5,7 +5,7 @@ import re
 
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from .operations import PoseOperations
@@ -63,6 +63,7 @@ class RegexBoneGroup(BoneGenerator):
     extension_axis_type: str = "local"
     extension_axis: str = "Y"
     b_collection: str | None = None
+    original_parent: bool = False
     _dynamic_pose_operations: dict[str, list['PoseOperations']] = field(default_factory=dict, init=False, repr=False)
     _dynamic_transform_links: list['TransformLink'] = field(default_factory=list, init=False, repr=False)
 
@@ -88,6 +89,7 @@ class RegexBoneGroup(BoneGenerator):
                 continue
 
             children = [child for child in bone.children if re.match(self.pattern, child.name)]
+            parent = self.parent if not self.original_parent else bone.parent.name
 
             if not children:
                 # Single bone without children - create extension bone
@@ -98,7 +100,7 @@ class RegexBoneGroup(BoneGenerator):
                     size_factor=self.extension_size_factor,
                     axis_type=self.extension_axis_type,
                     axis=self.extension_axis,
-                    parent=self.parent,
+                    parent=parent,
                     is_connected=self.is_connected,
                     start="head"
                 )
@@ -135,7 +137,7 @@ class RegexBoneGroup(BoneGenerator):
                             name=connect_bone_name,
                             bone_a=chain_bones[i],
                             bone_b=chain_bones[i+1],
-                            parent=self.parent if i == 0 else created_bones[-1],
+                            parent=parent if i == 0 else created_bones[-1],
                             start="head",
                             end="head",
                             is_connected=self.is_connected if i == 0 else True
@@ -148,7 +150,7 @@ class RegexBoneGroup(BoneGenerator):
                             size_factor=1.0,
                             axis_type="local",
                             axis="Y",
-                            parent=created_bones[-1] if created_bones else self.parent,
+                            parent=created_bones[-1] if created_bones else parent,
                             is_connected=True,
                             start="head"
                         )
@@ -325,7 +327,7 @@ class ExtensionBone(BoneGenerator):
 @dataclass
 class CopyBone(BoneGenerator):
     """Creates a bone by copying the transform of an existing bone."""
-    source_bone: str
+    bone_a: str
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates a copy of the source bone."""
@@ -334,10 +336,10 @@ class CopyBone(BoneGenerator):
             return None
         
         edit_bones = armature.data.edit_bones
-        source_bone_ref = edit_bones.get(self.source_bone)
+        source_bone_ref = edit_bones.get(self.bone_a)
 
         if not source_bone_ref:
-            print(f"[AetherBlend] Source bone '{self.source_bone}' not found for CopyBone '{self.name}'.")
+            print(f"[AetherBlend] Source bone '{self.bone_a}' not found for CopyBone '{self.name}'.")
             return None
         
         if self.name in edit_bones:
@@ -414,11 +416,11 @@ class ParallelBone(BoneGenerator):
     """Creates a bone extending from a source bone along an axis until it reaches a target coordinate."""
     bone_a: str
     bone_b: str
-    axis_type: str = "local"
-    axis: str = "Y"
-    coordinate: str = "Y"
-    start: str = "tail"
-    end: str = "head"
+    axis_type: Literal["local", "armature", "global"] = "local"
+    axis: Literal["X", "Y", "Z"] = "Y"
+    coordinate: Literal["X", "Y", "Z"] = "Y"
+    start: Literal["head", "tail"] = "tail"
+    end: Literal["head", "tail",] = "head"
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the ParallelBone extending from bone_a until reaching bone_b's coordinate."""
@@ -447,7 +449,7 @@ class ParallelBone(BoneGenerator):
         # Get target coordinate from bone_b
         if self.end == "tail":
             target_pos = bone_b_ref.tail.copy()
-        else:  # "head"
+        elif self.end == "head":  # "head"
             target_pos = bone_b_ref.head.copy()
         
         # Get the target coordinate value
@@ -524,14 +526,14 @@ class SkinBone(BoneGenerator):
             return None
         
         skin = None
-        ffxiv_armature = None
+        original_armature = None
         if data is not None:
             try:
                 skin_data_item = data.get(self.data_key)
                 if skin_data_item.type == 'MESH':
                     skin = skin_data_item
 
-                ffxiv_armature = data.get("ffxiv_armature")
+                original_armature = data.get("original_armature")
             except Exception:
                 pass
                 
@@ -542,7 +544,7 @@ class SkinBone(BoneGenerator):
             print(f"[AetherBlend] Reference bone '{self.bone_a}' not found in source armature for SkinBone '{self.name}'.")
             return None
         
-        world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, ffxiv_armature, mesh=skin)
+        world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, original_armature, mesh=skin)
         
         if world_co is None:
             print(f"[AetherBlend] No vertices found with weights for bone '{self.bone_a}'. Skipping SkinBone '{self.name}'.")

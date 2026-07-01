@@ -130,7 +130,7 @@ class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
 class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
     bl_idname = "aether.clean_up_rig"
     bl_label = "Remove Rigify Rig"
-    bl_description = ("Removes Rigify Control bones while preserving FFXIV animation Data")
+    bl_description = ("Removes Rigify Control bones while preserving Original animation Data")
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -142,8 +142,8 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
             return {'CANCELLED'}
         
         rig_collections = armature.data.collections
-        if not rig_collections.get("FFXIV"):
-            return {'FINISHED'} # If it doesnt have a FFXIV collection, we can assume its already clean and just exit
+        if not rig_collections.get("Original"):
+            return {'FINISHED'} # If it doesnt have an Original collection, we can assume its already clean and just exit
 
         ## Delete Meta Rig and Scripts
         existing_meta_rig = armature.aether_rig.meta_rig
@@ -172,7 +172,7 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
         for bone in edit_bones:
             delete = True
             for coll in bone.collections:
-                if coll.name == "FFXIV":
+                if coll.name == "Original":
                     delete = False
                 else:
                     coll.unassign(bone)
@@ -187,7 +187,7 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
         armature.aether_rig.rigified = False
 
         for coll in armature.data.collections:
-            if coll.name == "FFXIV":
+            if coll.name == "Original":
                 coll.is_visible = True
 
         ## Cleanup Rigify Settings and Constrains
@@ -203,7 +203,7 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
     
 class AETHER_OT_Reset_Rig(bpy.types.Operator):
     bl_idname = "aether.reset_rig"
-    bl_label = "Reset FFXIV Rig"
+    bl_label = "Reset Original Rig"
     bl_description = ("Resets the armature to its original state (removes animation data)")
     bl_options = {'REGISTER', 'UNDO'}
 

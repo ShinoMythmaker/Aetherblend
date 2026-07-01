@@ -1,0 +1,32 @@
+{
+    "name": "VRM-Default",
+    "module_keys": [
+        [
+            "hair.vrm_default"
+        ],
+        [
+            "face.vrm_default"
+        ],
+        [
+            "spine.vrm_default"
+        ],
+        [
+            "arms.vrm_default"
+        ],
+        [
+            "hands.vrm_default"
+        ],
+        [
+            "legs.vrm_default"
+        ],
+        [
+            "clothing.vrm_default"
+        ],
+        [
+            "misc.vrm_default"
+        ],
+        [
+            "ui.debug"
+        ]
+    ]
+}

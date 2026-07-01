@@ -73,7 +73,7 @@ class AetherRigGenerator:
         )
         self._sync_ui_flags_property(armature)
 
-        bones_to_delete = self._collect_ffxiv_bone_updates(meta_rig, pose_ops_stack)
+        bones_to_delete = self._collect_original_bone_updates(meta_rig, pose_ops_stack)
         self._remove_edit_bones(meta_rig, bones_to_delete)
         deleted_bones = set(bones_to_delete)
         pose_ops_stack.remove_bones(deleted_bones)
@@ -237,19 +237,19 @@ class AetherRigGenerator:
     def _ensure_meta_rig_collections(self, meta_rig: bpy.types.Object):
         linked_coll = meta_rig.data.collections.get("Linked")
         unlinked_coll = meta_rig.data.collections.get("Unlinked")
-        ffxiv_coll = meta_rig.data.collections.get("FFXIV")
+        original_coll = meta_rig.data.collections.get("Original")
 
         if not linked_coll:
             linked_coll = meta_rig.data.collections.new("Linked")
         if not unlinked_coll:
             unlinked_coll = meta_rig.data.collections.new("Unlinked")
-        if not ffxiv_coll:
-            ffxiv_coll = meta_rig.data.collections.new("FFXIV")
+        if not original_coll:
+            original_coll = meta_rig.data.collections.new("Original")
 
         collections = meta_rig.data.collections
         collections.move(linked_coll.index, 0)
         collections.move(unlinked_coll.index, 1)
-        collections.move(ffxiv_coll.index, 2)
+        collections.move(original_coll.index, 2)
 
     def _build_operation_stacks(self, meta_rig: bpy.types.Object, generation_data: dict | None = None) -> tuple[PoseOperationsStack, ABOperationStack]:
         pose_ops_stack = PoseOperationsStack()
@@ -269,8 +269,8 @@ class AetherRigGenerator:
         link_rig = utils.armature.duplicate(armature)
         utils.armature.add_bone_prefix(link_rig, "LINK-")
 
-        if link_rig.data.collections.get("FFXIV"):
-            link_rig.data.collections.remove(link_rig.data.collections["FFXIV"])
+        if link_rig.data.collections.get("Original"):
+            link_rig.data.collections.remove(link_rig.data.collections["Original"])
 
         utils.armature.b_collection.assign_bones(link_rig, list(link_rig.data.bones.keys()), "LINK", clear=True)
         utils.armature.join(src=link_rig, target=meta_rig)
@@ -308,7 +308,7 @@ class AetherRigGenerator:
         return {
             "eye_occlusion": eye_occlusion_objects[0] if eye_occlusion_objects else None,
             "iris": iris_object[0] if iris_object else None,
-            "ffxiv_armature": armature,
+            "original_armature": armature,
         }
 
     def _run_generator_modules(
@@ -344,15 +344,15 @@ class AetherRigGenerator:
 
         return ui_collections
 
-    def _collect_ffxiv_bone_updates(self, meta_rig: bpy.types.Object, pose_ops_stack: PoseOperationsStack) -> list[str]:
+    def _collect_original_bone_updates(self, meta_rig: bpy.types.Object, pose_ops_stack: PoseOperationsStack) -> list[str]:
         bones_to_delete: list[str] = []
-        ffxiv_collection = meta_rig.data.collections.get("FFXIV")
-        if not ffxiv_collection:
+        original_collection = meta_rig.data.collections.get("Original")
+        if not original_collection:
             return bones_to_delete
 
-        ffxiv_bone_names = {bone.name for bone in ffxiv_collection.bones}
+        original_bone_names = {bone.name for bone in original_collection.bones}
         for bone in meta_rig.data.bones.values():
-            if bone.name not in ffxiv_bone_names:
+            if bone.name not in original_bone_names:
                 continue
 
             if bone.get("ab_linked", False):
@@ -436,9 +436,9 @@ class AetherRigGenerator:
     def _update_deform_bones(self, armature: bpy.types.Object):
         bpy.ops.object.mode_set(mode='OBJECT')
 
-        ffxiv_bone_names = set(utils.armature.b_collection.get_bones(armature, "FFXIV").keys())
+        original_bone_names = set(utils.armature.b_collection.get_bones(armature, "Original").keys())
         for bone in armature.data.bones.values():
-            bone.use_deform = bone.name in ffxiv_bone_names
+            bone.use_deform = bone.name in original_bone_names
 
     def _hide_generated_collections(self, armature: bpy.types.Object, visible_collections: list[bpy.types.BoneCollection]):
         self._set_all_collections_visibility(armature, visible=False)

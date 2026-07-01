@@ -64,8 +64,10 @@ class limbs_leg(rigify_type):
 @dataclass
 class limbs_arm(rigify_type):
     """Rigify type: limbs.arm - Used for arm rigs."""
-    fk_coll: str = None
-    tweak_coll: str = None
+    fk_coll: str | None = None
+    tweak_coll: str | None = None
+    rotation_axis: str | None = None 
+    auto_align_extremity: bool | None = False
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
@@ -77,6 +79,11 @@ class limbs_arm(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
+            if self.rotation_axis is not None:
+                rigify_params.rotation_axis = self.rotation_axis
+                if self.auto_align_extremity is not None:
+                    rigify_params.auto_align_extremity = self.auto_align_extremity
+            
             super().set_fk_collection(rigify_params)
             super().set_tweak_collection(rigify_params)
         except Exception as e:
@@ -85,10 +92,11 @@ class limbs_arm(rigify_type):
 @dataclass
 class limbs_super_finger(rigify_type):
     """Rigify type: limbs.super_finger - Used for finger and toe rigs."""
-    tweak_coll: str = None
-    tweak_layers_extra: bool = False
-    make_extra_ik_control: bool = False
-    extra_ik_layers_extra: str = None
+    primary_rotation_axis: str | None = None
+    tweak_coll: str | None = None
+    tweak_layers_extra: bool | None = False
+    make_extra_ik_control: bool | None = False
+    extra_ik_layers_extra: str | None = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
@@ -100,6 +108,9 @@ class limbs_super_finger(rigify_type):
         rigify_params = pose_bone.rigify_parameters
         
         try:
+            if self.primary_rotation_axis is not None:
+                rigify_params.primary_rotation_axis = self.primary_rotation_axis
+
             super().set_tweak_collection(rigify_params)
 
             if self.extra_ik_layers_extra:

@@ -1,6 +1,7 @@
 import bpy
 
 from ...properties.tab_prop import get_active_tab
+from ...preferences import is_set_enabled
 from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
 
@@ -32,6 +33,23 @@ def draw_action_row(layout, label: str, operator_id: str, *, enabled: bool):
     right.enabled = enabled
     right.operator(operator_id, text="Apply", icon='TRIA_DOWN_BAR')
 
+def draw_toggle_row(layout, label: str, operator_id: str, *, enabled: bool):
+    row = layout.row(align=True)
+    # Keep enough width for operator text; very high factors collapse labels to icon-only.
+    split = row.split(factor=0.6, align=True)
+
+    left = split.row(align=True)
+    left.alignment = 'RIGHT'
+    if enabled:
+        left.label(text=label)
+    else:
+        left.label(text=label, icon='ERROR')
+
+    right = split.row(align=True)
+    right.ui_units_x = 7.0
+    right.enabled = enabled
+    right.operator(operator_id, text="Toggle", icon='NODE_MATERIAL')
+
 
 
 class AETHER_PT_shaders(bpy.types.Panel):
@@ -49,6 +67,24 @@ class AETHER_PT_shaders(bpy.types.Panel):
 
     def draw(self, context):
         pass
+
+
+class AETHER_PT_VRM_Shaders(bpy.types.Panel):
+    bl_label = "VRM Shaders"
+    bl_idname = "AETHER_PT_vrm_shaders"
+    bl_parent_id = "AETHER_PT_shaders"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'AetherBlend'
+
+    @classmethod
+    def poll(cls, context):
+        return shader_panel_poll(context) and is_set_enabled('VRM')
+
+    def draw(self, context):
+        layout = self.layout
+
+        draw_toggle_row(layout, "Toon Outline", "aether.vrm_toggle_outline", enabled=True)
 
 
 class AETHER_PT_shaders_materials(bpy.types.Panel):
@@ -96,11 +132,13 @@ class AETHER_PT_shaders_node_trees(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(AETHER_PT_shaders)
+    bpy.utils.register_class(AETHER_PT_VRM_Shaders)
     bpy.utils.register_class(AETHER_PT_shaders_materials)
     bpy.utils.register_class(AETHER_PT_shaders_node_trees)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_shaders_node_trees)
     bpy.utils.unregister_class(AETHER_PT_shaders_materials)
+    bpy.utils.unregister_class(AETHER_PT_VRM_Shaders)
     bpy.utils.unregister_class(AETHER_PT_shaders)
         
