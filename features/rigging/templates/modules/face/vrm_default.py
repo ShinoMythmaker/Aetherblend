@@ -307,8 +307,7 @@ def get_rig_module() -> RigModule:
         type="Generation",
         bone_groups=[EYES],
         ui_collections = UI_Collections([
-            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=2, title="Face (Primary)", visible=True),
+            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=1, title="Face (Primary)", visible=True),
         ]),
         operations =[
             BoneRestrictionOperation(time="Post", bone_name="Eye_master.L", hide_select=True, hide=True,),
