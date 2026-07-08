@@ -12,7 +12,7 @@ import re
 CUSTOM_TEMPLATE_NAME = 'Custom'
 _TEMPLATE_JSON_DIR = Path(__file__).resolve().parent / "templates" / "json"
 ## Defaults
-DEFAULT_TEMPLATE_NAME = 'Dynamic'
+DEFAULT_TEMPLATE_NAME = 'FFXIV-Default'
 DEFAULT_COLORSET_NAME = 'AetherBlend'
 
 
