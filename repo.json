@@ -7,7 +7,7 @@
       "id": "AetherBlend",
       "name": "AetherBlend",
       "tagline": "AetherBlend: Effortless GameEngine to Blender Rigging",
-      "version": "0.3.41",
+      "version": "0.3.43",
       "type": "add-on",
       "maintainer": "Shino Mythmaker, Oats",
       "license": [
@@ -25,9 +25,9 @@
         "Import-Export",
         "3D-View"
       ],
-      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.41/Aetherblend-v0.3.41.zip",
-      "archive_size": 33785140,
-      "archive_hash": "sha256:3676b4df8b5438068b8ae924aa20637848f10de85e8152f0d01e84e9256b942b"
+      "archive_url": "https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.43/Aetherblend-v0.3.43.zip",
+      "archive_size": 33785235,
+      "archive_hash": "sha256:33321004b2c2c182c3a2cb8798d81fbd830a1fc629285de94544f5194ec62709"
     }
   ]
 }

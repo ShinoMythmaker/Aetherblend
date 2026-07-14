@@ -525,6 +525,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             left.label(text="- Zed")
             left.label(text="- PancakePapi")
             left.label(text="- Pizzadabbin")
+            left.label(text="- Djaal")
 
             right.separator()
             right.operator("wm.url_open", text="GitHub Issues", icon='URL').url = f"{GITHUB_URL}/issues"
