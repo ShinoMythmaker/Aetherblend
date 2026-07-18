@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .operations import PoseOperations
 
 from . import rigify
-from .operations import ABOperation, ParentBoneOperation, PoseOperations, TransformLink
+from .operations import ABOperation, ParentBoneOperation, PoseOperations, TransformLink, RigifyTypeOperation
 from .. import utils
 
 @dataclass
@@ -140,7 +140,10 @@ class RegexBoneGroup(BoneGenerator):
                             parent=parent if i == 0 else created_bones[-1],
                             start="head",
                             end="head",
-                            is_connected=self.is_connected if i == 0 else True
+                            is_connected=self.is_connected if i == 0 else True,
+                            operations=[
+                                RigifyTypeOperation(time="Pre", bone_name=connect_bone_name, rigify_type=rigify.types.basic_copy_chain()),
+                            ] if i == 0 else []
                         )
                     else:
                         # Last bone - extend from its own tail
@@ -159,10 +162,8 @@ class RegexBoneGroup(BoneGenerator):
                     self.operations.extend(connect_bone.operations)
                     if result:
                         created_bones.extend(result)
-                        # Add pose operations and transform link for this bone
                         self._dynamic_pose_operations[connect_bone_name] = [
                             PoseOperations(
-                                rigify_settings=rigify.types.basic_super_copy(widget_type="bone"),
                                 b_collection=self.b_collection
                             )
                         ]

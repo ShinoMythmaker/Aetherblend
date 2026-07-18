@@ -36,6 +36,7 @@ Supporters in the highest tier (`Mythmaker`) are listed below.
 - Zed
 - PancakePapi
 - Pizzadabbin
+- Djaal
 
 ## Acknowledgements
 💖 A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
