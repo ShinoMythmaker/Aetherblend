@@ -226,6 +226,17 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
         layout = self.layout
         armature = context.active_object
         aether_rig = getattr(armature, 'aether_rig', None)
+
+
+        row = layout.row(align=True)
+        row.label(text="Blenderfy", icon='BONE_DATA')
+        row.operator(
+            "aether.remove_game_support",
+            text="Delete",
+            icon="TRASH", 
+            )
+
+        layout.separator()
         
         link_collection = armature.data.collections.get('LINK')
         if not link_collection:
