@@ -328,6 +328,7 @@ class skin_basic_chain(rigify_type):
     """Rigify type: skin.basic_chain - Used for basic skin chains."""
     skin_chain_priority: int = None
     skin_control_orientation_bone: str = None
+    skin_chain_use_scale: list = None
     
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
@@ -343,6 +344,8 @@ class skin_basic_chain(rigify_type):
                 rigify_params.skin_chain_priority = self.skin_chain_priority
             if self.skin_control_orientation_bone:
                 rigify_params.skin_control_orientation_bone = self.skin_control_orientation_bone
+            if self.skin_chain_use_scale:
+                rigify_params.skin_chain_use_scale = self.skin_chain_use_scale
         except Exception as e:
             print(f"[AetherBlend] Error setting basic chain priority: {e}")
 
