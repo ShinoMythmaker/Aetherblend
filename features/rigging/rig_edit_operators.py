@@ -74,97 +74,116 @@ class AETHER_OT_DeleteNoAnim(Operator):
 class AETHER_OT_RemoveGameSupport(Operator):
     bl_idname = "aether.remove_game_support"
     bl_label = "Remove Game Support"
-    bl_description = "Removes all Bones and systems that make the Armature compatible for the Game/Engine it is for. This is irreversable. " \
-    "Results in an overall better Rig"
+    bl_description = (
+        "Removes bones and systems used for game/engine compatibility. "
+        "This is irreversible, but animation data persists."
+    )
     bl_options = {'REGISTER', 'UNDO'}
 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row(align=True)
+        row.label(text="Are you sure? This is irreversible!", icon='ERROR')
+
     def execute(self, context):
+        ## What we do here is actually quite simple. Rename all vertex groups to the Rigify DEF bones. 
+        ## Then delete all LINK and orginal bones that have no longer any influence
+        ## At last we reparent all remaining children to there new parents. 
+        ## Since we are not changing any rigify bones, this can be done without harming animation data. 
+        ## Downsides are, no backwards compatibility with the game/engine, other meshes with old vertex groups will no longer work.
+        ## Since the original bones no longer exist.
 
-        ## Our goal is to rename or vertex groups from the original deformation bones to the new rigify bones but only if a rigify bone for that original bone exists. If not, we will keep the original bone and its vertex group.
-        ## For this we need a map. Mapping the oriinal bone to the corresponding Rigify bone. 
-        ## We can fetch this since rn every deformation bone that has a rigify bone, has a copy transforms constraint (Starting with AB-LINK) wich is pointing to a LINK bone, wich is parented to the rigify bone. 
+        ## How could we implement a reverse of this ? 
+        ## We do have a backup armature we coulkd use to restore the old bones. 
+        ## However what about the vertex groups ? I dont want to store the mapping in blender. 
+        ## We would have more options if the user would have something like "restore to backup"
+        ## then regenerates. Cause then we have basicly the mappings again and could re-rename the vertex groups.
+        ## All that wuld be easier if we would store transformLink pairs during rig generation on a custom property from teh armature.
+        ## I know i jsut said that i dont want to store the mapping in blender, but this would be a good use case for it.
+        ## There are many places where we could use it.
+        ## Maybe for another time (Shino) 
 
-        ## check if armature is selected
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature")
             return {'CANCELLED'}
-        
-        ## store current mode
-        original_mode = context.active_object.mode
 
-        ## go inot pose mode
-        bpy.ops.object.mode_set(mode='POSE')
+        original_mode = armature_utils._set_mode(armature, 'POSE')
+        try:
+            bpy.context.window.cursor_set('WAIT')
 
-        ## prepare dict 
-        transplant_map = {}  ## map to rename vertex groups 
-        reparent_map = {}  ## map to reparent lost childs to new rigify bones.
+            transplant_map: dict[str, str] = {}
+            reparent_map: dict[str, str] = {}
 
-        ## loop through all deformation bones 
-        
-        data_bones = armature.data.bones
-        pose_bones = armature.pose.bones
+            data_bones = armature.data.bones
+            pose_bones = armature.pose.bones
 
-        for data_bone in data_bones:
-            if data_bone.use_deform:
-                pose_bone = pose_bones.get(data_bone.name)
-                if not pose_bone:
+            for pose_bone in pose_bones:
+                if not pose_bone.bone.use_deform:
                     continue
+
                 for constraint in pose_bone.constraints:
-                    if constraint.type == 'COPY_TRANSFORMS' and constraint.name.startswith("AB-LINK"):
-                        if constraint.target and constraint.subtarget:
-                            link_bone = data_bones.get(constraint.subtarget)
-                            rigify_bone = link_bone.parent
-                            transplant_map[data_bone.name] = rigify_bone.name
+                    if constraint.type != 'COPY_TRANSFORMS' or not constraint.name.startswith("AB-LINK"):
+                        continue
+
+                    if not (constraint.target and constraint.subtarget):
                         break
-                
-        ## Now check for any future lost childs. If a bone is parented to a bone that is going to be deleted, we need to reparent it to the new rigify bone.
-        for data_bone in data_bones:
-            if data_bone.use_deform:
-                if data_bone.name in transplant_map:
-                    new_parent_name = transplant_map[data_bone.name]
-                    for child in data_bone.children:
-                        if child.use_deform and child.name not in transplant_map:
-                            reparent_map[child.name] = new_parent_name
-            
-        print(f"[AetherBlend] Transplant Map: {transplant_map}")
 
-        ## Now we simply rename any vertex group that has the original DEF bone aka the key, to the rigify bone aka the value.
-        meshes = armature_utils.find_meshes(armature)
+                    link_bone = data_bones.get(constraint.subtarget)
+                    rigify_bone = link_bone.parent if link_bone else None
+                    if rigify_bone:
+                        transplant_map[pose_bone.name] = rigify_bone.name
+                    break
 
-        for mesh in meshes:
-            for vertex_group in mesh.vertex_groups:
-                if vertex_group.name in transplant_map:
-                    old_name = vertex_group.name
-                    new_name = transplant_map[vertex_group.name]
-                    vertex_group.name = new_name
-                    print(f"[AetherBlend] Renamed Vertex Group: {old_name} to {new_name}")
+            for data_bone in data_bones:
+                if not data_bone.use_deform or data_bone.name not in transplant_map:
+                    continue
 
-        ## Now we need to enable all new DEF bones and delete all old DEF bones. But only the ones from our dictionary. 
-        bpy.ops.object.mode_set(mode='EDIT')
-        edit_bones = armature.data.edit_bones   
+                new_parent_name = transplant_map[data_bone.name]
+                for child in data_bone.children:
+                    if child.use_deform and child.name not in transplant_map:
+                        reparent_map[child.name] = new_parent_name
 
-        for old_bone_name, new_bone_name in transplant_map.items():
-            old_bone = edit_bones.get(old_bone_name)
-            link_bone = edit_bones.get(f"LINK-{old_bone_name}")
-            new_bone = edit_bones.get(new_bone_name)
-            if old_bone and new_bone:
+            meshes = armature_utils.find_meshes(armature)
+            for mesh in meshes:
+                for vertex_group in mesh.vertex_groups:
+                    new_name = transplant_map.get(vertex_group.name)
+                    if new_name:
+                        old_name = vertex_group.name
+                        vertex_group.name = new_name
+
+            bpy.ops.object.mode_set(mode='EDIT')
+            edit_bones = armature.data.edit_bones
+
+            for old_bone_name, new_bone_name in transplant_map.items():
+                old_bone = edit_bones.get(old_bone_name)
+                link_bone = edit_bones.get(f"LINK-{old_bone_name}")
+                new_bone = edit_bones.get(new_bone_name)
+                if not old_bone or not new_bone:
+                    continue
+
                 new_bone.use_deform = True
                 edit_bones.remove(old_bone)
-                edit_bones.remove(link_bone)
-                print(f"[AetherBlend] Deleted Old DEF Bone: {old_bone_name} and enabled New DEF Bone: {new_bone_name}")
+                if link_bone:
+                    edit_bones.remove(link_bone)
 
-        ## Now we need to reparent any lost childs to the new rigify bones.
-        for child_name, new_parent_name in reparent_map.items():
-            child_bone = edit_bones.get(child_name)
-            new_parent_bone = edit_bones.get(new_parent_name)
-            if child_bone and new_parent_bone:
-                child_bone.parent = new_parent_bone
-                print(f"[AetherBlend] Reparented Lost Child Bone: {child_name} to New Parent Bone: {new_parent_name}")
+            for child_name, new_parent_name in reparent_map.items():
+                child_bone = edit_bones.get(child_name)
+                new_parent_bone = edit_bones.get(new_parent_name)
+                if child_bone and new_parent_bone:
+                    child_bone.parent = new_parent_bone
 
-        ## go back to original mode
-        bpy.ops.object.mode_set(mode=original_mode)
-        
+            aether_rig = getattr(armature, 'aether_rig', None)
+            if aether_rig is not None:
+                aether_rig.converted = True
+
+        finally:
+            armature_utils._restore_mode(armature, original_mode)
+            bpy.context.window.cursor_set('DEFAULT')
+
         return {'FINISHED'}
     
 def register():

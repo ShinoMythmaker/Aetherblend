@@ -229,12 +229,18 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
 
 
         row = layout.row(align=True)
-        row.label(text="Blenderfy", icon='BONE_DATA')
+        row.label(text="Blenderfy", icon='BLENDER')
+        row.label(
+            text="Converted" if aether_rig.converted else "Not Converted",
+            icon='CHECKMARK' if aether_rig.converted else 'CANCEL'
+        )
+
+        row = layout.row(align=True)
         row.operator(
             "aether.remove_game_support",
-            text="Delete",
-            icon="TRASH", 
-            )
+            text="Convert",
+            icon="SHADERFX",
+        )
 
         layout.separator()
         
