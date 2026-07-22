@@ -9,7 +9,7 @@ ARM_R = BoneGroup(
         name="Right Arm",
         description="Right arm bones including upper arm, forearm, hand, and tweak bones",
         transform_link = [
-            TransformLink(target="DEF-upper_arm.R", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
+            TransformLink(target="DEF-upper_arm.R.001", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
             TransformLink(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
             TransformLink(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
             TransformLink(target="DEF-clavicle.R", bone="j_sako_r"),
@@ -144,7 +144,7 @@ ARM_R = BoneGroup(
 ARM_L = BoneGroup(
         name="Left Arm",
         transform_link= [
-            TransformLink(target="DEF-upper_arm.L", bone="j_ude_a_l", retarget="FK-upper_arm.L"),
+            TransformLink(target="DEF-upper_arm.L.001", bone="j_ude_a_l", retarget="FK-upper_arm.L"),
             TransformLink(target="DEF-forearm.L", bone="j_ude_b_l", retarget="FK-forearm.L"),
             TransformLink(target="DEF-hand.L", bone="j_te_l", retarget="FK-hand.L"),
             TransformLink(target="DEF-clavicle.L", bone="j_sako_l"),
