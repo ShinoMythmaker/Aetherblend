@@ -53,7 +53,7 @@ def unparent_all_bones(armature: bpy.types.Object) -> None:
         bone.parent = None
     bpy.ops.object.mode_set(mode=original_mode)
 
-def find_meshes(armature: bpy.types.Object) -> list:
+def find_meshes(armature: bpy.types.Object) -> list[bpy.types.Object]:
     """Returns all mesh objects that use the given armature modifier."""
     meshes = []
     for obj in bpy.data.objects:

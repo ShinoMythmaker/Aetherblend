@@ -226,6 +226,23 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
         layout = self.layout
         armature = context.active_object
         aether_rig = getattr(armature, 'aether_rig', None)
+
+
+        row = layout.row(align=True)
+        row.label(text="Blenderfy", icon='BLENDER')
+        row.label(
+            text="Converted" if aether_rig.converted else "Not Converted",
+            icon='CHECKMARK' if aether_rig.converted else 'CANCEL'
+        )
+
+        row = layout.row(align=True)
+        row.operator(
+            "aether.remove_game_support",
+            text="Convert",
+            icon="SHADERFX",
+        )
+
+        layout.separator()
         
         link_collection = armature.data.collections.get('LINK')
         if not link_collection:

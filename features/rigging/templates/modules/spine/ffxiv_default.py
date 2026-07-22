@@ -136,7 +136,10 @@ SPINE = BoneGroup(
             req_bones=["n_hara"],
             operations=[
                 RigifyTypeOperation(bone_name="n_hara_retarget", rigify_type=rigify.types.basic_raw_copy()),
-                CollectionOperation(bone_name="n_hara_retarget", collection_name="MCH")
+                CollectionOperation(bone_name="n_hara_retarget", collection_name="MCH"),
+                ParentBoneOperation(bone_name="MCH-Spine.001", parent=["n_hara_retarget"], time="Post"),
+                ParentBoneOperation(bone_name="MCH-Spine.002", parent=["n_hara_retarget"], time="Post"),
+                ParentBoneOperation(bone_name="n_hara_retarget", parent=["torso"], time="Post")
             ]
         )
         ],

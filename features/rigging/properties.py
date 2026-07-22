@@ -38,6 +38,13 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         description="Whether the armature went through generation process or not",
         default=False
     ) # type: ignore
+
+    converted : bpy.props.BoolProperty(
+        name="Converted",
+        description="Whether the armature has been converted to Blender-friendly form",
+        default=False,
+        options={'HIDDEN'}
+    ) # type: ignore
     
     selected_template : bpy.props.EnumProperty(
         name="Template",

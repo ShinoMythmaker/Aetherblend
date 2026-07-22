@@ -1,5 +1,6 @@
 """Animation import and retargeting for FFXIV animations to AetherBlend rigs."""
 
+import uuid
 import bpy
 from bpy.props import StringProperty, EnumProperty
 from bpy.types import Operator
@@ -14,54 +15,57 @@ from ...core.operations import DriverOperation, ParentBoneOperation
 
 #there has gotta be a better way to do this lmao
 #It's just that these bones are so incredibly case-by-case with their axis and invert requirements that I don't see a way to automate it without some sort of manual mapping like this. At least this way it's all in one place and easy to edit if needed. -Oats
+
+
+
 RETARGET_MAP = {
     # Arms
-    "j_ude_a_l": {"target": "upper_arm_fk.L", "invert_x": False, "invert_y": False, "invert_z": True, "invert_w": False, "invert_loc_x": True, "invert_loc_y": False, "invert_loc_z": False},
-    "j_ude_b_l": {"target": "forearm_fk.L", "invert_x": False, "invert_y": False, "invert_z": True, "invert_w": False, "invert_loc_x": True, "invert_loc_y": False, "invert_loc_z": False},
-    "j_ude_a_r": {"target": "upper_arm_fk.R", "invert_x": False, "invert_y": False, "invert_z": True, "invert_w": False, "invert_loc_x": True, "invert_loc_y": False, "invert_loc_z": False}, 
-    "j_ude_b_r": {"target": "forearm_fk.R", "invert_x": False, "invert_y": False, "invert_z": True, "invert_w": False, "invert_loc_x": True, "invert_loc_y": False, "invert_loc_z": False},
-    "j_sako_l": {"target": "clavicle.L", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_z": True},
-    "j_sako_r": {"target": "clavicle.R", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_z": True},
+    "j_ude_a_l": {"target": "upper_arm_fk.L", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)},
+    "j_ude_b_l": {"target": "forearm_fk.L", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)},
+    "j_ude_a_r": {"target": "upper_arm_fk.R", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)}, 
+    "j_ude_b_r": {"target": "forearm_fk.R", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)},
+    "j_sako_l": {"target": "clavicle.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_sako_r": {"target": "clavicle.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
 
     # Fingers
-    "j_oya_a_l": {"target": "thumb.L", "invert_z": True},
-    "j_hito_a_l": {"target": "index.L", "invert_z": True},
-    "j_naka_a_l": {"target": "middle.L", "invert_z": True},
-    "j_kusu_a_l": {"target": "ring.L", "invert_z": True},
-    "j_ko_a_l": {"target": "pinky.L", "invert_z": True},
+    "j_oya_a_l": {"target": "thumb.L", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_hito_a_l": {"target": "index.L", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_naka_a_l": {"target": "middle.L", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_kusu_a_l": {"target": "ring.L", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_ko_a_l": {"target": "pinky.L", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
 
-    "j_oya_a_r": {"target": "thumb.R", "invert_z": True},
-    "j_hito_a_r": {"target": "index.R", "invert_z": True},
-    "j_naka_a_r": {"target": "middle.R", "invert_z": True},
-    "j_kusu_a_r": {"target": "ring.R", "invert_z": True},
-    "j_ko_a_r": {"target": "pinky.R", "invert_z": True},
+    "j_oya_a_r": {"target": "thumb.R", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_hito_a_r": {"target": "index.R", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_naka_a_r": {"target": "middle.R", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_kusu_a_r": {"target": "ring.R", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
+    "j_ko_a_r": {"target": "pinky.R", "invert_rot": (False, False, True, False), "invert_loc": (False, False, False)},
 
 
     # Legs
-    "j_asi_a_l": {"target": "thigh_fk.L", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_asi_b_l": {"target": "knee.L", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_asi_c_l": {"target": "shin_fk.L", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True}, 
-    "j_asi_d_l": {"target": "foot_fk.L", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_asi_a_r": {"target": "thigh_fk.R", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_asi_b_r": {"target": "knee.R", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_asi_c_r": {"target": "shin_fk.R", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_asi_d_r": {"target": "foot_fk.R", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
+    "j_asi_a_l": {"target": "thigh_fk.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_asi_b_l": {"target": "knee.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_asi_c_l": {"target": "shin_fk.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)}, 
+    "j_asi_d_l": {"target": "foot_fk.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_asi_a_r": {"target": "thigh_fk.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_asi_b_r": {"target": "knee.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_asi_c_r": {"target": "shin_fk.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_asi_d_r": {"target": "foot_fk.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
 
     # Spine
-    "j_kosi": {"target": "Spine_fk.001", "invert_x": True, "invert_y": True, "invert_z": True, "invert_w": False, "invert_loc_x": True, "invert_loc_y": True, "invert_loc_z": True},
-    "j_sebo_a": {"target": "Spine_fk.002", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_sebo_b": {"target": "Spine_fk.003", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_sebo_c": {"target": "Spine_fk.004", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
-    "j_kubi": {"target": "neck", "invert_x": True, "invert_y": False, "invert_z": False, "invert_w": False, "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True},
+    "j_kosi": {"target": "Spine_fk.001", "invert_rot": (True, True, True, False), "invert_loc": (True, True, True)},
+    "j_sebo_a": {"target": "Spine_fk.002", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_sebo_b": {"target": "Spine_fk.003", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_sebo_c": {"target": "Spine_fk.004", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
+    "j_kubi": {"target": "neck", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
 
-    "n_hara": {"target": "n_hara_retarget", "invert_loc_x": False, "invert_loc_y": False, "invert_loc_z": True, "invert_z": False, "invert_x": True},
+    "n_hara": {"target": "n_hara_retarget", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
 
     # Tail
-    "n_sippo_a": {"target": "Tail", "invert_z": False, "invert_x": True},
-    "n_sippo_b": {"target": "Tail.001", "invert_z": False, "invert_x": True},
-    "n_sippo_c": {"target": "Tail.002", "invert_z": False, "invert_x": True},
-    "n_sippo_d": {"target": "Tail.003", "invert_z": False, "invert_x": True},
-    "n_sippo_e": {"target": "Tail.004", "invert_z": False, "invert_x": True},
+    "n_sippo_a": {"target": "Tail", "invert_rot": (True, False, False, False), "invert_loc": (False, False, False)},
+    "n_sippo_b": {"target": "Tail.001", "invert_rot": (True, False, False, False), "invert_loc": (False, False, False)},
+    "n_sippo_c": {"target": "Tail.002", "invert_rot": (True, False, False, False), "invert_loc": (False, False, False)},
+    "n_sippo_d": {"target": "Tail.003", "invert_rot": (True, False, False, False), "invert_loc": (False, False, False)},
+    "n_sippo_e": {"target": "Tail.004", "invert_rot": (True, False, False, False), "invert_loc": (False, False, False)},
 }
 
 
@@ -70,7 +74,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
     bl_idname = "aether.anim_import"
     bl_label = "Import Animation"
     bl_options = {'REGISTER', 'UNDO'}
-    bl_description = "Import and retarget in-game animation to AetherBlend rig (FBX only)"
+    bl_description = "Import and retarget in-game animation to AetherBlend rig"
     
     filepath: StringProperty(subtype="FILE_PATH")  # type: ignore
     filename_ext = ''
@@ -109,12 +113,12 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
             filepath=filepath,
             use_selection=True,
             bake_anim=True,
-            add_leaf_bones=False,
+            add_leaf_bones=True,
             primary_bone_axis='Y',
             secondary_bone_axis='X',
             use_armature_deform_only=True,
-            bake_anim_use_all_actions=False,
-            bake_anim_use_nla_strips=False,
+            bake_anim_use_all_actions=True,
+            bake_anim_use_nla_strips=True,
             bake_anim_use_all_bones=True,
             bake_anim_force_startend_keying=True,
             bake_anim_simplify_factor=0.0
@@ -122,7 +126,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
 
     #Good God I need to refactor this -Oats
 
-    def retarget_bone_animation(self, source_bone_name, target_bone_name, invert_x, invert_y, invert_z, invert_w, invert_loc_x, invert_loc_y, invert_loc_z, source_armature, target_armature): #these arguments are getting out of hand, now there are 11 of them! -Oats
+    def retarget_bone_animation(self, source_bone_name, target_bone_name, invert_rot, invert_loc, source_armature, target_armature):
 
         target = bpy.data.objects.get(target_armature.name)
         source = bpy.data.objects.get(source_armature.name)
@@ -156,15 +160,15 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
             return
         
         try:
-            # Build expressions with optional inversion
-            rot_z_expr = f"{'-' if invert_x else ''}{source_bone}_rot_z"
-            rot_x_expr = f"{'-' if invert_z else ''}{source_bone}_rot_x"
-            rot_y_expr = f"{'-' if invert_y else ''}{source_bone}_rot_y"
-            rot_w_expr = f"{'-' if invert_w else ''}{source_bone}_rot_w"
+            # Build expressions with optional inversion from tuple-based mappings
+            rot_z_expr = f"{'-' if invert_rot[0] else ''}{source_bone}_rot_z"
+            rot_x_expr = f"{'-' if invert_rot[2] else ''}{source_bone}_rot_x"
+            rot_y_expr = f"{'-' if invert_rot[1] else ''}{source_bone}_rot_y"
+            rot_w_expr = f"{'-' if invert_rot[3] else ''}{source_bone}_rot_w"
 
-            loc_x_expr = f"{'-' if invert_loc_x else ''}{source_bone}_loc_x"
-            loc_y_expr = f"{'-' if invert_loc_y else ''}{source_bone}_loc_y"
-            loc_z_expr = f"{'-' if invert_loc_z else ''}{source_bone}_loc_z"
+            loc_x_expr = f"{'-' if invert_loc[0] else ''}{source_bone}_loc_x"
+            loc_y_expr = f"{'-' if invert_loc[1] else ''}{source_bone}_loc_y"
+            loc_z_expr = f"{'-' if invert_loc[2] else ''}{source_bone}_loc_z"
             
             driver_X = DriverOperation(
                 driver_name=f"{target_bone}_anim_driver_X",
@@ -309,7 +313,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
             driver_W.apply(target_armature)
             driver_loc_X.apply(target_armature)
             driver_loc_Y.apply(target_armature)
-            driver_loc_Z.apply(target_armature)
+            driver_loc_Z.apply(target_armature) # Yikes - Oats
 
         except Exception as e:
             self.report({'ERROR'}, f"Failed to retarget '{source_bone_name}' to '{target_bone_name}': {str(e)}")
@@ -337,6 +341,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
             return {'CANCELLED'}
 
         try:
+
              # Store target rig BEFORE import
             target_armature = context.active_object
 
@@ -361,10 +366,19 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
                 )
                 # Get the imported glTF armature
                 gltf_armature = context.active_object
+
+                action = bpy.context.object.animation_data.action
+                start, end = action.frame_range
+
+                print(start, end)
+                scene = context.scene
+                scene.frame_start = int(start)
+                scene.frame_end = int(end)
                 
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.fbx') as temp:
-                    temp_path = temp.name
-                    self.export_fbx(filepath=temp_path)
+                    temp_path = f"{temp.name}{uuid.uuid4()}"
+                    self.export_fbx(filepath=temp_path
+                                    )
                     
                     # Delete the glTF armature before re-importing FBX
                     bpy.data.objects.remove(gltf_armature, do_unlink=True)
@@ -391,22 +405,42 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
                                  "shin_fk.R" : "knee.R",
                                  }
 
+            bpy.ops.object.select_all(action='DESELECT')
+
             # Set target_armature as active so mode switching works correctly
             bpy.context.view_layer.objects.active = target_armature
             target_armature.select_set(True)
-
-            for bone_name in parent_op_bones_hara:
-                ParentOP=ParentBoneOperation(bone_name=bone_name, parent=["n_hara_retarget"])
-                ParentOP.apply(armature=target_armature)
 
             for bone_name, parent_target in parent_op_bones_leg.items():
                 ParentOP=ParentBoneOperation(bone_name=bone_name, parent=(parent_target,))
                 ParentOP.apply(armature=target_armature)
 
             for ffbone, mapping in RETARGET_MAP.items():
-                self.retarget_bone_animation(ffbone, mapping["target"], mapping.get("invert_x", False), mapping.get("invert_y", False), mapping.get("invert_z", False), mapping.get("invert_w", False), mapping.get("invert_loc_x", False), mapping.get("invert_loc_y", False), mapping.get("invert_loc_z", False), source_armature, target_armature)
+                self.retarget_bone_animation(
+                    ffbone,
+                    mapping["target"],
+                    mapping.get("invert_rot", (False, False, False, False)),
+                    mapping.get("invert_loc", (False, False, False)),
+                    source_armature,
+                    target_armature,
+                )
 
-            self.report({'INFO'}, "Animation imported successfully")
+            pose_bones = target_armature.pose.bones
+            bpy.ops.pose.select_all(action='DESELECT')
+
+            for mapping in RETARGET_MAP.values():
+                bone_name = mapping.get("target")
+                pose_bone = pose_bones.get(bone_name)
+                pose_bone.select = True
+
+            bpy.ops.nla.bake(frame_start=int(start), frame_end=int(end), visual_keying=True, use_current_action=True)
+
+            self.report({'INFO'}, "Animation imported and baked successfully")
+
+            bpy.data.objects.remove(source_armature)
+
+            self.report({'INFO'}, "Animation source armature removed successfully")
+
             bpy.context.window.cursor_set('DEFAULT')
             return {'FINISHED'}
         except Exception as e:
