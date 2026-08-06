@@ -33,6 +33,25 @@ AetherBlend is a plugin designed for posing and animation of character models fr
 
 &nbsp;
 
+## AetherBridge Pose Streaming
+AetherBlend includes a lightweight bridge receiver mock for testing external pose streaming.
+
+- Run the mock receiver from the repo root:
+  - `python features/bridge/receiver_mock.py`
+- Open the dashboard in a browser:
+  - `http://127.0.0.1:8080/`
+- Configure Blender bridge settings to match:
+  - Host: `127.0.0.1`
+  - Port: `8080`
+  - Protocol: `http`
+  - Path: `/pose`
+- The dashboard auto-refreshes and shows:
+  - total frames received
+  - receive FPS
+  - last frame bone details
+
+&nbsp;
+
 ## Setup and Getting Started 
 - [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
 - [Getting Started](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
