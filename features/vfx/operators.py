@@ -1,8 +1,80 @@
-import bpy
 import os
-from bpy.types import Operator
-from bpy_extras.io_utils import ExportHelper  
+
+import bpy
+from bpy.types import Menu, Operator
+from bpy_extras.io_utils import ExportHelper
+
 from ...preferences import get_preferences
+
+
+def _spawn_opp_object(operator, context, object_name):
+    blend_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "assets", "blend", "opp.blend")
+    )
+    if not os.path.exists(blend_path):
+        operator.report({'ERROR'}, f"Could not find blend file: {blend_path}")
+        return {'CANCELLED'}
+
+    object_path = os.path.join(blend_path, "Object") + os.sep
+
+    try:
+        bpy.ops.wm.append(
+            filepath=os.path.join(object_path, object_name),
+            directory=object_path,
+            filename=object_name,
+            link=False,
+            autoselect=True,
+        )
+    except RuntimeError as exc:
+        operator.report({'ERROR'}, f"Failed to append {object_name}: {exc}")
+        return {'CANCELLED'}
+
+    obj = bpy.data.objects.get(object_name)
+    if obj is None:
+        operator.report({'ERROR'}, f"The {object_name} object could not be created.")
+        return {'CANCELLED'}
+
+    obj.select_set(True)
+    context.view_layer.objects.active = obj
+    context.view_layer.update()
+
+    operator.report({'INFO'}, f"Added {object_name} to the scene")
+    return {'FINISHED'}
+
+
+class AETHER_OT_VFXSpawnOPPCurve(Operator):
+    bl_idname = "aether.vfx_spawn_opp_curve"
+    bl_label = "OPP Curve"
+
+    def execute(self, context):
+        return _spawn_opp_object(self, context, "OPP Curve")
+
+
+class AETHER_OT_VFXSpawnOPPCircle(Operator):
+    bl_idname = "aether.vfx_spawn_opp_circle"
+    bl_label = "OPP Circle"
+
+    def execute(self, context):
+        return _spawn_opp_object(self, context, "OPP Circle")
+
+
+class AETHER_OT_VFXSpawnOPPPath(Operator):
+    bl_idname = "aether.vfx_spawn_opp_path"
+    bl_label = "OPP Path"
+
+    def execute(self, context):
+        return _spawn_opp_object(self, context, "OPP Path")
+
+
+class AETHER_MT_VFXProjectionPlane(Menu):
+    bl_idname = "AETHER_MT_vfx_projection_plane"
+    bl_label = "Projection Plane"
+
+    def draw(self, context):
+        self.layout.operator(AETHER_OT_VFXSpawnOPPCurve.bl_idname, text="OPP Curve", icon='CURVE_DATA')
+        self.layout.operator(AETHER_OT_VFXSpawnOPPCircle.bl_idname, text="OPP Circle", icon='MESH_CIRCLE')
+        self.layout.operator(AETHER_OT_VFXSpawnOPPPath.bl_idname, text="OPP Path", icon='CURVE_PATH')
+
 
 class AETHER_OT_VFXExport(Operator, ExportHelper):
     bl_idname = "aether.vfx_export"
@@ -61,8 +133,23 @@ class AETHER_OT_VFXExport(Operator, ExportHelper):
             return {'CANCELLED'}
         
 
+def _menu_draw(self, context):
+    self.layout.menu(AETHER_MT_VFXProjectionPlane.bl_idname)
+
+
 def register():
+    bpy.utils.register_class(AETHER_OT_VFXSpawnOPPCurve)
+    bpy.utils.register_class(AETHER_OT_VFXSpawnOPPCircle)
+    bpy.utils.register_class(AETHER_OT_VFXSpawnOPPPath)
+    bpy.utils.register_class(AETHER_MT_VFXProjectionPlane)
     bpy.utils.register_class(AETHER_OT_VFXExport)
+    bpy.types.VIEW3D_MT_add.append(_menu_draw)
+
 
 def unregister():
+    bpy.types.VIEW3D_MT_add.remove(_menu_draw)
     bpy.utils.unregister_class(AETHER_OT_VFXExport)
+    bpy.utils.unregister_class(AETHER_MT_VFXProjectionPlane)
+    bpy.utils.unregister_class(AETHER_OT_VFXSpawnOPPPath)
+    bpy.utils.unregister_class(AETHER_OT_VFXSpawnOPPCircle)
+    bpy.utils.unregister_class(AETHER_OT_VFXSpawnOPPCurve)
