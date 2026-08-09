@@ -45,6 +45,26 @@ def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
         new_bones[key] = values
     return new_bones
 
+def cplus_rotation_quat(deg_x: float, deg_y: float, deg_z: float) -> mathutils.Quaternion:
+"""
+Rebuild C+ exact rotation quaternion from its euler degrees using YaWPitchRoll (X=yaw about Y, Y=pitch about X, Z=Roll about Z).
+The old Blender euler "XYZ" path had the axes and compose order wrong, so it only matched the game for a single Z Rotation.
+"""
+    yaw = math.radians(deg_x)
+    pitch = math.radians(deg_y)
+    roll = math.radians(deg_z)
+
+    sy, cy = math.sin(yaw * 0.5), math.cos(yaw * 0.5)
+    sp, cp = math.sin(pitch * 0.5), math.cos(pitch * 0.5)
+    sr, cr = math.sin(roll * 0.5), math.cos(roll * 0.5)
+
+    qx = cy * sp * cr + sy * cp * sr
+    qy = sy * cp * cr - cy * sp * sr
+    qz = cy * cp * sr - sy * sp * cr
+    qw = cy * cp * cr + sy * sp * sr
+
+    return mathutils.Quaternion((qw, qx, qy, qz))
+
 def apply_transforms(
     armature: bpy.types.Object, 
     scale_dict: dict, 
@@ -70,13 +90,9 @@ def apply_transforms(
 
         rotation = rot_dict.get(posebone.name)
         if rotation:
-            rot_radians = mathutils.Vector((
-                math.radians(rotation['X']),
-                math.radians(rotation['Y']),
-                math.radians(rotation['Z'])
-            ))
-            euler_rot = mathutils.Euler(rot_radians, 'XYZ')
-            posebone.rotation_quaternion.rotate(euler_rot)
+            posebone.rotation_mode = 'QUATERNION'
+            q_cplus = cplus_rotation_quat(rotation['X'], rotation['Y'], rotation['Z'])
+            posebone.rotation_quaternion = q_cplus @ posebone.rotation_quaternion
 
         translation = pos_dict.get(posebone.name)
         if translation:
