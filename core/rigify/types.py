@@ -59,7 +59,30 @@ class limbs_leg(rigify_type):
             super().set_tweak_collection(rigify_params)
         except Exception as e:
             print(f"[AetherBlend] Error setting leg collections: {e}")
+
+@dataclass
+class limbs_ablend_leg(rigify_type):
+    """Rigify type: limbs.ablend_leg - Used for AetherBlend leg rigs."""
+    fk_coll: str = None
+    tweak_coll: str = None
+    segments: str = None
+    
+    def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
+        if pose_bone is None:
+            print(f"[AetherBlend] Warning: pose_bone is None")
+            return
         
+        armature.data.bones.active = pose_bone.bone
+        pose_bone.rigify_type = "limbs.ablend_leg"
+        rigify_params = pose_bone.rigify_parameters
+        
+        try:
+            super().set_fk_collection(rigify_params)
+            super().set_tweak_collection(rigify_params)
+            if self.segments is not None:
+                rigify_params.segments = self.segments
+        except Exception as e:
+            print(f"[AetherBlend] Error setting AetherBlend leg collections: {e}")
 
 @dataclass
 class limbs_arm(rigify_type):
