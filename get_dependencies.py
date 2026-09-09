@@ -7,7 +7,7 @@ import urllib.request
 
 MANIFEST_FILENAME = "blender_manifest.toml"
 WHEELS_DIR = './wheels'
-PYTHON_VERSIONS = ['cp311', 'cp313']
+PYTHON_VERSIONS = ['cp311', 'cp313', 'cp314']
 
 # PEP 427 wheel filename parser (name-version-(-build)?-python-abi-platform.whl)
 WHEEL_FILENAME_RE = re.compile(
