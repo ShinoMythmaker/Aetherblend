@@ -8,7 +8,11 @@
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
 </p>
 
-[Drag me into Blender](https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&blender_version_min=5.2.0)
+<p align="center">
+  <a href="https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&blender_version_min=5.2.0">
+    <img src="assets/brand/drag-into-blender.svg" alt="Drag and Drop into Blender" width="344">
+  </a>
+</p>
 
 AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
 
