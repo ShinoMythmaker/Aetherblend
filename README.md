@@ -9,10 +9,16 @@
 </p>
 
 <p align="center">
+    
   <a href="https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&blender_version_min=5.2.0">
-    <img src="assets/brand/drag-into-blender.svg" alt="Drag and Drop into Blender" width="344">
-  </a>
+      <img src="assets/brand/drag-into-blender.svg" alt="Drag and Drop into Blender" width="344" draggable="false">
+    </a>
+  
 </p>
+
+### <kbd><a href="YOUR_LONG_LINK"><h2>⤧ Drag and Drop into Blender</h2></a></kbd>
+### [`⤧ Drag and Drop into Blender`](YOUR_LONG_LINK)
+### [⤧ Drag and Drop into Blender](YOUR_LONG_LINK)
 
 AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
 
