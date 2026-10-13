@@ -17,37 +17,24 @@
 
 
 AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
+Note: AetherBlend is currently in beta and some features may not work as intended.
 
 <p align="center">
   <img width="100%" alt="AetherBlend showcase" src="assets/demo/showcase_low.jpg" />
 </p>
 
-<b>Note: AetherBlend is currently in beta and some features may not work as intended.</b>
 &nbsp;
 
-&nbsp;
+## What is the goal of AetherBlend
 
-## Features
-- IK/FK controls
-- Advanced face controls
-- Control automation
-- Dynamic rig generation based on character armature
+Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation. IK-rig pose and animation import and Aetherbridge (streaming Blender animations into the game, with lighting and camera syncing planned) are still in development, while we continue to refine our editable, modular rig templates.
 
-<p align="center">
-  <img width="50%" alt="Advanced Face Controls" src="Gif showing off the eyes, mouth etc." /><img width="50%" alt="Control Automation" src="Gif showing off the wrist and shin automation, heel controls etc. I'd say show the skirt as well but I'm far from happy with it." />
-</p>
-<p align="center"><b>Advanced Face Controls & Control Automation</b></p> 
-&nbsp;
-
-## Current Limitations
-- Pose and animation import is not currently functional
-- Rigs may not generate properly on some character models
 
 &nbsp;
 
 ## Setup and Getting Started 
 - [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
-- [Getting Started](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
+- [Getting Started (WIP)](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
 &nbsp;
 
 &nbsp;
