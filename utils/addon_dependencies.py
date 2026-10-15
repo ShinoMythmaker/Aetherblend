@@ -7,7 +7,6 @@ import addon_utils
 FEATURE_SETS: dict[str, str] = {
     "COMMON": "Common",
     "FFXIV": "FFXIV",
-    "VRM": "VRM",
 }
 
 COMMON_FEATURE_SET_TOKEN = "COMMON"
@@ -38,14 +37,6 @@ REQUIRED_ADDONS = (
         "feature_sets": ("FFXIV",),
         "source": "EXTERNAL",
         "link_label": "GitHub",
-    },
-    {
-        "name": "VRM format",
-        "module": "vrm",
-        "url": "https://extensions.blender.org/add-ons/vrm/",
-        "feature_sets": ("VRM",),
-        "source": "EXTERNAL",
-        "link_label": "Blender",
     },
 )
 

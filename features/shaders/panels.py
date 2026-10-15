@@ -1,6 +1,5 @@
 import bpy
 
-from ...preferences import is_set_enabled
 from ...properties.tab_prop import get_active_tab
 from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
@@ -69,24 +68,6 @@ class AETHER_PT_shaders(bpy.types.Panel):
         pass
 
 
-class AETHER_PT_VRM_Shaders(bpy.types.Panel):
-    bl_label = "VRM Shaders"
-    bl_idname = "AETHER_PT_vrm_shaders"
-    bl_parent_id = "AETHER_PT_shaders"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
-
-    @classmethod
-    def poll(cls, context):
-        return shader_panel_poll(context) and is_set_enabled('VRM')
-
-    def draw(self, context):
-        layout = self.layout
-
-        draw_toggle_row(layout, "Toon Outline", "aether.vrm_toggle_outline", enabled=True)
-
-
 class AETHER_PT_shaders_materials(bpy.types.Panel):
     bl_label = "Materials"
     bl_idname = "AETHER_PT_shaders_materials"
@@ -132,12 +113,10 @@ class AETHER_PT_shaders_node_trees(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(AETHER_PT_shaders)
-    bpy.utils.register_class(AETHER_PT_VRM_Shaders)
     bpy.utils.register_class(AETHER_PT_shaders_materials)
     bpy.utils.register_class(AETHER_PT_shaders_node_trees)
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_shaders_node_trees)
     bpy.utils.unregister_class(AETHER_PT_shaders_materials)
-    bpy.utils.unregister_class(AETHER_PT_VRM_Shaders)
     bpy.utils.unregister_class(AETHER_PT_shaders)

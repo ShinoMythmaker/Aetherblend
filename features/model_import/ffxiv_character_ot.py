@@ -9,7 +9,6 @@ from ...preferences import get_preferences
 from ...properties.tab_prop import set_active_tab
 from ...utils import addon_dependencies
 from ...utils.axis_conversion import AXIS_ITEMS
-from ..rigging import template_manager
 
 
 class AETHER_OT_Character_Import(bpy.types.Operator):
@@ -36,7 +35,6 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
 
     s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
     s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
-    s_create_backup_armature: BoolProperty(name="Create Backup Armature", description="Creates a backup armature for C+ reversion after import", default=True)  # type: ignore
 
 
 
@@ -174,10 +172,6 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
 
         split = col.split(factor=indent)
         split.label(text=" ")
-        split.prop(self, "s_create_backup_armature")
-
-        split = col.split(factor=indent)
-        split.label(text=" ")
         split.prop(self, "s_clear_noanim_bones")
 
         # Bone Orientation Section
@@ -267,35 +261,6 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             bpy.ops.armature.select_all(action='SELECT')
             bpy.ops.armature.assign_to_collection(new_collection_name="Original")
             bpy.ops.object.mode_set(mode='OBJECT')
-
-            # Pre-populate C+ axis settings to match what was used during import
-            # so the user doesn't have to configure them manually.
-            cplus = getattr(armature, 'aether_cplus', None)
-            if cplus and self.use_bone_axis_conversion:
-                cplus.cplus_primary_axis = self.primary_bone_axis
-                cplus.cplus_secondary_axis = self.secondary_bone_axis
-
-            # Create backup armature for C+ after import (if enabled)
-            if self.s_create_backup_armature:
-                cplus = getattr(armature, 'aether_cplus', None)
-                if cplus:
-                    # Create backup
-                    backup = utils.armature.duplicate(armature)
-                    backup.name = f"BACKUP_{armature.name}"
-                    backup.parent = armature
-                    backup.matrix_parent_inverse = armature.matrix_world.inverted()
-                    backup.hide_set(True)
-                    backup.hide_viewport = True
-                    cplus.backup_armature = backup
-
-                    # Link to same collection
-                    armature_collection = utils.collection.get_collection(armature)
-                    if armature_collection:
-                        utils.collection.link_to_collection([backup], armature_collection)
-
-            aether_rig = getattr(armature, 'aether_rig', None)
-            if aether_rig:
-                aether_rig.selected_template = template_manager.get_default_template_name()
 
             utils.object.select_only(armature)
 

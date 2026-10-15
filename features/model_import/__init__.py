@@ -1,6 +1,6 @@
-from . import ffxiv_character_ot, panels, vrm_ot
+from . import ffxiv_character_ot, panels
 
-modules = (ffxiv_character_ot, vrm_ot, panels)
+modules = (ffxiv_character_ot, panels)
 
 def register():
     for mod in modules:

@@ -5,7 +5,6 @@ import bpy
 from ...properties.tab_prop import get_active_tab
 from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
-from . import template_manager
 from .ui_links import UI_LINKS
 
 
@@ -14,60 +13,6 @@ def _flatten_children(iterable):
     for item in iterable:
         yield item
         yield from _flatten_children(item.children)
-
-
-MODULE_TYPE_ICONS = {
-    "Generation": 'GROUP_BONE',
-    "UI-Addon": 'OUTLINER_COLLECTION',
-    "Patch": 'MODIFIER',
-}
-
-def _format_module_family(module_key: str) -> str:
-    family_name = (module_key or '').split('.', 1)[0]
-    return family_name.replace('_', ' ').title() or "Misc"
-
-def _is_group_fallback(aether_rig, index: int) -> bool:
-    modules = getattr(aether_rig, 'modules', None)
-    if not modules or index <= 0 or index >= len(modules):
-        return False
-
-    group_index = getattr(modules[index], 'group_index', -1)
-    if group_index < 0:
-        return False
-
-    return getattr(modules[index - 1], 'group_index', -1) == group_index
-
-class AETHER_UL_RigModules(bpy.types.UIList):
-    """Display the currently selected rig modules in a Blender-style list."""
-
-    def draw_filter(self, context, layout):
-        # Intentionally draw nothing so Blender does not show the filter/sort footer.
-        pass
-
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        module = template_manager.AVAILABLE_MODULES.get(item.module_key)
-        if not module:
-            layout.label(text=item.module_key or "Unknown Module", icon='ERROR')
-            return
-
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            family_label = _format_module_family(item.module_key)
-            type_icon = MODULE_TYPE_ICONS.get(module.type, 'QUESTION')
-            is_fallback = _is_group_fallback(data, index)
-
-            split = layout.split(factor=0.72, align=True)
-            left = split.row(align=True)
-            right = split.row(align=True)
-            right.alignment = 'RIGHT'
-
-            if is_fallback:
-                left.label(text="", icon='TRIA_UP')
-
-            left.label(text=family_label, icon=type_icon)
-            right.label(text=module.name)
-        elif self.layout_type == 'GRID':
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon='PROPERTIES')
 
 
 class AETHER_PT_RigCreation(bpy.types.Panel):
@@ -129,78 +74,13 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         meta_rig_button.scale_y = 0.95
         meta_rig_button.operator("aether.generate_meta_rig", text="Generate Meta Rig", icon="ARMATURE_DATA")
 
-        row = col.row(align=True)
-
-        # Template selection
         row = layout.row(align=True)
         row.label(text="Template", icon='PRESET')
-        row.prop(aether_rig, "selected_template", text="")
+        row.prop(aether_rig, "template", text="")
 
-        # Colorset override
         row = layout.row(align=True)
         row.label(text="Colorset", icon='COLOR')
         row.prop(aether_rig, "selected_colorset", text="")
-
-        if template_manager.is_custom_template_selected(aether_rig):
-            modules_box = layout.box()
-
-            header = modules_box.row(align=True)
-            left = header.row(align=True)
-            right = header.row(align=True)
-            right.alignment = 'RIGHT'
-            right.scale_x = 1.25
-
-            left.label(text="Custom Template", icon='MODIFIER')
-            right.menu("AETHER_MT_populate_custom_template_menu", text="Pop.", icon='IMPORT')
-
-            save_row = modules_box.row(align=True)
-            save_row.prop(aether_rig, "custom_template_name", text="Name")
-            save_row.operator("aether.save_custom_template_json", text="", icon='FILE_TICK')
-            save_row.operator("aether.export_custom_template_clipboard", text="", icon='COPYDOWN')
-            save_row.operator("aether.import_custom_template_clipboard", text="", icon='PASTEDOWN')
-
-
-            row = modules_box.row()
-            list_col = row.column(align=True)
-
-            list_col.template_list(
-                "AETHER_UL_RigModules",
-                "",
-                aether_rig,
-                "modules",
-                aether_rig,
-                "module_index",
-                rows=max(4, min(10, max(1, len(aether_rig.modules))))
-                if len(aether_rig.modules) > 0 else 4,
-                sort_lock=True,
-            )
-
-            has_selection = 0 <= aether_rig.module_index < len(aether_rig.modules)
-            buttons = row.column(align=True)
-
-            buttons.menu("AETHER_MT_add_group_module_menu", text="", icon='ADD')
-
-            add_fallback_col = buttons.column(align=True)
-            add_fallback_col.enabled = has_selection
-            add_fallback_col.menu("AETHER_MT_add_fallback_module_menu", text="", icon='LINKED')
-
-            buttons.separator()
-
-            move_col = buttons.column(align=True)
-            move_col.enabled = has_selection
-
-            move_up = move_col.operator("aether.move_template_module", text="", icon='TRIA_UP')
-            move_up.direction = 'UP'
-
-            move_down = move_col.operator("aether.move_template_module", text="", icon='TRIA_DOWN')
-            move_down.direction = 'DOWN'
-
-            buttons.separator()
-
-            remove_col = buttons.column(align=True)
-            remove_col.enabled = has_selection
-            remove = remove_col.operator("aether.remove_template_module", text="", icon='REMOVE')
-            remove.module_index = aether_rig.module_index
 
 
 class AETHER_PT_RigManipulation(bpy.types.Panel):
@@ -473,7 +353,6 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
             layout.label(text=f"Rig bake settings panel not found for: {rig_id}")
 
 def register():
-    bpy.utils.register_class(AETHER_UL_RigModules)
     bpy.utils.register_class(AETHER_PT_RigCreation)
     bpy.utils.register_class(AETHER_PT_RigManipulation)
     bpy.utils.register_class(AETHER_PT_RigLayersPanel)
@@ -486,4 +365,3 @@ def unregister():
     bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
     bpy.utils.unregister_class(AETHER_PT_RigManipulation)
     bpy.utils.unregister_class(AETHER_PT_RigCreation)
-    bpy.utils.unregister_class(AETHER_UL_RigModules)
