@@ -1,5 +1,7 @@
-import bpy
 import collections
+
+import bpy
+
 from ...properties.tab_prop import get_active_tab
 from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
@@ -37,6 +39,7 @@ def _is_group_fallback(aether_rig, index: int) -> bool:
 
 class AETHER_UL_RigModules(bpy.types.UIList):
     """Display the currently selected rig modules in a Blender-style list."""
+
     def draw_filter(self, context, layout):
         # Intentionally draw nothing so Blender does not show the filter/sort footer.
         pass
@@ -84,9 +87,9 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
 
         armature = context.active_object
         return (
-            armature is not None 
+            armature is not None
             and armature.visible_get()
-            and armature.type == 'ARMATURE' 
+            and armature.type == 'ARMATURE'
             and getattr(armature, 'aether_rig', None)
         )
 
@@ -97,7 +100,7 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
             box = layout.box()
             box.label(text="Rigify addon is not enabled", icon='ERROR')
             return None
-        
+
         layout = self.layout
         armature = context.active_object
         aether_rig = getattr(armature, 'aether_rig', None)
@@ -105,7 +108,7 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
             return
 
         col = layout.column(align=True)
-        
+
         full_rig_button = col.row(align=True)
         full_rig_button.scale_y = 1.3
         if aether_rig.rigified:
@@ -132,7 +135,7 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         row = layout.row(align=True)
         row.label(text="Template", icon='PRESET')
         row.prop(aether_rig, "selected_template", text="")
-        
+
         # Colorset override
         row = layout.row(align=True)
         row.label(text="Colorset", icon='COLOR')
@@ -155,7 +158,7 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
             save_row.operator("aether.save_custom_template_json", text="", icon='FILE_TICK')
             save_row.operator("aether.export_custom_template_clipboard", text="", icon='COPYDOWN')
             save_row.operator("aether.import_custom_template_clipboard", text="", icon='PASTEDOWN')
-            
+
 
             row = modules_box.row()
             list_col = row.column(align=True)
@@ -218,7 +221,7 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return False
-        
+
         aether_rig = getattr(armature, 'aether_rig', None)
         return aether_rig and aether_rig.rigified
 
@@ -243,15 +246,15 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
         )
 
         layout.separator()
-        
+
         link_collection = armature.data.collections.get('LINK')
         if not link_collection:
             layout.label(text="LINK collection not found", icon='ERROR')
             return
-        
+
         row = layout.row(align=True)
         row.label(text="Inherit Scale", icon='ORIENTATION_PARENT')
-        
+
         current_text = "Full"
         if aether_rig:
             scale_labels = {
@@ -262,7 +265,7 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
                 'NONE_LEGACY': 'None (Legacy)'
             }
             current_text = scale_labels.get(aether_rig.link_inherit_scale, 'Full')
-        
+
         row.operator_menu_enum("aether.set_bone_inherit_scale", "inherit_scale", text=current_text)
 
         layout.separator()
@@ -273,7 +276,7 @@ class AETHER_PT_RigManipulation(bpy.types.Panel):
         row.operator(
             "aether.delete_no_anim",
             text="Delete",
-            icon="TRASH", 
+            icon="TRASH",
             )
 
 class AETHER_PT_RigLayersPanel(bpy.types.Panel):
@@ -303,10 +306,10 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
 
         if not armature.data.get("rig_id"):
             return
-        
+
         layout = self.layout
         any_soloed = any(collection.is_solo for collection in armature.data.collections)
-        
+
         ## AB Additions
         if context.mode == 'POSE':
             row = layout.row(align=True)
@@ -317,7 +320,7 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
                 depress=any_soloed,
             )
             layout.separator()
-            
+
         ## Rigify UI
         layout = self.layout
         row_table = collections.defaultdict(list)
@@ -334,7 +337,7 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
                 for index, coll in enumerate(row_buttons):
                     title = coll.rigify_ui_title or coll.name
                     row2 = row.row(align=True)
-                    
+
                     place_solo_left = index < midpoint
                     if len(row_buttons) == 1:
                         place_solo_left = False
@@ -366,42 +369,42 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
             return False
         if get_active_tab(context) != 'RIG_UI':
             return False
-        
+
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return False
-        
+
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return False
-            
+
         panel_name = "VIEW3D_PT_rig_ui_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
-        
+
         if panel_class and hasattr(panel_class, 'poll'):
             return panel_class.poll(context)
-        
+
         return False
 
     def draw(self, context):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return
-        
+
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return
-            
+
         aether_rig = getattr(armature, 'aether_rig', None)
         # if not aether_rig:
         #     return
-            
+
         panel_name = "VIEW3D_PT_rig_ui_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
-        
+
         ## Draw Links
         flags = [item.value for item in aether_rig.ui_flags]
-            
+
         for flag in flags:
             ui_link = UI_LINKS.get(flag)
             if not ui_link:
@@ -431,37 +434,37 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
             return False
         if get_active_tab(context) != 'RIG_UI':
             return False
-        
+
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return False
-        
+
         # Get rig_id from armature custom properties
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return False
-            
+
         panel_name = "VIEW3D_PT_rig_bake_settings_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
-        
+
         if panel_class and hasattr(panel_class, 'poll'):
             return panel_class.poll(context)
-        
+
         return False
 
     def draw(self, context):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return
-        
+
         # Get rig_id from armature custom properties
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return
-            
+
         panel_name = "VIEW3D_PT_rig_bake_settings_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
-        
+
         if panel_class and hasattr(panel_class, 'draw'):
             panel_class.draw(self, context)
         else:

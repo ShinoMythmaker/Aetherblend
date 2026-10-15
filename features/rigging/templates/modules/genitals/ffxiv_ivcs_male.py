@@ -1,8 +1,8 @@
-from ......core.generators import ConnectBone, ExtensionBone
-from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
-from ......core.shared import PoseOperations, BoneGroup, RigModule, TransformLink
 from ......core import rigify
-from ......core.rigify.settings import UI_Collections, BoneCollection
+from ......core.generators import ConnectBone, ExtensionBone
+from ......core.operations import CollectionOperation, RigifyTypeOperation
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 GENITALS_M = BoneGroup(
     name="Male Genitals",

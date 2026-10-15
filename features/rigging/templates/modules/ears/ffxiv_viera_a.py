@@ -1,7 +1,7 @@
+from ......core import rigify
 from ......core.bone_generators import ConnectBone
 from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
-from ......core import rigify
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 VIERA_EARS = BoneGroup(
     name="Viera Ears",

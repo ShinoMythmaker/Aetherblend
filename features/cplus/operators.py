@@ -1,9 +1,9 @@
-import bpy
 import base64
 import json
-
-from bpy.props import StringProperty
 from io import BytesIO
+
+import bpy
+from bpy.props import StringProperty
 
 from ... import utils
 from . import decoder
@@ -93,7 +93,7 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         bpy.context.view_layer.objects.active = armature
 
         self.report({'INFO'}, "C+ transforms applied, shapekeys baked, rest pose set, parenting and modifiers restored.")
-        return {'FINISHED'}   
+        return {'FINISHED'}
 
 class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
     bl_label = "Create Backup Armature"
@@ -104,7 +104,7 @@ class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
     def execute(self, context) -> set[str]:
         armature = context.active_object
         cplus = getattr(armature, 'aether_cplus', None)
-        
+
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select a valid armature object.")
             return {'CANCELLED'}
@@ -127,14 +127,14 @@ class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
         # Create backup armature
         backup = utils.armature.duplicate(armature)
         backup.name = f"BACKUP_{armature.name}"
-        
+
         # Parent backup to original armature
         backup.parent = armature
         backup.matrix_parent_inverse = armature.matrix_world.inverted()
-                
+
         # Store reference
         cplus.backup_armature = backup
-        
+
         # Make sure it's in the same collection
         armature_collection = utils.collection.get_collection(armature)
         if armature_collection:
@@ -149,7 +149,7 @@ class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
 
         self.report({'INFO'}, f"[AetherBlend] Created backup armature '{backup.name}'.")
         return {'FINISHED'}
-    
+
 class AETHER_OT_RevertToBackup(bpy.types.Operator):
     bl_label = "Revert to Backup"
     bl_idname = "aether.revert_cplus_to_backup"
@@ -161,33 +161,33 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
     def execute(self, context):
         armature = context.active_object
         cplus = getattr(armature, 'aether_cplus', None)
-        
+
         if not cplus or not cplus.backup_armature:
             self.report({'ERROR'}, "[AetherBlend] No backup armature found. Create a backup first.")
             return {'CANCELLED'}
-        
+
         backup = cplus.backup_armature
-        
+
         # Make backup visible temporarily for data access
         backup.hide_set(False)
         backup.hide_viewport = False
-        
+
         # Get Original bones from both armatures
         original_col = armature.data.collections.get('Original')
         if not original_col:
             self.report({'ERROR'}, "[AetherBlend] No Original bone collection found.")
             backup.hide_set(True)
-            backup.hide_viewport = True 
+            backup.hide_viewport = True
             return {'CANCELLED'}
-        
+
         original_bone_names = [b.name for b in original_col.bones]
-        
+
         # Copy bone transforms from backup to current armature
         # First, enter edit mode on backup to get bone data
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.context.view_layer.objects.active = backup
         bpy.ops.object.mode_set(mode='EDIT')
-        
+
         # Store backup bone transforms
         bone_data = {}
         for bone_name in original_bone_names:
@@ -198,36 +198,36 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
                     'tail': backup_bone.tail.copy(),
                     'roll': backup_bone.roll
                 }
-        
+
         # Switch to current armature and apply transforms
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.context.view_layer.objects.active = armature
         bpy.ops.object.mode_set(mode='EDIT')
-        
+
         for bone_name, data in bone_data.items():
             current_bone = armature.data.edit_bones.get(bone_name)
             if current_bone:
                 current_bone.head = data['head']
                 current_bone.tail = data['tail']
                 current_bone.roll = data['roll']
-        
+
         bpy.ops.object.mode_set(mode='OBJECT')
-        
+
         # Remove CPlus shapekeys from meshes
         meshes = utils.armature.find_meshes(armature)
         for mesh_obj in meshes:
             utils.object.remove_shapekey(mesh_obj, "CPlus", True, "ImportedPose")
-        
+
         # Hide backup again
         backup.hide_set(True)
         backup.hide_viewport = True
         bpy.ops.object.select_all(action='DESELECT')
         bpy.context.view_layer.objects.active = armature
-        
+
         cplus.applied = False
         self.report({'INFO'}, "Reverted CPlus changes to backup armature state.")
         return {'FINISHED'}
-    
+
 class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
     bl_label = "Parse from MCDF file"
     bl_idname = "aether.parse_cplus_from_mcdf"
@@ -249,16 +249,16 @@ class AETHER_OT_ParseFromMCDF(bpy.types.Operator):
         armature = context.active_object
         cplus = getattr(armature, 'aether_cplus', None)
 
-        if not self.filepath or not self.filepath.lower().endswith('.mcdf'): 
+        if not self.filepath or not self.filepath.lower().endswith('.mcdf'):
             self.report({'ERROR'}, "[AetherBlend] Invalid file format. Please select a .mcdf file.")
             return {'CANCELLED'}
-        
+
         cplus_string = decoder.get_mcdf_cplus(self.filepath)
 
         if cplus_string is None:
             self.report({'ERROR'}, "[AetherBlend] Invalid MCDF file.")
             return {'CANCELLED'}
-        
+
         if not cplus_string:
             self.report({'WARNING'}, "[AetherBlend] MCDF file read successfully, but it didn't contain any C+ data.")
             return {'CANCELLED'}
@@ -278,17 +278,17 @@ class AETHER_OT_PasteFromClipboard(bpy.types.Operator):
     def execute(self, context):
         armature = context.active_object
         cplus = getattr(armature, 'aether_cplus', None)
-        
+
         if not cplus:
             self.report({'ERROR'}, "[AetherBlend] No C+ settings found.")
             return {'CANCELLED'}
-        
+
         clipboard_text = context.window_manager.clipboard.strip()
-        
+
         if not clipboard_text:
             self.report({'ERROR'}, "[AetherBlend] Clipboard is empty.")
             return {'CANCELLED'}
-        
+
         cplus.code = clipboard_text
         self.report({'INFO'}, "[AetherBlend] C+ String pasted from clipboard.")
         return {'FINISHED'}

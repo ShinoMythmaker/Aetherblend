@@ -1,11 +1,6 @@
-from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, DriverOperation, CustomPropertyOperation
-from ......core.constraints import DampedTrackConstraint
-from ......core.bone_generators import ConnectBone, ExtensionBone, RegexBoneGroup
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
-from ......core import rigify
-from ......core.drivers import TransformChannelVariable, Driver, SinglePropertyVariable
-from ......core.custom_properties import FloatProperty
+from ......core.bone_generators import RegexBoneGroup
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule
 
 OPT = BoneGroup(
         name="Optional",

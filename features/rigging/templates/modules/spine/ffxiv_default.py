@@ -1,9 +1,15 @@
-from ......core.bone_generators import ConnectBone, ExtensionBone
-from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, WidgetOperation
-from ......core.constraints import CopyLocationConstraint, CopyTransformsConstraint
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
-from ......core.rigify.settings import UI_Collections, BoneCollection
+from ......core.bone_generators import ConnectBone, ExtensionBone
+from ......core.constraints import CopyLocationConstraint, CopyTransformsConstraint
+from ......core.operations import (
+    CollectionOperation,
+    ConstraintOperation,
+    ParentBoneOperation,
+    RigifyTypeOperation,
+    WidgetOperation,
+)
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 SPINE = BoneGroup(
         name="spine",
@@ -156,4 +162,3 @@ def get_rig_module() -> RigModule:
             BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
         ])
     )
-    

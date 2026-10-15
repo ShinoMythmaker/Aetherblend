@@ -194,7 +194,7 @@ class AETHER_OT_VFXExportModel(Operator, ExportHelper):
     bl_label = "Export VFX Model (GLB)"
     bl_options = {'REGISTER', 'UNDO'}
     bl_description = "Export VFX Model. This is meant for VFX not Animations !"
-    
+
     filepath: bpy.props.StringProperty(subtype="FILE_PATH") # type: ignore
     filename_ext = '.glb'
     filter_glob: bpy.props.StringProperty(default='*.glb', options={'HIDDEN'}) # type: ignore
@@ -203,18 +203,18 @@ class AETHER_OT_VFXExportModel(Operator, ExportHelper):
     uv_offset_v: bpy.props.FloatProperty(name="V Offset", default=0.0) # type: ignore
 
     def invoke(self, context, event):
-        prefs = get_preferences()  
-        blend_filename = bpy.path.basename(bpy.data.filepath) 
+        prefs = get_preferences()
+        blend_filename = bpy.path.basename(bpy.data.filepath)
         if blend_filename:
-            blend_filename = os.path.splitext(blend_filename)[0] + "_vfx.glb"  
+            blend_filename = os.path.splitext(blend_filename)[0] + "_vfx.glb"
         else:
-            blend_filename = "untitled_vfx_model.glb"  
-        
+            blend_filename = "untitled_vfx_model.glb"
+
         if prefs.default_vfx_export_path:
             self.filepath = os.path.join(prefs.default_vfx_export_path, blend_filename)
         else:
             self.filepath = blend_filename
-        
+
         return super().invoke(context, event)
 
 
@@ -248,7 +248,7 @@ class AETHER_OT_VFXExportModel(Operator, ExportHelper):
                 export_format='GLB',
                 use_selection=True,
                 export_yup=True,  #Y up enabled for VFX
-                export_apply=True, 
+                export_apply=True,
                 export_animations=False,
                 export_normals=True,
                 export_tangents=True,  #keep tangents
@@ -258,10 +258,10 @@ class AETHER_OT_VFXExportModel(Operator, ExportHelper):
                 use_mesh_edges=False,
                 use_mesh_vertices=False,
             )
-            
+
             self.report({'INFO'}, f"VFX model exported to {self.filepath}")
             return {'FINISHED'}
-            
+
         except Exception as e:
             self.report({'ERROR'}, f"Export failed: {str(e)}")
             return {'CANCELLED'}
@@ -279,25 +279,25 @@ class AETHER_OT_VFXExportEmitter(Operator, ExportHelper):
     bl_label = "Export VFX Emitter (GLTF)"
     bl_options = {'REGISTER', 'UNDO'}
     bl_description = "Export VFX Emitter Model, This is meant for VFX"
-    
+
     filepath: bpy.props.StringProperty(subtype="FILE_PATH") # type: ignore
     filename_ext = '.gltf'
     filter_glob: bpy.props.StringProperty(default='*.gltf', options={'HIDDEN'}) # type: ignore
 
-    
+
     def invoke(self, context, event):
-        prefs = get_preferences()  
-        blend_filename = bpy.path.basename(bpy.data.filepath) 
+        prefs = get_preferences()
+        blend_filename = bpy.path.basename(bpy.data.filepath)
         if blend_filename:
-            blend_filename = os.path.splitext(blend_filename)[0] + "_vfx.gltf"  
+            blend_filename = os.path.splitext(blend_filename)[0] + "_vfx.gltf"
         else:
-            blend_filename = "untitled_vfx_emitter.gltf"  
-        
+            blend_filename = "untitled_vfx_emitter.gltf"
+
         if prefs.default_vfx_export_path:
             self.filepath = os.path.join(prefs.default_vfx_export_path, blend_filename)
         else:
             self.filepath = blend_filename
-        
+
         return super().invoke(context, event)
 
 
@@ -305,7 +305,7 @@ class AETHER_OT_VFXExportEmitter(Operator, ExportHelper):
         if not context.selected_objects:
             self.report({'ERROR'}, "Please select objects to export.")
             return {'CANCELLED'}
-        
+
         try:
             bpy.ops.export_scene.gltf(    ### For Emitter models we really dont need anything just vertex postions and a custom normal we save as an attribute
                 filepath=self.filepath,
@@ -315,7 +315,7 @@ class AETHER_OT_VFXExportEmitter(Operator, ExportHelper):
                 export_apply=True,
                 export_animations=False,
                 export_normals=False,
-                export_tangents=False,  
+                export_tangents=False,
                 export_attributes=True,
                 export_materials='EXPORT',
                 export_image_format='AUTO',
@@ -327,11 +327,11 @@ class AETHER_OT_VFXExportEmitter(Operator, ExportHelper):
 
             self.report({'INFO'}, f"VFX model exported to {self.filepath}")
             return {'FINISHED'}
-            
+
         except Exception as e:
             self.report({'ERROR'}, f"Export failed: {str(e)}")
             return {'CANCELLED'}
-     
+
 
 def _menu_draw(self, context):
     self.layout.menu(AETHER_MT_VFXModel.bl_idname, icon='GEOMETRY_SET')

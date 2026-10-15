@@ -1,26 +1,33 @@
 import bpy
-from ...utils import armature as rig_utils
-from ...data.constants import xiv_tail_bones, sb_tail_collection, spring_prefix, spring_bone_collection, sb_tail_parent_bone
-from .spring_bones_ot import end_spring_bone
 
+from ...data.constants import (
+    sb_tail_collection,
+    sb_tail_parent_bone,
+    spring_bone_collection,
+    spring_prefix,
+    xiv_tail_bones,
+)
+from ...utils import armature as rig_utils
+from .spring_bones_ot import end_spring_bone
 
 
 class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
     """Generates a spring tail for the selected armature"""
+
     bl_idname = "aether.generate_spring_tail"
     bl_label = "Generate Spring Tail"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        bpy.context.window.cursor_set('WAIT')  
+        bpy.context.window.cursor_set('WAIT')
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
         spring_tail_path = f"{spring_bone_collection}/{sb_tail_collection}"
-        
-        context.scene.ab_sb_global_spring_frame = False 
-        context.scene.ab_sb_global_spring = False 
+
+        context.scene.ab_sb_global_spring_frame = False
+        context.scene.ab_sb_global_spring = False
 
         bpy.ops.object.mode_set(mode='EDIT')
 
@@ -33,10 +40,10 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
 
         rig_utils.bone.delete_keyframes(armature, xiv_tail_bones)
         rig_utils.bone.reset_transforms(armature, xiv_tail_bones)
- 
+
         # Create spring bones
         spring_bones = rig_utils.generate.bone_chain(armature, xiv_tail_bones, prefix=spring_prefix, parent_bone=sb_tail_parent_bone)
-        
+
         bpy.ops.object.mode_set(mode='POSE')
 
         # Check if spring bones is an empty array
@@ -53,11 +60,11 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
         # Apply Spring Bones properties to each spring bone
         for index, spring_bone_name in enumerate(spring_bones):
             pb = armature.pose.bones[spring_bone_name]
-            pb.ab_sb_bone_spring = True           
-            pb.ab_sb_bone_rot = True              
-            pb.ab_sb_collide = True               
-            pb.ab_sb_lock_axis = 'NONE'           
-            
+            pb.ab_sb_bone_spring = True
+            pb.ab_sb_bone_rot = True
+            pb.ab_sb_collide = True
+            pb.ab_sb_lock_axis = 'NONE'
+
             if index == 0:
                 pb.ab_sb_stiffness = 0.20
                 pb.ab_sb_damp = 0.40
@@ -82,19 +89,20 @@ class AETHER_OT_Generate_Spring_Tail(bpy.types.Operator):
                 pb.ab_sb_stiffness = 0.20
                 pb.ab_sb_damp = 0.40
                 pb.ab_sb_gravity = 0.20
-                pb.ab_sb_global_influence = 0.8 
+                pb.ab_sb_global_influence = 0.8
 
 
         # Restore original bone visibility
         rig_utils.bone.restore_visibility(armature, original_visibility)
 
-        bpy.ops.object.mode_set(mode='POSE')   
-        bpy.context.window.cursor_set('DEFAULT')  
+        bpy.ops.object.mode_set(mode='POSE')
+        bpy.context.window.cursor_set('DEFAULT')
         self.report({'INFO'}, "[AetherBlend] Spring tail generated and constraints set.")
         return {'FINISHED'}
 
 class AETHER_OT_Delete_Spring_Tail(bpy.types.Operator):
     """Deletes the generated spring tail and removes constraints from reference bones"""
+
     bl_idname = "aether.delete_spring_tail"
     bl_label = "Delete Spring Tail"
     bl_options = {'REGISTER', 'UNDO'}
@@ -105,10 +113,10 @@ class AETHER_OT_Delete_Spring_Tail(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
         spring_tail_path = f"{spring_bone_collection}/{sb_tail_collection}"
-        
+
         # Disable Spring Bones
-        context.scene.ab_sb_global_spring_frame = False 
-        context.scene.ab_sb_global_spring = False 
+        context.scene.ab_sb_global_spring_frame = False
+        context.scene.ab_sb_global_spring = False
         end_spring_bone(context, self)
 
         bpy.ops.object.mode_set(mode='POSE')
@@ -127,6 +135,7 @@ class AETHER_OT_Delete_Spring_Tail(bpy.types.Operator):
 
 class AETHER_OT_Bake_Spring_Tail(bpy.types.Operator):
     """Bake the spring tail animation to keyframes"""
+
     bl_idname = "aether.bake_spring_tail"
     bl_label = "Bake Spring Tail"
     bl_options = {'REGISTER', 'UNDO'}

@@ -1,13 +1,15 @@
 import bpy
 from bpy.types import Operator
-from ...utils import armature as armature_utils 
+
+from ...utils import armature as armature_utils
+
 
 class AETHER_OT_SetBoneInheritScale(Operator):
     bl_idname = "aether.set_bone_inherit_scale"
     bl_label = "Set Inherit Scale"
     bl_description = "Set inherit scale for bones in LINK collection"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     inherit_scale: bpy.props.EnumProperty(
         name="Inherit Scale",
         items=[
@@ -19,28 +21,28 @@ class AETHER_OT_SetBoneInheritScale(Operator):
         ],
         default='FULL',
     ) # type: ignore
-    
+
     def execute(self, context):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "Select an armature")
             return {'CANCELLED'}
-        
+
         link_collection = armature.data.collections.get('LINK')
         if not link_collection:
             self.report({'ERROR'}, "LINK collection not found")
             return {'CANCELLED'}
-        
+
         aether_rig = getattr(armature, 'aether_rig', None)
         if aether_rig:
             aether_rig.link_inherit_scale = self.inherit_scale
-        
+
         bone_count = 0
         for bone in armature.pose.bones:
             if bone.bone.collections.get('LINK'):
                 bone.bone.inherit_scale = self.inherit_scale
                 bone_count += 1
-        
+
         self.report({'INFO'}, f"Updated {bone_count} bones in LINK collection")
         return {'FINISHED'}
 
@@ -49,7 +51,7 @@ class AETHER_OT_DeleteNoAnim(Operator):
     bl_label = "Delete NoAnim"
     bl_description = "Deletes all bones containing the 'noanim' flag."
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     def execute(self, context):
         pattern = "noanim"
         armature = context.active_object
@@ -62,12 +64,12 @@ class AETHER_OT_DeleteNoAnim(Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         edit_bones = armature.data.edit_bones
-        
+
         for bone in edit_bones:
             if pattern in bone.name:
                 edit_bones.remove(bone)
 
-        bpy.ops.object.mode_set(mode=original_mode)  
+        bpy.ops.object.mode_set(mode=original_mode)
         return {'FINISHED'}
 
 
@@ -89,22 +91,22 @@ class AETHER_OT_RemoveGameSupport(Operator):
         row.label(text="Are you sure? This is irreversible!", icon='ERROR')
 
     def execute(self, context):
-        ## What we do here is actually quite simple. Rename all vertex groups to the Rigify DEF bones. 
+        ## What we do here is actually quite simple. Rename all vertex groups to the Rigify DEF bones.
         ## Then delete all LINK and orginal bones that have no longer any influence
-        ## At last we reparent all remaining children to there new parents. 
-        ## Since we are not changing any rigify bones, this can be done without harming animation data. 
+        ## At last we reparent all remaining children to there new parents.
+        ## Since we are not changing any rigify bones, this can be done without harming animation data.
         ## Downsides are, no backwards compatibility with the game/engine, other meshes with old vertex groups will no longer work.
         ## Since the original bones no longer exist.
 
-        ## How could we implement a reverse of this ? 
-        ## We do have a backup armature we coulkd use to restore the old bones. 
-        ## However what about the vertex groups ? I dont want to store the mapping in blender. 
+        ## How could we implement a reverse of this ?
+        ## We do have a backup armature we coulkd use to restore the old bones.
+        ## However what about the vertex groups ? I dont want to store the mapping in blender.
         ## We would have more options if the user would have something like "restore to backup"
         ## then regenerates. Cause then we have basicly the mappings again and could re-rename the vertex groups.
         ## All that wuld be easier if we would store transformLink pairs during rig generation on a custom property from teh armature.
         ## I know i jsut said that i dont want to store the mapping in blender, but this would be a good use case for it.
         ## There are many places where we could use it.
-        ## Maybe for another time (Shino) 
+        ## Maybe for another time (Shino)
 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
@@ -185,7 +187,7 @@ class AETHER_OT_RemoveGameSupport(Operator):
             bpy.context.window.cursor_set('DEFAULT')
 
         return {'FINISHED'}
-    
+
 def register():
     bpy.utils.register_class(AETHER_OT_RemoveGameSupport)
     bpy.utils.register_class(AETHER_OT_DeleteNoAnim)

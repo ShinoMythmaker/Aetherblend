@@ -1,8 +1,9 @@
-import bpy
-from bpy.props import StringProperty, EnumProperty
-from pathlib import Path
-import os
 import json
+import os
+from pathlib import Path
+
+import bpy
+from bpy.props import EnumProperty, StringProperty
 
 from .utils import addon_dependencies
 
@@ -39,6 +40,7 @@ def get_preferences():
 
 class AETHER_OT_Set_Default_Template(bpy.types.Operator):
     """Set the default rig template used for new rigs."""
+
     bl_idname = "aether.set_default_template"
     bl_label = "Set as Default Template"
     bl_description = "Use this template as the default when creating a new rig"
@@ -51,7 +53,7 @@ class AETHER_OT_Set_Default_Template(bpy.types.Operator):
     def execute(self, context):
         prefs = get_preferences()
         prefs.default_template = self.template_name
-        
+
         # If the template being set as default is hidden, unhide it
         raw = (getattr(prefs, 'hidden_templates', '') or '').strip()
         hidden: set[str] = set()
@@ -66,17 +68,18 @@ class AETHER_OT_Set_Default_Template(bpy.types.Operator):
                     }
             except Exception:
                 pass
-        
+
         if self.template_name in hidden:
             hidden.remove(self.template_name)
             prefs.hidden_templates = json.dumps(sorted(hidden), ensure_ascii=True)
-        
+
         self.report({'INFO'}, f"Default template set to: {self.template_name}")
         return {'FINISHED'}
 
 
 class AETHER_OT_Delete_Custom_Template(bpy.types.Operator):
     """Delete one custom template file from addon preferences."""
+
     bl_idname = "aether.delete_custom_template"
     bl_label = "Delete Custom Template"
     bl_description = "Delete this custom template JSON file"
@@ -104,6 +107,7 @@ class AETHER_OT_Delete_Custom_Template(bpy.types.Operator):
 
 class AETHER_OT_Toggle_Template_Visibility(bpy.types.Operator):
     """Toggle whether a template appears in dropdown lists."""
+
     bl_idname = "aether.toggle_template_visibility"
     bl_label = "Toggle Template Visibility"
     bl_description = "Hide or show this template in template dropdowns"
@@ -120,7 +124,7 @@ class AETHER_OT_Toggle_Template_Visibility(bpy.types.Operator):
 
         prefs = get_preferences()
         default_name = (getattr(prefs, 'default_template', '') or '').strip()
-        
+
         if self.template_name == default_name:
             self.report({'WARNING'}, "Cannot hide the default template")
             return {'CANCELLED'}
@@ -154,6 +158,7 @@ class AETHER_OT_Toggle_Template_Visibility(bpy.types.Operator):
 
 class AETHER_OT_Toggle_Feature_Set(bpy.types.Operator):
     """Toggle one feature set used for dependency checks and UI state."""
+
     bl_idname = "aether.toggle_feature_set"
     bl_label = "Toggle Feature Set"
     bl_description = "Enable or disable one feature set"
@@ -203,6 +208,7 @@ class AETHER_OT_Toggle_Feature_Set(bpy.types.Operator):
 
 class AetherBlendPreferences(bpy.types.AddonPreferences):
     """Addon preferences for AetherBlend."""
+
     bl_idname = __package__
 
     tabs: EnumProperty(
@@ -335,7 +341,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             and not addon_dependencies.is_common_feature_set(value)
         }
 
-    def draw(self, context):        
+    def draw(self, context):
         layout = self.layout
 
         def draw_switch(parent, prop_name, label):
@@ -440,7 +446,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         if self.tabs == 'GENERAL':
             box = layout.box()
             box.label(text="General Settings", icon='SETTINGS')
-            
+
             box.separator()
             draw_switch(box, "auto_navigate_tabs", "Auto Navigate Tabs")
             box.separator()

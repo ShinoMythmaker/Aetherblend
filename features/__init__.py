@@ -1,10 +1,4 @@
-from . import model_import
-from . import rigging
-from . import cplus
-from . import animation
-from . import vfx
-from . import shaders
-from . import spring_bones
+from . import animation, cplus, model_import, rigging, shaders, spring_bones, vfx
 
 modules = (model_import, rigging, cplus, animation, vfx, shaders, spring_bones)
 

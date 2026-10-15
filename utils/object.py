@@ -1,6 +1,7 @@
-import bpy
-from collections import defaultdict
 import os
+from collections import defaultdict
+
+import bpy
 
 from . import addon_dependencies
 
@@ -81,7 +82,7 @@ def find_by_armature_and_material_property(
 def merge_by_material(objects):
     """Merges objects that share the same material and returns the updated list of all objects, including non-mesh objects that were not modified."""
     material_mesh_groups = defaultdict(list)
-    all_objects = set(objects)  
+    all_objects = set(objects)
 
     for obj in objects:
         try:
@@ -91,7 +92,7 @@ def merge_by_material(objects):
         except ReferenceError:
             print(f"[AetherBlend] Skipping deleted object: {obj}")
 
-    new_objects = set()  
+    new_objects = set()
 
     for material, meshes in material_mesh_groups.items():
         if len(meshes) < 2:
@@ -113,35 +114,35 @@ def merge_by_material(objects):
                 non_mesh_objects.add(obj)
         except ReferenceError:
             print(f"[AetherBlend] Skipping deleted object: {obj}")
-    
-    updated_objects = new_objects | non_mesh_objects  
+
+    updated_objects = new_objects | non_mesh_objects
 
     return list(updated_objects)
 
 def merge_by_name(objects, name_filter):
     """Merges all objects in the given list that contain the specified name_filter in their name. Returns an updated object list."""
     filtered_objects = [obj for obj in objects if name_filter.lower() in obj.name.lower() and obj.type == "MESH"]
-    
+
     updated_objects = set(objects)
 
     if len(filtered_objects) < 2:
-        return list(updated_objects)  
+        return list(updated_objects)
 
-    bpy.ops.object.select_all(action='DESELECT')  
+    bpy.ops.object.select_all(action='DESELECT')
     for obj in filtered_objects:
         obj.select_set(True)
 
-    bpy.context.view_layer.objects.active = filtered_objects[0]  
-    bpy.ops.object.join() 
+    bpy.context.view_layer.objects.active = filtered_objects[0]
+    bpy.ops.object.join()
 
     merged_object = bpy.context.view_layer.objects.active
 
-    updated_objects.difference_update(filtered_objects)  
-    updated_objects.add(merged_object) 
+    updated_objects.difference_update(filtered_objects)
+    updated_objects.add(merged_object)
 
-    bpy.ops.object.select_all(action='DESELECT') 
+    bpy.ops.object.select_all(action='DESELECT')
 
-    return list(updated_objects)  
+    return list(updated_objects)
 
 def import_meddle_shader(filepath, imported_objects):
     """Imports Meddle shaders for the given objects."""
@@ -151,11 +152,11 @@ def import_meddle_shader(filepath, imported_objects):
 
     for obj in imported_objects:
         try:
-            if obj and obj.type == "MESH": 
+            if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")  
-        
+            print(f"Skipping deleted object: {obj}")
+
     character_directory = os.path.dirname(filepath)
     meddle_cache_directory = os.path.join(character_directory, "cache","")
 
@@ -175,11 +176,11 @@ def import_ffgear_shader(filepath, imported_objects):
 
     for obj in imported_objects:
         try:
-            if obj and obj.type == "MESH": 
+            if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")  
-        
+            print(f"Skipping deleted object: {obj}")
+
     character_directory = os.path.dirname(filepath)
     ffgear_cache_directory = os.path.join(character_directory, "cache","")
 
@@ -196,8 +197,7 @@ def import_ffgear_shader(filepath, imported_objects):
         return False
 
 def remove_shapekey(obj: bpy.types.Object, shapekey_name: str, enable_backup: bool = False, backup_shapekey_name: str = None) -> None:
-    """
-    Removes the specified shapekey from the object if it exists, or handles backup unmuting.
+    """Removes the specified shapekey from the object if it exists, or handles backup unmuting.
     """
     if obj.type != 'MESH' or not obj.data.shape_keys:
         return
@@ -213,7 +213,7 @@ def remove_shapekey(obj: bpy.types.Object, shapekey_name: str, enable_backup: bo
         else:
             for key_block in obj.data.shape_keys.key_blocks:
                 key_block.mute = False
-                
+
         if obj.data.shape_keys:
             sk = obj.data.shape_keys.key_blocks.get(shapekey_name)
             if sk:

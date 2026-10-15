@@ -2,10 +2,8 @@
 """
 
 import bpy
-from bpy.props import EnumProperty
 from bpy_extras.io_utils import axis_conversion as _bpy_axis_conversion
 from mathutils import Matrix
-
 
 # ---------------------------------------------------------------------------
 # Shared axis-choice enum items

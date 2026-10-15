@@ -1,17 +1,16 @@
 import json
-import zlib
-import bpy
-import mathutils
 import math
-import lz4.block
-
+import zlib
 from collections import defaultdict
-from mathutils import Matrix
 from io import BufferedIOBase, BytesIO
 
+import bpy
+import lz4.block
+import mathutils
+
+
 def translate_hash(the_hasherrrr: bytes) -> tuple[int, dict]:
-    """
-    Decompresses a C+ string, returning the version and data dict.
+    """Decompresses a C+ string, returning the version and data dict.
     """
     inflated = zlib.decompress(the_hasherrrr, zlib.MAX_WBITS | 16)
     version = inflated[0]
@@ -20,8 +19,7 @@ def translate_hash(the_hasherrrr: bytes) -> tuple[int, dict]:
     return version, data
 
 def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
-    """
-    Extracts bone values for a given key from the C+ data dict.
+    """Extracts bone values for a given key from the C+ data dict.
     """
     bones = cplus_dict.get('Bones', {})
     new_bones = defaultdict(dict)
@@ -33,7 +31,7 @@ def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
         if value_key in ['Translation', 'Rotation']:
             if 'X' not in values:
                 values['X'] = 0.0
-            
+
             if 'Y' not in values:
                 values['Y'] = 0.0
 
@@ -46,23 +44,23 @@ def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
     return new_bones
 
 def apply_transforms(
-    armature: bpy.types.Object, 
-    scale_dict: dict, 
-    rot_dict: dict, 
-    pos_dict: dict, 
+    armature: bpy.types.Object,
+    scale_dict: dict,
+    rot_dict: dict,
+    pos_dict: dict,
     bones: dict[str, bpy.types.PoseBone] = None,
 ) -> None:
     """Applies C+ pose transforms (scale, rotation, translation) to *bones*.
     """
     original_mode = armature.mode
-    
+
     if bones is None:
         bones = armature.pose.bones
-    
+
     # Apply C+ transforms (bones must be in Y/X orientation at this point)
     bpy.ops.object.mode_set(mode='POSE')
     bpy.context.view_layer.objects.active = armature
-    
+
     for posebone in bones.values():
         scale_vector = scale_dict.get(posebone.name)
         if scale_vector:
@@ -81,12 +79,11 @@ def apply_transforms(
         translation = pos_dict.get(posebone.name)
         if translation:
             posebone.location += mathutils.Vector((translation['X'], translation['Y'], translation['Z']))
-    
+
     bpy.ops.object.mode_set(mode=original_mode)
 
 def read_size(reader: BufferedIOBase, size: int) -> int | None:
-    """
-    Reads the specified size of bytes, and returns the value as an integer.
+    """Reads the specified size of bytes, and returns the value as an integer.
     Returns None if no more data can be read.
     """
     byte = reader.read(size)
@@ -97,22 +94,19 @@ def read_size(reader: BufferedIOBase, size: int) -> int | None:
     return int.from_bytes(byte, byteorder='little')
 
 def read_byte(reader: BufferedIOBase) -> int | None:
-    """
-    Reads a byte and returns the value as an integer.
+    """Reads a byte and returns the value as an integer.
     Returns None if no more data can be read.
     """
     return read_size(reader, 1)
 
 def read_int(reader: BufferedIOBase) -> int | None:
-    """
-    Reads an integer and returns the value.
+    """Reads an integer and returns the value.
     Returns None if no more data can be read.
     """
     return read_size(reader, 4)
 
 def read_leb128(reader: BufferedIOBase) -> int:
-    """
-    Reads an LEB128 compressed number and returns the value as an integer.
+    """Reads an LEB128 compressed number and returns the value as an integer.
     """
     result = 0
     shift = 0
@@ -132,8 +126,7 @@ def read_leb128(reader: BufferedIOBase) -> int:
     return result
 
 def get_chunk(file: BufferedIOBase) -> bytes | None:
-    """
-    Reads and processes a chunk, starting from where the file reader position is currently.
+    """Reads and processes a chunk, starting from where the file reader position is currently.
     Returns None if no more data can be read.
     """
     magic = read_byte(file)
@@ -156,8 +149,7 @@ def get_chunk(file: BufferedIOBase) -> bytes | None:
         raise Exception(f'Unknown Chunk Magic Value: {magic}')
 
 def get_mcdf_cplus(path: str) -> str | None:
-    """
-    Reads an MCDF file to retrieve it's C+ string.
+    """Reads an MCDF file to retrieve it's C+ string.
     Returns None if there was an error while reading the file.
     """
     try:

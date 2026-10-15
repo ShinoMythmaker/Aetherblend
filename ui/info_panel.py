@@ -1,4 +1,5 @@
 import bpy
+
 from ..preferences import get_preferences
 from ..properties.tab_prop import get_active_tab_prop_name
 
@@ -6,12 +7,13 @@ GITHUB_URL = "https://github.com/ShinoMythmaker/Aetherblend"
 
 class AETHER_PT_InfoPanel(bpy.types.Panel):
     """Addon Info Panel"""
+
     bl_label = " "
     bl_idname = "AETHER_PT_info_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "AetherBlend"
-    bl_order = 0 
+    bl_order = 0
 
     @classmethod
     def poll(cls, context):
@@ -26,32 +28,32 @@ class AETHER_PT_InfoPanel(bpy.types.Panel):
         return True
 
     def draw_header(self, context):
-        self.layout.label(text=f"AetherBlend")
+        self.layout.label(text="AetherBlend")
 
     def draw(self, context):
         layout = self.layout
-        
+
         layout.operator("wm.url_open", text="Support & Links", icon="HEART").url = "https://www.patreon.com/ShinoMythmaker"
-        
+
         row = layout.row()
         row.operator("wm.url_open", text="Wiki", icon="HELP").url = f"{GITHUB_URL}/wiki"
         row.operator("wm.url_open", text="Issues", icon="BOOKMARKS").url = f"{GITHUB_URL}/issues"
-        
+
         # Tab selector
         layout.separator()
         tabs = context.scene.aether_tabs
         active_tab_prop = get_active_tab_prop_name(context)
-        
+
         # Check if armature is selected
         armature = context.active_object
         has_armature = armature is not None and armature.type == 'ARMATURE'
-        
+
         # Check if armature has rig_id (for Rig Layers tab)
         has_rig_id = False
         if has_armature:
             rig_id = armature.data.get("rig_id")
             has_rig_id = rig_id is not None
-        
+
         split = layout.split(factor=0.2, align=True)
         split.prop_enum(tabs, active_tab_prop, 'IMPORT_EXPORT', icon='FILE', text="")
         split = split.split(factor=0.25, align=True)
@@ -76,4 +78,3 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_InfoPanel)
-        

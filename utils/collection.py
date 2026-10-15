@@ -15,14 +15,14 @@ def create_collection(name="Collection"):
     """Creates a Collection"""
     new_collection = bpy.data.collections.new(name)
     bpy.context.scene.collection.children.link(new_collection)
-    return new_collection 
+    return new_collection
 
 def get_collection(obj):
     """Returns the first collection that contains this object."""
     for collection in bpy.data.collections:
         if any(obj is coll_obj for coll_obj in collection.objects):
-            return collection  
-    return None  
+            return collection
+    return None
 
 
 def collection_tree(root_collection: bpy.types.Collection) -> list[bpy.types.Collection]:

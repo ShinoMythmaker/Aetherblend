@@ -1,17 +1,16 @@
-import bpy
 import math
-import mathutils
-
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import ClassVar, Literal
 
-from .drivers import Driver
-from .custom_properties import CustomProperty
+import bpy
+import mathutils
 
-from .constraints import Constraint, CopyTransformsConstraint
-from . import rigify
 from .. import utils
+from . import rigify
+from .constraints import Constraint, CopyTransformsConstraint
+from .custom_properties import CustomProperty
+from .drivers import Driver
 
 Mode = Literal["POSE", "EDIT"]
 Time = Literal["Pre", "Post"]
@@ -21,6 +20,7 @@ _WGTS = "WGTS"
 @dataclass
 class PoseOperations:
     """Groups all pose mode operations for a single bone."""
+
     rigify_settings: 'rigify.types.rigify_type | None' = None
     constraints: 'list[Constraint] | None' = None
     b_collection: str | None = None
@@ -30,11 +30,11 @@ class PoseOperations:
         try:
             if self.rigify_settings:
                 self.rigify_settings.apply(pose_bone, armature)
-            
+
             if self.constraints:
                 for constraint in self.constraints:
                     constraint.apply(pose_bone, armature)
-            
+
             if self.b_collection:
                 utils.armature.b_collection.assign_bones(armature, [pose_bone.name], self.b_collection)
         except Exception as e:
@@ -44,7 +44,7 @@ class PoseOperationsStack:
     """Holds function for merging multiple PoseOperations into one dictionary"""
 
     stack: dict[str, list[PoseOperations]]
-    
+
     def __init__(self, stack: dict[str, list[PoseOperations]] | None = None):
         self.stack = stack if stack is not None else {}
 
@@ -180,13 +180,13 @@ class ABOperationStack:
                 if operation.rigify_settings:
                     rigify_op = RigifyTypeOperation(bone_name, operation.rigify_settings)
                     self.add_operation(rigify_op)
-                
+
                 if operation.constraints:
                     constraintList = operation.constraints
                     for constraint in constraintList:
                         constraint_op = ConstraintOperation(bone_name, constraint)
                         self.add_operation(constraint_op)
-                
+
                 if operation.b_collection:
                     collection_op = CollectionOperation(bone_name, operation.b_collection)
                     self.add_operation(collection_op)
@@ -239,6 +239,7 @@ class RigifyTypeOperation(ABOperation):
 @dataclass
 class TransformLink:
     """Links a bone to a target for rigging purposes."""
+
     target: str
     bone: str
     retarget: str | None = None
@@ -272,7 +273,7 @@ class TransformLink:
             )
         )
         return pose_operations_dict
-    
+
     def to_ABOperation(self) -> list[ABOperation]:
         """Convert this TransformLink to an ABOperation."""
         ops = []
@@ -311,7 +312,7 @@ class ParentBoneOperation(ABOperation):
     bone_name: str
     parent: tuple[str, ...]
     is_connected: bool = False
-    
+
     mode: ClassVar[Mode] = "EDIT"
 
     def apply(self, armature: bpy.types.Object, data_dict: dict | None = None):
@@ -321,12 +322,12 @@ class ParentBoneOperation(ABOperation):
         editBone = self._getEditBone(self.bone_name, armature)
         if not editBone:
             return
-        parent_bone = None 
+        parent_bone = None
         for parent_name in self.parent:
                 parent_bone = self._getEditBone(parent_name, armature)
                 if parent_bone:
                     break
-                
+
         if not parent_bone:
             parent_names_str = ", ".join(self.parent)
             print(f"[AetherBlend] ParentBoneOperation: None of the specified parent bones '{parent_names_str}' were found for bone '{self.bone_name}' in armature '{armature.name}'.")
@@ -353,7 +354,7 @@ class DriverOperation(ABOperation):
         if not self._switch_mode():
             return
         target = armature
-        if self.data is None and self.bone_name is not None:          
+        if self.data is None and self.bone_name is not None:
             poseBone = self._getPoseBone(self.bone_name, armature)
             target = poseBone
             if self.constraint_name is not None:
@@ -381,7 +382,7 @@ class CustomPropertyOperation(ABOperation):
         """Creates a custom property for a given bone or armature"""
         if not self._switch_mode():
             return
-        
+
         try:
             target = armature.data
             if self.bone_name:
@@ -398,6 +399,7 @@ class CustomPropertyOperation(ABOperation):
 @dataclass()
 class WidgetOperation(ABOperation):
     """Overrides the widget of a bone."""
+
     mode: ClassVar[Mode] = "POSE"
     time : Time = field(default="Post", kw_only=True)
 
@@ -425,12 +427,12 @@ class WidgetOperation(ABOperation):
         if not pose_bone:
             print(f"[AetherBlend] WidgetOperation bone '{self.bone_name}' not found in armature.")
             return
-        
-        
-        
+
+
+
         scale = (self.scale[0] * self.scale_factor, self.scale[1] * self.scale_factor, self.scale[2] * self.scale_factor)
 
-        degree = [math.radians(self.rotation[0]), math.radians(self.rotation[1]), math.radians(self.rotation[2])] 
+        degree = [math.radians(self.rotation[0]), math.radians(self.rotation[1]), math.radians(self.rotation[2])]
 
         try:
             if self.color_set:
@@ -504,7 +506,7 @@ class WidgetOperation(ABOperation):
         for separator in (".", "_", "-", " "):
             normalized_name = normalized_name.replace(separator, "")
         return normalized_name
-    
+
 
 @dataclass()
 class BoneRestrictionOperation(ABOperation):
@@ -535,17 +537,17 @@ class BoneRestrictionOperation(ABOperation):
             dataBone.hide = self.hide
         if isinstance(self.lock_location, bool):
             lock_location = (self.lock_location, self.lock_location, self.lock_location)
-        else:            
+        else:
             lock_location = self.lock_location
 
         if isinstance(self.lock_rotation, bool):
             lock_rotation = (self.lock_rotation, self.lock_rotation, self.lock_rotation)
-        else:            
+        else:
             lock_rotation = self.lock_rotation
 
         if isinstance(self.lock_scale, bool):
             lock_scale = (self.lock_scale, self.lock_scale, self.lock_scale)
-        else:            
+        else:
             lock_scale = self.lock_scale
 
         try:
@@ -568,6 +570,7 @@ class BoneRestrictionOperation(ABOperation):
 @dataclass()
 class PoseBoneOperation(ABOperation):
     """Poses a bone by setting its location, rotation, and scale."""
+
     mode: ClassVar[Mode] = "POSE"
     time : Time = field(default="Post", kw_only=True)
 
@@ -594,6 +597,7 @@ class PoseBoneOperation(ABOperation):
 @dataclass
 class PropOverrideOperation(ABOperation):
     """Overrides a custom property of a bone."""
+
     mode: ClassVar[Mode] = "POSE"
     time : Time = field(default="Post", kw_only=True)
 
@@ -613,11 +617,11 @@ class PropOverrideOperation(ABOperation):
         if not poseBone:
             print(f"[AetherBlend] PropOverride bone '{self.bone_name}' not found in armature.")
             return
-        
+
         try:
             poseBone[self.property_name] = self.value
         except Exception as e:
             print(f"[AetherBlend] Error applying PropOverride for bone '{poseBone.name}': {e}")
 
-    
+
 

@@ -1,11 +1,20 @@
 import bpy
-import mathutils
+
+from ...data.constants import (
+    sb_breast_collection,
+    sb_breast_parent_bone,
+    spring_bone_collection,
+    spring_prefix,
+    xiv_breast_bone_l,
+    xiv_breast_bone_r,
+)
 from ...utils import armature as rig_utils
-from ...data.constants import xiv_breast_bone_r, xiv_breast_bone_l, sb_breast_collection, sb_breast_parent_bone, spring_prefix, spring_bone_collection
 from .spring_bones_ot import end_spring_bone
+
 
 class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
     """Generate spring breast bones for the active armature object."""
+
     bl_idname = "aether.generate_spring_breasts"
     bl_label = "Generate Spring Breasts"
     bl_options = {'REGISTER', 'UNDO'}
@@ -74,23 +83,24 @@ class AETHER_OT_Generate_Spring_Breasts(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, "[AetherBlend] Spring breasts generated and constraints set.")
         return {'FINISHED'}
-    
+
 
 class AETHER_OT_Bake_Spring_Breasts(bpy.types.Operator):
     """Bake spring breast bones for the active armature object."""
+
     bl_idname = "aether.bake_spring_breasts"
     bl_label = "Bake Spring Breasts"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        bpy.context.window.cursor_set('WAIT')  
+        bpy.context.window.cursor_set('WAIT')
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
-        
-        context.scene.ab_sb_global_spring_frame = False 
-        context.scene.ab_sb_global_spring = False 
+
+        context.scene.ab_sb_global_spring_frame = False
+        context.scene.ab_sb_global_spring = False
 
         start_frame = context.scene.frame_start
         end_frame = context.scene.frame_end
@@ -129,10 +139,11 @@ class AETHER_OT_Bake_Spring_Breasts(bpy.types.Operator):
 
         self.report({'INFO'}, f"[AetherBlend] Spring breasts baked from frame {start_frame} to {end_frame}.")
         return {'FINISHED'}
-    
+
 
 class AETHER_OT_Delete_Spring_Breasts(bpy.types.Operator):
     """Delete spring breast bones for the active armature object."""
+
     bl_idname = "aether.delete_spring_breasts"
     bl_label = "Delete Spring Breasts"
     bl_options = {'REGISTER', 'UNDO'}
@@ -143,10 +154,10 @@ class AETHER_OT_Delete_Spring_Breasts(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
         spring_breast_path = f"{spring_bone_collection}/{sb_breast_collection}"
-        
+
         # Disable Spring Bones
-        context.scene.ab_sb_global_spring_frame = False 
-        context.scene.ab_sb_global_spring = False 
+        context.scene.ab_sb_global_spring_frame = False
+        context.scene.ab_sb_global_spring = False
         end_spring_bone(context, self)
 
         bpy.ops.object.mode_set(mode='POSE')

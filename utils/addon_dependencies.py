@@ -1,8 +1,8 @@
 """Helpers for checking Blender add-on dependencies."""
 
-import addon_utils
 from typing import Literal, get_args
 
+import addon_utils
 
 FEATURE_SETS: dict[str, str] = {
     "COMMON": "Common",

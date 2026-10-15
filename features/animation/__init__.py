@@ -1,8 +1,4 @@
-from . import export_anim
-from . import export_pose
-from . import panels
-from . import properties
-from . import animation_import
+from . import animation_import, export_anim, export_pose, panels, properties
 
 modules = (properties, export_anim, export_pose, panels, animation_import)
 

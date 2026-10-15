@@ -32,7 +32,7 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         description="Reference to the Meta-Rig for this armature",
         poll=lambda self, obj: obj.type == 'ARMATURE'
     ) # type: ignore
-    
+
     rigified : bpy.props.BoolProperty(
         name="Rigified",
         description="Whether the armature went through generation process or not",
@@ -45,7 +45,7 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         default=False,
         options={'HIDDEN'}
     ) # type: ignore
-    
+
     selected_template : bpy.props.EnumProperty(
         name="Template",
         description="Select a rig template or switch to the editable custom module list",
@@ -90,7 +90,7 @@ class AETHER_PROP_Rig(bpy.types.PropertyGroup):
         default=0,
         options={'HIDDEN'}
     ) # type: ignore
-    
+
     link_inherit_scale : bpy.props.EnumProperty(
         name="LINK Inherit Scale",
         description="Inherit scale setting for LINK collection bones",

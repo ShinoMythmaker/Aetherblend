@@ -1,24 +1,36 @@
 import bpy
+
+from ...data.constants import (
+    sb_ear_parent_bone,
+    sb_ear_target_bone_l,
+    sb_ear_target_bone_r,
+    sb_ears_collection,
+    spring_bone_collection,
+    spring_prefix,
+    xiv_ear_bone_l,
+    xiv_ear_bone_r,
+)
 from ...utils import armature as rig_utils
-from ...data.constants import xiv_ear_bone_l, xiv_ear_bone_r, sb_ear_target_bone_l, sb_ear_target_bone_r, sb_ear_parent_bone, sb_ears_collection, spring_prefix, spring_bone_collection
 from .spring_bones_ot import end_spring_bone
+
 
 class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
     """Generate spring ear bones for the active armature object."""
+
     bl_idname = "aether.generate_spring_ears"
     bl_label = "Generate Spring Ears"
     bl_options = {'REGISTER', 'UNDO'}
 
-    
+
     def execute(self, context):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
         spring_ears_path = f"{spring_bone_collection}/{sb_ears_collection}"
-        
-        context.scene.ab_sb_global_spring_frame = False 
-        context.scene.ab_sb_global_spring = False 
+
+        context.scene.ab_sb_global_spring_frame = False
+        context.scene.ab_sb_global_spring = False
 
         referenece_bones_l = xiv_ear_bone_l + sb_ear_target_bone_l
         referenece_bones_r = xiv_ear_bone_r + sb_ear_target_bone_r
@@ -46,7 +58,7 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
         spring_bones_r = rig_utils.generate.bone_chain(armature, referenece_bones_r, prefix=spring_prefix, parent_bone=sb_ear_parent_bone)
 
         bpy.ops.object.mode_set(mode='POSE')
-        
+
         # Check if spring bones is an empty array
         if not spring_bones_l or not spring_bones_r:
             self.report({'ERROR'}, "[AetherBlend] No spring bones generated. Missing reference bones.")
@@ -59,16 +71,16 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
         rig_utils.bone.add_constraint_copy_rotation(xiv_ear_bone_l, armature, spring_bones_l, overwrite=True)
         rig_utils.bone.add_constraint_copy_rotation(xiv_ear_bone_r, armature, spring_bones_r, overwrite=True)
 
-        # Merge both spring bone lists 
+        # Merge both spring bone lists
         spring_bones = spring_bones_l +spring_bones_r
 
         # Apply Spring Bones properties to each spring bone
         for index, spring_bone_name in enumerate(spring_bones):
             pb = armature.pose.bones[spring_bone_name]
-            pb.ab_sb_bone_spring = True           
-            pb.ab_sb_bone_rot = True              
-            pb.ab_sb_collide = True               
-            pb.ab_sb_lock_axis = 'NONE'           
+            pb.ab_sb_bone_spring = True
+            pb.ab_sb_bone_rot = True
+            pb.ab_sb_collide = True
+            pb.ab_sb_lock_axis = 'NONE'
             pb.ab_sb_stiffness = 0.15
             pb.ab_sb_damp = 0.70
             pb.ab_sb_gravity = 0
@@ -77,20 +89,21 @@ class AETHER_OT_Generate_Spring_Ears(bpy.types.Operator):
         # Restore original bone visibility
         rig_utils.bone.restore_visibility(armature, original_visibility)
 
-        bpy.ops.object.mode_set(mode='POSE')   
+        bpy.ops.object.mode_set(mode='POSE')
 
         self.report({'INFO'}, "[AetherBlend] Spring ears generated and constraints set.")
         return {'FINISHED'}
-    
+
 
 class AETHER_OT_Bake_Spring_Ears(bpy.types.Operator):
     """Bake spring ear bones for the active armature object."""
+
     bl_idname = "aether.bake_spring_ears"
     bl_label = "Bake Spring Ears"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        bpy.context.window.cursor_set('WAIT')  
+        bpy.context.window.cursor_set('WAIT')
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
@@ -129,13 +142,14 @@ class AETHER_OT_Bake_Spring_Ears(bpy.types.Operator):
         rig_utils.bone.restore_visibility(armature, original_visibility)
 
         bpy.ops.object.mode_set(mode='POSE')
-        bpy.context.window.cursor_set('DEFAULT')  
+        bpy.context.window.cursor_set('DEFAULT')
         self.report({'INFO'}, f"[AetherBlend] Spring ears baked from frame {start_frame} to {end_frame}.")
         return {'FINISHED'}
-    
+
 
 class AETHER_OT_Delete_Spring_Ears(bpy.types.Operator):
     """Delete spring ear bones for the active armature object."""
+
     bl_idname = "aether.delete_spring_ears"
     bl_label = "Delete Spring Ears"
     bl_options = {'REGISTER', 'UNDO'}
@@ -146,10 +160,10 @@ class AETHER_OT_Delete_Spring_Ears(bpy.types.Operator):
             self.report({'ERROR'}, "[AetherBlend] Select an armature object")
             return {'CANCELLED'}
         spring_ears_path = f"{spring_bone_collection}/{sb_ears_collection}"
-        
+
         # Disable Spring Bones
-        context.scene.ab_sb_global_spring_frame = False 
-        context.scene.ab_sb_global_spring = False 
+        context.scene.ab_sb_global_spring_frame = False
+        context.scene.ab_sb_global_spring = False
         end_spring_bone(context, self)
 
         bpy.ops.object.mode_set(mode='POSE')
@@ -167,7 +181,7 @@ class AETHER_OT_Delete_Spring_Ears(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='POSE')
         self.report({'INFO'}, "[AetherBlend] Spring ears deleted.")
         return {'FINISHED'}
-    
+
 
 def register():
     bpy.utils.register_class(AETHER_OT_Generate_Spring_Ears)
@@ -178,4 +192,4 @@ def unregister():
     bpy.utils.unregister_class(AETHER_OT_Generate_Spring_Ears)
     bpy.utils.unregister_class(AETHER_OT_Bake_Spring_Ears)
     bpy.utils.unregister_class(AETHER_OT_Delete_Spring_Ears)
-    
+

@@ -1,8 +1,8 @@
+from ......core.rigify.settings import BoneCollection, UI_Collections
 from ......core.shared import RigModule
-from ......core.rigify.settings import UI_Collections, BoneCollection
-
 from .ffxiv_ivcs_female import get_rig_module as get_female_rig_module
 from .ffxiv_ivcs_male import get_rig_module as get_male_rig_module
+
 
 def get_rig_module() -> RigModule:
     female_module = get_female_rig_module()

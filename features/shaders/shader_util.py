@@ -1,8 +1,7 @@
 import os
-import bpy
 from pathlib import Path
 
-
+import bpy
 
 _ASSET_DIR = Path(__file__).resolve().parents[2] / "assets" / "blend"
 _NODE_GROUPS_BLEND = _ASSET_DIR / "node_groups.blend"
@@ -57,7 +56,7 @@ def connect_sockets(node_tree: bpy.types.NodeTree, group_node: bpy.types.Node, i
         for target_node_label, target_socket_name in connections:
             target_socket = get_input_socket_by_node_name(node_tree, target_node_label, target_socket_name)
             if not target_socket:
-                continue    
+                continue
             node_tree.links.new(output_socket, target_socket)
     ############
     # Connect Inputs
@@ -102,7 +101,7 @@ def apply_material_property_to_socket(input_socket, material_prop):
 
     for idx in range(min(target_len, len(source_values))):
         input_socket.default_value[idx] = source_values[idx]
-    
+
 def get_socket_by_node_label(node_tree, node_label, socket_name):
     for node in node_tree.nodes:
         if node.label == node_label:
@@ -211,11 +210,11 @@ def import_ffgear_shader(filepath, objects):
     """Imports FFGear shaders for the given objects."""
     for obj in objects:
         try:
-            if obj and obj.type == "MESH": 
+            if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")  
-        
+            print(f"Skipping deleted object: {obj}")
+
     character_directory = os.path.dirname(filepath)
     ffgear_cache_directory = os.path.join(character_directory, "cache","")
 
@@ -235,11 +234,11 @@ def import_meddle_shader(filepath, objects):
     """Imports Meddle shaders for the given objects."""
     for obj in objects:
         try:
-            if obj and obj.type == "MESH": 
+            if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")  
-        
+            print(f"Skipping deleted object: {obj}")
+
     character_directory = os.path.dirname(filepath)
     meddle_cache_directory = os.path.join(character_directory, "cache","")
 

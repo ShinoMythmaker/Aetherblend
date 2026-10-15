@@ -1,7 +1,4 @@
-from . import info_panel
-from . import aetherbridge_pt
-from . import spring_bone_pt
-from . import properties_bridge
+from . import aetherbridge_pt, info_panel, properties_bridge, spring_bone_pt
 
 modules = (info_panel, properties_bridge)
 

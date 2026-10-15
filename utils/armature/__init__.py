@@ -1,8 +1,10 @@
-from . import b_collection
+from types import SimpleNamespace
 
 import bpy
 from mathutils import Vector
-from types import SimpleNamespace
+
+from . import b_collection
+
 
 def _select_single(obj: bpy.types.Object):
     bpy.ops.object.select_all(action='DESELECT')
@@ -24,9 +26,9 @@ def find_armature_in_objects(objects):
     for obj in objects:
         try:
             if obj.type == 'ARMATURE':
-                return obj 
+                return obj
         except ReferenceError:
-            print(f"[AetherBlend] Skipping deleted object: {obj}")  
+            print(f"[AetherBlend] Skipping deleted object: {obj}")
     return None
 
 def reset_pose_bones(armature: bpy.types.Object) -> None:
@@ -71,13 +73,13 @@ def _apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Objec
     try:
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.select_all(action='DESELECT')
-                
+
         mesh_obj.hide_set(False)
         mesh_obj.select_set(True)
-        
+
         bpy.context.view_layer.objects.active = mesh_obj
 
-        
+
         armature_mods = [m for m in mesh_obj.modifiers if m.type == 'ARMATURE' and m.object == armature_obj]
         for mod in armature_mods:
 
@@ -89,7 +91,7 @@ def _apply_as_shapekey(mesh_obj: bpy.types.Object, armature_obj: bpy.types.Objec
 
             mesh_obj.data.shape_keys.key_blocks[-1].name = shapekey_name
             mesh_obj.data.shape_keys.key_blocks[-1].value = 1.0
-            mesh_obj.data.shape_keys.key_blocks[-1].mute = False    
+            mesh_obj.data.shape_keys.key_blocks[-1].mute = False
 
     except Exception as e:
         print(f"[AetherBlend] Failed to apply armature modifier as shapekey on '{mesh_obj.name}': {e}")

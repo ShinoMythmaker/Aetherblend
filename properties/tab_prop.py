@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import EnumProperty
 
-
 TAB_ITEMS = [
     ('IMPORT_EXPORT', "Import/Export", "Import and Export tools", 'IMPORT', 0),
     ('CPLUS', "C+", "Customize Plus tools", 'MODIFIER', 1),
@@ -33,7 +32,7 @@ def set_active_tab(context, value):
 
 class AetherTabProperties(bpy.types.PropertyGroup):
     """Properties for AetherBlend tab management"""
-    
+
     active_tab: EnumProperty(
         name="Active Tab",
         description="Currently active tab in AetherBlend panel",

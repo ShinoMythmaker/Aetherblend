@@ -1,11 +1,13 @@
-import bpy
 import time
 
+import bpy
+
 from ... import utils
-from ...utils import addon_dependencies
-from . import template_manager
 from ...preferences import get_preferences
 from ...properties.tab_prop import set_active_tab
+from ...utils import addon_dependencies
+from . import template_manager
+
 
 class _ArmatureSelectionHelpers:
     def _require_addon(self, *, module_name: str | None = None, display_name: str | None = None) -> bool:
@@ -77,10 +79,10 @@ class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
             if not rig_generator.generate_rigify_rig(state):
                 self.report({'ERROR'}, "Rigify generation failed")
                 return {'CANCELLED'}
-            
+
             if get_preferences().auto_navigate_tabs == 'ON':
                 set_active_tab(context, 'RIG_LAYERS')
-            
+
             utils.object.select_only(armature)
             bpy.ops.object.mode_set(mode='POSE')
 
@@ -126,7 +128,7 @@ class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
             return {'FINISHED'}
         finally:
             bpy.context.window.cursor_set('DEFAULT')
-    
+
 class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
     bl_idname = "aether.clean_up_rig"
     bl_label = "Remove Rigify Rig"
@@ -135,37 +137,37 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
 
     def execute(self, context):
         time_start = time.time()
-        bpy.context.window.cursor_set('WAIT') 
+        bpy.context.window.cursor_set('WAIT')
 
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return {'CANCELLED'}
-        
+
         rig_collections = armature.data.collections
         if not rig_collections.get("Original"):
             return {'FINISHED'} # If it doesnt have an Original collection, we can assume its already clean and just exit
 
         ## Delete Meta Rig and Scripts
         existing_meta_rig = armature.aether_rig.meta_rig
-        
+
         if existing_meta_rig:
             if hasattr(existing_meta_rig.data, 'rigify_rig_ui') and existing_meta_rig.data.rigify_rig_ui:
                 script = existing_meta_rig.data.rigify_rig_ui
                 if script and script.name in bpy.data.texts:
                     bpy.data.texts.remove(script)
             bpy.data.objects.remove(existing_meta_rig, do_unlink=True)
-        
+
         ## Cleanup Rigify ID
         if "rig_id" in armature.data:
             del armature.data["rig_id"]
 
-        ## Delete Drivers 
+        ## Delete Drivers
         try:
             for fc in armature.data.animation_data.drivers:
                 armature.data.driver_remove(fc.data_path, fc.array_index)
         except:
             pass
-        
+
         # Cleanup Bones
         bpy.ops.object.mode_set(mode='EDIT')
         edit_bones = armature.data.edit_bones
@@ -200,7 +202,7 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
 
         print(f"[AetherBlend] Clean Up rig: {time.time() - time_start:.3f}s")
         return {'FINISHED'}
-    
+
 class AETHER_OT_Reset_Rig(bpy.types.Operator):
     bl_idname = "aether.reset_rig"
     bl_label = "Reset Original Rig"
@@ -211,16 +213,16 @@ class AETHER_OT_Reset_Rig(bpy.types.Operator):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
             return {'CANCELLED'}
-        
+
         result = bpy.ops.aether.clean_up_rig()
         if result != {'FINISHED'}:
             self.report({'ERROR'}, "Clean Up process Failed")
             return {'CANCELLED'}
-        
+
         # Remove all animation data
         if armature.animation_data:
             armature.animation_data_clear()
-        
+
         bpy.ops.object.mode_set(mode='OBJECT')
         return {'FINISHED'}
 

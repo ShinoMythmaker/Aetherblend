@@ -1,9 +1,8 @@
-from ......core.bone_generators import ConnectBone, ExtensionBone, CopyBone
-from ......core.operations import ParentBoneOperation, RigifyTypeOperation, CollectionOperation
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
-from ......core.rigify.settings import UI_Collections, BoneCollection
-
+from ......core.bone_generators import ConnectBone, CopyBone, ExtensionBone
+from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 HAND_R = BoneGroup(
     name="Right Hand",
@@ -420,7 +419,7 @@ def get_rig_module() -> RigModule:
         name="XIV-Default",
         type="Generation",
         bone_groups=[HAND_L, HAND_R],
-        ui_collections=UI_Collections([ 
+        ui_collections=UI_Collections([
             BoneCollection(name="Fingers.L", ui=True, color_set="Fingers_Left", row_index=1, title="Fingers.L", visible=False),
             BoneCollection(name="Fingers.R", ui=True, color_set="Fingers_Right", row_index=1, title="Fingers.R", visible=False),
         ])

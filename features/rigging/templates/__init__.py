@@ -2,13 +2,10 @@ import importlib
 import pkgutil
 from collections import defaultdict
 
-from ....core.shared import RigModule
 from ....core.rigify import *
-
-
-from .colorsets import *
+from ....core.shared import RigModule
 from . import modules as module_root
-
+from .colorsets import *
 from .modules import *
 
 

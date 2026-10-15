@@ -1,12 +1,11 @@
-import bpy 
-from typing import ClassVar, Mapping
+from typing import ClassVar
 
-from . import shader_util
+import bpy
+
+from ...preferences import get_preferences
 from ...utils import addon_dependencies
 from ...utils.armature import find_meshes
-from ...preferences import get_preferences
-
-
+from . import shader_util
 
 # root socket: (target node name, target socket name)
 _IRIS_SHADER_INPUT_CONNECTIONS = {}
@@ -70,7 +69,7 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
             if not armature or armature.type != 'ARMATURE':
                 self.report({'ERROR'}, "Please select an armature object.")
                 return {'CANCELLED'}
-            
+
             #####
             # Get Material
             #####
@@ -78,12 +77,12 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
             if not meshes:
                 self.report({'ERROR'}, "No meshes found using the selected armature.")
                 return {'CANCELLED'}
-            
+
             eyes = shader_util.find_material_by_property(meshes, "ShaderPackage", "iris.shpk")
             if not eyes:
                 self.report({'ERROR'}, "No materials with ShaderPackage='iris.shpk' found on meshes driven by the armature.")
                 return {'CANCELLED'}
-            
+
             eye_material = eyes[0][1]
 
             #####
@@ -105,7 +104,7 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
             #####
             shader_util.pop_default_mappings(eye_material, group_node)
 
-            #### 
+            ####
             # Apply custom Mapping
             ####
             shader_util.pop_custom_mappings(eye_material, group_node, _IRIS_SHADER_CUSTOM_MAPPINGS)
@@ -121,7 +120,7 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
             )
 
             #####
-            # Style 
+            # Style
             #####
             group_node.location = (-1100, -600)
             group_node.width = 300
@@ -131,12 +130,12 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
                 [obj for obj, _material in eyes],
                 eye_material,
             )
-        
+
             self.report({'INFO'}, f"Node group '{self.group_name}' appended successfully.")
         except ValueError as e:
             self.report({'ERROR'}, str(e))
         return {'FINISHED'}
-    
+
 class AETHER_OT_S_Limbal(bpy.types.Operator):
     """Apply AetherBlend Limbal Rings node-group setup to iris materials."""
 
@@ -151,7 +150,7 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             if not armature or armature.type != 'ARMATURE':
                 self.report({'ERROR'}, "Please select an armature object.")
                 return {'CANCELLED'}
-            
+
             #####
             # Get Material
             #####
@@ -159,12 +158,12 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             if not meshes:
                 self.report({'ERROR'}, "No meshes found using the selected armature.")
                 return {'CANCELLED'}
-            
+
             eyes = shader_util.find_material_by_property(meshes, "ShaderPackage", "iris.shpk")
             if not eyes:
                 self.report({'ERROR'}, "No materials with ShaderPackage='iris.shpk' found on meshes driven by the armature.")
                 return {'CANCELLED'}
-            
+
             eye_material = eyes[0][1]
 
             #####
@@ -179,7 +178,7 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             #####
             shader_util.pop_default_mappings(eye_material, group_node)
 
-            #### 
+            ####
             # Apply custom Mapping
             ####
             shader_util.pop_custom_mappings(eye_material, group_node, _LIMBAL_SHADER_CUSTOM_MAPPING)
@@ -195,7 +194,7 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
             )
 
             #####
-            # Style 
+            # Style
             #####
             group_node.location = (-0, -1450)
             group_node.width = 220
@@ -205,12 +204,12 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
                 [obj for obj, _material in eyes],
                 eye_material,
             )
-        
+
             self.report({'INFO'}, f"Node group '{self.group_name}' appended successfully.")
         except ValueError as e:
             self.report({'ERROR'}, str(e))
         return {'FINISHED'}
-    
+
 class AETHER_OT_S_FFGear(bpy.types.Operator):
     """Run FFGear shader import for meshes bound to the selected armature."""
 
@@ -238,7 +237,7 @@ class AETHER_OT_S_FFGear(bpy.types.Operator):
             if not armature or armature.type != 'ARMATURE':
                 self.report({'ERROR'}, "Please select an armature object.")
                 return {'CANCELLED'}
-            
+
             # Get affected Meshes
             meshes = find_meshes(armature)
 
@@ -251,10 +250,10 @@ class AETHER_OT_S_FFGear(bpy.types.Operator):
             # Making sure only rig is selcted afterwards
             for obj in context.selected_objects:
                 obj.select_set(False)
-            
+
             armature.select_set(True)
-        
-            self.report({'INFO'}, f"FFGEAR shader imported successfully.")
+
+            self.report({'INFO'}, "FFGEAR shader imported successfully.")
         except Exception as e:
             self.report({'ERROR'}, str(e))
             return {'CANCELLED'}
@@ -291,7 +290,7 @@ class AETHER_OT_S_Meddle(bpy.types.Operator):
             if not armature or armature.type != 'ARMATURE':
                 self.report({'ERROR'}, "Please select an armature object.")
                 return {'CANCELLED'}
-            
+
             # Get affected Meshes
             meshes = find_meshes(armature)
 
@@ -304,10 +303,10 @@ class AETHER_OT_S_Meddle(bpy.types.Operator):
             # Making sure only rig is selcted afterwards
             for obj in context.selected_objects:
                 obj.select_set(False)
-            
+
             armature.select_set(True)
-        
-            self.report({'INFO'}, f"Meddle shader imported successfully.")
+
+            self.report({'INFO'}, "Meddle shader imported successfully.")
         except Exception as e:
             self.report({'ERROR'}, str(e))
             return {'CANCELLED'}
@@ -320,6 +319,7 @@ class AETHER_OT_S_Meddle(bpy.types.Operator):
 
 class AETHER_OT_VRM_ToggleOutline(bpy.types.Operator):
     """Toggle the visibility of MToon Outline shaders in the imported VRM model."""
+
     bl_idname = "aether.vrm_toggle_outline"
     bl_label = "Toggle MToon Outline Visibility"
     bl_options = {'REGISTER', 'UNDO'}
@@ -355,4 +355,3 @@ def unregister():
     bpy.utils.unregister_class(AETHER_OT_S_FFGear)
     bpy.utils.unregister_class(AETHER_OT_S_Meddle)
     bpy.utils.unregister_class(AETHER_OT_VRM_ToggleOutline)
-    

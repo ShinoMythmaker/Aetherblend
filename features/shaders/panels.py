@@ -1,7 +1,7 @@
 import bpy
 
-from ...properties.tab_prop import get_active_tab
 from ...preferences import is_set_enabled
+from ...properties.tab_prop import get_active_tab
 from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
 
@@ -141,4 +141,3 @@ def unregister():
     bpy.utils.unregister_class(AETHER_PT_shaders_materials)
     bpy.utils.unregister_class(AETHER_PT_VRM_Shaders)
     bpy.utils.unregister_class(AETHER_PT_shaders)
-        

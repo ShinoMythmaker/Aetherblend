@@ -2,8 +2,9 @@ import json
 import os
 import re
 import tomllib
-import tomli_w
 import urllib.request
+
+import tomli_w
 
 MANIFEST_FILENAME = "blender_manifest.toml"
 WHEELS_DIR = './wheels'

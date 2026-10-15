@@ -1,15 +1,17 @@
 import bpy
+
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
+
 
 class AETHER_PT_CustomizePlus(bpy.types.Panel):
     bl_label = "Customize Plus"
     bl_idname = "AETHER_PT_customize_plus"
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'  
+    bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 2 
-    
+    bl_order = 2
+
     @classmethod
     def poll(cls, context):
         if not visible_in_current_area(context):
@@ -19,11 +21,11 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
 
         armature = context.active_object
         return (
-            armature is not None 
+            armature is not None
             and armature.type == 'ARMATURE'
             and getattr(armature, 'aether_cplus', None)
         )
-    
+
     def draw(self, context):
         armature = context.active_object
         if not armature or armature.type != 'ARMATURE':
@@ -52,7 +54,7 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
             label_col = row.column(align=True)
             label_col.scale_x = 0.8
             label_col.label(text="C+ String")
-            
+
             field_col = row.column(align=True)
             field_col.scale_x = 1.2
             field_col.prop(cplus, "code", text="")
@@ -80,7 +82,7 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
                     ref_col.operator("aether.create_backup_armature", text="Update Backup", icon="RECOVER_LAST")
                 else:
                     ref_col.operator("aether.create_backup_armature", text="Create Backup", icon="DUPLICATE")
-                
+
                 arrow_col = row.column(align=True)
                 arrow_col.scale_x = 0.3
                 arrow_col.label(text="→")
@@ -135,4 +137,4 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_CustomizePlus_AxisConversion)
-    bpy.utils.unregister_class(AETHER_PT_CustomizePlus) 
+    bpy.utils.unregister_class(AETHER_PT_CustomizePlus)

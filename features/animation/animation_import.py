@@ -1,14 +1,15 @@
 """Animation import and retargeting for FFXIV animations to AetherBlend rigs."""
 
-import uuid
-import bpy
-from bpy.props import StringProperty, EnumProperty
-from bpy.types import Operator
 import tempfile
+import uuid
+
+import bpy
+from bpy.props import EnumProperty, StringProperty
 from bpy_extras.io_utils import ImportHelper
-from ...utils.axis_conversion import AXIS_ITEMS
-from ...core.drivers import TransformChannelVariable, Driver
+
+from ...core.drivers import Driver, TransformChannelVariable
 from ...core.operations import DriverOperation, ParentBoneOperation
+from ...utils.axis_conversion import AXIS_ITEMS
 
 # FFXIV bone names to AetherBlend FK control mapping
 # TODO: Implement retargeting logic
@@ -22,7 +23,7 @@ RETARGET_MAP = {
     # Arms
     "j_ude_a_l": {"target": "upper_arm_fk.L", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)},
     "j_ude_b_l": {"target": "forearm_fk.L", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)},
-    "j_ude_a_r": {"target": "upper_arm_fk.R", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)}, 
+    "j_ude_a_r": {"target": "upper_arm_fk.R", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)},
     "j_ude_b_r": {"target": "forearm_fk.R", "invert_rot": (False, False, True, False), "invert_loc": (True, False, False)},
     "j_sako_l": {"target": "clavicle.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
     "j_sako_r": {"target": "clavicle.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
@@ -44,7 +45,7 @@ RETARGET_MAP = {
     # Legs
     "j_asi_a_l": {"target": "thigh_fk.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
     "j_asi_b_l": {"target": "knee.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
-    "j_asi_c_l": {"target": "shin_fk.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)}, 
+    "j_asi_c_l": {"target": "shin_fk.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
     "j_asi_d_l": {"target": "foot_fk.L", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
     "j_asi_a_r": {"target": "thigh_fk.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
     "j_asi_b_r": {"target": "knee.R", "invert_rot": (True, False, False, False), "invert_loc": (False, False, True)},
@@ -70,12 +71,12 @@ RETARGET_MAP = {
 
 
 
-class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):   
+class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
     bl_idname = "aether.anim_import"
     bl_label = "Import Animation"
     bl_options = {'REGISTER', 'UNDO'}
     bl_description = "Import and retarget in-game animation to AetherBlend rig"
-    
+
     filepath: StringProperty(subtype="FILE_PATH")  # type: ignore
     filename_ext = ''
     filter_glob: StringProperty(default='*.glb;*.gltf;*.fbx', options={'HIDDEN'})  # type: ignore
@@ -84,7 +85,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
         if context.active_object and context.active_object.type == 'ARMATURE':
             return [(a.name, a.name, "") for a in bpy.data.actions]
         return [('NONE', "No Actions", "")]
-    
+
     selected_action: bpy.props.EnumProperty(name="Action", items=get_actions) # type: ignore
 
     export_format: bpy.props.EnumProperty(
@@ -100,14 +101,14 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
         items=AXIS_ITEMS,
         default='X',
     )  # type: ignore
-    
+
     secondary_bone_axis: EnumProperty(
         name="Secondary Bone Axis",
         description="Secondary axis for bone orientation",
         items=AXIS_ITEMS,
         default='Y',
     )  # type: ignore
-    
+
     def export_fbx(self, filepath):
         bpy.ops.export_scene.fbx(
             filepath=filepath,
@@ -134,7 +135,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
         if not target or target.type != 'ARMATURE':
             self.report({'ERROR'}, "No armature found in the scene for retargeting")
             return
-        
+
         source_bone = source_bone_name
         target_bone = target_bone_name
 
@@ -158,7 +159,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
         if not target_bone:
             self.report({'WARNING'}, f"Target bone '{target_bone_name}' not found")
             return
-        
+
         try:
             # Build expressions with optional inversion from tuple-based mappings
             rot_z_expr = f"{'-' if invert_rot[0] else ''}{source_bone}_rot_z"
@@ -169,7 +170,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
             loc_x_expr = f"{'-' if invert_loc[0] else ''}{source_bone}_loc_x"
             loc_y_expr = f"{'-' if invert_loc[1] else ''}{source_bone}_loc_y"
             loc_z_expr = f"{'-' if invert_loc[2] else ''}{source_bone}_loc_z"
-            
+
             driver_X = DriverOperation(
                 driver_name=f"{target_bone}_anim_driver_X",
                 bone_name=target_bone,
@@ -189,7 +190,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
                     ],
                 )
             )
-            
+
             driver_Z = DriverOperation(
                 driver_name=f"{target_bone}_anim_driver_Z",
                 bone_name=target_bone,
@@ -323,14 +324,14 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
         layout.prop(self, "primary_bone_axis")
         layout.prop(self, "secondary_bone_axis")
 
-    def execute(self, context):  
-        bpy.context.window.cursor_set('WAIT')   
-        
+    def execute(self, context):
+        bpy.context.window.cursor_set('WAIT')
+
         if not self.filepath:
             self.report({'ERROR'}, "[AetherBlend] Please select an animation file (.fbx, .gltf, or .glb)")
             bpy.context.window.cursor_set('DEFAULT')
             return {'CANCELLED'}
-        
+
         filepath_lower = self.filepath.lower()
         is_gltf = filepath_lower.endswith(('.gltf', '.glb'))
         is_fbx = filepath_lower.endswith('.fbx')
@@ -349,7 +350,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
                 self.report({'ERROR'}, "Select target AetherBlend armature first")
                 bpy.context.window.cursor_set('DEFAULT')
                 return {'CANCELLED'}
-            
+
             # Import with FBX axis conversion (native)
 
             if is_fbx:
@@ -374,15 +375,15 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
                 scene = context.scene
                 scene.frame_start = int(start)
                 scene.frame_end = int(end)
-                
+
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.fbx') as temp:
                     temp_path = f"{temp.name}{uuid.uuid4()}"
                     self.export_fbx(filepath=temp_path
                                     )
-                    
+
                     # Delete the glTF armature before re-importing FBX
                     bpy.data.objects.remove(gltf_armature, do_unlink=True)
-                    
+
                     bpy.ops.import_scene.fbx(
                         filepath=temp_path,
                         ignore_leaf_bones=True,
@@ -390,7 +391,7 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
                         secondary_bone_axis=self.secondary_bone_axis,
                         anim_offset=0
                     )
-            
+
             source_armature = context.active_object
             if not source_armature or source_armature.type != 'ARMATURE':
                 self.report({'ERROR'}, "Failed to import armature")

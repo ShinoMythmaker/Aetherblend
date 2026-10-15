@@ -1,25 +1,22 @@
-import bpy
-
-from abc import ABC
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
-
+import bpy
 
 if TYPE_CHECKING:
     from .bone_generators import BoneGenerator
 
-from .operations import ABOperation, PoseOperations, PoseOperationsStack, TransformLink
 from . import rigify
 from .bone_generators import BoneGenerator
+from .operations import ABOperation, PoseOperations, PoseOperationsStack, TransformLink
 
 ModuleType = Literal["Generator", "Patch","UI-Addon"]
 UI_Type = Literal["checkbox", "slider", "dropdown"]
-  
+
 @dataclass
 class BoneGroup:
     """A group of bone generators that can be executed together."""
+
     name: str
     description: str = ""
     transform_link: list[TransformLink] = field(default_factory=list)
@@ -31,17 +28,17 @@ class BoneGroup:
         self.transform_link = list(self.transform_link)
         self.generators = list(self.generators)
         self.operations = list(self.operations)
-    
+
     def check(self, armature: bpy.types.Object, data: dict | None = None) -> bool:
         """Check if all required bones exist in the armature for this bone group."""
         future_bones = []
-        
+
         for bone_gen in self.generators:
             future_bones.append(bone_gen.name)
             if bone_gen.data_key is not None:
                 data_value = data.get(bone_gen.data_key) if data else None
                 if data_value is None:
-                    print(f"[AetherBlend] Error Code: DEMON")
+                    print("[AetherBlend] Error Code: DEMON")
                     return False
             if bone_gen.req_bones:
                 for req_bone in bone_gen.req_bones:
@@ -53,10 +50,9 @@ class BoneGroup:
                                 continue
                             return False
         return True
-    
+
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], list[ABOperation]]:
         """Generate all bones in this group."""
-
         generated_bones: list[str] = []
         generated_operations: list[ABOperation] = list(self.operations)
 
@@ -76,20 +72,20 @@ class BoneGroup:
                 generated_bones.extend(new_bones)
 
         return generated_bones, generated_operations
-        
-    
+
+
     def execute(self, armature: bpy.types.Object, data: dict | None = None) -> tuple[list[str], dict[str, list[PoseOperations]], list[ABOperation]]:
         """Execute the full generation process for this bone group."""
         # Check if bone group can theoriticlly be generated
         if not self.check(armature, data=data):
             print(f"[AetherBlend] BoneGroup '{self.name}' check failed - missing required bones")
             return [], {}, []
-        
+
         bpy.ops.object.mode_set(mode='EDIT')
-        
+
         # Generate bones and collect runtime operations for this execution only.
         generated_bones, generated_operations = self.generate(armature, data=data)
-        
+
         # Collect Pose Operations
         pose_operations_dict: dict[str, list[PoseOperations]] = {}
 
@@ -107,7 +103,7 @@ class BoneGroup:
             link_item.mark_linked(armature)
             for operation in link_item.to_ABOperation():
                 generated_operations.append(operation)
-        
+
         # Add BoneGenerator pose operations
         for bone_gen in self.generators:
             # Collect dynamic pose operations (empty dict for most generators)
@@ -116,7 +112,7 @@ class BoneGroup:
                 if bone_name not in pose_operations_dict:
                     pose_operations_dict[bone_name] = []
                 pose_operations_dict[bone_name].extend(operations)
-            
+
             # Collect dynamic transform links (empty list for most generators)
             dynamic_links = bone_gen.get_dynamic_transform_links()
             for link_item in dynamic_links:
@@ -125,27 +121,27 @@ class BoneGroup:
                     if bone_name not in pose_operations_dict:
                         pose_operations_dict[bone_name] = []
                     pose_operations_dict[bone_name].extend(operations)
-            
+
             if bone_gen.pose_operations:
                 if bone_gen.name not in pose_operations_dict:
                     pose_operations_dict[bone_gen.name] = []
                 pose_operations_dict[bone_gen.name].append(bone_gen.pose_operations)
-        
+
         return generated_bones, pose_operations_dict, generated_operations
-    
+
 @dataclass
 class UILink:
     """Defines a link between a bone or armature property and a UI element"""
-    
+
     title: str
     property_name: str | None = None
     bone_name: str | None = None
     constraint_name: str | None = None
-    white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show. 
+    white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show.
     ui_type: UI_Type | None = "checkbox"
     ui_params: dict | None = None  # Additional parameters for the UI element
     override: Literal["EyeLidControl"] | None = None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)
-     
+
     def eye_lid_control_draw(self, context, layout: bpy.types.UILayout):
 
         armature = context.active_object
@@ -154,9 +150,9 @@ class UILink:
             layout.operator("aether.eyelid_offset_edit_end", text="Exit Eye Lid Edit Mode", icon='CANCEL')
         else:
             layout.operator("aether.eyelid_offset_edit_start", text="Enter Eye Lid Edit Mode", icon='EDITMODE_HLT')
-     
+
         return
-    
+
     def draw(self, context, layout: bpy.types.UILayout):
         """Draws the UI element for this link."""
         armature = context.active_object
@@ -177,7 +173,7 @@ class UILink:
         if self.white_list:
             if not selected_bones.intersection(self.white_list):
                 return
-            
+
         if self.override == "EyeLidControl":
             self.eye_lid_control_draw(context, layout)
             return
@@ -202,10 +198,11 @@ class UILink:
         else:
             print(f"[AetherBlend] Unknown UI element type '{self.ui_type}' for UILink '{self.title}'")
 
-        
+
 @dataclass
 class RigModule:
     """Defines a rig module and its behavior category."""
+
     name: str
     type: ModuleType
     bone_groups: list[BoneGroup]
@@ -224,18 +221,19 @@ class RigModule:
             bones, pose_ops, operations = bone_group.execute(armature, data)
 
             if not bones and not pose_ops:
-                continue 
-                
+                continue
+
             integrity = True
             pose_op_stack.merge(PoseOperationsStack(stack = pose_ops))
             module_operations.extend(operations or [])
 
-            
+
         return integrity, pose_op_stack, self.ui_collections, module_operations
 
 
 @dataclass(frozen=True)
 class Template():
     """Defines a rig template with its properties and modules."""
+
     name: str
     modules: 'list[list[RigModule]]'

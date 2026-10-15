@@ -1,8 +1,4 @@
-from . import decoder
-from . import operators
-from . import properties
-from . import panels
-from . import editor_panel
+from . import decoder, editor_panel, operators, panels, properties
 
 modules = (properties, operators, panels)
 

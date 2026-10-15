@@ -1,8 +1,4 @@
-from . import spring_bones_ot
-from . import spring_tail_ot
-from . import spring_ear_ot
-from . import spring_breast_ot
-from . import spring_bones_pt
+from . import spring_bones_ot, spring_bones_pt, spring_breast_ot, spring_ear_ot, spring_tail_ot
 
 modules = (
     # spring_bones_ot,

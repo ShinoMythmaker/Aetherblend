@@ -1,9 +1,8 @@
 import bpy
 
-from .info_panel import AETHER_PT_InfoPanel
 from ..features.animation.panels import AETHER_PT_ExportPanel
-from ..features.model_import.panels import AETHER_PT_ImportPanel
 from ..features.cplus.panels import AETHER_PT_CustomizePlus
+from ..features.model_import.panels import AETHER_PT_ImportPanel
 from ..features.rigging.panels import (
     AETHER_PT_RigBakeSettingsPanel,
     AETHER_PT_RigCreation,
@@ -11,6 +10,7 @@ from ..features.rigging.panels import (
     AETHER_PT_RigManipulation,
     AETHER_PT_RigUIPanel,
 )
+from .info_panel import AETHER_PT_InfoPanel
 
 _SOURCE_PANELS = (
     AETHER_PT_InfoPanel,

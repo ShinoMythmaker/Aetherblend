@@ -1,8 +1,8 @@
+from ......core import rigify
 from ......core.bone_generators import ExtensionBone
 from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
-from ......core import rigify
-from ......core.rigify.settings import UI_Collections, BoneCollection
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 MIQO_EARS = BoneGroup(
     name="Miqo Ears",

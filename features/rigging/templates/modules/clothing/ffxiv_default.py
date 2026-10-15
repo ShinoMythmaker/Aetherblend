@@ -1,11 +1,18 @@
-from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import ParentBoneOperation, ConstraintOperation, RigifyTypeOperation, CollectionOperation, DriverOperation, CustomPropertyOperation
-from ......core.constraints import DampedTrackConstraint
-from ......core.bone_generators import ConnectBone, ExtensionBone
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
-from ......core.drivers import TransformChannelVariable, Driver, SinglePropertyVariable
+from ......core.bone_generators import ConnectBone, ExtensionBone
+from ......core.constraints import DampedTrackConstraint
 from ......core.custom_properties import FloatProperty
+from ......core.drivers import Driver, SinglePropertyVariable, TransformChannelVariable
+from ......core.operations import (
+    CollectionOperation,
+    ConstraintOperation,
+    CustomPropertyOperation,
+    DriverOperation,
+    ParentBoneOperation,
+    RigifyTypeOperation,
+)
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 SKIRT_R = BoneGroup(
         name="Skirt Right",

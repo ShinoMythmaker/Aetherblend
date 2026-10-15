@@ -1,12 +1,19 @@
 import mathutils
 
-from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, PropOverrideOperation, RigifyTypeOperation, WidgetOperation, BoneRestrictionOperation
-from ......core.constraints import CopyLocationConstraint, CopyScaleConstraint, LimitLocationConstraint
-from ......core.drivers import TransformChannelVariable, Driver, SinglePropertyVariable
-from ......core.bone_generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone, OffsetBone
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
+from ......core.bone_generators import (
+    BridgeBone,
+    ConnectBone,
+    CopyBone,
+    ExtensionBone,
+)
+from ......core.operations import (
+    BoneRestrictionOperation,
+    CollectionOperation,
+    RigifyTypeOperation,
+)
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 EYES = BoneGroup(
     name="Head",
@@ -29,13 +36,13 @@ EYES = BoneGroup(
 
 
         ## We need to build a fake eye ring here so rigify can generate the eye controls. This is dumb and i dont know why rigify doesnt have a better soltuion
-        ## I also checked what VRM to Rigify did and they spawn the rigify bse rig and edit it, they shrimply dont delete the additional eyebones. 
+        ## I also checked what VRM to Rigify did and they spawn the rigify bse rig and edit it, they shrimply dont delete the additional eyebones.
         ## Due to the nature of this, this will look scuffed but idc
 
         ExtensionBone(
             name="Eye.L.Ring_helper1",
             bone_a="Eye.L",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="Z",
             size_factor=0.4,
@@ -43,7 +50,7 @@ EYES = BoneGroup(
         ExtensionBone(
             name="Eye.L.Ring_helper2",
             bone_a="Eye.L",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="Z",
             size_factor=-0.4,
@@ -51,7 +58,7 @@ EYES = BoneGroup(
         ExtensionBone(
             name="Eye.L.Ring_helper3",
             bone_a="Eye.L",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="X",
             size_factor=0.4,
@@ -59,7 +66,7 @@ EYES = BoneGroup(
         ExtensionBone(
             name="Eye.L.Ring_helper4",
             bone_a="Eye.L",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="X",
             size_factor=-0.4,
@@ -117,15 +124,15 @@ EYES = BoneGroup(
             bone_a="lid.T.L",
             bone_b="lid.T.L.002",
             offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
-            is_connected=True,  
+            is_connected=True,
             parent="Eye.L",
             req_bones=["lid.T.L", "lid.T.L.002"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.001", collection_name="Face (Secondary)")
             ]
-        ), 
+        ),
 
         BridgeBone(
-            name="lid.T.L.003", 
+            name="lid.T.L.003",
             bone_a="lid.T.L.002",
             bone_b="lid.B.L",
             offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
@@ -159,7 +166,7 @@ EYES = BoneGroup(
 
 
 
-        #Right Eye 
+        #Right Eye
         CopyBone(
             name="Eye.R",
             bone_a="J_Adj_R_FaceEye",
@@ -173,13 +180,13 @@ EYES = BoneGroup(
 
 
         ## We need to build a fake eye ring here so rigify can generate the eye controls. This is dumb and i dont know why rigify doesnt have a better soltuion
-        ## I also checked what VRM to Rigify did and they spawn the rigify bse rig and edit it, they shrimply dont delete the additional eyebones. 
+        ## I also checked what VRM to Rigify did and they spawn the rigify bse rig and edit it, they shrimply dont delete the additional eyebones.
         ## Due to the nature of this, this will look scuffed but idc
 
         ExtensionBone(
             name="Eye.R.Ring_helper1",
             bone_a="Eye.R",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="Z",
             size_factor=0.4,
@@ -187,7 +194,7 @@ EYES = BoneGroup(
         ExtensionBone(
             name="Eye.R.Ring_helper2",
             bone_a="Eye.R",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="Z",
             size_factor=-0.4,
@@ -195,7 +202,7 @@ EYES = BoneGroup(
         ExtensionBone(
             name="Eye.R.Ring_helper3",
             bone_a="Eye.R",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="X",
             size_factor=0.4,
@@ -203,7 +210,7 @@ EYES = BoneGroup(
         ExtensionBone(
             name="Eye.R.Ring_helper4",
             bone_a="Eye.R",
-            parent=["Head"], 
+            parent=["Head"],
             start="head",
             axis="X",
             size_factor=-0.4,
@@ -261,15 +268,15 @@ EYES = BoneGroup(
             bone_a="lid.T.R",
             bone_b="lid.T.R.002",
             offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
-            is_connected=True,  
+            is_connected=True,
             parent="Eye.R",
             req_bones=["lid.T.R", "lid.T.R.002"],
             operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.001", collection_name="Face (Secondary)")
             ]
-        ), 
+        ),
 
         BridgeBone(
-            name="lid.T.R.003", 
+            name="lid.T.R.003",
             bone_a="lid.T.R.002",
             bone_b="lid.B.R",
             offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
@@ -298,7 +305,7 @@ EYES = BoneGroup(
             operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003", collection_name="Face (Secondary)")]
         ),
     ]
-        
+
 )
 
 def get_rig_module() -> RigModule:

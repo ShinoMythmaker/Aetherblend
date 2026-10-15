@@ -1,24 +1,23 @@
 import bpy
 
-from ...utils import addon_dependencies
+from ...preferences import is_set_enabled
 from ...properties.tab_prop import get_active_tab
+from ...utils import addon_dependencies
 from ...utils.ui_visibility import visible_in_current_area
-
-from ...preferences import is_set_enabled, get_preferences
 
 
 class AETHER_PT_ImportPanel(bpy.types.Panel):
     bl_label = "Import"
     bl_idname = "AETHER_PT_import_panel"
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'  
+    bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 1 
+    bl_order = 1
 
     @classmethod
     def poll(cls, context):
         return visible_in_current_area(context) and get_active_tab(context) == 'IMPORT_EXPORT'
-    
+
     def draw(self, context):
         layout = self.layout
 
@@ -41,8 +40,8 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
                 row = layout.row(align=True)
                 row.operator("aether.vrm_import", text="VRM", icon = "IMPORT")
 
-        
-        
+
+
 
 
 def menu_func_import(self, context):
@@ -55,9 +54,8 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(AETHER_PT_ImportPanel)
-    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import) 
- 
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
 
 
-            
-            
+
+

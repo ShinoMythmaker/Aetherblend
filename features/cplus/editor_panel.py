@@ -1,21 +1,23 @@
 import bpy
+
 from ...properties.tab_prop import get_active_tab
+
 
 class AETHER_PT_CPlusEditor(bpy.types.Panel):
     bl_label = "C+ Editor"
     bl_idname = "AETHER_PT_cplus_editor"
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'  
+    bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 3 
-    
+    bl_order = 3
+
     @classmethod
     def poll(cls, context):
         return get_active_tab(context) == 'CPLUS'
-    
+
     def draw(self, context):
         layout = self.layout
-        
+
         box = layout.box()
         col = box.column(align=True)
         col.label(text="Work In Progress", icon='INFO')

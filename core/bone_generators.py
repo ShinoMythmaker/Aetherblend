@@ -1,18 +1,18 @@
-import bpy
 import math
-import mathutils 
 import re
-
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal
+
+import bpy
+import mathutils
 
 if TYPE_CHECKING:
     from .operations import PoseOperations
 
 from . import rigify
-from .operations import ABOperation, ParentBoneOperation, PoseOperations, TransformLink, RigifyTypeOperation
-from .. import utils
+from .operations import ABOperation, ParentBoneOperation, PoseOperations, RigifyTypeOperation, TransformLink
+
 
 @dataclass
 class BoneGenerator(ABC):
@@ -32,7 +32,7 @@ class BoneGenerator(ABC):
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates the bone and returns the created bone name(s)."""
         return NotImplementedError
-        
+
     def _set_parent(self, new_bone: bpy.types.EditBone, edit_bones: bpy.types.ArmatureEditBones, is_connected_overrite: bool | None = None) -> None:
         """Sets the parent bone for the generated bone. Override in subclasses if needed."""
         is_connected_overrite = is_connected_overrite if is_connected_overrite is not None else self.is_connected
@@ -45,12 +45,12 @@ class BoneGenerator(ABC):
                 new_bone.use_connect = is_connected_overrite
             else:
                 self.operations.append(ParentBoneOperation(new_bone.name, tuple(parent_names), is_connected_overrite))
-        return 
-    
+        return
+
     def get_dynamic_pose_operations(self) -> dict[str, list['PoseOperations']]:
         """Returns dynamically generated pose operations. Override in subclasses that need this."""
         return {}
-    
+
     def get_dynamic_transform_links(self) -> list[TransformLink]:
         """Returns dynamically generated transform links. Override in subclasses that need this."""
         return []
@@ -69,15 +69,14 @@ class RegexBoneGroup(BoneGenerator):
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
         """Generates bone chains for pattern-matched bones in the target armature."""
-
         if not armature:
             print(f"[AetherBlend] Invalid armatures provided for RegexBoneGroup with pattern '{self.pattern}'.")
             return None
-        
+
         # Reset dynamic tracking for each generate() call
         self._dynamic_pose_operations = {}
         self._dynamic_transform_links = []
-        
+
         ref_bones = armature.data.bones
         matched_bones = [bone for bone in ref_bones if re.match(self.pattern, bone.name)]
 
@@ -119,18 +118,18 @@ class RegexBoneGroup(BoneGenerator):
                     self._dynamic_transform_links.append(
                         TransformLink(target=f"DEF-{bone_name}", bone=bone.name)
                     )
-                
+
                 processed_bones.add(bone.name)
             else:
                 # Chain of bones - create connect bones for each
                 chain_bones = self._build_chain(bone)
                 processed_bones.update(chain_bones)
-                
+
                 # Create ConnectBones for all bones in chain including last
                 for i in range(len(chain_bones)):
                     source_bone_name = chain_bones[i]
                     connect_bone_name = f"{self.prefix}_{source_bone_name}"
-                    
+
                     if i < len(chain_bones) - 1:
                         # Connect to next bone in chain
                         connect_bone = ConnectBone(
@@ -157,7 +156,7 @@ class RegexBoneGroup(BoneGenerator):
                             is_connected=True,
                             start="head"
                         )
-                    
+
                     result = connect_bone.generate(armature, data)
                     self.operations.extend(connect_bone.operations)
                     if result:
@@ -170,14 +169,14 @@ class RegexBoneGroup(BoneGenerator):
                         self._dynamic_transform_links.append(
                             TransformLink(target=f"DEF-{connect_bone_name}", bone=source_bone_name)
                         )
-                        
+
         return created_bones if created_bones else None
-    
+
     def _build_chain(self, start_bone) -> list[str]:
         """Build a chain of bones starting from start_bone following the pattern."""
         chain = [start_bone.name]
         current = start_bone
-        
+
         while True:
             children = [child for child in current.children if re.match(self.pattern, child.name)]
             if not children:
@@ -185,13 +184,13 @@ class RegexBoneGroup(BoneGenerator):
             # Follow the first matching child
             current = children[0]
             chain.append(current.name)
-        
+
         return chain
-    
+
     def get_dynamic_pose_operations(self) -> dict[str, list['PoseOperations']]:
         """Returns the dynamically generated pose operations after generate() is called."""
         return self._dynamic_pose_operations if self._dynamic_pose_operations else {}
-    
+
     def get_dynamic_transform_links(self) -> list['TransformLink']:
         """Returns the dynamically generated transform links after generate() is called."""
         return self._dynamic_transform_links if self._dynamic_transform_links else []
@@ -199,6 +198,7 @@ class RegexBoneGroup(BoneGenerator):
 @dataclass
 class ConnectBone(BoneGenerator):
     """Creates a bone connecting point A to point B."""
+
     bone_a: str
     bone_b: str
     start: str = "head"
@@ -209,7 +209,7 @@ class ConnectBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armature provided for ConnectBone '{self.name}'.")
             return None
-            
+
         edit_bones = armature.data.edit_bones
         bone_a_ref = edit_bones.get(self.bone_a)
         bone_b_ref = edit_bones.get(self.bone_b)
@@ -217,17 +217,17 @@ class ConnectBone(BoneGenerator):
         if not bone_a_ref or not bone_b_ref:
             print(f"[AetherBlend] Cannot create ConnectBone '{self.name}': reference bones '{self.bone_a}' or '{self.bone_b}' not found.")
             return None
-        
+
         if self.start == "tail":
             head_pos = bone_a_ref.tail.copy()
         else:  # "head"
             head_pos = bone_a_ref.head.copy()
-        
+
         if self.end == "tail":
             tail_pos = bone_b_ref.tail.copy()
         else:  # "head"
             tail_pos = bone_b_ref.head.copy()
-        
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
 
@@ -235,16 +235,17 @@ class ConnectBone(BoneGenerator):
         new_bone.head = head_pos
         new_bone.tail = tail_pos
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
-        
+
         self._set_parent(new_bone, edit_bones)
-        
+
         created_name = new_bone.name
-        
+
         return [created_name]
 
 @dataclass
 class ExtensionBone(BoneGenerator):
     """Creates a bone extending from a source bone in a given direction."""
+
     bone_a: str
     size_factor: float = 1.0
     axis_type: str = "local"
@@ -256,14 +257,14 @@ class ExtensionBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armature provided for ExtensionBone '{self.name}'.")
             return None
-        
+
         edit_bones = armature.data.edit_bones
         bone_a_ref = edit_bones.get(self.bone_a)
 
         if not bone_a_ref:
             print(f"[AetherBlend] Reference bone '{self.bone_a}' not found for ExtensionBone '{self.name}'.")
             return None
-        
+
         if self.start == "tail":
             start_pos = bone_a_ref.tail.copy()
         else:  # "head"
@@ -275,7 +276,7 @@ class ExtensionBone(BoneGenerator):
             if self.axis == "X":
                 direction_vector = local_bone_matrix[0]
             elif self.axis == "Y":
-                direction_vector = local_bone_matrix[1] 
+                direction_vector = local_bone_matrix[1]
             elif self.axis == "Z":
                 direction_vector = local_bone_matrix[2]
         elif self.axis_type == "armature":
@@ -292,10 +293,10 @@ class ExtensionBone(BoneGenerator):
                 world_direction = mathutils.Vector((0.0, 1.0, 0.0))
             elif self.axis == "Z":
                 world_direction = mathutils.Vector((0.0, 0.0, 1.0))
-            
+
             armature_matrix_inv = armature.matrix_world.to_3x3().inverted()
             direction_vector = armature_matrix_inv @ world_direction
-        
+
         if not direction_vector:
             print(f"[AetherBlend] Invalid axis configuration for ExtensionBone '{self.name}': axis_type='{self.axis_type}', axis='{self.axis}'.")
             return None
@@ -305,12 +306,12 @@ class ExtensionBone(BoneGenerator):
         except (TypeError, ValueError):
             print(f"[AetherBlend] Invalid size_factor value for ExtensionBone '{self.name}': {self.size_factor!r}.")
             return None
-        
+
         ref_bone_length = bone_a_ref.length if bone_a_ref.length > 0 else 1.0
         extension_length = ref_bone_length * size_factor
         tail_pos = start_pos + direction_vector.normalized() * extension_length
-        
-        
+
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
 
@@ -320,14 +321,15 @@ class ExtensionBone(BoneGenerator):
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
 
         self._set_parent(new_bone, edit_bones)
-        
+
         created_name = new_bone.name
-        
+
         return [created_name]
 
 @dataclass
 class CopyBone(BoneGenerator):
     """Creates a bone by copying the transform of an existing bone."""
+
     bone_a: str
 
     def generate(self, armature: bpy.types.Object, data: dict | None = None) -> list[str] | None:
@@ -335,14 +337,14 @@ class CopyBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armature provided for CopyBone '{self.name}'.")
             return None
-        
+
         edit_bones = armature.data.edit_bones
         source_bone_ref = edit_bones.get(self.bone_a)
 
         if not source_bone_ref:
             print(f"[AetherBlend] Source bone '{self.bone_a}' not found for CopyBone '{self.name}'.")
             return None
-        
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
 
@@ -352,7 +354,7 @@ class CopyBone(BoneGenerator):
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else source_bone_ref.roll
 
         self._set_parent(new_bone, edit_bones)
-        
+
         created_name = new_bone.name
         return [created_name]
 
@@ -360,6 +362,7 @@ class CopyBone(BoneGenerator):
 @dataclass
 class OffsetBone(BoneGenerator):
     """Create a bone at a giving offset from a source bone."""
+
     bone_a: str
     offset: mathutils.Vector = field(default_factory=lambda: mathutils.Vector((0.0, 0.0, 0.0)))
     size_factor: float = 1.0
@@ -369,7 +372,7 @@ class OffsetBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armature provided for OffsetBone '{self.name}'.")
             return None
-        
+
         edit_bones = armature.data.edit_bones
         bone_a_ref = edit_bones.get(self.bone_a)
 
@@ -398,7 +401,7 @@ class OffsetBone(BoneGenerator):
 
         head_pos = bone_a_ref.head + offset_in_armature
         tail_pos = head_pos + scaled_bone_vector
-        
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
 
@@ -408,13 +411,14 @@ class OffsetBone(BoneGenerator):
         new_bone.roll = math.radians(self.roll) if self.roll != 0.0 else 0.0
 
         self._set_parent(new_bone, edit_bones)
-        
+
         created_name = new_bone.name
         return [created_name]
 
 @dataclass
 class ParallelBone(BoneGenerator):
     """Creates a bone extending from a source bone along an axis until it reaches a target coordinate."""
+
     bone_a: str
     bone_b: str
     axis_type: Literal["local", "armature", "global"] = "local"
@@ -428,7 +432,7 @@ class ParallelBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armature provided for ParallelBone '{self.name}'.")
             return None
-        
+
         edit_bones = armature.data.edit_bones
         bone_a_ref = edit_bones.get(self.bone_a)
         bone_b_ref = edit_bones.get(self.bone_b)
@@ -436,11 +440,11 @@ class ParallelBone(BoneGenerator):
         if not bone_a_ref:
             print(f"[AetherBlend] Reference bone '{self.bone_a}' not found for ParallelBone '{self.name}'.")
             return None
-        
+
         if not bone_b_ref:
             print(f"[AetherBlend] Target bone '{self.bone_b}' not found for ParallelBone '{self.name}'.")
             return None
-        
+
         # Get start position from bone_a
         if self.start == "tail":
             start_pos = bone_a_ref.tail.copy()
@@ -452,7 +456,7 @@ class ParallelBone(BoneGenerator):
             target_pos = bone_b_ref.tail.copy()
         elif self.end == "head":  # "head"
             target_pos = bone_b_ref.head.copy()
-        
+
         # Get the target coordinate value
         coord_index = {"X": 0, "Y": 1, "Z": 2}.get(self.coordinate.upper(), 1)
         target_coord_value = target_pos[coord_index]
@@ -464,7 +468,7 @@ class ParallelBone(BoneGenerator):
             if self.axis == "X":
                 direction_vector = local_bone_matrix[0]
             elif self.axis == "Y":
-                direction_vector = local_bone_matrix[1] 
+                direction_vector = local_bone_matrix[1]
             elif self.axis == "Z":
                 direction_vector = local_bone_matrix[2]
         elif self.axis_type == "armature":
@@ -481,26 +485,26 @@ class ParallelBone(BoneGenerator):
                 world_direction = mathutils.Vector((0.0, 1.0, 0.0))
             elif self.axis == "Z":
                 world_direction = mathutils.Vector((0.0, 0.0, 1.0))
-            
+
             armature_matrix_inv = armature.matrix_world.to_3x3().inverted()
             direction_vector = armature_matrix_inv @ world_direction
-        
+
         if not direction_vector:
             print(f"[AetherBlend] Invalid axis configuration for ParallelBone '{self.name}': axis_type='{self.axis_type}', axis='{self.axis}'.")
             return None
-        
+
         direction_vector = direction_vector.normalized()
-        
+
         # Calculate the length needed to reach the target coordinate
         # We need to solve: start_pos[coord_index] + t * direction_vector[coord_index] = target_coord_value
         if abs(direction_vector[coord_index]) < 0.0001:
             print(f"[AetherBlend] Direction vector has no component along coordinate '{self.coordinate}' for ParallelBone '{self.name}'. Cannot reach target.")
             return None
-        
+
         t = (target_coord_value - start_pos[coord_index]) / direction_vector[coord_index]
-        
+
         tail_pos = start_pos + direction_vector * t
-        
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
 
@@ -512,7 +516,7 @@ class ParallelBone(BoneGenerator):
         self._set_parent(new_bone, edit_bones)
 
         created_name = new_bone.name
-        
+
         return [created_name]
 
 @dataclass
@@ -525,7 +529,7 @@ class SkinBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armature provided for SkinBone '{self.name}'.")
             return None
-        
+
         skin = None
         original_armature = None
         if data is not None:
@@ -537,47 +541,47 @@ class SkinBone(BoneGenerator):
                 original_armature = data.get("original_armature")
             except Exception:
                 pass
-                
+
         bones = armature.data.bones
         bone_a_ref = bones.get(self.bone_a)
 
         if not bone_a_ref:
             print(f"[AetherBlend] Reference bone '{self.bone_a}' not found in source armature for SkinBone '{self.name}'.")
             return None
-        
+
         world_co, weight = self._find_highest_weight_vertex_world_pos(self.bone_a, original_armature, mesh=skin)
-        
+
         if world_co is None:
             print(f"[AetherBlend] No vertices found with weights for bone '{self.bone_a}'. Skipping SkinBone '{self.name}'.")
-            return None     
-        
+            return None
+
         ref_bone_length = bone_a_ref.length if bone_a_ref.length > 0 else 0.3
-    
+
         bone_length = ref_bone_length * self.size_factor
-        
+
         bpy.context.view_layer.objects.active = armature
-        
+
         edit_bones = armature.data.edit_bones
-        
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
-        
+
         new_bone = edit_bones.new(self.name)
-        
+
         local_co = armature.matrix_world.inverted() @ world_co
         new_bone.head = local_co
-        
+
         direction = mathutils.Vector((0.0, 0.0, bone_length))
         new_bone.tail = local_co + direction
-        
+
         self._set_parent(new_bone, edit_bones)
 
         created_name = new_bone.name
         return [created_name]
-    
+
     def _find_highest_weight_vertex_world_pos(self, bone_name: str, armature: bpy.types.Object, mesh = None) -> tuple:
         depsgraph = bpy.context.evaluated_depsgraph_get()
-        
+
         best_weight = 0.0
         best_world_co = None
 
@@ -585,72 +589,72 @@ class SkinBone(BoneGenerator):
             object_pool = [mesh]
         else:
             object_pool = [obj for obj in bpy.data.objects if obj.type == 'MESH']
-            
+
         candidate_objects = []
-        
+
         for obj in object_pool:
             if obj is None:
                 continue
             if obj.type != 'MESH':
                 continue
-            
+
             has_armature_mod = False
             for modifier in obj.modifiers:
                 if modifier.type == 'ARMATURE' and modifier.object == armature:
                     has_armature_mod = True
                     break
-            
+
             if not has_armature_mod:
                 continue
-                
+
             vg = obj.vertex_groups.get(bone_name)
             if vg is not None:
                 candidate_objects.append((obj, vg))
-        
+
         if not candidate_objects:
             return (None, 0.0)
-        
+
         for obj, vertex_group in candidate_objects:
             armature_mod = None
             for mod in obj.modifiers:
                 if mod.type == 'ARMATURE' and mod.object == armature:
                     armature_mod = mod
                     break
-            
+
             if not armature_mod:
                 continue
-            
+
             eval_obj = obj.evaluated_get(depsgraph)
-            
+
             try:
                 mesh_eval = eval_obj.to_mesh()
-            except Exception as e:
+            except Exception:
                 continue
-            
+
             if mesh_eval is None:
                 continue
-            
+
             orig_verts = obj.data.vertices
             vg_index = vertex_group.index
-            
+
             if len(mesh_eval.vertices) != len(orig_verts):
                 eval_obj.to_mesh_clear()
                 continue
-            
+
             for v_idx, vertex in enumerate(orig_verts):
                 for group in vertex.groups:
                     if group.group == vg_index and group.weight > best_weight:
                         eval_local_co = mesh_eval.vertices[v_idx].co.copy()
                         world_co = obj.matrix_world @ eval_local_co
-                        
+
                         best_weight = group.weight
                         best_world_co = world_co.copy()
                         break
-            
+
             eval_obj.to_mesh_clear()
-        
+
         return (best_world_co, best_weight)
-    
+
 @dataclass
 class BridgeBone(BoneGenerator):
     #Unlike other generators, BridgeBone's is_connected defines whether the last bone is connected to bone_b
@@ -664,7 +668,7 @@ class BridgeBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armatures provided for BridgeBone '{self.name}'.")
             return None
-            
+
         edit_bones = armature.data.edit_bones
         bone_a_ref = edit_bones.get(self.bone_a)
         bone_b_ref = edit_bones.get(self.bone_b)
@@ -672,27 +676,27 @@ class BridgeBone(BoneGenerator):
         if not bone_a_ref or not bone_b_ref:
             print(f"[AetherBlend] Cannot create BridgeBone '{self.name}': reference bones '{self.bone_a}' or '{self.bone_b}' not found in source armature.")
             return None
-        
+
         start_pos = bone_a_ref.head.copy()
         end_pos = bone_b_ref.head.copy()
-        
+
         midpoint = (start_pos + end_pos) / 2.0
         curve_factor = math.sin(math.pi * 0.5)  # Maximum curve at t=0.5
         bridge_head = midpoint + (self.offset_factor * curve_factor)
-        
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
 
         new_bone = edit_bones.new(self.name)
         new_bone.head = bridge_head
         new_bone.tail = end_pos
-        
+
         bone_a_ref.tail = bridge_head
         new_bone.parent = bone_a_ref
-        new_bone.use_connect = True    
-            
+        new_bone.use_connect = True
+
         self._set_parent(bone_a_ref, edit_bones, is_connected_overrite=False)
-        
+
         if self.is_connected:
             bone_b_ref = edit_bones.get(self.bone_b)
             if bone_b_ref:
@@ -700,8 +704,8 @@ class BridgeBone(BoneGenerator):
                 bone_b_ref.use_connect = True
             else:
                 print(f"[AetherBlend] Warning: Target bone '{self.bone_b}' not found for connection in BridgeBone '{self.name}'.")
-        
-        created_name = new_bone.name  
+
+        created_name = new_bone.name
         return [created_name]
 
 @dataclass
@@ -716,31 +720,31 @@ class CenterBone(BoneGenerator):
         if not armature:
             print(f"[AetherBlend] Invalid armatures provided for CenterBone '{self.name}'.")
             return None
-        
+
         edit_bones = armature.data.edit_bones
         valid_ref_bones = list[bpy.types.EditBone]()
-        
+
         for bone_name in self.ref_bones:
             bone_ref = edit_bones.get(bone_name)
             if bone_ref:
                 valid_ref_bones.append(bone_ref)
             else:
                 print(f"[AetherBlend] Warning: Reference bone '{bone_name}' not found in source armature for CenterBone '{self.name}'.")
-        
+
         if not valid_ref_bones:
             print(f"[AetherBlend] Error: No valid reference bones found for CenterBone '{self.name}'. Cannot create center bone.")
             return None
-        
+
         total_position = mathutils.Vector((0.0, 0.0, 0.0))
         total_length = 0.0
         for bone_ref in valid_ref_bones:
             total_position += bone_ref.head
             total_length += bone_ref.length
-        
+
         center_position = total_position / len(valid_ref_bones)
         avg_length = total_length / len(valid_ref_bones) if total_length > 0 else 0.3
         eye_bone_length = avg_length * self.size_factor
-        
+
         if self.axis == "X":
             direction_vector = mathutils.Vector((eye_bone_length, 0.0, 0.0))
         elif self.axis == "Y":
@@ -750,19 +754,19 @@ class CenterBone(BoneGenerator):
         else:
             # Default to Y axis if invalid
             direction_vector = mathutils.Vector((0.0, eye_bone_length, 0.0))
-        
+
         if self.name in edit_bones:
             edit_bones.remove(edit_bones[self.name])
-        
+
         new_bone = edit_bones.new(self.name)
-        
+
         if self.inverted:
             new_bone.tail = center_position.copy()
             new_bone.head = center_position + direction_vector
         else:
             new_bone.head = center_position.copy()
             new_bone.tail = center_position + direction_vector
-        
+
         self._set_parent(new_bone, edit_bones)
 
         created_name = new_bone.name

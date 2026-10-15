@@ -10,7 +10,7 @@ CS_ARG = {
         "fingers_right": ColorSet(name="Fingers_Right", normal="#9AAAFF", select="#98E5FF", active="#C4FFFF"),
         "fingers_left": ColorSet(name="Fingers_Left", normal="#CC6E00", select="#98E5FF", active="#C4FFFF"),
         "torso": ColorSet(name="Torso", normal="#34DBDB", select="#98E5FF", active="#C4FFFF"),
-        "torso_tweak": ColorSet(name="Torso_Tweak", normal="#34DBDB", select="#98E5FF", active="#C4FFFF"), 
+        "torso_tweak": ColorSet(name="Torso_Tweak", normal="#34DBDB", select="#98E5FF", active="#C4FFFF"),
         "head": ColorSet(name="Head", normal="#34DBDB", select="#98E5FF", active="#C4FFFF"),
         "face_primary": ColorSet(name="Face_Primary", normal="#9AAAFF", select="#98E5FF", active="#C4FFFF"),
         "face_secondary": ColorSet(name="Face_Secondary", normal="#CC6E00", select="#98E5FF", active="#C4FFFF"),

@@ -1,10 +1,12 @@
 import os
+
 import bpy
+
 
 def import_model(filepath: str, pack_images=True, disable_bone_shape=False, merge_vertices=False):
     """Imports GLTF or FBX. Returns list of imported objects."""
-    bone_heuristic = "BLENDER" 
-        
+    bone_heuristic = "BLENDER"
+
     scene_objects = set(bpy.context.scene.objects)
     ext = os.path.splitext(filepath)[1].lower()
 
@@ -32,7 +34,6 @@ def import_model(filepath: str, pack_images=True, disable_bone_shape=False, merg
 
 def import_vrm(filepath: str):
     """Imports a VRM file. Returns list of imported objects."""
-        
     scene_objects = set(bpy.context.scene.objects)
     bpy.ops.import_scene.vrm(filepath=filepath,)
 

@@ -1,9 +1,15 @@
-from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import BoneRestrictionOperation, ParentBoneOperation, ConstraintOperation, CollectionOperation, PropOverrideOperation, RigifyTypeOperation, DriverOperation, WidgetOperation
-from ......core.bone_generators import ConnectBone, ExtensionBone, CopyBone
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
-from ......core.drivers import TransformChannelVariable, Driver, SinglePropertyVariable
+from ......core.bone_generators import CopyBone
+from ......core.operations import (
+    BoneRestrictionOperation,
+    CollectionOperation,
+    ParentBoneOperation,
+    PropOverrideOperation,
+    RigifyTypeOperation,
+    WidgetOperation,
+)
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 ARM_R = BoneGroup(
         name="Right Arm",
@@ -21,25 +27,25 @@ ARM_R = BoneGroup(
                 bone_a="J_Bip_R_Shoulder",
                 req_bones=["J_Bip_R_Shoulder"],
                 parent="Spine.004",
-                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.R", parent=["Spine.004", "J_Bip_C_Chest"], is_connected=False), 
-                    RigifyTypeOperation(time="Pre", bone_name="clavicle.R", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")), 
+                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.R", parent=["Spine.004", "J_Bip_C_Chest"], is_connected=False),
+                    RigifyTypeOperation(time="Pre", bone_name="clavicle.R", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
                     CollectionOperation(time="Pre", bone_name="clavicle.R", collection_name="Torso")
                 ]
             ),
             # Right Arm
             CopyBone(
-                name="upper_arm.R", 
-                bone_a="J_Bip_R_UpperArm", 
+                name="upper_arm.R",
+                bone_a="J_Bip_R_UpperArm",
                 parent="clavicle.R",
                 req_bones=["J_Bip_R_UpperArm"],
                 operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="upper_arm.R", rigify_type=rigify.types.limbs_arm(rotation_axis="z", auto_align_extremity=True, fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)")), 
+                    RigifyTypeOperation(time="Pre", bone_name="upper_arm.R", rigify_type=rigify.types.limbs_arm(rotation_axis="z", auto_align_extremity=True, fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)")),
                     CollectionOperation(time="Pre", bone_name="upper_arm.R", collection_name="Arm.R (IK)")
                 ]
             ),
             CopyBone(
-                name="forearm.R", 
-                bone_a="J_Bip_R_LowerArm", 
+                name="forearm.R",
+                bone_a="J_Bip_R_LowerArm",
                 parent="upper_arm.R",
                 is_connected=True,
                 req_bones=["J_Bip_R_LowerArm"],
@@ -48,8 +54,8 @@ ARM_R = BoneGroup(
                 ]
             ),
             CopyBone(
-                name="hand.R", 
-                bone_a="J_Bip_R_Hand", 
+                name="hand.R",
+                bone_a="J_Bip_R_Hand",
                 parent="forearm.R",
                 is_connected=True,
                 req_bones=["J_Bip_R_Hand"],
@@ -76,25 +82,25 @@ ARM_L = BoneGroup(
                 bone_a="J_Bip_L_Shoulder",
                 req_bones=["J_Bip_L_Shoulder"],
                 parent="Spine.004",
-                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.L", parent=["Spine.004", "J_Bip_C_Chest"], is_connected=False), 
-                    RigifyTypeOperation(time="Pre", bone_name="clavicle.L", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")), 
+                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.L", parent=["Spine.004", "J_Bip_C_Chest"], is_connected=False),
+                    RigifyTypeOperation(time="Pre", bone_name="clavicle.L", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
                     CollectionOperation(time="Pre", bone_name="clavicle.L", collection_name="Torso")
                 ]
             ),
             # Left Arm
             CopyBone(
-                name="upper_arm.L", 
-                bone_a="J_Bip_L_UpperArm", 
+                name="upper_arm.L",
+                bone_a="J_Bip_L_UpperArm",
                 parent="clavicle.L",
                 req_bones=["J_Bip_L_UpperArm"],
                 operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="upper_arm.L", rigify_type=rigify.types.limbs_arm(rotation_axis="z", auto_align_extremity=True, fk_coll="Arm.L (FK)", tweak_coll="Arm.L (Tweak)")), 
+                    RigifyTypeOperation(time="Pre", bone_name="upper_arm.L", rigify_type=rigify.types.limbs_arm(rotation_axis="z", auto_align_extremity=True, fk_coll="Arm.L (FK)", tweak_coll="Arm.L (Tweak)")),
                     CollectionOperation(time="Pre", bone_name="upper_arm.L", collection_name="Arm.L (IK)")
                 ]
             ),
             CopyBone(
-                name="forearm.L", 
-                bone_a="J_Bip_L_LowerArm", 
+                name="forearm.L",
+                bone_a="J_Bip_L_LowerArm",
                 parent="upper_arm.L",
                 is_connected=True,
                 req_bones=["J_Bip_L_LowerArm"],
@@ -103,8 +109,8 @@ ARM_L = BoneGroup(
                 ]
             ),
             CopyBone(
-                name="hand.L", 
-                bone_a="J_Bip_L_Hand", 
+                name="hand.L",
+                bone_a="J_Bip_L_Hand",
                 parent="forearm.L",
                 is_connected=True,
                 req_bones=["J_Bip_L_Hand"],
@@ -145,4 +151,3 @@ def get_rig_module() -> RigModule:
             BoneRestrictionOperation(time="Post", bone_name="hand_tweak.R", hide_select=True, hide=True),
         ]
     )
-    

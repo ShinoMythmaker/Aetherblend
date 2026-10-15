@@ -1,16 +1,19 @@
-import bpy
+import base64
 import json
+import math
 import os
 import re
-import math
-import base64
 import tempfile
-from bpy.types import Operator
+
+import bpy
 from bpy.props import BoolProperty
+from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
-from mathutils import Matrix, Euler
+from mathutils import Matrix
+
 from ...preferences import get_preferences
 from ...utils.axis_conversion import AXIS_ITEMS
+
 
 def pose_export_image_items(_self, _context):
     items = [('__NONE__', "None", "Do not embed an image")]
@@ -20,28 +23,29 @@ def pose_export_image_items(_self, _context):
 
 class AETHER_OT_PoseExport(Operator, ExportHelper):
     """Exports armature pose into a .pose file."""
+
     bl_idname = "aether.pose_export"
     bl_label = "Export to Pose File"
     bl_options = {'REGISTER'}
-    
+
     filepath: bpy.props.StringProperty(subtype="FILE_PATH") # type: ignore
     filename_ext = '.pose'
     filter_glob: bpy.props.StringProperty(default='*.pose', options={'HIDDEN'}) # type: ignore
-    
+
     # Axis conversion properties
     use_pose_axis_conversion: BoolProperty(
         name="Use Axis Conversion",
         description="Apply pose axis conversion to match character import settings",
         default=True
     ) # type: ignore
-    
+
     pose_primary_axis: bpy.props.EnumProperty(
         name="Primary Axis",
         description="Primary axis for pose export orientation.",
         items=AXIS_ITEMS,
         default='X',
     ) # type: ignore
-    
+
     pose_secondary_axis: bpy.props.EnumProperty(
         name="Secondary Axis",
         description="Secondary axis for pose export orientation.",
@@ -102,16 +106,16 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
         description="Path to an external image file",
         default="",
     ) # type: ignore
-    
-    
+
+
     def invoke(self, context, event):
-        prefs = get_preferences()  
-        blend_filename = bpy.path.basename(bpy.data.filepath) 
+        prefs = get_preferences()
+        blend_filename = bpy.path.basename(bpy.data.filepath)
         if blend_filename:
-            blend_filename = os.path.splitext(blend_filename)[0] + ".pose"  
+            blend_filename = os.path.splitext(blend_filename)[0] + ".pose"
         else:
-            blend_filename = "untitled.pose"  
-        
+            blend_filename = "untitled.pose"
+
         if prefs.default_pose_export_path:
             self.filepath = os.path.join(prefs.default_pose_export_path, blend_filename)
         else:
@@ -256,25 +260,25 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             return self._encode_file_to_base64(self.preview_external_path)
 
         return None
-    
-    
+
+
     def execute(self, context):
         armature = context.object
         if not armature or armature.type != 'ARMATURE':
             self.report({'ERROR'}, "No armature selected")
             return {'CANCELLED'}
-        
+
         from ... import utils as aether_utils
         pose_correction_matrix = Matrix.Identity(4)
         if self.use_pose_axis_conversion:
             pose_correction_matrix = aether_utils.axis_conversion.get_export_correction_matrix(
                 self.pose_primary_axis, self.pose_secondary_axis
             )
-        
+
         x_rotation = Matrix.Rotation(math.radians(-90), 4, 'X')
 
         tags = [tag.strip() for tag in self.pose_tags.split(',') if tag.strip()]
-        
+
         skeleton_data = {
             "Author": self.pose_author,
             "Description": self.pose_description,
@@ -285,12 +289,12 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
             "FileVersion": 2,
             "Bones": {}
         }
-        
+
         original_col = armature.data.collections.get('Original')
         if not original_col:
             self.report({'ERROR'}, "Original bone collection not found")
             return {'CANCELLED'}
-            
+
         selected_bones = [bone.name for bone in original_col.bones]
         for bone_name in selected_bones:
             clean_bone_name = re.sub(r"\.\d+$", "", bone_name)
@@ -300,22 +304,22 @@ class AETHER_OT_PoseExport(Operator, ExportHelper):
                 if self.use_pose_axis_conversion:
                     bone_matrix_world = bone_matrix_world @ pose_correction_matrix
                 bone_matrix_world = x_rotation @ bone_matrix_world
-                
+
                 bone_data = {}
                 bone_data["Position"] = f"{bone_matrix_world.translation.x:.6f}, {bone_matrix_world.translation.y:.6f}, {bone_matrix_world.translation.z:.6f}"
                 bone_data["Rotation"] = f"{bone_matrix_world.to_quaternion().x:.6f}, {bone_matrix_world.to_quaternion().y:.6f}, {bone_matrix_world.to_quaternion().z:.6f}, {bone_matrix_world.to_quaternion().w:.6f}"
                 bone_data["Scale"] = f"{bone_matrix_world.to_scale().x:.8f}, {bone_matrix_world.to_scale().y:.8f}, {bone_matrix_world.to_scale().z:.8f}"
-                
+
                 skeleton_data["Bones"][clean_bone_name] = bone_data
 
         if self.include_preview_image:
             encoded_image = self._get_preview_base64(context)
             if encoded_image:
                 skeleton_data["Base64Image"] = encoded_image
-        
+
         with open(self.filepath, 'w') as f:
             json.dump(skeleton_data, f, indent=4)
-        
+
         self.report({'INFO'}, "Pose exported successfully!")
         return {'FINISHED'}
 

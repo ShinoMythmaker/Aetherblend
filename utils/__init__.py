@@ -3,12 +3,7 @@
 Modules are named after the primary context they operate on.
 """
 
-from . import armature
-from . import addon_dependencies
-from . import axis_conversion
-from . import collection
-from . import import_export
-from . import object
+from . import addon_dependencies, armature, axis_conversion, collection, import_export, object
 
 __all__ = [
 	'armature',

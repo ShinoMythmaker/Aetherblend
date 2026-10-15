@@ -1,9 +1,15 @@
-from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.bone_generators import ConnectBone, ExtensionBone, ParallelBone
-from ......core.operations import ParentBoneOperation, PropOverrideOperation, RigifyTypeOperation, CollectionOperation, ConstraintOperation
-from ......core.constraints import DampedTrackConstraint
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
+from ......core.bone_generators import ConnectBone, ExtensionBone, ParallelBone
+from ......core.constraints import DampedTrackConstraint
+from ......core.operations import (
+    CollectionOperation,
+    ConstraintOperation,
+    ParentBoneOperation,
+    PropOverrideOperation,
+    RigifyTypeOperation,
+)
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 LEG_R = BoneGroup(
         name="Right Leg",
@@ -18,7 +24,7 @@ LEG_R = BoneGroup(
         generators = [
             # Right Leg
             ConnectBone(
-                name="thigh.R", 
+                name="thigh.R",
                 bone_a="j_asi_a_r",
                 bone_b="j_asi_b_r",
                 parent="Spine.001",
@@ -26,14 +32,14 @@ LEG_R = BoneGroup(
                 end="tail",
                 req_bones=["j_asi_a_r", "j_asi_c_r"],
                 operations=[ParentBoneOperation(time="Pre", bone_name="thigh.R", parent=["Spine.001", "j_kosi"], is_connected=False),
-                            RigifyTypeOperation(time="Pre", bone_name="thigh.R", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)")), 
+                            RigifyTypeOperation(time="Pre", bone_name="thigh.R", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)")),
                             CollectionOperation(time="Pre", bone_name="thigh.R", collection_name="Leg.R (IK)")]
             ),
             ConnectBone(
-                name="shin.R", 
-                bone_a="j_asi_b_r", 
-                bone_b="j_asi_d_r", 
-                parent="thigh.R", 
+                name="shin.R",
+                bone_a="j_asi_b_r",
+                bone_b="j_asi_d_r",
+                parent="thigh.R",
                 roll=-90,
                 start="tail",
                 is_connected=True,
@@ -41,9 +47,9 @@ LEG_R = BoneGroup(
                 operations=[CollectionOperation(time="Pre", bone_name="shin.R", collection_name="Leg.R (IK)")]
             ),
             ConnectBone(
-                name="foot.R", 
-                bone_a="j_asi_d_r", 
-                bone_b="j_asi_e_r", 
+                name="foot.R",
+                bone_a="j_asi_d_r",
+                bone_b="j_asi_e_r",
                 parent="shin.R",
                 is_connected=True,
                 roll=-90,
@@ -120,7 +126,7 @@ LEG_R = BoneGroup(
                     ParentBoneOperation(time="Post", bone_name="knee.R", parent=["MCH-knee.R"])
                 ]
             ),
-            # MCH Bones 
+            # MCH Bones
             # This has gotta be the biggest brain idea I've had in a while - Oats
             ExtensionBone(
                 name="MCH-knee_target.R",
@@ -152,7 +158,7 @@ LEG_L = BoneGroup(
         generators = [
             # Left Leg
             ConnectBone(
-                name="thigh.L", 
+                name="thigh.L",
                 bone_a="j_asi_a_l",
                 bone_b="j_asi_b_l",
                 parent="Spine.001",
@@ -160,13 +166,13 @@ LEG_L = BoneGroup(
                 end="tail",
                 req_bones=["j_asi_a_l", "j_asi_c_l"],
                 operations=[ParentBoneOperation(time="Pre", bone_name="thigh.L", parent=["Spine.001", "j_kosi"], is_connected=False),
-                            RigifyTypeOperation(time="Pre", bone_name="thigh.L", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)")), 
+                            RigifyTypeOperation(time="Pre", bone_name="thigh.L", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)")),
                             CollectionOperation(time="Pre", bone_name="thigh.L", collection_name="Leg.L (IK)")]
             ),
             ConnectBone(
-                name="shin.L", 
-                bone_a="j_asi_b_l", 
-                bone_b="j_asi_d_l", 
+                name="shin.L",
+                bone_a="j_asi_b_l",
+                bone_b="j_asi_d_l",
                 parent="thigh.L",
                 roll=-90,
                 start="tail",
@@ -175,9 +181,9 @@ LEG_L = BoneGroup(
                 operations=[CollectionOperation(time="Pre", bone_name="shin.L", collection_name="Leg.L (IK)")]
             ),
             ConnectBone(
-                name="foot.L", 
-                bone_a="j_asi_d_l", 
-                bone_b="j_asi_e_l", 
+                name="foot.L",
+                bone_a="j_asi_d_l",
+                bone_b="j_asi_e_l",
                 parent="shin.L",
                 is_connected=True,
                 req_bones=["j_asi_d_l", "j_asi_e_l"],
@@ -253,7 +259,7 @@ LEG_L = BoneGroup(
                     ParentBoneOperation(time="Post", bone_name="knee.L", parent=["MCH-knee.L"])
                 ]
             ),
-            # MCH Bones 
+            # MCH Bones
             # This has gotta be the biggest brain idea I've had in a while - Oats
             ExtensionBone(
                 name="MCH-knee_target.L",

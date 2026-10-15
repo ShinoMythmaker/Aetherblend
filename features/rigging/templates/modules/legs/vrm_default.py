@@ -1,9 +1,14 @@
-from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.bone_generators import ConnectBone, CopyBone, ExtensionBone, ParallelBone
-from ......core.operations import BoneRestrictionOperation, ParentBoneOperation, PropOverrideOperation, RigifyTypeOperation, CollectionOperation, ConstraintOperation
-from ......core.constraints import DampedTrackConstraint
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
+from ......core.bone_generators import ConnectBone, CopyBone, ExtensionBone, ParallelBone
+from ......core.operations import (
+    BoneRestrictionOperation,
+    CollectionOperation,
+    ParentBoneOperation,
+    PropOverrideOperation,
+    RigifyTypeOperation,
+)
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 LEG_R = BoneGroup(
         name="Right Leg",
@@ -16,17 +21,17 @@ LEG_R = BoneGroup(
         generators = [
             # Right Leg
             CopyBone(
-                name="thigh.R", 
+                name="thigh.R",
                 bone_a="J_Bip_R_UpperLeg",
                 req_bones=["J_Bip_R_UpperLeg"],
                 operations=[ParentBoneOperation(time="Pre", bone_name="thigh.R", parent=["Spine.001", "j_kosi"], is_connected=False),
-                            RigifyTypeOperation(time="Pre", bone_name="thigh.R", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)")), 
+                            RigifyTypeOperation(time="Pre", bone_name="thigh.R", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.R (FK)", tweak_coll="Leg.R (Tweak)")),
                             CollectionOperation(time="Pre", bone_name="thigh.R", collection_name="Leg.R (IK)")]
             ),
             CopyBone(
-                name="shin.R", 
-                bone_a="J_Bip_R_LowerLeg", 
-                parent="thigh.R", 
+                name="shin.R",
+                bone_a="J_Bip_R_LowerLeg",
+                parent="thigh.R",
                 is_connected=True,
                 req_bones=["J_Bip_R_LowerLeg"],
                 operations=[CollectionOperation(time="Pre", bone_name="shin.R", collection_name="Leg.R (IK)")]
@@ -79,8 +84,8 @@ LEG_R = BoneGroup(
 
             ## Foot and Heel
             ConnectBone(
-                name="foot.R", 
-                bone_a="J_Bip_R_Foot", 
+                name="foot.R",
+                bone_a="J_Bip_R_Foot",
                 bone_b="J_Bip_R_ToeBase",
                 parent="shin.R",
                 end="head",
@@ -123,17 +128,17 @@ LEG_L = BoneGroup(
         generators = [
             # Left Leg
             CopyBone(
-                name="thigh.L", 
+                name="thigh.L",
                 bone_a="J_Bip_L_UpperLeg",
                 req_bones=["J_Bip_L_UpperLeg"],
                 operations=[ParentBoneOperation(time="Pre", bone_name="thigh.L", parent=["Spine.001", "j_kosi"], is_connected=False),
-                            RigifyTypeOperation(time="Pre", bone_name="thigh.L", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)")), 
+                            RigifyTypeOperation(time="Pre", bone_name="thigh.L", rigify_type=rigify.types.limbs_leg( fk_coll="Leg.L (FK)", tweak_coll="Leg.L (Tweak)")),
                             CollectionOperation(time="Pre", bone_name="thigh.L", collection_name="Leg.L (IK)")]
             ),
             CopyBone(
-                name="shin.L", 
-                bone_a="J_Bip_L_LowerLeg", 
-                parent="thigh.L", 
+                name="shin.L",
+                bone_a="J_Bip_L_LowerLeg",
+                parent="thigh.L",
                 is_connected=True,
                 req_bones=["J_Bip_L_LowerLeg"],
                 operations=[CollectionOperation(time="Pre", bone_name="shin.L", collection_name="Leg.L (IK)")]
@@ -186,8 +191,8 @@ LEG_L = BoneGroup(
 
             ## Foot and Heel
             ConnectBone(
-                name="foot.L", 
-                bone_a="J_Bip_L_Foot", 
+                name="foot.L",
+                bone_a="J_Bip_L_Foot",
                 bone_b="J_Bip_L_ToeBase",
                 parent="shin.L",
                 end="head",

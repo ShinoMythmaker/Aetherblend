@@ -10,7 +10,7 @@ CS_RIGIFY = {
         "fingers_right": ColorSet(name="Fingers_Right", normal="#60C735", select="#98E5FF", active="#C4FFFF"),
         "fingers_left": ColorSet(name="Fingers_Left", normal="#60C735", select="#98E5FF", active="#C4FFFF"),
         "torso": ColorSet(name="Torso", normal="#FAE63D", select="#98E5FF", active="#C4FFFF"),
-        "torso_tweak": ColorSet(name="Torso_Tweak", normal="#387FC8", select="#98E5FF", active="#C4FFFF"), 
+        "torso_tweak": ColorSet(name="Torso_Tweak", normal="#387FC8", select="#98E5FF", active="#C4FFFF"),
         "head": ColorSet(name="Head", normal="#FAE63D", select="#98E5FF", active="#C4FFFF"),
         "face_primary": ColorSet(name="Face_Primary", normal="#FAE63D", select="#98E5FF", active="#C4FFFF"),
         "face_secondary": ColorSet(name="Face_Secondary", normal="#387FC8", select="#98E5FF", active="#C4FFFF"),

@@ -1,4 +1,4 @@
-from ......core.rigify.settings import UI_Collections, BoneCollection
+from ......core.rigify.settings import BoneCollection, UI_Collections
 from ......core.shared import RigModule
 
 

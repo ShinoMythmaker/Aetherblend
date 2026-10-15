@@ -1,10 +1,9 @@
-import mathutils
 
-from ......core.rigify.settings import UI_Collections, BoneCollection
-from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation
-from ......core.generators import ConnectBone, ExtensionBone, CenterBone, CopyBone, SkinBone, BridgeBone
-from ......core.shared import PoseOperations, BoneGroup, TransformLink, RigModule
 from ......core import rigify
+from ......core.generators import CenterBone, ConnectBone, ExtensionBone
+from ......core.operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation, WidgetOperation
+from ......core.rigify.settings import BoneCollection, UI_Collections
+from ......core.shared import BoneGroup, RigModule, TransformLink
 
 MOUTH_AUTO = BoneGroup(
     name="Mouth",
@@ -91,9 +90,9 @@ MOUTH_AUTO = BoneGroup(
             parent="jaw_master",
             req_bones=["j_f_ulip_02_r", "Mouth.Center"],
             operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.R", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center", 
-                                                                                                                          skin_chain_falloff_length=True, 
-                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0], 
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.R", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center",
+                                                                                                                          skin_chain_falloff_length=True,
+                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0],
                                                                                                                           primary_layer_extra="Face (Primary)",
                                                                                                                           skin_chain_use_scale=[True, True, True, True])),
                         CollectionOperation(time="Pre", bone_name="Lip.T.R", collection_name="Face (Secondary)")
@@ -117,9 +116,9 @@ MOUTH_AUTO = BoneGroup(
             parent="jaw_master",
             req_bones=["j_f_dlip_02_r", "Mouth.Center.001"],
             operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.R", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center", 
-                                                                                                                          skin_chain_falloff_length=True, 
-                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0], 
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.R", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center",
+                                                                                                                          skin_chain_falloff_length=True,
+                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0],
                                                                                                                           primary_layer_extra="Face (Primary)",
                                                                                                                           skin_chain_use_scale=[True, True, True, True])),
                         CollectionOperation(time="Pre", bone_name="Lip.B.R", collection_name="Face (Secondary)")
@@ -239,9 +238,9 @@ MOUTH_AUTO = BoneGroup(
             parent="jaw_master",
             req_bones=["j_f_ulip_02_l", "Mouth.Center"],
             operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.L", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center", 
-                                                                                                                          skin_chain_falloff_length=True, 
-                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0], 
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.T.L", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center",
+                                                                                                                          skin_chain_falloff_length=True,
+                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0],
                                                                                                                           primary_layer_extra="Face (Primary)",
                                                                                                                           skin_chain_use_scale=[True, True, True, True])),
                         CollectionOperation(time="Pre", bone_name="Lip.T.L", collection_name="Face (Secondary)"),
@@ -265,9 +264,9 @@ MOUTH_AUTO = BoneGroup(
             parent="jaw_master",
             req_bones=["j_f_dlip_02_l", "Mouth.Center.001"],
             operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.L", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center", 
-                                                                                                                          skin_chain_falloff_length=True, 
-                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0], 
+                        RigifyTypeOperation(time="Pre", bone_name="Lip.B.L", rigify_type=rigify.types.skin_stretchy_chain(skin_control_orientation_bone="Mouth.Center",
+                                                                                                                          skin_chain_falloff_length=True,
+                                                                                                                          skin_chain_falloff=[0.0, 0.0, -1.0],
                                                                                                                           primary_layer_extra="Face (Primary)",
                                                                                                                           skin_chain_use_scale=[True, True, True, True])),
                         CollectionOperation(time="Pre", bone_name="Lip.B.L", collection_name="Face (Secondary)")

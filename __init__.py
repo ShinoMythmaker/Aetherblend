@@ -4,13 +4,12 @@
 # for _path in site.getusersitepackages() if isinstance(site.getusersitepackages(), list) else [site.getusersitepackages()]:
 #     if _path not in sys.path:
 #         sys.path.append(_path)
-# Should not be needed anymore i would much rather have developers install dependancies via the script to ensure using the same artifacts as users. 
+# Should not be needed anymore i would much rather have developers install dependancies via the script to ensure using the same artifacts as users.
 
-from . import preferences
-from . import features
-from . import ui
+from . import features, preferences, ui
 from .properties import tab_prop
 from .utils import addon_dependencies
+
 
 def register():
     """Register all addon components."""

@@ -1,14 +1,15 @@
 
 
-import bpy
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 
+import bpy
+
+from .. import utils
 from . import rigify
 from .operations import ABOperationStack, PoseOperations, PoseOperationsStack, WidgetOperation
 from .shared import RigModule
-from .. import utils
 
 _ASSET_DIR = Path(__file__).resolve().parents[1] / "assets" / "blend"
 _WGTS_FILE = _ASSET_DIR / "wgts.blend"
@@ -29,6 +30,7 @@ _DEFAULT_OPERATIONS = [
 
 class AetherRigGenerator:
     """Generates an armature based on ordered module priority groups."""
+
     name: str
     modules: 'list[list[RigModule]]'
     color_sets: 'dict[str, rigify.ColorSet]'
@@ -64,7 +66,7 @@ class AetherRigGenerator:
 
         self._configure_meta_rig(armature, meta_rig)
 
-        
+
         ui_collections = self._run_generator_modules(
             meta_rig,
             generation_data,
@@ -133,7 +135,7 @@ class AetherRigGenerator:
         cleanup_existing: Callable[[], object] | None,
     ) -> bool:
         bpy.ops.object.mode_set(mode='OBJECT')
-        
+
         utils.armature.reset_transforms(armature)
 
         armature.hide_set(False)
@@ -151,7 +153,7 @@ class AetherRigGenerator:
             return False
 
         return True
-    
+
     def _append_widgets(self, armature: bpy.types.Object):
         """Append widget objects from wgts.blend and place them in the armature's WGTS collection."""
         def _base_object_name(object_name: str) -> str:

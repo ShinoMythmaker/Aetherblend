@@ -1,21 +1,23 @@
 import bpy
+
 from ..properties.tab_prop import get_active_tab
+
 
 class AETHER_PT_AetherBridge(bpy.types.Panel):
     bl_label = "AetherBridge"
     bl_idname = "AETHER_PT_aetherbridge"
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'  
+    bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 4 
-    
+    bl_order = 4
+
     @classmethod
     def poll(cls, context):
         return get_active_tab(context) == 'IMPORT_EXPORT'
-    
+
     def draw(self, context):
         layout = self.layout
-        
+
         box = layout.box()
         col = box.column(align=True)
         col.label(text="Work In Progress", icon='INFO')

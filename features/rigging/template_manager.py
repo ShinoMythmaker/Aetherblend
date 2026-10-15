@@ -1,12 +1,13 @@
+import json
+import re
+from pathlib import Path
+
+import bpy
+
 from ...core.aether_rig_generator import AetherRigGenerator
 from ...core.shared import RigModule, Template
 from ...preferences import get_default_custom_template_path, get_preferences
 from .templates import AVAILABLE_MODULES, CS_COLORSETS, get_module_key
-from pathlib import Path
-import bpy
-import json
-import re
-
 
 ## For Dropdowns
 CUSTOM_TEMPLATE_NAME = 'Custom'
@@ -173,7 +174,7 @@ def _template_from_definition(template_name: str, definition: dict) -> Template 
 
     if not module_groups:
         return None
-    
+
     return Template(name=template_name, modules=module_groups)
 
 
@@ -287,7 +288,7 @@ def populate_modules_from_template(aether_rig, template_name: str | None = None)
     aether_rig.module_index = 0 if aether_rig.modules else 0
 
 
-## Get selections 
+## Get selections
 def get_selected_template(aether_rig):
     """Get the template data currently driving generation."""
     template_name = getattr(aether_rig, 'selected_template', DEFAULT_TEMPLATE_NAME)

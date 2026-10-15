@@ -1,16 +1,17 @@
 import bpy
-from ...data.constants import sb_tail_collection, sb_ears_collection, sb_breast_collection
-from ...data.constants import spring_bone_collection
+
+from ...data.constants import sb_breast_collection, sb_ears_collection, sb_tail_collection, spring_bone_collection
 from ...properties.tab_prop import get_active_tab
 from ...utils.ui_visibility import visible_in_current_area
+
 
 class AETHER_PT_SpringBones(bpy.types.Panel):
     bl_label = "Spring Bones"
     bl_idname = "AETHER_PT_spring_bones"
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'  
+    bl_region_type = 'UI'
     bl_category = 'AetherBlend'
-    bl_order = 6 
+    bl_order = 6
 
     @classmethod
     def poll(cls, context):
@@ -20,7 +21,7 @@ class AETHER_PT_SpringBones(bpy.types.Panel):
             return False
         armature = context.active_object
         return armature is not None and armature.type == 'ARMATURE'
-    
+
     def draw(self, context):
         armature = context.active_object
         layout = self.layout
@@ -102,5 +103,5 @@ class AETHER_PT_SpringBones(bpy.types.Panel):
 def register():
     bpy.utils.register_class(AETHER_PT_SpringBones)
 
-def unregister():  
+def unregister():
     bpy.utils.unregister_class(AETHER_PT_SpringBones)

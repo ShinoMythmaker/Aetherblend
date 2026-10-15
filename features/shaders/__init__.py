@@ -1,5 +1,4 @@
-from . import operators 
-from . import panels
+from . import operators, panels
 
 modules = (operators, panels)
 

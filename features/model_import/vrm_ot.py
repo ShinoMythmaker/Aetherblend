@@ -4,35 +4,33 @@
 import re
 
 import bpy
-from bpy.props import BoolProperty, StringProperty, EnumProperty
+from bpy.props import BoolProperty, StringProperty
 
 from ... import utils
-from ...utils import addon_dependencies
-from ...utils.axis_conversion import AXIS_ITEMS
 from ...preferences import get_preferences
 from ...properties.tab_prop import set_active_tab
-from ..rigging import template_manager
 
 
 class AETHER_OT_VRM_Import(bpy.types.Operator):
     """Import a VRM model into Blender with various options."""
+
     bl_idname = "aether.vrm_import"
     bl_label = "Import VRM Model"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     filepath: StringProperty(subtype="FILE_PATH")  # type: ignore
     filter_glob: StringProperty(default='*.vrm', options={'HIDDEN'})  # type: ignore
 
     s_import_collection: BoolProperty(name="Import-Collection", description="Stores all import in a seperatre Collection", default=True)  # type: ignore
     s_cleanup_colliders: BoolProperty(name="Cleanup Colliders", description="Removes colliders from the imported model", default=True)  # type: ignore
     s_hide_toon_shaders: BoolProperty(name="Hide Toon Shaders", description="Hides toon shaders from the imported model", default=True)  # type: ignore
-    
-    
+
+
     def invoke(self, context, event):
         prefs = get_preferences()
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
-    
+
     def draw(self, context):
         indent = 0.3
         indent_nested = 0.3
@@ -48,7 +46,7 @@ class AETHER_OT_VRM_Import(bpy.types.Operator):
 
         col = box.column(align=True)
 
-        split = col.split(factor=indent)  
+        split = col.split(factor=indent)
         split.label(text=" ")
         split.prop(self, "s_import_collection")
 
@@ -59,13 +57,13 @@ class AETHER_OT_VRM_Import(bpy.types.Operator):
         split = col.split(factor=indent)
         split.label(text=" ")
         split.prop(self, "s_hide_toon_shaders")
- 
-    def execute(self, context):  
-        bpy.context.window.cursor_set('WAIT')   
-        
-        if not self.filepath or not self.filepath.lower().endswith(".vrm"): 
+
+    def execute(self, context):
+        bpy.context.window.cursor_set('WAIT')
+
+        if not self.filepath or not self.filepath.lower().endswith(".vrm"):
             self.report({'ERROR'}, "[AetherBlend] Invalid file format. Please select a .vrm file.")
-            return {'CANCELLED'}   
+            return {'CANCELLED'}
 
         # Import the model
         imported_objects = utils.import_export.import_vrm(filepath=self.filepath)
@@ -95,13 +93,13 @@ class AETHER_OT_VRM_Import(bpy.types.Operator):
             bpy.ops.object.mode_set(mode='OBJECT')
 
         self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
-        
+
         if get_preferences().auto_navigate_tabs == 'ON':
             set_active_tab(context, 'GENERATE')
-        
+
         bpy.context.window.cursor_set('DEFAULT')
         return {'FINISHED'}
-    
+
 
 def _hide_toon_shaders(objects):
     """Hides toon shaders in the imported objects."""

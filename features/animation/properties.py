@@ -1,12 +1,12 @@
 """Animation export properties."""
 
 import bpy
-from bpy.props import EnumProperty, BoolProperty
+from bpy.props import BoolProperty, EnumProperty
 
 
 class AetherAnimationExportProperties(bpy.types.PropertyGroup):
     """Properties for animation export settings."""
-    
+
     # Pose Export Axis Orientation
     pose_primary_axis: EnumProperty(
         name="Primary Pose Axis",
@@ -21,7 +21,7 @@ class AetherAnimationExportProperties(bpy.types.PropertyGroup):
         ),
         default='Y',
     )  # type: ignore
-    
+
     pose_secondary_axis: EnumProperty(
         name="Secondary Pose Axis",
         description="Secondary axis for pose export orientation.",
@@ -35,7 +35,7 @@ class AetherAnimationExportProperties(bpy.types.PropertyGroup):
         ),
         default='X',
     )  # type: ignore
-    
+
     use_pose_axis_conversion: BoolProperty(
         name="Use Pose Axis Conversion",
         description="Apply pose axis conversion to match character import settings",

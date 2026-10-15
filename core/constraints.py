@@ -1,11 +1,12 @@
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
 import bpy
 
 
 class Constraint(ABC):
     """Abstract base class for all bone constraints."""
-    
+
     @abstractmethod
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         """Applies the constraint to the given bone."""
@@ -14,7 +15,7 @@ class Constraint(ABC):
 @dataclass(frozen=True)
 class CopyScaleConstraint(Constraint):
     target_bone: str | None = None
-    axis: tuple[bool, bool, bool] = (True, True, True) 
+    axis: tuple[bool, bool, bool] = (True, True, True)
     power: float = 1.0
     uniform_scale: bool = False
     offset: bool = False
@@ -30,7 +31,7 @@ class CopyScaleConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object not found for Copy Scale constraint.")
+            print("[AetherBlend] Target object not found for Copy Scale constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -48,7 +49,7 @@ class CopyScaleConstraint(Constraint):
 class CopyLocationConstraint(Constraint):
     target_bone: str | None = None
     head_tail: float = 0.0
-    axis: tuple[bool, bool, bool] = (True, True, True) 
+    axis: tuple[bool, bool, bool] = (True, True, True)
     invert_axis: tuple[bool, bool, bool] = (False, False, False)
     offset: bool = False
     target_space: str = "POSE"
@@ -62,7 +63,7 @@ class CopyLocationConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object not found for Copy Location constraint.")
+            print("[AetherBlend] Target object not found for Copy Location constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -82,7 +83,7 @@ class CopyLocationConstraint(Constraint):
 class CopyRotationConstraint(Constraint):
     target_bone: str | None = None
     euler_order: str = "ZXY"
-    axis: tuple[bool, bool, bool] = (True, True, True) 
+    axis: tuple[bool, bool, bool] = (True, True, True)
     invert_axis: tuple[bool, bool, bool] = (False, False, False)
     mix_mode: str = "AFTER"
     target_space: str = "LOCAL_OWNER_ORIENT"
@@ -96,7 +97,7 @@ class CopyRotationConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object not found for Copy Rotation constraint.")
+            print("[AetherBlend] Target object not found for Copy Rotation constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -133,7 +134,7 @@ class CopyTransformsConstraint(Constraint):
         else:
             target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object not found for Copy Transforms constraint.")
+            print("[AetherBlend] Target object not found for Copy Transforms constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -149,7 +150,7 @@ class TrackToConstraint(Constraint):
     target_bone: str
     track_axis: str = "TRACK_Y"
     up_axis: str = "UP_X"
-    target_z: bool = False 
+    target_z: bool = False
     target_space: str = "LOCAL_OWNER_ORIENT"
     owner_space: str = "LOCAL_WITH_PARENT"
     space_object: str | None = None
@@ -163,7 +164,7 @@ class TrackToConstraint(Constraint):
         constraint.name = self.name
         target_obj = armature
         if not target_obj:
-            print(f"[AetherBlend] Target object not found for Track To constraint.")
+            print("[AetherBlend] Target object not found for Track To constraint.")
             return
         constraint.target = target_obj
         constraint.subtarget = self.target_bone
@@ -195,7 +196,7 @@ class DampedTrackConstraint(Constraint):
        constraint.name = self.name
        target_obj = armature
        if not target_obj:
-           print(f"[AetherBlend] Target object not found for Damped Track constraint.")
+           print("[AetherBlend] Target object not found for Damped Track constraint.")
            return
        constraint.target =  target_obj
        constraint.subtarget = self.target_bone

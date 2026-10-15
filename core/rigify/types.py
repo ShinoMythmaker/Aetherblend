@@ -1,22 +1,24 @@
-import bpy
 from dataclasses import dataclass
 from typing import Any
 
+import bpy
+
+
 class rigify_type:
     """Base class for rigify types."""
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
-        """
-        Apply rigify settings to a bone.
+        """Apply rigify settings to a bone.
         
         Args:
             pose_bone: The pose bone to apply settings to
             armature: The armature object
+
         """
         raise NotImplementedError("Subclasses must implement apply()")
 
     def set_fk_collection (self, rigify_params: Any) -> None:
-        
+
         try:
             if self.fk_coll:
                 rigify_params.fk_coll_refs.clear()
@@ -29,7 +31,7 @@ class rigify_type:
 
     def set_tweak_collection (self, rigify_params: Any) -> None:
 
-        try:            
+        try:
             if self.tweak_coll:
                 rigify_params.tweak_coll_refs.clear()
                 bpy.ops.pose.rigify_collection_ref_add(prop_name="tweak_coll_refs")
@@ -38,52 +40,54 @@ class rigify_type:
                     tweak_ref.name = self.tweak_coll
         except Exception as e:
                 print(f"[AetherBlend] Error setting Tweak collection: {e}")
-        
+
 @dataclass
 class limbs_leg(rigify_type):
     """Rigify type: limbs.leg - Used for leg rigs."""
+
     fk_coll: str = None
     tweak_coll: str = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "limbs.leg"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             super().set_fk_collection(rigify_params)
             super().set_tweak_collection(rigify_params)
         except Exception as e:
             print(f"[AetherBlend] Error setting leg collections: {e}")
-        
+
 
 @dataclass
 class limbs_arm(rigify_type):
     """Rigify type: limbs.arm - Used for arm rigs."""
+
     fk_coll: str | None = None
     tweak_coll: str | None = None
-    rotation_axis: str | None = None 
+    rotation_axis: str | None = None
     auto_align_extremity: bool | None = False
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "limbs.arm"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.rotation_axis is not None:
                 rigify_params.rotation_axis = self.rotation_axis
                 if self.auto_align_extremity is not None:
                     rigify_params.auto_align_extremity = self.auto_align_extremity
-            
+
             super().set_fk_collection(rigify_params)
             super().set_tweak_collection(rigify_params)
         except Exception as e:
@@ -92,21 +96,22 @@ class limbs_arm(rigify_type):
 @dataclass
 class limbs_super_finger(rigify_type):
     """Rigify type: limbs.super_finger - Used for finger and toe rigs."""
+
     primary_rotation_axis: str | None = None
     tweak_coll: str | None = None
     tweak_layers_extra: bool | None = False
     make_extra_ik_control: bool | None = False
     extra_ik_layers_extra: str | None = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "limbs.super_finger"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.primary_rotation_axis is not None:
                 rigify_params.primary_rotation_axis = self.primary_rotation_axis
@@ -130,13 +135,14 @@ class limbs_super_finger(rigify_type):
 @dataclass
 class limbs_super_palm(rigify_type):
     """Rigify type: limbs.super_palm - Palm rig"""
+
     palm_both_sides: bool = None
 
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "limbs.super_palm"
         rigify_params = pose_bone.rigify_parameters
@@ -157,9 +163,9 @@ class limbs_spline_tentacle(rigify_type):
 
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "limbs.spline_tentacle"
         rigify_params = pose_bone.rigify_parameters
@@ -178,23 +184,24 @@ class limbs_spline_tentacle(rigify_type):
 @dataclass
 class spines_basic_spine(rigify_type):
     """Rigify type: spines.basic_spine - Used for spine rigs."""
+
     fk_coll: str = None
     tweak_coll: str = None
     pivot_pos: int = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "spines.basic_spine"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             super().set_fk_collection(rigify_params)
             super().set_tweak_collection(rigify_params)
-            
+
             if self.pivot_pos is not None:
                 rigify_params.pivot_pos = self.pivot_pos
         except Exception as e:
@@ -203,17 +210,18 @@ class spines_basic_spine(rigify_type):
 @dataclass
 class spines_super_head(rigify_type):
     """Rigify type: spines.super_head - Used for neck/head rigs."""
+
     tweak_coll: str = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "spines.super_head"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             super().set_tweak_collection(rigify_params)
         except Exception as e:
@@ -222,19 +230,20 @@ class spines_super_head(rigify_type):
 @dataclass
 class spines_basic_tail(rigify_type):
     """Rigify type: spines.basic_tail - Used for tail rigs."""
+
     use_x: bool = False
     use_y: bool = False
     use_z: bool = False
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "spines.basic_tail"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             rigify_params.copy_rotation_axes[0] = self.use_x
             rigify_params.copy_rotation_axes[1] = self.use_y
@@ -245,13 +254,14 @@ class spines_basic_tail(rigify_type):
 @dataclass
 class basic_super_copy(rigify_type):
     """Rigify type: basic.super_copy - Used for simple control bones."""
+
     widget_type: str = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "basic.super_copy"
         rigify_params = pose_bone.rigify_parameters
@@ -265,6 +275,7 @@ class basic_super_copy(rigify_type):
 @dataclass
 class skin_stretchy_chain(rigify_type):
     """Rigify type: skin.stretchy_chain - Used for facial and stretchy chains."""
+
     skin_chain_pivot_pos: int = None
     skin_control_orientation_bone: str = None
     skin_chain_falloff: list = None
@@ -275,16 +286,16 @@ class skin_stretchy_chain(rigify_type):
     primary_layer_extra: str = None
     secondary_layer_extra: str = None
     skin_control_orientation_bone: str = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
 
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "skin.stretchy_chain"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.skin_chain_pivot_pos is not None:
                 rigify_params.skin_chain_pivot_pos = self.skin_chain_pivot_pos
@@ -302,7 +313,7 @@ class skin_stretchy_chain(rigify_type):
                 rigify_params.skin_chain_use_scale = self.skin_chain_use_scale
             if self.skin_control_orientation_bone:
                 rigify_params.skin_control_orientation_bone = self.skin_control_orientation_bone
-            
+
             if self.primary_layer_extra:
                 rigify_params.skin_primary_layers_extra = True
                 rigify_params.skin_primary_coll_refs.clear()
@@ -311,7 +322,7 @@ class skin_stretchy_chain(rigify_type):
                     if len(rigify_params.skin_primary_coll_refs) > 0:
                         skin_ref = rigify_params.skin_primary_coll_refs[-1]
                         skin_ref.name = self.primary_layer_extra
-            
+
             if self.secondary_layer_extra:
                 rigify_params.skin_secondary_layers_extra = True
                 rigify_params.skin_secondary_coll_refs.clear()
@@ -326,19 +337,20 @@ class skin_stretchy_chain(rigify_type):
 @dataclass
 class skin_basic_chain(rigify_type):
     """Rigify type: skin.basic_chain - Used for basic skin chains."""
+
     skin_chain_priority: int = None
     skin_control_orientation_bone: str = None
     skin_chain_use_scale: list = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "skin.basic_chain"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.skin_chain_priority is not None:
                 rigify_params.skin_chain_priority = self.skin_chain_priority
@@ -352,21 +364,22 @@ class skin_basic_chain(rigify_type):
 @dataclass
 class skin_glue(rigify_type):
     """Rigify type: skin.glue - Used for glue bones in facial rigs."""
+
     relink_constraints: bool = None
     skin_glue_use_tail: bool = None
     skin_glue_tail_reparent: bool = None
     skin_glue_add_constraint: str = None
     skin_glue_add_constraint_influence: float = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "skin.glue"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.relink_constraints:
                 rigify_params.relink_constraints = self.relink_constraints
@@ -384,18 +397,19 @@ class skin_glue(rigify_type):
 @dataclass
 class skin_anchor(rigify_type):
     """Rigify type: skin.anchor - Used for anchor bones in facial rigs."""
+
     pivot_master_widget_type: str = None
     skin_anchor_hide: bool = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "skin.anchor"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.pivot_master_widget_type:
                 rigify_params.pivot_master_widget_type = self.pivot_master_widget_type
@@ -407,29 +421,30 @@ class skin_anchor(rigify_type):
 @dataclass
 class face_skin_eye(rigify_type):
     """Rigify type: face.skin_eye - Used for eye rigs."""
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "face.skin_eye"
 
 @dataclass
 class face_skin_jaw(rigify_type):
     """Rigify type: face.skin_jaw - Used for jaw rigs."""
+
     jaw_mouth_influence: float = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "face.skin_jaw"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.jaw_mouth_influence is not None:
                 rigify_params.jaw_mouth_influence = self.jaw_mouth_influence
@@ -439,17 +454,18 @@ class face_skin_jaw(rigify_type):
 @dataclass
 class face_basic_tongue(rigify_type):
     """Rigify type: face.basic_tongue - Used for tongue rigs."""
+
     tweak_coll: str = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "face.basic_tongue"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             super().set_tweak_collection(rigify_params)
         except Exception as e:
@@ -458,19 +474,20 @@ class face_basic_tongue(rigify_type):
 @dataclass
 class basic_raw_copy(rigify_type):
     """Rigify type: basic.raw_copy - Used for raw copy bones."""
+
     relink_constraints: bool = None
     parent: str = None
     widget_type: str = None
-    
+
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "basic.raw_copy"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.relink_constraints:
                 rigify_params.relink_constraints = self.relink_constraints
@@ -485,18 +502,19 @@ class basic_raw_copy(rigify_type):
 @dataclass
 class basic_copy_chain(rigify_type):
     """Rigify type: basic.copy_chain - Used for copy chain bones."""
+
     make_deforms: bool = None
     make_controls: bool = None
 
     def apply(self, pose_bone: bpy.types.PoseBone, armature: bpy.types.Object) -> None:
         if pose_bone is None:
-            print(f"[AetherBlend] Warning: pose_bone is None")
+            print("[AetherBlend] Warning: pose_bone is None")
             return
-        
+
         armature.data.bones.active = pose_bone.bone
         pose_bone.rigify_type = "basic.copy_chain"
         rigify_params = pose_bone.rigify_parameters
-        
+
         try:
             if self.make_deforms is not None:
                 rigify_params.make_deforms = self.make_deforms

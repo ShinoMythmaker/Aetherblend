@@ -27,7 +27,7 @@ def assign_bones(armature: bpy.types.Object, bone_names: list[str], collection_n
     if not target_coll:
         target_coll = armature.data.collections.new(collection_name)
 
-    
+
     for bone_name in bone_names:
         bone = armature.data.bones.get(bone_name)
         if bone:

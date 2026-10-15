@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
-from typing import Literal, ClassVar
+from dataclasses import dataclass, field
+from typing import ClassVar, Literal
+
 import bpy
 
 DriverType = Literal['AVERAGE', 'SUM', 'SCRIPTED', 'MIN', 'MAX']
@@ -14,6 +15,7 @@ ContextProperty = Literal['ACTIVE_VIEW_LAYER', 'ACTIVE_SCENE']
 @dataclass()
 class DriverVariable(ABC):
     """Abstract base class for driver variables."""
+
     name: str
     type: ClassVar[VariableType]
 
@@ -25,11 +27,12 @@ class DriverVariable(ABC):
 @dataclass()
 class Driver():
     """Universal Driver Class"""
+
     type: DriverType
     expression: str | None = None
     use_self: bool | None = None
     variables: list[DriverVariable] = field(default=None, kw_only=True)
-    
+
     def apply(self, target: bpy.types.PoseBone | bpy.types.Object | bpy.types.Constraint, property: tuple[str, int] | str, armature: bpy.types.Object) -> None:
         """Applies the driver to the given bone."""
         if isinstance(property, str):
@@ -50,15 +53,16 @@ class Driver():
             variable.add(driver, armature)
 
 ####################################################
-# Driver Variables 
+# Driver Variables
 ####################################################
 
 @dataclass()
 class TransformChannelVariable(DriverVariable):
     """Driver variable for a transform channel."""
+
     type: ClassVar[VariableType] = 'TRANSFORMS'
 
-    
+
     target_bone: str | None = None
     target_object: bpy.types.Object | None = None
     transform_type: TransformType | None = None
@@ -82,7 +86,7 @@ class TransformChannelVariable(DriverVariable):
         else:
             print(f"[AetherBlend] Warning: Armature not found for driver variable '{self.name}'. Driver may not work as expected.")
             return driver
-            
+
         if self.target_bone is not None:
             d_target.bone_target = self.target_bone
         if self.transform_type is not None:
@@ -123,12 +127,12 @@ class SinglePropertyVariable(DriverVariable):
         else:
             print(f"[AetherBlend] Warning: Armature not found for driver variable '{self.name}'. Driver may not work as expected.")
             return driver
-        
+
         if self.data_path is not None:
             d_target.data_path = self.data_path
         if self.use_fallback_value is not None:
             d_target.use_fallback_value = self.fallback_value
         if self.fallback_value is not None:
             d_target.fallback_value = self.fallback_value
-        
+
         return driver
