@@ -1,7 +1,7 @@
 ---
 title: Rig Generator
 group: Development
-order: 120
+order: 250
 sub: true
 ---
 # Operators: Rig Generator

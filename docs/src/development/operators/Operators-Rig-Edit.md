@@ -1,7 +1,7 @@
 ---
 title: Rig Edit
 group: Development
-order: 130
+order: 240
 sub: true
 ---
 # Operators: Rig Edit

@@ -1,7 +1,7 @@
 ---
 title: Operator Reference
 group: Development
-order: 100
+order: 210
 summary: Every operator, its parameters and what it does.
 ---
 # Operators

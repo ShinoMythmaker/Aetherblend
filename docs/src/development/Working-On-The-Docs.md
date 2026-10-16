@@ -16,18 +16,6 @@ Use the virtual environment from [Contributing](Contributing). Its setup command
 .venv\Scripts\python.exe -m pip install markdown pygments
 ```
 
-## Where Things Live
-
-| Path | Content |
-|------|---------|
-| `docs/src/guides/` | User guides (installation, getting started, ...) |
-| `docs/src/operators/` | One page per operator group |
-| `docs/src/development/` | Contributor pages like this one |
-| `docs/src/Home.md` | Text used by the landing page |
-| `README.md` | Landing page intro, goal and acknowledgements |
-| `docs/assets/` | Stylesheet, scripts and images |
-| `docs/*.html` | Generated output. Do not edit by hand |
-
 ## Adding or Editing a Page
 
 Every Markdown file under `docs/src/` that has a `group` in its frontmatter becomes a page in the navigation:
@@ -66,7 +54,8 @@ Rules to keep in mind:
 From the repository root:
 
 ```powershell
-.venv\Scripts\python.exe docs\build.py
+cd docs
+..venv\Scripts\python.exe build.py
 ```
 
 What it does:
@@ -85,8 +74,8 @@ The pages use relative links, so serve the `docs` folder with a small local web 
 1. Open a terminal in VS Code and run:
 
    ```powershell
-   Set-Location docs
-   ..\.venv\Scripts\python.exe -m http.server 8000
+   cd docs
+   ..venv\Scripts\python.exe -m http.server 8000
    ```
 
 2. Open the Command Palette (`Ctrl+Shift+P`), run **Simple Browser: Show** and enter `http://localhost:8000`.
@@ -95,32 +84,6 @@ The pages use relative links, so serve the `docs` folder with a small local web 
 
 You can also open `docs\index.html` directly in a normal browser, but a server matches how GitHub Pages serves the site.
 
-### Automate the rebuild (optional)
-
-To rebuild with one keystroke, add a task in `.vscode/tasks.json` (the `.vscode` folder is ignored by git, so this stays local):
-
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Build docs",
-      "type": "shell",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe docs\\build.py",
-      "group": "build"
-    },
-    {
-      "label": "Serve docs",
-      "type": "shell",
-      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe -m http.server 8000",
-      "options": { "cwd": "${workspaceFolder}/docs" },
-      "isBackground": true
-    }
-  ]
-}
-```
-
-Run them with **Terminal > Run Task**.
 
 ## Before You Commit
 

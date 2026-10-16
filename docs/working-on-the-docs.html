@@ -15,8 +15,7 @@
   <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
   <nav class="header-links">
     <a href="installation.html">Guides</a>
-    <a href="operators.html">Development</a>
-    <a href="operators-rig-generator.html">Operator Reference</a>
+    <a href="contributing.html">Development</a>
     <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
     <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
   </nav>
@@ -24,21 +23,17 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="">Installation</a>
-<a href="getting-started.html" class="">Getting Started</a>
-<a href="the-template-system.html" class="sub">The Template System</a>
-<a href="animation-modding.html" class="">Animation Modding</a>
 <h4>Development</h4>
-<a href="operators.html" class="">Operator Reference</a>
-<a href="operators-import-export.html" class="sub">Import / Export</a>
 <a href="contributing.html" class="">Contributing</a>
 <a href="working-on-the-docs.html" class="active">Working on the Docs</a>
 <a href="style-guide.html" class="">Style Guide</a>
-<h4>Operator Reference</h4>
-<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
+<a href="operators.html" class="">Operator Reference</a>
+<a href="operators-import-export.html" class="sub">Import / Export</a>
+<a href="operators-preferences.html" class="sub">Preferences</a>
 <a href="operators-rig-edit.html" class="sub">Rig Edit</a>
+<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
 <a href="operators-rig-ui.html" class="sub">Rig UI</a>
-<a href="operators-shaders.html" class="sub">Shaders</a>
-<a href="operators-preferences.html" class="sub">Preferences</a></aside>
+<a href="operators-shaders.html" class="sub">Shaders</a></aside>
 <main><article>
 <h1>Working on the Docs</h1>
 <p>The website is generated. You edit Markdown in <code>docs/src/</code>, run <code>build.py</code>, and it writes plain HTML pages into <code>docs/</code>, which GitHub Pages serves. The HTML files are committed, so always rebuild before you commit documentation changes.</p>
@@ -47,45 +42,6 @@
 <div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">markdown</span> <span class="n">pygments</span>
 </code></pre></div>
 
-<h2 id="where-things-live">Where Things Live<a class="headerlink" href="#where-things-live" title="Permanent link">#</a></h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Path</th>
-<th>Content</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>docs/src/guides/</code></td>
-<td>User guides (installation, getting started, ...)</td>
-</tr>
-<tr>
-<td><code>docs/src/operators/</code></td>
-<td>One page per operator group</td>
-</tr>
-<tr>
-<td><code>docs/src/development/</code></td>
-<td>Contributor pages like this one</td>
-</tr>
-<tr>
-<td><code>docs/src/Home.md</code></td>
-<td>Text used by the landing page</td>
-</tr>
-<tr>
-<td><code>README.md</code></td>
-<td>Landing page intro, goal and acknowledgements</td>
-</tr>
-<tr>
-<td><code>docs/assets/</code></td>
-<td>Stylesheet, scripts and images</td>
-</tr>
-<tr>
-<td><code>docs/*.html</code></td>
-<td>Generated output. Do not edit by hand</td>
-</tr>
-</tbody>
-</table></div>
 <h2 id="adding-or-editing-a-page">Adding or Editing a Page<a class="headerlink" href="#adding-or-editing-a-page" title="Permanent link">#</a></h2>
 <p>Every Markdown file under <code>docs/src/</code> that has a <code>group</code> in its frontmatter becomes a page in the navigation:</p>
 <div class="codehilite"><pre><span></span><code>---
@@ -143,7 +99,8 @@ Content here.
 </ul>
 <h2 id="build-the-site">Build the Site<a class="headerlink" href="#build-the-site" title="Permanent link">#</a></h2>
 <p>From the repository root:</p>
-<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">docs</span><span class="p">\</span><span class="n">build</span><span class="p">.</span><span class="n">py</span>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">docs</span>
+<span class="p">..</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">build</span><span class="p">.</span><span class="n">py</span>
 </code></pre></div>
 
 <p>What it does:</p>
@@ -160,37 +117,14 @@ Content here.
 <li>Open a terminal in VS Code and run:</li>
 </ol>
 <p><code>powershell
-   Set-Location docs
-   ..\.venv\Scripts\python.exe -m http.server 8000</code></p>
+   cd docs
+   ..venv\Scripts\python.exe -m http.server 8000</code></p>
 <ol>
 <li>Open the Command Palette (<code>Ctrl+Shift+P</code>), run <strong>Simple Browser: Show</strong> and enter <code>http://localhost:8000</code>.</li>
 <li>Edit Markdown, run the build again and refresh the preview (the server keeps running).</li>
 <li>Stop the server with <code>Ctrl+C</code> when you are done.</li>
 </ol>
 <p>You can also open <code>docs\index.html</code> directly in a normal browser, but a server matches how GitHub Pages serves the site.</p>
-<h3 id="automate-the-rebuild-optional">Automate the rebuild (optional)<a class="headerlink" href="#automate-the-rebuild-optional" title="Permanent link">#</a></h3>
-<p>To rebuild with one keystroke, add a task in <code>.vscode/tasks.json</code> (the <code>.vscode</code> folder is ignored by git, so this stays local):</p>
-<div class="codehilite"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0.0"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Build docs"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"shell"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${workspaceFolder}\\.venv\\Scripts\\python.exe docs\\build.py"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"build"</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Serve docs"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"shell"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${workspaceFolder}\\.venv\\Scripts\\python.exe -m http.server 8000"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"cwd"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${workspaceFolder}/docs"</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">"isBackground"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>Run them with <strong>Terminal &gt; Run Task</strong>.</p>
 <h2 id="before-you-commit">Before You Commit<a class="headerlink" href="#before-you-commit" title="Permanent link">#</a></h2>
 <ul>
 <li>Rebuild with <code>docs\build.py</code> so the HTML matches the Markdown.</li>
@@ -202,13 +136,9 @@ Content here.
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>
 <li><a href="#setup">Setup</a></li>
-<li><a href="#where-things-live">Where Things Live</a></li>
 <li><a href="#adding-or-editing-a-page">Adding or Editing a Page</a></li>
 <li><a href="#build-the-site">Build the Site</a></li>
-<li><a href="#preview-in-vs-code">Preview in VS Code</a><ul>
-<li><a href="#automate-the-rebuild-optional">Automate the rebuild (optional)</a></li>
-</ul>
-</li>
+<li><a href="#preview-in-vs-code">Preview in VS Code</a></li>
 <li><a href="#before-you-commit">Before You Commit</a></li>
 </ul>
 </div>
