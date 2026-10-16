@@ -7,8 +7,7 @@ _REGISTERED = []
 
 def _source_panels():
     # Imported lazily because the feature panels import from this package.
-    from ..features.animation.panels import AETHER_PT_ExportPanel
-    from ..features.model_import.panels import AETHER_PT_ImportPanel
+    from ..features.import_export.panels import AETHER_PT_ExportPanel, AETHER_PT_ImportPanel
     from ..features.rig_edit.panels import AETHER_PT_RigManipulation
     from ..features.rig_generator.panels import AETHER_PT_RigCreation
     from ..features.rig_ui.panels import (

@@ -14,7 +14,7 @@ from ...utils.axis_conversion import AXIS_ITEMS
 class AETHER_OT_Character_Import(bpy.types.Operator):
     """Import a character model into Blender with various options."""
 
-    bl_idname = "aether.model_import_character"
+    bl_idname = "aether.import_export_import_character"
     bl_label = "Import Character"
     bl_options = {'REGISTER', 'UNDO'}
 

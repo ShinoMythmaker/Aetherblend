@@ -26,7 +26,7 @@ AetherBlend/
       rigify/            # rigify settings (collections, colorsets)
 ```
 
-Features: `animation`, `model_import`, `shaders`, `rig_generator` (build a rig), `rig_edit` (convert and clean up a generated rig), `rig_ui` (use a generated rig: layers, rig UI, eyelid editing).
+Features: `import_export` (import characters, export poses and animations), `shaders`, `rig_generator` (build a rig), `rig_edit` (convert and clean up a generated rig), `rig_ui` (use a generated rig: layers, rig UI, eyelid editing).
 
 - R-1.1 A feature MUST be a self-contained package under `features/`.
 - R-1.2 A feature MAY import `utils/`, `ui/` and `preferences`. A feature MUST NOT import another feature except through the names in that feature's `__all__` (for example `from ..rig_generator import instructions`).

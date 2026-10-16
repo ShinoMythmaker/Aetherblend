@@ -1,9 +1,9 @@
 """Add-on features. Each feature is a self-contained package that registers its own operators, panels and properties."""
-from . import animation, model_import, rig_edit, rig_generator, rig_ui, shaders
+from . import import_export, rig_edit, rig_generator, rig_ui, shaders
 
-__all__ = ['animation', 'model_import', 'rig_edit', 'rig_generator', 'rig_ui', 'shaders']
+__all__ = ['import_export', 'rig_edit', 'rig_generator', 'rig_ui', 'shaders']
 
-modules = (model_import, rig_generator, rig_edit, rig_ui, animation, shaders)
+modules = (import_export, rig_generator, rig_edit, rig_ui, shaders)
 
 def register():
     for mod in modules:
