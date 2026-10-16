@@ -1,6 +1,6 @@
 ---
-title: Overview
-group: Operator Reference
+title: Operator Reference
+group: Development
 order: 100
 summary: Every operator, its parameters and what it does.
 ---

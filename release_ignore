@@ -1,0 +1,12 @@
+.*
+*/.*
+docs/*
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+get_dependencies.py
+LICENSE
+README.md
+repo.json
+ruff.toml
+release_ignore
+*__pycache__*

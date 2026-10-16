@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contributing · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Guides</a>
+    <a href="operators.html">Development</a>
+    <a href="operators-rig-generator.html">Operator Reference</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<a href="getting-started.html" class="">Getting Started</a>
+<a href="the-template-system.html" class="sub">The Template System</a>
+<a href="animation-modding.html" class="">Animation Modding</a>
+<h4>Development</h4>
+<a href="operators.html" class="">Operator Reference</a>
+<a href="operators-import-export.html" class="sub">Import / Export</a>
+<a href="contributing.html" class="active">Contributing</a>
+<a href="working-on-the-docs.html" class="">Working on the Docs</a>
+<a href="style-guide.html" class="">Style Guide</a>
+<h4>Operator Reference</h4>
+<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
+<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
+<a href="operators-rig-ui.html" class="sub">Rig UI</a>
+<a href="operators-shaders.html" class="sub">Shaders</a>
+<a href="operators-preferences.html" class="sub">Preferences</a></aside>
+<main><article>
+<h1>Contributing</h1>
+<p>Everything you need to work on AetherBlend on one page. Docs work has its own page: <a href="working-on-the-docs.html">Working on the Docs</a>.</p>
+<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
+<p>You need Blender 5.2+, Git, Python 3.11+ and <a href="https://code.visualstudio.com/">VS Code</a> with the Python extension.</p>
+<div class="codehilite"><pre><span></span><code><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">ShinoMythmaker</span><span class="p">/</span><span class="n">Aetherblend</span><span class="p">.</span><span class="n">git</span>
+<span class="nb">cd </span><span class="n">Aetherblend</span>
+</code></pre></div>
+
+<p>Use your fork's URL if you work from a fork. Then, from the repository root:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">venv</span><span class="p">;</span> <span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-upgrade</span> <span class="n">pip</span> <span class="n">ruff</span> <span class="n">tomli-w</span> <span class="n">markdown</span> <span class="n">pygments</span> <span class="n">fake-bpy-module</span><span class="p">;</span> <span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">get_dependencies</span><span class="p">.</span><span class="n">py</span>
+</code></pre></div>
+
+<p>This creates the virtual environment, installs the tools and downloads the bundled wheels into <code>wheels/</code> (not committed). Run <code>get_dependencies.py</code> again if <code>wheels/</code> is missing or you change <code>dependencies</code> in <code>blender_manifest.toml</code>.</p>
+<p>In VS Code:</p>
+<ol>
+<li>Run <strong>Python: Select Interpreter</strong> and pick <code>.venv</code>.</li>
+<li><code>fake-bpy-module</code> gives you <code>bpy</code> autocompletion. If it doesn't match your Blender, install the matching version, for example <code>fake-bpy-module-5.2</code>.</li>
+<li>Install the <a href="https://marketplace.visualstudio.com/items?itemName=JacquesLucke.blender-development">Blender Development</a> extension. Run <strong>Blender: Build and Start</strong> to open Blender with the add-on loaded, and <strong>Blender: Reload Addon</strong> after changes. You can attach the debugger to that session.</li>
+</ol>
+<h2 id="guidelines">Guidelines<a class="headerlink" href="#guidelines" title="Permanent link">#</a></h2>
+<p>These are guidelines, not hard rules. A pull request that doesn't follow all of them can still be accepted, but it is more likely to be if it does.</p>
+<ul>
+<li><strong>New features are standalone</strong> and can be enabled and disabled in the add-on preferences. They don't import other features. Shared code goes in <code>utils/</code> or <code>ui/</code>.</li>
+<li><strong>Edited features keep working</strong> and can still be enabled and disabled.</li>
+<li><strong>Follow the <a href="style-guide.html">Style Guide</a></strong> as well as you can.</li>
+<li>Keep pull requests small and focused. Keep operators thin.</li>
+<li>Don't rename operator IDs, <code>.blend</code> property names, preference keys or the template format without asking. User data depends on them.</li>
+<li>Changed an operator? Update its page in <code>docs/src/operators/</code> and rebuild the docs.</li>
+</ul>
+<p>Before you open the pull request:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">.</span>
+<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">compileall</span> <span class="n">-q</span> <span class="p">.</span>
+</code></pre></div>
+
+<p>Then test in Blender: run what you changed, toggle the feature off and on in preferences, and check the console for errors. Mention in the pull request how you tested.</p>
+<h2 id="release">Release<a class="headerlink" href="#release" title="Permanent link">#</a></h2>
+<p>Only the maintainer releases the main repository. This is for forks.</p>
+<ol>
+<li>Update <code>blender_manifest.toml</code>: set the new <code>version</code> and, if needed, <code>blender_version_min</code>.</li>
+<li>Optionally run <code>docs\build.py</code> to update the docs now. It also runs automatically after the release.</li>
+<li>Push the change, then create and push a version tag like <code>v0.3.8</code> on the default branch.</li>
+<li>The <code>draft-release-with-zip</code> workflow runs on the tag. It downloads the wheels, zips the repository and creates a draft GitHub release.</li>
+<li>Review and publish the release. The <code>Update repo.json on Release</code> workflow then rewrites <code>repo.json</code> to point at the new release and its hash, and pushes it to the default branch. (<code>Manual Update repo.json</code> does the same on demand.)</li>
+<li>When that finishes, the <code>Rebuild docs after release</code> workflow runs <code>docs/build.py</code> and pushes the updated <code>README.md</code> and <code>docs/</code>. It also runs daily to pick up new Meddle Tools and FFGear releases.</li>
+</ol>
+<p>Don't edit <code>repo.json</code> by hand.</p>
+<p>Files listed in <code>release_ignore</code> are left out of the zip (dot files, <code>docs/</code>, repository text files, tooling and <code>__pycache__</code>). It holds one <code>zip</code> pattern per line and no comments. <code>wheels/</code> is kept on purpose, because the manifest needs it.</p>
+<p>Forks must change <code>REPO_URL</code> and <code>MASTER_REPO_JSON</code> in <code>docs/build.py</code>, and the URLs in <code>repo.json</code> and <code>blender_manifest.toml</code>.</p>
+<div class="page-nav"><a class="prev" href="operators-preferences.html"><small>Previous</small>Preferences</a><a class="next" href="working-on-the-docs.html"><small>Next</small>Working on the Docs</a></div>
+</article></main>
+<aside class="toc-col"><h4>On this page</h4><div class="toc">
+<ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#guidelines">Guidelines</a></li>
+<li><a href="#release">Release</a></li>
+</ul>
+</div>
+</aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
