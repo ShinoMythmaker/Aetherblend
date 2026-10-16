@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing Rig Modules · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Docs</a>
+    <a href="operators.html">Operators</a>
+    <a href="style-guide.html">Style Guide</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<a href="getting-started.html" class="">Getting Started</a>
+<a href="the-template-system.html" class="sub">The Template System</a>
+<a href="animation-modding.html" class="">Animation Modding</a>
+<h4>Operator Reference</h4>
+<a href="operators.html" class="">Overview</a>
+<a href="operators-import-export.html" class="sub">Import / Export</a>
+<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
+<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
+<a href="operators-rig-ui.html" class="sub">Rig UI</a>
+<a href="operators-shaders.html" class="sub">Shaders</a>
+<a href="operators-preferences.html" class="sub">Preferences</a>
+<h4>Development</h4>
+<a href="style-guide.html" class="">Style Guide</a>
+<a href="writing-rig-modules.html" class="sub active">Writing Rig Modules</a></aside>
+<main><article>
+<h1>Writing Rig Modules</h1>
+<p>A rig module describes how one part of a character (arms, eyes, hair, ...) is turned into a Rigify rig. Modules are small classes that run a list of instructions.</p>
+<p>Where modules live and which one to copy as a starting point can change, so look for the demo module in the rig generator's library.</p>
+<h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">#</a></h2>
+<ul>
+<li>R-M.1 A module variant defines <code>class Module(RigModule)</code> with <code>name</code>, <code>requires</code> and <code>ui_collections</code>.</li>
+<li>R-M.2 Build steps are the methods <code>meta_edit</code>, <code>meta_pose</code>, <code>final_edit</code> and <code>final_pose</code>. Define only the ones you need.</li>
+<li>R-M.3 Steps only call functions from the instruction set. A step MUST NOT use <code>bpy.ops</code> directly.</li>
+<li>R-M.4 A variant is exposed from its package <code>__init__.py</code> and listed in <code>__all__</code>. A new part package is added to the modules package.</li>
+<li>R-M.5 Helpers shared by variants of one part go in a file whose name starts with <code>_</code>.</li>
+</ul>
+<h2 id="build-steps">Build Steps<a class="headerlink" href="#build-steps" title="Permanent link">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Runs on</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>meta_edit</code></td>
+<td>meta rig, edit mode</td>
+<td>create, connect, align and parent bones</td>
+</tr>
+<tr>
+<td><code>meta_pose</code></td>
+<td>meta rig, pose mode</td>
+<td>assign Rigify types, bone collections</td>
+</tr>
+<tr>
+<td><code>final_edit</code></td>
+<td>generated rig, edit mode</td>
+<td>adjust bones after Rigify ran</td>
+</tr>
+<tr>
+<td><code>final_pose</code></td>
+<td>generated rig, pose mode</td>
+<td>constraints, drivers, locks</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="requires"><code>requires</code><a class="headerlink" href="#requires" title="Permanent link">#</a></h2>
+<p>A tuple of bone names that must exist in the source armature. If any is missing, the module is skipped, so a character without that part still generates.</p>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">#</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="sd">"""Demo module: copy this to start a new rig module."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">bpy</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">....definitions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RigModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....instructions</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">....rigify.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoneCollection</span><span class="p">,</span> <span class="n">UI_Collections</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Module</span><span class="p">(</span><span class="n">RigModule</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">"Demo"</span>
+    <span class="n">requires</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"j_example_bone"</span><span class="p">,)</span>
+    <span class="n">ui_collections</span> <span class="o">=</span> <span class="n">UI_Collections</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">BoneCollection</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Demo (IK)"</span><span class="p">,</span> <span class="n">ui</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color_set</span><span class="o">=</span><span class="s2">"IK_Left"</span><span class="p">,</span> <span class="n">row_index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Demo IK"</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">meta_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rig</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">connect</span><span class="p">(</span><span class="n">rig</span><span class="p">,</span> <span class="s2">"demo_bone"</span><span class="p">,</span> <span class="s2">"j_example_bone"</span><span class="p">,</span> <span class="s2">"j_example_bone"</span><span class="p">,</span> <span class="n">end_point</span><span class="o">=</span><span class="s2">"tail"</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s2">"Spine.001"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">meta_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rig</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rigify</span><span class="o">.</span><span class="n">basic_super_copy</span><span class="p">(</span><span class="n">rig</span><span class="p">,</span> <span class="s2">"demo_bone"</span><span class="p">)</span>
+        <span class="n">collection</span><span class="p">(</span><span class="n">rig</span><span class="p">,</span> <span class="p">[</span><span class="s2">"demo_bone"</span><span class="p">],</span> <span class="s2">"Demo (IK)"</span><span class="p">)</span>
+</code></pre></div>
+<div class="page-nav"><a class="prev" href="style-guide.html"><small>Previous</small>Style Guide</a></div>
+</article></main>
+<aside class="toc-col"><h4>On this page</h4><div class="toc">
+<ul>
+<li><a href="#rules">Rules</a></li>
+<li><a href="#build-steps">Build Steps</a></li>
+<li><a href="#requires">requires</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</div>
+</aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

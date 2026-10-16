@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting Started · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Docs</a>
+    <a href="operators.html">Operators</a>
+    <a href="style-guide.html">Style Guide</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<a href="getting-started.html" class="active">Getting Started</a>
+<a href="the-template-system.html" class="sub">The Template System</a>
+<a href="animation-modding.html" class="">Animation Modding</a>
+<h4>Operator Reference</h4>
+<a href="operators.html" class="">Overview</a>
+<a href="operators-import-export.html" class="sub">Import / Export</a>
+<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
+<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
+<a href="operators-rig-ui.html" class="sub">Rig UI</a>
+<a href="operators-shaders.html" class="sub">Shaders</a>
+<a href="operators-preferences.html" class="sub">Preferences</a>
+<h4>Development</h4>
+<a href="style-guide.html" class="">Style Guide</a>
+<a href="writing-rig-modules.html" class="sub">Writing Rig Modules</a></aside>
+<main><article>
+<h1>Getting Started</h1>
+<h2 id="how-to-use-aetherblend">How to use Aetherblend<a class="headerlink" href="#how-to-use-aetherblend" title="Permanent link">#</a></h2>
+<p>This section will serve as a guide to AetherBlend's basic features and their usage.</p>
+<h3 id="importing-your-character">Importing your character:<a class="headerlink" href="#importing-your-character" title="Permanent link">#</a></h3>
+<p>There are currently two methods to import your character (or non-player model) using AetherBlend. You can:</p>
+<ol>
+<li>Open the N-panel and select 'Import Character', then navigate to your Meddle export and select the relevant .gltf file</li>
+<li>Navigate to File &gt; Import &gt; FFXIV Character (Meddle), then head to your Meddle export and select the relevant .gltf file</li>
+</ol>
+<p>The import window will contain a couple of options you may want to enable or disable based on preference:</p>
+<p><strong>Shaders: Import with Meddle</strong></p>
+<p>This setting simply enables or disables using Meddle's shader setup for materials such as skin, hair and gear.</p>
+<p><strong>Armature: Apply Pose Track</strong></p>
+<p>This setting controls whether or not to apply any character customisations such as height or bust. It is <strong>not</strong> designed to apply your C+, it is <strong>only</strong> to apply your vanilla scalings if you have exported in meddle using the "Reference pose + Scale" option.</p>
+<p><strong>Bone Orientation:</strong></p>
+<p>This menu allows you to enable changing the primary and secondary bone axes of the armature being imported. It is automatically set to work best with AetherBlend. Change this at your own risk, it is likely to result in complete failure of rig generation.</p>
+<h3 id="generating-the-rig">Generating the Rig<a class="headerlink" href="#generating-the-rig" title="Permanent link">#</a></h3>
+<p>With your armature selected, simply select the "Generate Rig" option from the N-panel. The option for a separate meta exists for debugging purposes and can be safely ignored.
+The dynamic template and AetherBlend colourset will be applied.</p>
+<h3 id="the-n-panel">The N-Panel<a class="headerlink" href="#the-n-panel" title="Permanent link">#</a></h3>
+<p>The N-panel contains important options like file export, rig generation and individual rig control options. It is divided into four tabs:</p>
+<p><strong>1. Import/Export</strong></p>
+<p>Here you will find options to import and export your character and their pose/animation.</p>
+<p><strong>2. Generate</strong></p>
+<p>The Generate tab allows you to generate a rig for your character. A dynamic and custom template are available by default as well as a choice of coloursets. For a more detailed explanation of the template system, go <a href="the-template-system.html">here</a>. All operators are described in the <a href="operators.html">operator reference</a>.</p>
+<p><strong>3. Rig Layers</strong></p>
+<p>Different control layers such as the left and right arms, legs and torso can be found here.</p>
+<p><strong>4. Rig UI</strong></p>
+<p>Contained here are any optional settings that contextually appear depending on what control you have selected. They allow you to switch between IK and FK controls, among other things.</p>
+<div class="page-nav"><a class="prev" href="installation.html"><small>Previous</small>Installation</a><a class="next" href="the-template-system.html"><small>Next</small>The Template System</a></div>
+</article></main>
+<aside class="toc-col"></aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

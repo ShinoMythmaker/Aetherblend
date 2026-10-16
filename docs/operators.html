@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operators · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Docs</a>
+    <a href="operators.html">Operators</a>
+    <a href="style-guide.html">Style Guide</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<a href="getting-started.html" class="">Getting Started</a>
+<a href="the-template-system.html" class="sub">The Template System</a>
+<a href="animation-modding.html" class="">Animation Modding</a>
+<h4>Operator Reference</h4>
+<a href="operators.html" class="active">Overview</a>
+<a href="operators-import-export.html" class="sub">Import / Export</a>
+<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
+<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
+<a href="operators-rig-ui.html" class="sub">Rig UI</a>
+<a href="operators-shaders.html" class="sub">Shaders</a>
+<a href="operators-preferences.html" class="sub">Preferences</a>
+<h4>Development</h4>
+<a href="style-guide.html" class="">Style Guide</a>
+<a href="writing-rig-modules.html" class="sub">Writing Rig Modules</a></aside>
+<main><article>
+<h1>Operators</h1>
+<p>Every AetherBlend action is a Blender operator. You can run it from the UI or from Python.</p>
+<h2 id="calling-an-operator">Calling an Operator<a class="headerlink" href="#calling-an-operator" title="Permanent link">#</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">bpy</span>
+
+<span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">aether</span><span class="o">.</span><span class="n">rig_generator_generate_full</span><span class="p">()</span>
+<span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">aether</span><span class="o">.</span><span class="n">rig_edit_set_inherit_scale</span><span class="p">(</span><span class="n">inherit_scale</span><span class="o">=</span><span class="s2">"FIX_SHEAR"</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Operator IDs follow <code>aether.&lt;feature&gt;_&lt;action&gt;</code>. Operators that open a file dialog (<code>INVOKE_DEFAULT</code>) can be run without a dialog by passing <code>"EXEC_DEFAULT"</code> and a <code>filepath</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">aether</span><span class="o">.</span><span class="n">import_export_import_character</span><span class="p">(</span><span class="s2">"EXEC_DEFAULT"</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="s2">"C:/models/model.gltf"</span><span class="p">)</span>
+</code></pre></div>
+
+<p>An operator whose requirements are not met (see each page) raises <code>RuntimeError: ... poll() failed</code> when called from Python.</p>
+<h2 id="reference-by-feature">Reference by Feature<a class="headerlink" href="#reference-by-feature" title="Permanent link">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Page</th>
+<th>Operators</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Import / Export</td>
+<td><a href="operators-import-export.html">Operators Import Export</a></td>
+<td><code>import_character</code>, <code>export_pose</code>, <code>export_anim</code></td>
+</tr>
+<tr>
+<td>Rig Generator</td>
+<td><a href="operators-rig-generator.html">Operators Rig Generator</a></td>
+<td><code>generate_full</code>, <code>generate_meta</code>, <code>clean_up</code>, <code>reset</code></td>
+</tr>
+<tr>
+<td>Rig Edit</td>
+<td><a href="operators-rig-edit.html">Operators Rig Edit</a></td>
+<td><code>set_inherit_scale</code>, <code>delete_no_anim</code>, <code>remove_game_support</code></td>
+</tr>
+<tr>
+<td>Rig UI</td>
+<td><a href="operators-rig-ui.html">Operators Rig UI</a></td>
+<td><code>solo_collections</code>, <code>eyelid_edit_start</code>, <code>eyelid_edit_end</code></td>
+</tr>
+<tr>
+<td>Shaders</td>
+<td><a href="operators-shaders.html">Operators Shaders</a></td>
+<td><code>iris</code>, <code>limbal</code>, <code>ffgear</code>, <code>meddle</code></td>
+</tr>
+<tr>
+<td>Preferences</td>
+<td><a href="operators-preferences.html">Operators Preferences</a></td>
+<td><code>toggle_feature_set</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Full IDs are <code>aether.&lt;feature&gt;_&lt;action&gt;</code>, for example <code>aether.shaders_iris</code>.</p>
+<h2 id="where-to-find-them">Where to Find Them<a class="headerlink" href="#where-to-find-them" title="Permanent link">#</a></h2>
+<p>The add-on has a sidebar tab named <strong>AetherBlend</strong> in the 3D Viewport (<code>N</code> panel). It shows one workflow tab at a time:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Import / Export</td>
+<td>bring a model in, export poses and animations</td>
+</tr>
+<tr>
+<td>Generate</td>
+<td>create and edit the rig, set up shaders</td>
+</tr>
+<tr>
+<td>Rig Layers</td>
+<td>show and solo bone collections</td>
+</tr>
+<tr>
+<td>Rig UI</td>
+<td>rig-specific controls</td>
+</tr>
+</tbody>
+</table></div>
+<p>The same panels can also be shown in the Properties editor <strong>Tool</strong> tab (see <a href="operators-preferences.html">Operators Preferences</a>).</p>
+<h2 id="tips">Tips<a class="headerlink" href="#tips" title="Permanent link">#</a></h2>
+<ul>
+<li>Most operators support Undo (<code>Ctrl+Z</code>).</li>
+<li>Messages appear in the status bar. Longer errors are in the Blender system console.</li>
+<li>Operator parameters shown in the tables are the Python keyword arguments.</li>
+</ul>
+<div class="page-nav"><a class="prev" href="animation-modding.html"><small>Previous</small>Animation Modding</a><a class="next" href="operators-import-export.html"><small>Next</small>Import / Export</a></div>
+</article></main>
+<aside class="toc-col"><h4>On this page</h4><div class="toc">
+<ul>
+<li><a href="#calling-an-operator">Calling an Operator</a></li>
+<li><a href="#reference-by-feature">Reference by Feature</a></li>
+<li><a href="#where-to-find-them">Where to Find Them</a></li>
+<li><a href="#tips">Tips</a></li>
+</ul>
+</div>
+</aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

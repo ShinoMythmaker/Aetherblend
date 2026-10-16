@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operators: Rig Edit · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Docs</a>
+    <a href="operators.html">Operators</a>
+    <a href="style-guide.html">Style Guide</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<a href="getting-started.html" class="">Getting Started</a>
+<a href="the-template-system.html" class="sub">The Template System</a>
+<a href="animation-modding.html" class="">Animation Modding</a>
+<h4>Operator Reference</h4>
+<a href="operators.html" class="">Overview</a>
+<a href="operators-import-export.html" class="sub">Import / Export</a>
+<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
+<a href="operators-rig-edit.html" class="sub active">Rig Edit</a>
+<a href="operators-rig-ui.html" class="sub">Rig UI</a>
+<a href="operators-shaders.html" class="sub">Shaders</a>
+<a href="operators-preferences.html" class="sub">Preferences</a>
+<h4>Development</h4>
+<a href="style-guide.html" class="">Style Guide</a>
+<a href="writing-rig-modules.html" class="sub">Writing Rig Modules</a></aside>
+<main><article>
+<h1>Operators: Rig Edit</h1>
+<p>Back to <a href="operators.html">Operators</a>.</p>
+<p><strong>Where:</strong> AetherBlend tab → Generate → <em>Rig Manipulation</em> panel.<br />
+<strong>Common requirements:</strong> the active armature has a generated rig (<code>aether_rig.rigified</code>).</p>
+<h2 id="aetherrig_edit_set_inherit_scale"><code>aether.rig_edit_set_inherit_scale</code><a class="headerlink" href="#aetherrig_edit_set_inherit_scale" title="Permanent link">#</a></h2>
+<p><strong>Label:</strong> Set Inherit Scale</p>
+<p>Sets how the <code>LINK</code> bones inherit scale from their parents. These bones connect the generated rig to the original game skeleton.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inherit_scale</code></td>
+<td>enum</td>
+<td>stored value</td>
+<td><code>FULL</code>, <code>FIX_SHEAR</code> (Aligned), <code>AVERAGE</code>, <code>NONE</code>, <code>NONE_LEGACY</code> (None, legacy)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What it does:</strong> requires the <code>LINK</code> bone collection, stores the choice on the rig so a regenerate keeps it, and applies it to every bone in the collection. Reports how many bones changed. In the panel it is a drop-down.</p>
+<div class="codehilite"><pre><span></span><code><span class="n">bpy</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">aether</span><span class="o">.</span><span class="n">rig_edit_set_inherit_scale</span><span class="p">(</span><span class="n">inherit_scale</span><span class="o">=</span><span class="s2">"FIX_SHEAR"</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="aetherrig_edit_delete_no_anim"><code>aether.rig_edit_delete_no_anim</code><a class="headerlink" href="#aetherrig_edit_delete_no_anim" title="Permanent link">#</a></h2>
+<p><strong>Label:</strong> Delete NoAnim</p>
+<p>Removes every bone whose name contains <code>noanim</code>. These helper bones are not needed for animation and are removed to keep the export clean.</p>
+<p><strong>Parameters:</strong> none. Needs an armature. The original mode is restored afterwards.</p>
+<h2 id="aetherrig_edit_remove_game_support"><code>aether.rig_edit_remove_game_support</code><a class="headerlink" href="#aetherrig_edit_remove_game_support" title="Permanent link">#</a></h2>
+<p><strong>Label:</strong> Remove Game Support (button text: Convert)</p>
+<p>Converts the generated rig into a standalone Rigify rig without the game skeleton. <strong>This cannot be undone</strong>, so a confirmation dialog appears.</p>
+<p><strong>Parameters:</strong> none.</p>
+<h3 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">#</a></h3>
+<ol>
+<li>Finds which deform bone corresponds to which Rigify bone through the <code>AB-LINK</code> Copy Transforms constraints.</li>
+<li>Renames the meshes' vertex groups to the Rigify DEF bone names.</li>
+<li>In Edit mode deletes the original bones and their <code>LINK-</code> bones.</li>
+<li>Re-parents any remaining deform children.</li>
+<li>Sets <code>converted</code> on the rig.</li>
+</ol>
+<p>Use it when you only want to animate in Blender and do not need to export back to the game. Export a <code>.blend</code> copy first.</p>
+<div class="page-nav"><a class="prev" href="operators-rig-generator.html"><small>Previous</small>Rig Generator</a><a class="next" href="operators-rig-ui.html"><small>Next</small>Rig UI</a></div>
+</article></main>
+<aside class="toc-col"><h4>On this page</h4><div class="toc">
+<ul>
+<li><a href="#aetherrig_edit_set_inherit_scale">aether.rig_edit_set_inherit_scale</a></li>
+<li><a href="#aetherrig_edit_delete_no_anim">aether.rig_edit_delete_no_anim</a></li>
+<li><a href="#aetherrig_edit_remove_game_support">aether.rig_edit_remove_game_support</a><ul>
+<li><a href="#what-it-does">What it does</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

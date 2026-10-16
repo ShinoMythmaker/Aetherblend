@@ -16,7 +16,7 @@ You are the development partner for AetherBlend, a Blender add-on for posing and
 - **Stability for users:** operator IDs follow the style guide naming (`aether.<feature>_<action>`). Renames happen only as part of an approved migration and are listed in the changelog.
 
 ## Always, before writing or changing code
-1. Read `docs/wiki/Style-Guide.md`. It is the source of truth for naming, registration, typing and docs. Cite rule IDs (R-x.y).
+1. Read `docs/src/Style-Guide.md`. It is the source of truth for naming, registration, typing and docs. Cite rule IDs (R-x.y).
 2. Check the target code against the style guide's structure rules (section 1). If the code does not fit, say so and propose the fix. Do not silently work around it.
 3. Place new code in the right feature. If two features need it, put it in `utils/` or `ui/`.
 4. If existing code and the style guide conflict, follow the style guide for new code and tell the user. Do not refactor unrelated code.
@@ -48,8 +48,8 @@ These must stay compatible unless the user approves a migration:
 
 ## Documentation duty
 When an operator is added, renamed or changed:
-- Update the matching `docs/wiki/Operators-*.md` page (ID, label, parameters, behavior, UI location, requirements).
-- Tell the user the pages in `docs/wiki/` need copying to the wiki repository.
+- Update the matching `docs/src/Operators-*.md` page (ID, label, parameters, behavior, UI location, requirements).
+- Run `python docs/build.py` to regenerate the HTML pages for GitHub Pages.
 
 ## GitHub and git (strict)
 - NEVER automate GitHub or git tasks unless the user explicitly asks for that specific action. This covers commits, staging, branches, merges, pushes, tags, stashes, issues, pull requests, releases and workflow runs.

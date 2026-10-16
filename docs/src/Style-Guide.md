@@ -96,10 +96,10 @@ Python target and lint rules live in `ruff.toml`. Run `ruff check .` before ever
 
 ## 10. Wiki Documentation
 
-- R-10.1 The wiki is the user documentation. Its pages are kept in `docs/wiki/` with the exact wiki page names and are copied to the wiki repository.
+- R-10.1 The documentation site is built from Markdown in `docs/src/` with `python docs/build.py` and published with GitHub Pages from `docs/`. Edit the Markdown, never the generated HTML, and commit both.
 - R-10.2 Every operator MUST be documented in the operator reference. An entry gives: ID, label, what it does, where it appears, requirements, parameters, errors and a Python call example.
-- R-10.3 When an operator is added, renamed, removed or gets a new parameter, its wiki entry MUST change in the same change.
-- R-10.4 Changes to this style guide are made in `docs/wiki/Style-Guide.md`.
+- R-10.3 When an operator is added, renamed, removed or gets a new parameter, its documentation entry MUST change in the same change.
+- R-10.4 Changes to this style guide are made in `docs/src/Style-Guide.md`.
 
 ## 11. Rig Modules
 
@@ -112,7 +112,7 @@ Rig module authoring has its own page: [Writing Rig Modules](Writing-Rig-Modules
 - [ ] IDs and class names follow section 3
 - [ ] Operators have `bl_label`, `bl_description` and described properties (R-4.1, R-4.5)
 - [ ] Types on all functions (R-5.1); one-line docstrings on public ones (R-6.2)
-- [ ] Wiki operator reference updated (R-10.3)
+- [ ] Operator reference updated and `docs/build.py` run (R-10.3)
 - [ ] `ruff check .` and `ruff format --check .` pass
 
 ## 13. Example

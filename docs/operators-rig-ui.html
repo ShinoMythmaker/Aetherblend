@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operators: Rig UI · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Docs</a>
+    <a href="operators.html">Operators</a>
+    <a href="style-guide.html">Style Guide</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<a href="getting-started.html" class="">Getting Started</a>
+<a href="the-template-system.html" class="sub">The Template System</a>
+<a href="animation-modding.html" class="">Animation Modding</a>
+<h4>Operator Reference</h4>
+<a href="operators.html" class="">Overview</a>
+<a href="operators-import-export.html" class="sub">Import / Export</a>
+<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
+<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
+<a href="operators-rig-ui.html" class="sub active">Rig UI</a>
+<a href="operators-shaders.html" class="sub">Shaders</a>
+<a href="operators-preferences.html" class="sub">Preferences</a>
+<h4>Development</h4>
+<a href="style-guide.html" class="">Style Guide</a>
+<a href="writing-rig-modules.html" class="sub">Writing Rig Modules</a></aside>
+<main><article>
+<h1>Operators: Rig UI</h1>
+<p>Back to <a href="operators.html">Operators</a>.</p>
+<p>These operators help while posing a generated rig.</p>
+<h2 id="aetherrig_ui_solo_collections"><code>aether.rig_ui_solo_collections</code><a class="headerlink" href="#aetherrig_ui_solo_collections" title="Permanent link">#</a></h2>
+<p><strong>Label:</strong> Solo Selected (the button reads <em>Unsolo All</em> while a solo is active)<br />
+<strong>Where:</strong> Rig Layers tab → <em>Rig Layers</em> panel. Pose mode only.</p>
+<p>Shows only the bone collections that contain the selected bones.</p>
+<p><strong>Parameters:</strong> none.</p>
+<ul>
+<li>If any collection is already soloed, it unsolos all of them.</li>
+<li>Otherwise it solos the collections of the selected pose bones.</li>
+<li>Cancels if no bones are selected.</li>
+</ul>
+<h2 id="aetherrig_ui_eyelid_edit_start"><code>aether.rig_ui_eyelid_edit_start</code><a class="headerlink" href="#aetherrig_ui_eyelid_edit_start" title="Permanent link">#</a></h2>
+<p><strong>Label:</strong> Start Editing Eye Lid Offset (button text: Enter Eye Lid Edit Mode)<br />
+<strong>Where:</strong> Rig UI tab, eyes section.</p>
+<p>Unlocks the six eyelid anchor bones so you can move them to fit the character's eyes.</p>
+<p><strong>Parameters:</strong> none.</p>
+<ol>
+<li>Sets <code>eye_lid_edit_mode</code> on the rig.</li>
+<li>Unsolos all collections and solos <code>Eyes_Anchors</code>.</li>
+<li>Unlocks location, rotation and scale on the <code>lid.anchor.B.[LR].00[123]</code> bones.</li>
+</ol>
+<h2 id="aetherrig_ui_eyelid_edit_end"><code>aether.rig_ui_eyelid_edit_end</code><a class="headerlink" href="#aetherrig_ui_eyelid_edit_end" title="Permanent link">#</a></h2>
+<p><strong>Label:</strong> End Editing Eye Lid Offset (button text: Exit Eye Lid Edit Mode)</p>
+<p>Reverses the start operator: clears the mode, removes the solo and locks the anchor bones again.</p>
+<p><strong>Parameters:</strong> none.</p>
+<div class="page-nav"><a class="prev" href="operators-rig-edit.html"><small>Previous</small>Rig Edit</a><a class="next" href="operators-shaders.html"><small>Next</small>Shaders</a></div>
+</article></main>
+<aside class="toc-col"><h4>On this page</h4><div class="toc">
+<ul>
+<li><a href="#aetherrig_ui_solo_collections">aether.rig_ui_solo_collections</a></li>
+<li><a href="#aetherrig_ui_eyelid_edit_start">aether.rig_ui_eyelid_edit_start</a></li>
+<li><a href="#aetherrig_ui_eyelid_edit_end">aether.rig_ui_eyelid_edit_end</a></li>
+</ul>
+</div>
+</aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
