@@ -22,11 +22,23 @@ The quickest way. Drag a button below into an open Blender window.
 2. Drag the **same button a second time** to install the add-on from that repository.
 3. Meddle Tools and FFGear come from the same repository, so once it is added they need only **one drop each**.
 
-<p>
-<a class="drop-link" href="{{aetherblend_link}}" draggable="true">Drag AetherBlend into Blender</a>
-<a class="drop-link" href="{{meddle_link}}" draggable="true">Drag Meddle Tools into Blender</a>
-<a class="drop-link" href="{{ffgear_link}}" draggable="true">Drag FFGear into Blender</a>
-</p>
+<div class="drop-stack">
+  <div class="drop-row required">
+    <span class="tag">Required</span>
+    <a class="drop-link large" href="{{aetherblend_link}}" draggable="true">Drag AetherBlend into Blender</a>
+    <p>The add-on itself. Drop it <strong>twice</strong>: first to add the repository, then to install.</p>
+  </div>
+  <div class="drop-row recommended">
+    <span class="tag">Recommended</span>
+    <a class="drop-link subtle" href="{{meddle_link}}" draggable="true">Drag Meddle Tools into Blender</a>
+    <p>Needed to import characters with their materials and shaders. You can skip it if you only use AetherBlend's rigging tools.</p>
+  </div>
+  <div class="drop-row optional">
+    <span class="tag">Optional</span>
+    <a class="drop-link subtle" href="{{ffgear_link}}" draggable="true">Drag FFGear into Blender</a>
+    <p>Extra gear shaders. Not needed for AetherBlend to work.</p>
+  </div>
+</div>
 
 All three buttons use the shared [FFXIV Blender Plugins](https://github.com/ShinoMythmaker/FFXIV-Blender-Plugins) repository. Because it is a repository, Blender keeps the installed add-ons updated afterwards.
 

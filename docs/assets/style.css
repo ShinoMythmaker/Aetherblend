@@ -145,7 +145,8 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 .hero .note { max-width: 640px; margin: 12px auto 0; color: var(--muted); font-size: .95rem; }
 .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
 .btn {
-  display: inline-block; padding: 12px 26px; border-radius: 10px; font-weight: 600; border: 1px solid var(--border);
+  display: inline-flex; align-items: center; justify-content: center; padding: 12px 26px; border-radius: 10px;
+  font-weight: 600; border: 1px solid var(--border);
   color: var(--heading); background: var(--panel);
 }
 .btn:hover { text-decoration: none; border-color: var(--accent); }
@@ -164,6 +165,22 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
   -webkit-mask: url("img/move.svg") center / contain no-repeat; mask: url("img/move.svg") center / contain no-repeat;
 }
 .drop-link.large { padding: 14px 30px; font-size: 1.05rem; background: rgba(91, 192, 222, 0.16); color: var(--heading); }
+.drop-link.subtle { border: 1px dashed #3b4f6b; background: transparent; color: var(--text); }
+.drop-link.subtle:hover { border-color: var(--accent); color: var(--accent); }
+.drop-stack { display: grid; gap: 14px; margin: 1.4em 0; }
+.drop-row {
+  display: grid; grid-template-columns: 330px 1fr; gap: 6px 18px; align-items: center; padding: 16px 18px;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel);
+}
+.drop-row .drop-link { margin: 0; grid-column: 1; justify-content: flex-start; }
+.drop-row .tag {
+  grid-column: 1 / -1; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+.drop-row p { grid-column: 2; margin: 0; color: var(--muted); font-size: .92rem; }
+.drop-row.required { border-color: var(--accent); background: linear-gradient(135deg, var(--accent-soft), transparent); }
+.drop-row.required .tag { color: var(--accent); }
+.drop-row.recommended .tag { color: var(--accent-2); }
+@media (max-width: 700px) { .drop-row { grid-template-columns: 1fr; } .drop-row p { grid-column: 1; } }
 .landing { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
 .landing section { margin-top: 72px; }
 .landing h2 { font-size: 1.7rem; color: var(--heading); margin: 0 0 .5em; }
