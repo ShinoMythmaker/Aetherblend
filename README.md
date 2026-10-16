@@ -25,18 +25,15 @@ Note: AetherBlend is currently in beta and some features may not work as intende
 
 &nbsp;
 
-## What is the goal of AetherBlend
-
-Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation. IK-rig pose and animation import and Aetherbridge (streaming Blender animations into the game, with lighting and camera syncing planned) are still in development, while we continue to refine our editable, modular rig templates.
-
-
-&nbsp;
-
 <p align="center">
-  <a href="https://shinomythmaker.github.io/Aetherblend/installation.html"><img width="240" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>&nbsp;&nbsp;&nbsp;
+  <a href="https://shinomythmaker.github.io/Aetherblend/index.html"><img width="240" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>&nbsp;&nbsp;&nbsp;
   <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="240" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>&nbsp;&nbsp;&nbsp;
   <a href="https://discord.gg/NEF7TdXGqH"><img width="240" alt="Discord" src="assets/brand/btn-discord.svg" /></a>
 </p>
+
+## What is the goal of AetherBlend
+
+Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation. IK-rig pose and animation import and Aetherbridge (streaming Blender animations into the game, with lighting and camera syncing planned) are still in development, while we continue to refine our editable, modular rig templates.
 
 &nbsp;
 

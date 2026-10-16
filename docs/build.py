@@ -154,19 +154,19 @@ def apply_facts(text: str) -> str:
     """Replace ``{{version}}``, ``{{blender_min}}`` and ``{{repo}}`` placeholders."""
     return re.sub(r"\{\{\s*(\w+)\s*\}\}", lambda m: FACTS.get(m.group(1), m.group(0)), text)
 
-
-def sync_readme_download() -> None:
-    """Point the README drag-and-drop link at the manifest version."""
-    path = ROOT / "README.md"
-    text = path.read_text(encoding="utf-8")
-    url = f"{REPO_URL}/releases/download/v{VERSION}/Aetherblend-v{VERSION}.zip"
-    updated = re.sub(
-        r'(href=")[^"]*releases/download/[^"?]*(\?[^"]*?)blender_version_min=[\d.]+',
-        lambda m: f"{m.group(1)}{url}{m.group(2)}blender_version_min={MANIFEST['blender_version_min']}",
-        text,
-    )
-    if updated != text:
-        path.write_text(updated, encoding="utf-8")
+# I have remopved the drag and drop link from the readme me making this kidna not deprciated. We keep it incase we need it again
+# def sync_readme_download() -> None:
+#     """Point the README drag-and-drop link at the manifest version."""
+#     path = ROOT / "README.md"
+#     text = path.read_text(encoding="utf-8")
+#     url = f"{REPO_URL}/releases/download/v{VERSION}/Aetherblend-v{VERSION}.zip"
+#     updated = re.sub(
+#         r'(href=")[^"]*releases/download/[^"?]*(\?[^"]*?)blender_version_min=[\d.]+',
+#         lambda m: f"{m.group(1)}{url}{m.group(2)}blender_version_min={MANIFEST['blender_version_min']}",
+#         text,
+#     )
+#     if updated != text:
+#         path.write_text(updated, encoding="utf-8")
 
 
 def resolve_link(href: str) -> str | None:
@@ -375,7 +375,7 @@ def main() -> None:
     )
     for old in DOCS.glob("*.html"):
         old.unlink()
-    sync_readme_download()
+    # sync_readme_download()
     (DOCS / "index.html").write_text(build_index(), encoding="utf-8")
     for page in PAGES:
         (DOCS / f"{page.slug}.html").write_text(build_page(page), encoding="utf-8")
