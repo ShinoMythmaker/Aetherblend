@@ -1,6 +1,6 @@
 ---
 title: Preferences
-group: Operator Reference
+group: Development
 order: 160
 sub: true
 ---

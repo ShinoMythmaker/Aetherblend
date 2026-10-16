@@ -1,6 +1,6 @@
 ---
 title: Rig UI
-group: Operator Reference
+group: Development
 order: 140
 sub: true
 ---

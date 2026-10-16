@@ -1,6 +1,6 @@
 ---
 title: Rig Generator
-group: Operator Reference
+group: Development
 order: 120
 sub: true
 ---

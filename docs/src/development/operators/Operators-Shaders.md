@@ -1,6 +1,6 @@
 ---
 title: Shaders
-group: Operator Reference
+group: Development
 order: 150
 sub: true
 ---

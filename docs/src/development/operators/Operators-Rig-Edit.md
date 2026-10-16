@@ -1,6 +1,6 @@
 ---
 title: Rig Edit
-group: Operator Reference
+group: Development
 order: 130
 sub: true
 ---
