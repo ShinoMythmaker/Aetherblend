@@ -25,12 +25,13 @@ WIKI_URL_PREFIX = f"{REPO_URL}/wiki/"
 
 @dataclass(frozen=True)
 class Page:
-    """One documentation page, described by the frontmatter of ``docs/src/<name>.md``."""
+    """One documentation page, described by the frontmatter of a Markdown file under ``docs/src``."""
 
     name: str
     title: str
     group: str
     order: int
+    path: Path
     sub: bool = False
     summary: str = ""
     aliases: tuple[str, ...] = ()
@@ -55,18 +56,26 @@ def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
 
 
 def load_pages() -> tuple[Page, ...]:
-    """Discover navigation pages: every Markdown file in ``docs/src`` whose frontmatter has a ``group``."""
+    """Discover navigation pages: every Markdown file under ``docs/src`` with a ``group`` in its frontmatter.
+
+    Page names (file stems) must be unique across folders; the output stays flat.
+    """
     pages = []
-    for path in sorted(SRC.glob("*.md")):
+    names: dict[str, Path] = {}
+    for path in sorted(SRC.rglob("*.md")):
         meta, _ = split_frontmatter(path.read_text(encoding="utf-8"))
         if "group" not in meta:
             continue
+        if path.stem in names:
+            raise SystemExit(f"Duplicate page name '{path.stem}': {names[path.stem]} and {path}")
+        names[path.stem] = path
         pages.append(
             Page(
                 name=path.stem,
                 title=meta.get("title", path.stem.replace("-", " ")),
                 group=meta["group"],
                 order=int(meta.get("order", 1000)),
+                path=path,
                 sub=meta.get("sub", "").lower() == "true",
                 summary=meta.get("summary", ""),
                 aliases=tuple(a.strip() for a in meta.get("aliases", "").split(",") if a.strip()),
@@ -169,6 +178,7 @@ def resolve_link(href: str) -> str | None:
     else:
         target = href
     name, _, anchor = target.partition("#")
+    name = name.rsplit("/", 1)[-1]
     slug = SLUGS.get(name.removesuffix(".md").lower())
     if slug is None:
         return None
@@ -254,7 +264,7 @@ def sidebar_html(current: Page) -> str:
 
 def build_page(page: Page) -> str:
     """Render one documentation page."""
-    _, source = split_frontmatter((SRC / f"{page.name}.md").read_text(encoding="utf-8"))
+    _, source = split_frontmatter(page.path.read_text(encoding="utf-8"))
     title, text = split_title(source, page.title)
     body, toc = render_markdown(text)
     index = PAGES.index(page)

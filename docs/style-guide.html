@@ -176,10 +176,10 @@
 </ul>
 <h2 id="10-wiki-documentation">10. Wiki Documentation<a class="headerlink" href="#10-wiki-documentation" title="Permanent link">#</a></h2>
 <ul>
-<li>R-10.1 The documentation site is built from Markdown in <code>docs/src/</code> with <code>python docs/build.py</code> and published with GitHub Pages from <code>docs/</code>. Edit the Markdown, never the generated HTML, and commit both. A page appears in the navigation through its frontmatter (<code>title</code>, <code>group</code>, <code>order</code>, <code>sub</code>, <code>summary</code>, <code>aliases</code>). Never hard-code the add-on version or minimum Blender version; use the placeholders defined in <code>docs/build.py</code>.</li>
+<li>R-10.1 The documentation site is built from Markdown in <code>docs/src/</code> with <code>python docs/build.py</code> and published with GitHub Pages from <code>docs/</code>. Sources live in topic subfolders (<code>guides/</code>, <code>operators/</code>, <code>development/</code>; <code>Home.md</code> stays at the root); the folder is for organisation only and does not affect the URL or navigation. File names must be unique across folders. Edit the Markdown, never the generated HTML, and commit both. A page appears in the navigation through its frontmatter (<code>title</code>, <code>group</code>, <code>order</code>, <code>sub</code>, <code>summary</code>, <code>aliases</code>). Never hard-code the add-on version or minimum Blender version; use the placeholders defined in <code>docs/build.py</code>.</li>
 <li>R-10.2 Every operator MUST be documented in the operator reference. An entry gives: ID, label, what it does, where it appears, requirements, parameters, errors and a Python call example.</li>
 <li>R-10.3 When an operator is added, renamed, removed or gets a new parameter, its documentation entry MUST change in the same change.</li>
-<li>R-10.4 Changes to this style guide are made in <code>docs/src/Style-Guide.md</code>.</li>
+<li>R-10.4 Changes to this style guide are made in <code>docs/src/development/Style-Guide.md</code>.</li>
 </ul>
 <h2 id="11-rig-modules">11. Rig Modules<a class="headerlink" href="#11-rig-modules" title="Permanent link">#</a></h2>
 <p>Rig module authoring has its own page: <a href="writing-rig-modules.html">Writing Rig Modules</a>.</p>
