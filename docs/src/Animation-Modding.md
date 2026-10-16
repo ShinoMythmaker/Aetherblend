@@ -1,3 +1,9 @@
+---
+title: Animation Modding
+group: Guides
+order: 40
+summary: Take an animation from Blender into the game.
+---
 ## Intro to Modding Animations using Aetherblend
 
 This section of the wiki will serve to introduce you to the basic components of modding animations. You can find a video version of this guide [here.](https://www.youtube.com/watch?v=lNv0DwsQhmk)

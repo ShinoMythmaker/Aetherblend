@@ -1,3 +1,9 @@
+---
+title: Writing Rig Modules
+group: Development
+order: 210
+sub: true
+---
 # Writing Rig Modules
 
 A rig module describes how one part of a character (arms, eyes, hair, ...) is turned into a Rigify rig. Modules are small classes that run a list of instructions.

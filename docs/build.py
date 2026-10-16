@@ -5,7 +5,10 @@ Run from anywhere with ``python docs/build.py``. Requires the ``markdown`` and `
 """
 
 import html
+import json
 import re
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,17 +21,19 @@ SRC = DOCS / "src"
 
 REPO_URL = "https://github.com/ShinoMythmaker/Aetherblend"
 WIKI_URL_PREFIX = f"{REPO_URL}/wiki/"
-# Old wiki page names that now live under a different page.
-LEGACY_PAGES = {"How-to-AetherBlend-(Alpha)": "getting-started", "Home": "index"}
 
 
 @dataclass(frozen=True)
 class Page:
-    """One documentation page: ``name`` is the Markdown file stem in ``docs/src``."""
+    """One documentation page, described by the frontmatter of ``docs/src/<name>.md``."""
 
     name: str
     title: str
+    group: str
+    order: int
     sub: bool = False
+    summary: str = ""
+    aliases: tuple[str, ...] = ()
 
     @property
     def slug(self) -> str:
@@ -36,39 +41,123 @@ class Page:
         return self.name.lower()
 
 
-NAV: tuple[tuple[str, tuple[Page, ...]], ...] = (
-    (
-        "Guides",
-        (
-            Page("Installation", "Installation"),
-            Page("Getting-Started", "Getting Started"),
-            Page("The-Template-System", "The Template System", sub=True),
-            Page("Animation-Modding", "Animation Modding"),
-        ),
-    ),
-    (
-        "Operator Reference",
-        (
-            Page("Operators", "Overview"),
-            Page("Operators-Import-Export", "Import / Export", sub=True),
-            Page("Operators-Rig-Generator", "Rig Generator", sub=True),
-            Page("Operators-Rig-Edit", "Rig Edit", sub=True),
-            Page("Operators-Rig-UI", "Rig UI", sub=True),
-            Page("Operators-Shaders", "Shaders", sub=True),
-            Page("Operators-Preferences", "Preferences", sub=True),
-        ),
-    ),
-    (
-        "Development",
-        (
-            Page("Style-Guide", "Style Guide"),
-            Page("Writing-Rig-Modules", "Writing Rig Modules", sub=True),
-        ),
-    ),
-)
-PAGES = tuple(page for _, pages in NAV for page in pages)
+def split_frontmatter(text: str) -> tuple[dict[str, str], str]:
+    """Split an optional ``---`` delimited ``key: value`` block from the top of the Markdown."""
+    match = re.match(r"---\s*\n(.*?)\n---\s*\n", text, re.S)
+    if not match:
+        return {}, text
+    meta = {}
+    for line in match.group(1).splitlines():
+        key, _, value = line.partition(":")
+        if key.strip():
+            meta[key.strip().lower()] = value.strip()
+    return meta, text[match.end() :]
+
+
+def load_pages() -> tuple[Page, ...]:
+    """Discover navigation pages: every Markdown file in ``docs/src`` whose frontmatter has a ``group``."""
+    pages = []
+    for path in sorted(SRC.glob("*.md")):
+        meta, _ = split_frontmatter(path.read_text(encoding="utf-8"))
+        if "group" not in meta:
+            continue
+        pages.append(
+            Page(
+                name=path.stem,
+                title=meta.get("title", path.stem.replace("-", " ")),
+                group=meta["group"],
+                order=int(meta.get("order", 1000)),
+                sub=meta.get("sub", "").lower() == "true",
+                summary=meta.get("summary", ""),
+                aliases=tuple(a.strip() for a in meta.get("aliases", "").split(",") if a.strip()),
+            )
+        )
+    return tuple(sorted(pages, key=lambda page: (page.order, page.name)))
+
+
+def read_manifest() -> dict[str, str]:
+    """Read the simple ``key = "value"`` pairs from ``blender_manifest.toml``."""
+    text = (ROOT / "blender_manifest.toml").read_text(encoding="utf-8")
+    return dict(re.findall(r'^(\w+)\s*=\s*"([^"]*)"', text, re.M))
+
+
+MANIFEST = read_manifest()
+VERSION = MANIFEST["version"]
+BLENDER_MIN = ".".join(MANIFEST["blender_version_min"].split(".")[:2])
+MASTER_REPO_JSON = "https://raw.githubusercontent.com/ShinoMythmaker/FFXIV-Blender-Plugins/refs/heads/main/repo.json"
+
+
+def version_key(version: str) -> tuple[int, ...]:
+    """Turn ``1.2.3`` into a sortable tuple."""
+    return tuple(int(part) for part in re.findall(r"\d+", version))
+
+
+def drag_link(archive_url: str, blender_min: str) -> str:
+    """Build a link Blender accepts by drag and drop: the zip plus the repository it belongs to."""
+    repository = urllib.parse.quote(MASTER_REPO_JSON, safe="")
+    return f"{archive_url}?repository={repository}&blender_version_min={blender_min}"
+
+
+def master_plugin_links() -> dict[str, str]:
+    """Return drag-and-drop links for Meddle Tools and FFGear taken from the master repository's repo.json."""
+    wanted = {"meddle_tools": "meddle_link", "FFGear": "ffgear_link"}
+    fallback = {
+        "meddle_link": "https://github.com/PassiveModding/MeddleTools/releases/latest",
+        "ffgear_link": "https://github.com/kajupe/FFGear/releases/latest",
+    }
+    try:
+        with urllib.request.urlopen(MASTER_REPO_JSON, timeout=15) as response:  # noqa: S310
+            entries = json.load(response)["data"]
+    except (OSError, ValueError, KeyError):
+        print("[AetherBlend] Could not read the master repo.json; using release page links.")
+        return fallback
+    ours = version_key(MANIFEST["blender_version_min"])
+    links = dict(fallback)
+    for plugin_id, key in wanted.items():
+        usable = [e for e in entries if e.get("id") == plugin_id and version_key(e["blender_version_min"]) <= ours]
+        if usable:
+            best = max(usable, key=lambda e: version_key(e["version"]))
+            links[key] = drag_link(best["archive_url"], best["blender_version_min"])
+    return links
+
+
+AETHERBLEND_ARCHIVE = f"{REPO_URL}/releases/download/v{VERSION}/Aetherblend-v{VERSION}.zip"
+AETHERBLEND_LINK = drag_link(AETHERBLEND_ARCHIVE, MANIFEST["blender_version_min"])
+FACTS = {
+    "version": VERSION,
+    "blender_min": BLENDER_MIN,
+    "repo": REPO_URL,
+    "aetherblend_link": AETHERBLEND_LINK,
+    "repo_link": MASTER_REPO_JSON,
+    **master_plugin_links(),
+}
+PAGES = load_pages()
+GROUPS: dict[str, tuple[Page, ...]] = {}
+for _page in PAGES:
+    GROUPS[_page.group] = (*GROUPS.get(_page.group, ()), _page)
 SLUGS = {page.name.lower(): page.slug for page in PAGES}
-SLUGS.update({key.lower(): value for key, value in LEGACY_PAGES.items()})
+SLUGS["home"] = "index"
+for _page in PAGES:
+    SLUGS.update({alias.lower(): _page.slug for alias in _page.aliases})
+
+
+def apply_facts(text: str) -> str:
+    """Replace ``{{version}}``, ``{{blender_min}}`` and ``{{repo}}`` placeholders."""
+    return re.sub(r"\{\{\s*(\w+)\s*\}\}", lambda m: FACTS.get(m.group(1), m.group(0)), text)
+
+
+def sync_readme_download() -> None:
+    """Point the README drag-and-drop link at the manifest version."""
+    path = ROOT / "README.md"
+    text = path.read_text(encoding="utf-8")
+    url = f"{REPO_URL}/releases/download/v{VERSION}/Aetherblend-v{VERSION}.zip"
+    updated = re.sub(
+        r'(href=")[^"]*releases/download/[^"?]*(\?[^"]*?)blender_version_min=[\d.]+',
+        lambda m: f"{m.group(1)}{url}{m.group(2)}blender_version_min={MANIFEST['blender_version_min']}",
+        text,
+    )
+    if updated != text:
+        path.write_text(updated, encoding="utf-8")
 
 
 def resolve_link(href: str) -> str | None:
@@ -88,6 +177,7 @@ def resolve_link(href: str) -> str | None:
 
 def render_markdown(text: str) -> tuple[str, str]:
     """Convert Markdown to HTML and return ``(body_html, toc_html)``."""
+    text = apply_facts(text)
     text = re.sub(r"\[\[([^\]]+)\]\]", lambda m: f"[{m.group(1)}]({m.group(1).strip().replace(' ', '-')})", text)
     text = re.sub(r"^&nbsp;\s*$", "", text, flags=re.M)
     md = markdown.Markdown(
@@ -117,14 +207,13 @@ def split_title(text: str, fallback: str) -> tuple[str, str]:
 
 
 def header_html(prefix: str = "") -> str:
-    """Return the shared top bar."""
+    """Return the shared top bar; one link per navigation group."""
+    links = "\n    ".join(f'<a href="{pages[0].slug}.html">{html.escape(group)}</a>' for group, pages in GROUPS.items())
     return f"""<header class="site-header">
   <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
   <a class="brand" href="{prefix}index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
   <nav class="header-links">
-    <a href="installation.html">Docs</a>
-    <a href="operators.html">Operators</a>
-    <a href="style-guide.html">Style Guide</a>
+    {links}
     <a href="{REPO_URL}">GitHub</a>
     <a class="cta" href="{REPO_URL}/releases/latest">Download</a>
   </nav>
@@ -155,7 +244,7 @@ def shell(title: str, content: str, description: str = "") -> str:
 def sidebar_html(current: Page) -> str:
     """Return the left navigation with the current page highlighted."""
     parts = []
-    for group, pages in NAV:
+    for group, pages in GROUPS.items():
         parts.append(f"<h4>{html.escape(group)}</h4>")
         for page in pages:
             classes = " ".join(c for c in ("sub" if page.sub else "", "active" if page == current else "") if c)
@@ -165,7 +254,7 @@ def sidebar_html(current: Page) -> str:
 
 def build_page(page: Page) -> str:
     """Render one documentation page."""
-    source = (SRC / f"{page.name}.md").read_text(encoding="utf-8")
+    _, source = split_frontmatter((SRC / f"{page.name}.md").read_text(encoding="utf-8"))
     title, text = split_title(source, page.title)
     body, toc = render_markdown(text)
     index = PAGES.index(page)
@@ -213,8 +302,7 @@ def build_index() -> str:
     thanks = readme_section(readme, "Acknowledgements")
     thanks_items = [p.strip() for p in strip_html_tags(thanks).split("\n\n") if p.strip()]
     thanks_html = "".join(f"<p>{render_markdown(item)[0][3:-4]}</p>" for item in thanks_items)
-    download = re.search(r'href="([^"]*releases/download[^"]*)"', readme)
-    download_url = html.unescape(download.group(1)) if download else f"{REPO_URL}/releases/latest"
+    download_url = AETHERBLEND_LINK
     discord = re.search(r"https://discord\.gg/\w+", readme)
     discord_url = discord.group(0) if discord else REPO_URL
     home = (SRC / "Home.md").read_text(encoding="utf-8") if (SRC / "Home.md").exists() else ""
@@ -222,24 +310,23 @@ def build_index() -> str:
     about_html = render_markdown(about.group(1))[0] if about else ""
 
     cards = "".join(
-        f'<a class="card" href="{slug}.html"><h3>{title}</h3><p>{text}</p></a>'
-        for slug, title, text in (
-            ("installation", "Installation", "Requirements and how to install the add-on."),
-            ("getting-started", "Getting Started", "Import a character and generate your first rig."),
-            ("animation-modding", "Animation Modding", "Take an animation from Blender into the game."),
-            ("the-template-system", "Template System", "Build and share your own rig templates."),
-            ("operators", "Operator Reference", "Every operator, its parameters and what it does."),
-            ("style-guide", "Style Guide", "Conventions for contributing code."),
-        )
+        f'<a class="card" href="{page.slug}.html"><h3>{html.escape(page.title)}</h3>'
+        f"<p>{html.escape(page.summary)}</p></a>"
+        for page in PAGES
+        if page.summary
     )
     content = f"""{header_html()}
 <section class="hero">
   <img class="logo" src="assets/img/logo.png" alt="AetherBlend">
-  <div><span class="badge">Blender 5.2+ &middot; Beta</span></div>
+  <div><span class="badge">Blender {BLENDER_MIN}+ &middot; v{VERSION} &middot; Beta</span></div>
   <p class="lead">{html.escape(lead)}</p>
   <p class="note">{html.escape(note)}</p>
   <div class="btn-row">
-    <a class="btn primary" href="{html.escape(download_url)}">Download for Blender</a>
+    <a class="btn primary download" data-latest-zip href="{html.escape(download_url)}" draggable="true"
+       title="Drag this button into a Blender window to install">
+      <img src="assets/img/blender.svg" alt="" width="34" height="34">
+      <span><strong>Download for Blender</strong><small>or drag &amp; drop this button into Blender</small></span>
+    </a>
     <a class="btn" href="installation.html">Installation guide</a>
     <a class="btn" href="{REPO_URL}">View on GitHub</a>
   </div>
@@ -278,6 +365,7 @@ def main() -> None:
     )
     for old in DOCS.glob("*.html"):
         old.unlink()
+    sync_readme_download()
     (DOCS / "index.html").write_text(build_index(), encoding="utf-8")
     for page in PAGES:
         (DOCS / f"{page.slug}.html").write_text(build_page(page), encoding="utf-8")

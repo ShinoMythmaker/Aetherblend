@@ -1,3 +1,10 @@
+---
+title: The Template System
+group: Guides
+order: 30
+sub: true
+summary: Build and share your own rig templates.
+---
 ## The Template System
 
 The template system serves to provide a more modular foundation for rig generation that provides greater control and variation in different elements of the control rig. By default AetherBlend loads the 'Dynamic' template which contains a preset list of modules it will attempt to generate on the target armature.

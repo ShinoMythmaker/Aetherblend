@@ -1,3 +1,9 @@
+---
+title: Preferences
+group: Operator Reference
+order: 160
+sub: true
+---
 # Operators: Preferences
 
 Back to [[Operators]].

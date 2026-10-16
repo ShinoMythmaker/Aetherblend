@@ -1,5 +1,11 @@
+---
+title: Installation
+group: Guides
+order: 10
+summary: Requirements and how to install the add-on.
+---
 ## Requirements 
-- Blender 5.2 or newer
+- Blender {{blender_min}} or newer
 - [Meddle](https://github.com/PassiveModding/Meddle) and [MeddleTools](https://github.com/PassiveModding/MeddleTools)
 - Rigify
 &nbsp;
@@ -7,7 +13,24 @@
 **Note: Rigify ships with Blender but may need to be enabled manually**
 
 ## Installation
-You can install AetherBlend manually or with Blender's repository feature:
+You can install AetherBlend with drag and drop, manually, or with Blender's repository feature:
+
+### Drag and drop
+The quickest way. Drag a button below into an open Blender window.
+
+1. Drag the **AetherBlend** button into Blender. The first time, Blender asks to add the AetherBlend repository, confirm it.
+2. Drag the **same button a second time** to install the add-on from that repository.
+3. Meddle Tools and FFGear come from the same repository, so once it is added they need only **one drop each**.
+
+<p>
+<a class="drop-link" href="{{aetherblend_link}}" draggable="true"><img src="assets/img/blender.svg" alt="" width="22" height="22">AetherBlend</a>
+<a class="drop-link" href="{{meddle_link}}" draggable="true"><img src="assets/img/blender.svg" alt="" width="22" height="22">Meddle Tools</a>
+<a class="drop-link" href="{{ffgear_link}}" draggable="true"><img src="assets/img/blender.svg" alt="" width="22" height="22">FFGear</a>
+</p>
+
+All three buttons use the shared [FFXIV Blender Plugins](https://github.com/ShinoMythmaker/FFXIV-Blender-Plugins) repository. Because it is a repository, Blender keeps the installed add-ons updated afterwards.
+
+If dragging does nothing, use one of the methods below.
 
 ### Manual
 1. Download the newest .zip from the releases page

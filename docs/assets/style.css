@@ -150,6 +150,12 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 }
 .btn:hover { text-decoration: none; border-color: var(--accent); }
 .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #07111c; border: 0; }
+.btn.download { display: inline-flex; align-items: center; gap: 14px; padding: 10px 26px 10px 18px; text-align: left; }
+.btn.download img { flex: none; }
+.btn.download span { display: flex; flex-direction: column; line-height: 1.25; }
+.btn.download small { font-weight: 500; font-size: .78rem; opacity: .75; }
+.drop-link { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 8px; border: 1px dashed var(--accent); font-weight: 600; }
+.drop-link img { flex: none; }
 .landing { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
 .landing section { margin-top: 72px; }
 .landing h2 { font-size: 1.7rem; color: var(--heading); margin: 0 0 .5em; }

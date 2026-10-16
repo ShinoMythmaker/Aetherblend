@@ -1,3 +1,9 @@
+---
+title: Rig Generator
+group: Operator Reference
+order: 120
+sub: true
+---
 # Operators: Rig Generator
 
 Back to [[Operators]].

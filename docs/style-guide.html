@@ -14,9 +14,9 @@
   <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
   <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
   <nav class="header-links">
-    <a href="installation.html">Docs</a>
-    <a href="operators.html">Operators</a>
-    <a href="style-guide.html">Style Guide</a>
+    <a href="installation.html">Guides</a>
+    <a href="operators.html">Operator Reference</a>
+    <a href="style-guide.html">Development</a>
     <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
     <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
   </nav>
@@ -176,7 +176,7 @@
 </ul>
 <h2 id="10-wiki-documentation">10. Wiki Documentation<a class="headerlink" href="#10-wiki-documentation" title="Permanent link">#</a></h2>
 <ul>
-<li>R-10.1 The documentation site is built from Markdown in <code>docs/src/</code> with <code>python docs/build.py</code> and published with GitHub Pages from <code>docs/</code>. Edit the Markdown, never the generated HTML, and commit both.</li>
+<li>R-10.1 The documentation site is built from Markdown in <code>docs/src/</code> with <code>python docs/build.py</code> and published with GitHub Pages from <code>docs/</code>. Edit the Markdown, never the generated HTML, and commit both. A page appears in the navigation through its frontmatter (<code>title</code>, <code>group</code>, <code>order</code>, <code>sub</code>, <code>summary</code>, <code>aliases</code>). Never hard-code the add-on version or minimum Blender version; use the placeholders defined in <code>docs/build.py</code>.</li>
 <li>R-10.2 Every operator MUST be documented in the operator reference. An entry gives: ID, label, what it does, where it appears, requirements, parameters, errors and a Python call example.</li>
 <li>R-10.3 When an operator is added, renamed, removed or gets a new parameter, its documentation entry MUST change in the same change.</li>
 <li>R-10.4 Changes to this style guide are made in <code>docs/src/Style-Guide.md</code>.</li>

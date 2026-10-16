@@ -1,3 +1,9 @@
+---
+title: Overview
+group: Operator Reference
+order: 100
+summary: Every operator, its parameters and what it does.
+---
 # Operators
 
 Every AetherBlend action is a Blender operator. You can run it from the UI or from Python.

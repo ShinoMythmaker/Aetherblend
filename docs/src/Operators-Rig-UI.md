@@ -1,3 +1,9 @@
+---
+title: Rig UI
+group: Operator Reference
+order: 140
+sub: true
+---
 # Operators: Rig UI
 
 Back to [[Operators]].

@@ -1,3 +1,9 @@
+---
+title: Rig Edit
+group: Operator Reference
+order: 130
+sub: true
+---
 # Operators: Rig Edit
 
 Back to [[Operators]].

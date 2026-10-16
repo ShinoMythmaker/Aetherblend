@@ -1,3 +1,9 @@
+---
+title: Shaders
+group: Operator Reference
+order: 150
+sub: true
+---
 # Operators: Shaders
 
 Back to [[Operators]].

@@ -1,3 +1,9 @@
+---
+title: Style Guide
+group: Development
+order: 200
+summary: Conventions for contributing code.
+---
 <!-- AI/agent note: Rules are numbered (R-x.y) and use MUST / MUST NOT / SHOULD. Cite rule IDs in reviews. Section 12 is a checklist for new code. -->
 # AetherBlend Style Guide
 
@@ -96,7 +102,7 @@ Python target and lint rules live in `ruff.toml`. Run `ruff check .` before ever
 
 ## 10. Wiki Documentation
 
-- R-10.1 The documentation site is built from Markdown in `docs/src/` with `python docs/build.py` and published with GitHub Pages from `docs/`. Edit the Markdown, never the generated HTML, and commit both.
+- R-10.1 The documentation site is built from Markdown in `docs/src/` with `python docs/build.py` and published with GitHub Pages from `docs/`. Edit the Markdown, never the generated HTML, and commit both. A page appears in the navigation through its frontmatter (`title`, `group`, `order`, `sub`, `summary`, `aliases`). Never hard-code the add-on version or minimum Blender version; use the placeholders defined in `docs/build.py`.
 - R-10.2 Every operator MUST be documented in the operator reference. An entry gives: ID, label, what it does, where it appears, requirements, parameters, errors and a Python call example.
 - R-10.3 When an operator is added, renamed, removed or gets a new parameter, its documentation entry MUST change in the same change.
 - R-10.4 Changes to this style guide are made in `docs/src/Style-Guide.md`.

@@ -1,3 +1,10 @@
+---
+title: Getting Started
+group: Guides
+order: 20
+summary: Import a character and generate your first rig.
+aliases: How-to-AetherBlend-(Alpha)
+---
 ## How to use Aetherblend
 
 This section will serve as a guide to AetherBlend's basic features and their usage.
