@@ -1,4 +1,4 @@
-"""Animation import and retargeting for FFXIV animations to AetherBlend rigs."""
+﻿"""Animation import and retargeting for FFXIV animations to AetherBlend rigs."""
 
 import tempfile
 import uuid
@@ -7,8 +7,8 @@ import bpy
 from bpy.props import EnumProperty, StringProperty
 from bpy_extras.io_utils import ImportHelper
 
-from ...core.drivers import Driver, TransformChannelVariable
-from ...core.operations import DriverOperation, ParentBoneOperation
+from ..rig_generator.drivers import Driver, TransformChannelVariable
+from ..rig_generator.operations import DriverOperation, ParentBoneOperation
 from ...utils.axis_conversion import AXIS_ITEMS
 
 # FFXIV bone names to AetherBlend FK control mapping

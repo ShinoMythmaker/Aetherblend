@@ -10,7 +10,8 @@ aetherblend/
   __init__.py          # feature registry + register()/unregister()
   preferences/         # add-on preferences + feature toggles
   shared/              # code used by 2+ features ONLY
-    core/  utils/  data/
+    utils/  data/
+  features/rig_generator/  # rig generation: modules, instructions, pipeline, UI
   features/<feature>/
     __init__.py        # FEATURE metadata, register(), unregister(), public API
     operators/
@@ -110,7 +111,7 @@ Every feature MUST be fully enableable and disableable at runtime from preferenc
 ## 9. Imports
 
 - R-9.1 Order: standard library, third party (`bpy`, `mathutils`), local.
-- R-9.2 MUST import modules, not names: `from . import bone`. Wildcard imports are forbidden.
+- R-9.2 MUST import modules, not names: `from . import bone`. A wildcard import is only allowed from a module that defines `__all__`, so the star import brings in exactly the public API (for example `from ....instructions import *` in rig modules).
 - R-9.3 Inside a feature use relative imports. For shared code use `from ...shared.utils import bone`.
 
 ## 10. Console and Errors

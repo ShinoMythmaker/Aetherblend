@@ -1,8 +1,8 @@
-import bpy
+﻿import bpy
 
 from ..features.animation.panels import AETHER_PT_ExportPanel
 from ..features.model_import.panels import AETHER_PT_ImportPanel
-from ..features.rigging.panels import (
+from ..features.rig_generator.panels import (
     AETHER_PT_RigBakeSettingsPanel,
     AETHER_PT_RigCreation,
     AETHER_PT_RigLayersPanel,

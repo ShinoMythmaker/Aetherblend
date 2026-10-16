@@ -1,6 +1,6 @@
-from . import animation, model_import, rigging, shaders
+﻿from . import animation, model_import, rig_generator, shaders
 
-modules = (model_import, rigging, animation, shaders)
+modules = (model_import, rig_generator, animation, shaders)
 
 def register():
     for mod in modules:
