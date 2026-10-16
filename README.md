@@ -32,12 +32,10 @@ Our goal is to make custom FFXIV characters animation-ready in Blender: generate
 
 &nbsp;
 
-## Setup and Getting Started
-
 <p align="center">
-  <a href="https://shinomythmaker.github.io/Aetherblend/installation.html"><img width="300" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>
-  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="300" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>
-  <a href="https://discord.gg/NEF7TdXGqH"><img width="300" alt="Discord" src="assets/brand/btn-discord.svg" /></a>
+  <a href="https://shinomythmaker.github.io/Aetherblend/installation.html"><img width="240" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>&nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="240" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>&nbsp;&nbsp;&nbsp;
+  <a href="https://discord.gg/NEF7TdXGqH"><img width="240" alt="Discord" src="assets/brand/btn-discord.svg" /></a>
 </p>
 
 &nbsp;
