@@ -32,34 +32,26 @@ Our goal is to make custom FFXIV characters animation-ready in Blender: generate
 
 &nbsp;
 
-## Setup and Getting Started 
-- [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
-- [Getting Started (WIP)](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
-&nbsp;
+## Setup and Getting Started
 
-&nbsp;
-
-## Support & Feedback
-
-- Make sure to submit [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on Github.
-- Check the [wiki](https://github.com/ShinoMythmaker/Aetherblend/wiki/Home) for useful information!
-- To stay up to date or find out more about development, join our [Discord]( https://discord.gg/NEF7TdXGqH)!
-<p><a href="https://discord.gg/NEF7TdXGqH"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
-    
+<p align="center">
+  <a href="https://shinomythmaker.github.io/Aetherblend/installation.html"><img width="300" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>
+  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="300" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>
+  <a href="https://discord.gg/NEF7TdXGqH"><img width="300" alt="Discord" src="assets/brand/btn-discord.svg" /></a>
 </p>
-&nbsp;
 
 &nbsp;
+
 ## Acknowledgements
-💖 A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
+- A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
 
-💖 [Zed](https://x.com/RoseHikari24) and [CC](https://x.com/CC_VibesXIV), two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!
+- [Zed](https://x.com/RoseHikari24) and [CC](https://x.com/CC_VibesXIV), two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!
 
-💖 [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. 
+- [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. 
 
-💖 [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
+- [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
 
-💖 Ofcourse everyone that showed interest in not only AetherBlend but also [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!
+- Ofcourse everyone that showed interest in not only AetherBlend but also [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!
 
 ---
 &nbsp; 
