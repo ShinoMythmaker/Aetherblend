@@ -1,53 +1,25 @@
-﻿from .... import rigify
-from ....bone_generators import ExtensionBone
-from ....operations import CollectionOperation, ParentBoneOperation, RigifyTypeOperation
+"""Miqo'te ears: one controllable bone per ear."""
+from ....instructions import *
+from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
-from ....shared import BoneGroup, RigModule, TransformLink
 
-MIQO_EARS = BoneGroup(
-    name="Miqo Ears",
-    transform_link=[
-        TransformLink(target="DEF-Ear.R", bone="j_mimi_r"),
-        TransformLink(target="DEF-Ear.L", bone="j_mimi_l")
-    ],
-    generators=[
-        ExtensionBone(
-            name="Ear.R",
-            bone_a="j_mimi_r",
-            axis_type="local",
-            axis="Y",
-            start="head",
-            roll=150,
-            parent="Head",
-            req_bones=["j_mimi_r"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Ear.R", parent=["Head", "j_kao"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Ear.R", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
-                        CollectionOperation(time="Pre", bone_name="Ear.R", collection_name="Head"),
-                        ]
-        ),
-        ExtensionBone(
-            name="Ear.L",
-            bone_a="j_mimi_l",
-            axis_type="local",
-            axis="Y",
-            start="head",
-            roll=-150,
-            parent="Head",
-            req_bones=["j_mimi_l"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Ear.L", parent=["Head", "j_kao"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Ear.L", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
-                        CollectionOperation(time="Pre", bone_name="Ear.L", collection_name="Head"),
-                        ]
-        ),
-    ]
-)
+HEAD_COLLECTION = "Head"
 
-def get_rig_module() -> RigModule:
-    return RigModule(
-        name="XIV-Miqo",
-        type="Generation",
-        bone_groups=[MIQO_EARS],
-        ui_collections = UI_Collections([
-            BoneCollection(name="Head", ui=True, color_set="Head", row_index=0, title="Head", visible=True),
-        ])
-    )
+
+class Module(RigModule):
+    name = "XIV-Miqo"
+    ui_collections = UI_Collections([
+        BoneCollection(name=HEAD_COLLECTION, ui=True, color_set="Head", row_index=0, title="Head", visible=True),
+    ])
+
+    def meta_edit(self, rig):
+        extend(rig, "Ear.R", "j_mimi_r", start_point="head", roll=150, parent=["Head", "j_kao"])
+        extend(rig, "Ear.L", "j_mimi_l", start_point="head", roll=-150, parent=["Head", "j_kao"])
+
+    def meta_pose(self, rig):
+        for ear in ["Ear.R", "Ear.L"]:
+            rigify.basic_super_copy(rig, ear, widget_type="bone")
+            collection(rig, [ear], HEAD_COLLECTION)
+
+        link(rig, "j_mimi_r", "DEF-Ear.R")
+        link(rig, "j_mimi_l", "DEF-Ear.L")

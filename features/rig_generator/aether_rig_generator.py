@@ -38,13 +38,13 @@ class AetherRigGenerator:
     """Generates an armature by running the steps of the selected rig modules in order."""
 
     name: str
-    module_groups: list[list[RigModule]]
+    module_groups: list[list[RigModule]]  # instances created from the template's module classes
     color_sets: 'dict[str, rigify.ColorSet]'
 
-    def __init__(self, name: str, color_sets: 'dict[str, rigify.ColorSet]', modules: list[list[RigModule]] | None = None):
+    def __init__(self, name: str, color_sets: 'dict[str, rigify.ColorSet]', modules: list[list[type[RigModule]]] | None = None):
         self.name = name
         self.color_sets = color_sets
-        self.module_groups = [list(group) for group in (modules or []) if group]
+        self.module_groups = [[module_class() for module_class in group] for group in (modules or []) if group]
 
     # ------------------------------
     # Meta rig generation pipeline
@@ -63,7 +63,7 @@ class AetherRigGenerator:
 
         original_bone_names = set(meta_rig.data.bones.keys())
 
-        valid_modules = self._validate_modules(meta_rig, original_bone_names)
+        valid_modules = self._validate_modules(available_bones=original_bone_names)
         self._sync_ui_flags_property(armature, valid_modules)
 
         self._run_meta_edit(meta_rig, valid_modules)
@@ -268,7 +268,7 @@ class AetherRigGenerator:
         for color_set in self.color_sets.values():
             color_set.add(meta_rig)
 
-    def _validate_modules(self, meta_rig: bpy.types.Object, available_bones: set[str]) -> list[RigModule]:
+    def _validate_modules(self, available_bones: set[str]) -> list[RigModule]:
         """Pick the first module of every priority group whose required bones all exist."""
         valid: list[RigModule] = []
 
@@ -288,6 +288,7 @@ class AetherRigGenerator:
         enter_mode(meta_rig, "EDIT")
         for module in modules:
             module.meta_edit(meta_rig)
+        resolve_pending_parents(meta_rig)
 
     def _sort_original_bones(self, meta_rig: bpy.types.Object):
         """Move original bones into Linked or Unlinked and drop the LINK bones that nothing uses."""

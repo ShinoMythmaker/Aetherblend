@@ -1,417 +1,81 @@
-﻿
-from .... import rigify
-from ....generators import CenterBone, ConnectBone, ExtensionBone
-from ....operations import CollectionOperation, RigifyTypeOperation, WidgetOperation
-from ....rigify.settings import BoneCollection, UI_Collections
-from ....shared import BoneGroup, RigModule, TransformLink
+"""Mouth module: manual controls, one plain control per lip, teeth and tongue bone."""
+import bpy
 
-MOUTH_MANUAL = BoneGroup(
-    name="Mouth Manual",
-    #I genuinely think this is probably the dumbest addition to the rigging system but here we are. Some people just hate nice things. - Oats
-    transform_link=[
-        TransformLink(target="DEF-Jaw", bone="j_f_ago"),
-        TransformLink(target="DEF-Lip.T.R", bone="j_f_ulip_01_r"),
-        TransformLink(target="DEF-Lip.T.R.001", bone="j_f_umlip_01_r"),
-        TransformLink(target="DEF-Lip.T.R.002", bone="j_f_uslip_r"),
-        TransformLink(target="DEF-Lip.B.R", bone="j_f_dlip_01_r"),
-        TransformLink(target="DEF-Lip.B.R.001", bone="j_f_dmlip_01_r"),
-        TransformLink(target="DEF-Lip.B.R.002", bone="j_f_dslip_r"),
-        TransformLink(target="DEF-Lip.T.L", bone="j_f_ulip_01_l"),
-        TransformLink(target="DEF-Lip.T.L.001", bone="j_f_umlip_01_l"),
-        TransformLink(target="DEF-Lip.T.L.002", bone="j_f_uslip_l"),
-        TransformLink(target="DEF-Lip.B.L", bone="j_f_dlip_01_l"),
-        TransformLink(target="DEF-Lip.B.L.001", bone="j_f_dmlip_01_l"),
-        TransformLink(target="DEF-Lip.B.L.002", bone="j_f_dslip_l"),
-        TransformLink(target="DEF-Lip.T.L.003", bone="j_f_ulip_02_l"),
-        TransformLink(target="DEF-Lip.T.L.004", bone="j_f_umlip_02_l"),
-        TransformLink(target="DEF-Lip.T.R.003", bone="j_f_ulip_02_r"),
-        TransformLink(target="DEF-Lip.T.R.004", bone="j_f_umlip_02_r"),
-        TransformLink(target="DEF-Lip.B.L.003", bone="j_f_dlip_02_l"),
-        TransformLink(target="DEF-Lip.B.L.004", bone="j_f_dmlip_02_l"),
-        TransformLink(target="DEF-Lip.B.R.003", bone="j_f_dlip_02_r"),
-        TransformLink(target="DEF-Lip.B.R.004", bone="j_f_dmlip_02_r"),
-        TransformLink(target="DEF-Teeth.T", bone="j_f_hagukiup"),
-        TransformLink(target="DEF-Teeth.B", bone="j_f_hagukidn"),
-        TransformLink(target="DEF-Tongue", bone="j_f_bero_01"),
-        TransformLink(target="DEF-Tongue.001", bone="j_f_bero_02"),
-        TransformLink(target="DEF-Tongue.002", bone="j_f_bero_03"),
-    ],
-    generators=[
-        #Jaw
-        CenterBone(
-            name="jaw_ref",
-            ref_bones=["j_f_dlip_01_r", "j_f_dlip_01_l"],
-            axis="Y",
-            inverted=False,
-            parent="Head",
-            req_bones=["j_f_dlip_01_r", "j_f_dlip_01_l"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="jaw_ref", collection_name="MCH")
-                        ]
-        ),
-        ConnectBone(
-            name="Jaw",
-            bone_a="j_f_ago",
-            bone_b="jaw_ref",
-            parent=["Head", "j_kao"],
-            req_bones=["j_f_ago", "jaw_ref"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Jaw", rigify_type=rigify.types.basic_super_copy(widget_type="jaw")),
-                        CollectionOperation(time="Pre", bone_name="Jaw", collection_name="Face (Primary)")
-            ]
-        ),
-        #Lips Right
-        ExtensionBone(
-            name="Lip.T.R",
-            bone_a="j_f_ulip_01_r",
-            parent=["Head", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_ulip_01_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.R", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.R", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.T.R.001",
-            bone_a="j_f_umlip_01_r",
-            parent=["Head", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_umlip_01_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.001", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.R.001", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.T.R.002",
-            bone_a="j_f_uslip_r",
-            parent=["Head", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_uslip_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.002", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.R.002", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.R",
-            bone_a="j_f_dlip_01_r",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dlip_01_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.R", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.R", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.R.001",
-            bone_a="j_f_dmlip_01_r",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dmlip_01_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.R.001", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.R.001", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.R.002",
-            bone_a="j_f_dslip_r",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dslip_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.R.002", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.R.002", collection_name="Face (Primary)")
-                        ]
-        ),
-        #Lips Left
-        ExtensionBone(
-            name="Lip.T.L",
-            bone_a="j_f_ulip_01_l",
-            parent=["Head", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_ulip_01_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.L", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.L", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.T.L.001",
-            bone_a="j_f_umlip_01_l",
-            parent=["Head", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_umlip_01_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.001", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.L.001", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.T.L.002",
-            bone_a="j_f_uslip_l",
-            parent=["Head", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_uslip_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.002", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.L.002", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.L",
-            bone_a="j_f_dlip_01_l",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dlip_01_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.L", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.L", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.L.001",
-            bone_a="j_f_dmlip_01_l",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dmlip_01_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.L.001", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.L.001", collection_name="Face (Primary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.L.002",
-            bone_a="j_f_dslip_l",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dslip_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.L.002", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.L.002", collection_name="Face (Primary)")
-                        ]
-        ),
-        # Child Bones
-        ExtensionBone(
-            name="Lip.T.R.003",
-            bone_a="j_f_ulip_02_r",
-            parent=["Lip.T.R", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_ulip_02_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.003", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.R.003", collection_name="Face (Secondary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.T.R.004",
-            bone_a="j_f_umlip_02_r",
-            parent=["Lip.T.R.001", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_umlip_02_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.R.004", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.R.004", collection_name="Face (Secondary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.T.L.003",
-            bone_a="j_f_ulip_02_l",
-            parent=["Lip.T.L", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_ulip_02_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.003", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.L.003", collection_name="Face (Secondary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.T.L.004",
-            bone_a="j_f_umlip_02_l",
-            parent=["Lip.T.L.001", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_umlip_02_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.T.L.004", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.T.L.004", collection_name="Face (Secondary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.R.003",
-            bone_a="j_f_dlip_02_r",
-            parent=["Lip.B.R", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dlip_02_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.R.003", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.R.003", collection_name="Face (Secondary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.R.004",
-            bone_a="j_f_dmlip_02_r",
-            parent=["Lip.B.R.001", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dmlip_02_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.R.004", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.R.004", collection_name="Face (Secondary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.L.003",
-            bone_a="j_f_dlip_02_l",
-            parent=["Lip.B.L", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dlip_02_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.L.003", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.L.003", collection_name="Face (Secondary)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Lip.B.L.004",
-            bone_a="j_f_dmlip_02_l",
-            parent=["Lip.B.L.001", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_dmlip_02_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lip.B.L.004", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Lip.B.L.004", collection_name="Face (Secondary)")
-            ]
-        ),
-        #Teeth
-        ExtensionBone(
-            name="Teeth.T",
-            bone_a="j_f_hagukiup",
-            parent=["Head", "j_kao"],
-            start="head",
-            size_factor=1,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_hagukiup"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Teeth.T", rigify_type=rigify.types.basic_super_copy(widget_type="teeth")),
-                        CollectionOperation(time="Pre", bone_name="Teeth.T", collection_name="Face (Misc)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Teeth.B",
-            bone_a="j_f_hagukidn",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=1,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_hagukidn"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Teeth.B", rigify_type=rigify.types.basic_super_copy(widget_type="teeth")),
-                        CollectionOperation(time="Pre", bone_name="Teeth.B", collection_name="Face (Misc)")
-                        ]
-        ),
-        ExtensionBone(
-            name="Tongue",
-            bone_a="j_f_bero_01",
-            parent=["Jaw", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_bero_01"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Tongue", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Tongue", collection_name="Face (Misc)")
-                        ]
-        ),
-         ExtensionBone(
-            name="Tongue.001",
-            bone_a="j_f_bero_02",
-            parent=["Tongue", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_bero_02"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Tongue.001", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Tongue.001", collection_name="Face (Misc)")
-                        ]
-        ),
-         ExtensionBone(
-            name="Tongue.002",
-            bone_a="j_f_bero_03",
-            parent=["Tongue.001", "j_kao"],
-            start="head",
-            size_factor=0.3,
-            axis="Y",
-            axis_type="local",
-            req_bones=["j_f_bero_03"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Tongue.002", rigify_type=rigify.types.basic_super_copy(widget_type="circle")),
-                        CollectionOperation(time="Pre", bone_name="Tongue.002", collection_name="Face (Misc)")
-                        ]
-         )
-    ]
+from ....instructions import *
+from ....module import RigModule
+from ....rigify.settings import BoneCollection, UI_Collections
+
+PRIMARY = "Face (Primary)"
+SECONDARY = "Face (Secondary)"
+MISC = "Face (Misc)"
+SIDES = ((".R", "r"), (".L", "l"))
+ROWS = (
+    ("T", "u", ("ulip_01", "umlip_01", "uslip")),
+    ("B", "d", ("dlip_01", "dmlip_01", "dslip")),
 )
-def get_rig_module() -> RigModule:
-    return RigModule(
-        name="XIV-Manual",
-        type="Generation",
-        bone_groups=[MOUTH_MANUAL],
-        ui_collections = UI_Collections([
-            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=1, title="Face (Primary)", visible=True),
-            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=1, title="Face (Secondary)", visible=False),
-            BoneCollection(name="Face (Misc)", ui=True, color_set="Face_Secondary", row_index=2, title="Face (Misc)", visible=False),
-        ]),
-        operations=[
-            WidgetOperation(bone_name="Teeth.T", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
-            WidgetOperation(bone_name="Teeth.B", rotation=[0.0, 0.0, 3.1415], scale_factor=1.7),
-            WidgetOperation(bone_name="jaw_master_mouth", scale=[0.6, 1, 0.3]),
-            WidgetOperation(bone_name="Lip.T.R.Middle", scale_factor=0.1),
-            WidgetOperation(bone_name="Lip.T.R.Middle.001", scale_factor=0.1),
-            WidgetOperation(bone_name="Lip.B.L.Middle", scale_factor=0.1),
-            WidgetOperation(bone_name="Lip.B.L.Middle.001", scale_factor=0.1),
-            WidgetOperation(bone_name="Lip.B.R.Middle", scale_factor=0.1),
-            WidgetOperation(bone_name="Lip.B.R.Middle.001", scale_factor=0.1),
-            WidgetOperation(bone_name="Lip.T.L.Middle", scale_factor=0.1),
-            WidgetOperation(bone_name="Lip.T.L.Middle.001", scale_factor=0.1),
-            ]
-    )
+# Inner lip sources (_02), parented to the first two main lip bones of the row.
+INNER = {"T": ("ulip_02", "umlip_02"), "B": ("dlip_02", "dmlip_02")}
+TONGUE = (("Tongue", "j_f_bero_01"), ("Tongue.001", "j_f_bero_02"), ("Tongue.002", "j_f_bero_03"))
+
+
+class Module(RigModule):
+    name = "XIV-Manual"
+    ui_collections = UI_Collections([
+        BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=1, title=PRIMARY, visible=True),
+        BoneCollection(name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=1, title=SECONDARY, visible=False),
+        BoneCollection(name=MISC, ui=True, color_set="Face_Secondary", row_index=2, title=MISC, visible=False),
+    ])
+
+    def meta_edit(self, rig: bpy.types.Object) -> None:
+        center(rig, "jaw_ref", ["j_f_dlip_01_r", "j_f_dlip_01_l"], axis="Y", parent="Head")
+        connect(rig, "Jaw", "j_f_ago", "jaw_ref", parent="Head")
+
+        for suffix, source in SIDES:
+            for row, _, sources in ROWS:
+                parent_bone = "Jaw" if row == "B" else "Head"
+                for index, src in enumerate(sources):
+                    extend(rig, f"Lip.{row}{suffix}{self._number(index)}", f"j_f_{src}_{source}",
+                           axis="Y", start_point="head", size_factor=0.3, parent=parent_bone)
+                for index, src in enumerate(INNER[row]):
+                    extend(rig, f"Lip.{row}{suffix}.{index + 3:03d}", f"j_f_{src}_{source}",
+                           axis="Y", start_point="head", size_factor=0.3,
+                           parent=f"Lip.{row}{suffix}{self._number(index)}")
+
+        extend(rig, "Teeth.T", "j_f_hagukiup", axis="Y", start_point="head", parent="Head")
+        extend(rig, "Teeth.B", "j_f_hagukidn", axis="Y", start_point="head", parent="Jaw")
+
+        for index, (name, source) in enumerate(TONGUE):
+            extend(rig, name, source, axis="Y", start_point="head", size_factor=0.3,
+                   parent="Jaw" if index == 0 else TONGUE[index - 1][0])
+
+    def meta_pose(self, rig: bpy.types.Object) -> None:
+        collection(rig, ["jaw_ref"], "MCH")
+        rigify.basic_super_copy(rig, "Jaw", widget_type="jaw")
+        collection(rig, ["Jaw"], PRIMARY)
+        link(rig, "j_f_ago", "DEF-Jaw")
+
+        for suffix, source in SIDES:
+            for row, _, sources in ROWS:
+                for index, src in enumerate(sources):
+                    name = f"Lip.{row}{suffix}{self._number(index)}"
+                    rigify.basic_super_copy(rig, name, widget_type="circle")
+                    collection(rig, [name], PRIMARY)
+                    link(rig, f"j_f_{src}_{source}", f"DEF-{name}")
+                for index, src in enumerate(INNER[row]):
+                    name = f"Lip.{row}{suffix}.{index + 3:03d}"
+                    rigify.basic_super_copy(rig, name, widget_type="circle")
+                    collection(rig, [name], SECONDARY)
+                    link(rig, f"j_f_{src}_{source}", f"DEF-{name}")
+
+        for name, source in (("Teeth.T", "j_f_hagukiup"), ("Teeth.B", "j_f_hagukidn"), *TONGUE):
+            rigify.basic_super_copy(rig, name, widget_type="teeth" if name.startswith("Teeth") else "circle")
+            collection(rig, [name], MISC)
+            link(rig, source, f"DEF-{name}")
+
+    def final_pose(self, rig: bpy.types.Object) -> None:
+        for teeth in ("Teeth.T", "Teeth.B"):
+            widget(rig, teeth, rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
+
+    @staticmethod
+    def _number(index: int) -> str:
+        return "" if index == 0 else f".{index:03d}"

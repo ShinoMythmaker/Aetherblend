@@ -1,1472 +1,402 @@
-﻿import mathutils
+"""Face module: brows, cheeks, nose, nostrils and eyes as skin chains."""
+from typing import NamedTuple
 
-from .... import rigify
-from ....bone_generators import (
-    BridgeBone,
-    CenterBone,
-    ConnectBone,
-    CopyBone,
-    ExtensionBone,
-    OffsetBone,
-    SkinBone,
-)
-from ....constraints import CopyLocationConstraint, LimitLocationConstraint
-from ....drivers import Driver, TransformChannelVariable
-from ....operations import (
-    BoneRestrictionOperation,
-    CollectionOperation,
-    ConstraintOperation,
-    DriverOperation,
-    ParentBoneOperation,
-    PoseBoneOperation,
-    PropOverrideOperation,
-    RigifyTypeOperation,
-    WidgetOperation,
-)
+import bpy
+
+from ......utils import object as object_utils
+from ....instructions import *
+from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
-from ....shared import BoneGroup, RigModule, TransformLink
 
-HEAD = BoneGroup(
-    name="Head",
-    transform_link= [
-        TransformLink(target="DEF-Cheek.B.R", bone="j_f_shoho_r"),
-        TransformLink(target="DEF-Cheek.B.R.001", bone="j_f_dhoho_r"),
-        TransformLink(target="DEF-Cheek.T.R", bone="j_f_hoho_r"),
-        TransformLink(target="DEF-Cheek.T.R.001", bone="j_f_dmemoto_r"),
-        TransformLink(target="DEF-Cheek.B.L", bone="j_f_shoho_l"),
-        TransformLink(target="DEF-Cheek.B.L.001", bone="j_f_dhoho_l"),
-        TransformLink(target="DEF-Cheek.T.L", bone="j_f_hoho_l"),
-        TransformLink(target="DEF-Cheek.T.L.001", bone="j_f_dmemoto_l"),
-        TransformLink(target="DEF-Nose", bone="j_f_uhana"),
-        TransformLink(target="DEF-Nose.R", bone="j_f_dmiken_r"),
-        TransformLink(target="DEF-Nostril.R", bone="j_f_hana_r"),
-        TransformLink(target="DEF-Nose.L", bone="j_f_dmiken_l"),
-        TransformLink(target="DEF-Nostril.L", bone="j_f_hana_l"),
-    ],
-    generators=[
-        #Cheek Right
-        CenterBone(
-            name="Corner.R",
-            ref_bones=["j_f_uslip_r", "j_f_dslip_r", "j_f_shoho_r"],
-            axis="Y",
-            inverted=False,
-            parent="Head",
-            req_bones=["j_f_uslip_r", "j_f_dslip_r", "j_f_shoho_r"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Corner.R", collection_name="MCH")
-            ]
-        ),
-        CenterBone(
-            name="Corner.L",
-            ref_bones=["j_f_uslip_l", "j_f_dslip_l", "j_f_shoho_l"],
-            axis="Y",
-            inverted=False,
-            parent="Head",
-            req_bones=["j_f_uslip_l", "j_f_dslip_l", "j_f_shoho_l"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Corner.L", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.R",
-            bone_a="Corner.R",
-            bone_b="j_f_shoho_r",
-            parent="Head",
-            req_bones=["Corner.R", "j_f_shoho_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0,
-                                                                                                                          skin_chain_falloff_length=True,
-                                                                                                                          skin_chain_use_scale=[True, True, True, True],
-                                                                                                                          primary_layer_extra="Face (Primary)",
-                                                                                                                          skin_control_orientation_bone="Head")),
-                        CollectionOperation(time="Pre", bone_name="Cheek.R", collection_name="Face (Primary)")
-            ]
-        ),
+PRIMARY = "Face (Primary)"
+SECONDARY = "Face (Secondary)"
+SCALE_ALL = [True, True, True, True]
 
-        ConnectBone(
-            name="Cheek.L",
-            bone_a="Corner.L",
-            bone_b="j_f_shoho_l",
-            parent="Head",
-            req_bones=["Corner.L", "j_f_shoho_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0,
-                                                                                                                          skin_chain_falloff_length=True,
-                                                                                                                          skin_chain_use_scale=[True, True, True, True],
-                                                                                                                          primary_layer_extra="Face (Primary)",
-                                                                                                                          skin_control_orientation_bone="Head")),
-                        CollectionOperation(time="Pre", bone_name="Cheek.L", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.B.R",
-            bone_a="j_f_shoho_r",
-            bone_b="j_f_hoho_r",
-            parent="Cheek.R",
-            is_connected=True,
-            req_bones=["j_f_shoho_r", "j_f_hoho_r"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Cheek.B.R", collection_name="Face (Primary)")
-            ]
-         ),
-        ConnectBone(
-            name="Cheek.B.R.001",
-            bone_a="j_f_dhoho_r",
-            bone_b="j_f_hoho_r",
-            parent="Head",
-            req_bones=["j_f_dhoho_r", "j_f_hoho_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.B.R.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Cheek.B.R.001", collection_name="Face (Secondary)")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.T.R",
-            bone_a="j_f_hoho_r",
-            bone_b="j_f_dmemoto_r",
-            parent="Head",
-            req_bones=["j_f_hoho_r", "j_f_dmemoto_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Cheek.T.R", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.T.R.001",
-            bone_a="j_f_dmemoto_r",
-            bone_b="j_f_hana_r",
-            parent="Head",
-            req_bones=["j_f_dmemoto_r", "j_f_hana_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Cheek.T.R.001", collection_name="Face (Secondary)")
-            ]
-        ),
-        #Cheek Left
-        ConnectBone(
-            name="Cheek.B.L",
-            bone_a="j_f_shoho_l",
-            bone_b="j_f_hoho_l",
-            parent="Cheek.L",
-            is_connected=True,
-            req_bones=["j_f_shoho_l", "j_f_hoho_l"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Cheek.B.L", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.B.L.001",
-            bone_a="j_f_dhoho_l",
-            bone_b="j_f_hoho_l",
-            parent="Head",
-            req_bones=["j_f_dhoho_l", "j_f_hoho_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.B.L.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Cheek.B.L.001", collection_name="Face (Secondary)")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.T.L",
-            bone_a="j_f_hoho_l",
-            bone_b="j_f_dmemoto_l",
-            parent="Head",
-            req_bones=["j_f_hoho_l", "j_f_dmemoto_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Cheek.T.L", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.T.L.001",
-            bone_a="j_f_dmemoto_l",
-            bone_b="j_f_hana_l",
-            parent="Head",
-            req_bones=["j_f_dmemoto_l", "j_f_hana_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L.001", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Cheek.T.L.001", collection_name="Face (Secondary)")
-                        ]
-        ),
-        #Nose Centre
-        CenterBone(
-            name="NoseRef",
-            ref_bones=["j_f_miken_02_r", "j_f_miken_02_l"],
-            axis="Z",
-            parent="Head",
-            req_bones=["j_f_miken_02_r", "j_f_miken_02_l"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="NoseRef", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Nose",
-            bone_a="j_f_uhana",
-            bone_b="NoseRef",
-            parent="Head",
-            req_bones=["j_f_uhana", "NoseRef"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Nose", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Head", skin_chain_priority=2, skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Nose", collection_name="Face (Primary)")
-            ]
-        ),
-        #Nose Right
-        ConnectBone(
-            name="Nose.R",
-            bone_a="j_f_dmiken_r",
-            bone_b="Brow.R.003",
-            end="tail",
-            parent="Head",
-            req_bones=["j_f_dmiken_r", "Brow.R.003"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Nose.R", rigify_type=rigify.types.skin_basic_chain(skin_chain_priority=0, skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Nose.R", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Nostril.R",
-            bone_a="j_f_hana_r",
-            bone_b="j_f_uhana",
-            parent="Head",
-            req_bones=["j_f_hana_r", "j_f_uhana"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Nostril.R", rigify_type=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Nostril.R", collection_name="Face (Primary)")
-            ]
-        ),
-        #Nose Left
-        ConnectBone(
-            name="Nose.L",
-            bone_a="j_f_dmiken_l",
-            bone_b="Brow.L.003",
-            end="tail",
-            parent="Head",
-            req_bones=["j_f_dmiken_l", "Brow.L.003"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Nose.L", rigify_type=rigify.types.skin_basic_chain(skin_chain_priority=0, skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Nose.L", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Nostril.L",
-            bone_a="j_f_hana_l",
-            bone_b="j_f_uhana",
-            parent="Head",
-            req_bones=["j_f_hana_l", "j_f_uhana"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Nostril.L", rigify_type=rigify.types.skin_basic_chain(skin_chain_priority=1, skin_control_orientation_bone="Head", skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Nostril.L", collection_name="Face (Primary)")
-            ]
-        ),
+OCCLUSION_SHADER = "characterocclusion.shpk"
+IRIS_SHADER = "iris.shpk"
+SLIDER_COLOR = (0.443137, 0.541176, 1.0)
+LID_COLOR = (1.0, 0.435294, 0.733333)
+IRIS_RANGE = (0.7, 1.5)
+PUPIL_RANGE = (0.5, 2.3)
+LID_EXPRESSION = "min(1, max(0, (-y / 1) - max(0, {x} / 0.667)))"
 
-        #Anchor
-        ExtensionBone(
-            name="Face.Suppressor",
-            bone_a="NoseRef",
-            is_connected=False,
-            axis_type="local",
-            axis="Y",
-            start="head",
-            size_factor=1.0,
-            parent="Head",
-            req_bones=["j_kao"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Face.Suppressor", rigify_type=rigify.types.skin_anchor(skin_anchor_hide=True)),
-                        CollectionOperation(time="Pre", bone_name="Face.Suppressor", collection_name="MCH")
-                        ]
-        ),
-        #Nose Glue
-        ConnectBone(
-            name="Nostril.Glue.R",
-            bone_a="j_f_hana_r",
-            bone_b="j_f_uhana",
-            parent="Head",
-            req_bones=["j_f_hana_r", "j_f_uhana"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.R", collection_name="MCH")
-                        ]
-        ),
-        ConnectBone(
-            name="Nostril.Glue.L",
-            bone_a="j_f_hana_l",
-            bone_b="j_f_uhana",
-            parent="Head",
-            req_bones=["j_f_hana_l", "j_f_uhana"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.L", collection_name="MCH")
-                        ]
-        ),
-        ConnectBone(
-            name="Nostril.Glue.R.001",
-            bone_a="Cheek.T.R.001",
-            bone_b="Nostril.R",
-            parent="Head",
-            req_bones=["Cheek.T.R.001", "Nostril.R"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.R.001", collection_name="MCH")
-                        ]
-        ),
-        ConnectBone(
-            name="Nostril.Glue.L.001",
-            bone_a="Cheek.T.L.001",
-            bone_b="Nostril.L",
-            parent="Head",
-            req_bones=["Cheek.T.L.001", "Nostril.L"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.L.001", collection_name="MCH")
-            ]
-        ),
-        #Cheek Glue Bones Right
-        ConnectBone(
-            name="Cheek.B.R.glue",
-            bone_a="j_f_dhoho_r",
-            bone_b="j_f_shoho_r",
-            parent="Head",
-            req_bones=["j_f_shoho_r", "j_f_dhoho_r"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.B.R.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True,
-                                                                                                                        skin_glue_use_tail=True,
-                                                                                                                        skin_glue_add_constraint="COPY_LOCATION_OWNER",
-                                                                                                                        skin_glue_add_constraint_influence=0.5,
-                                                                                                                        skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Cheek.B.R.glue", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.T.R.glue",
-            bone_a="j_f_dhoho_r",
-            bone_b="j_f_hoho_r",
-            parent="Head",
-            req_bones=["j_f_hoho_r", "j_f_dhoho_r"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.T.R.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Cheek.T.R.glue", collection_name="MCH")
-            ]
-        ),
-        #Cheek Glue Bones Left
-        ConnectBone(
-            name="Cheek.B.L.glue",
-            bone_a="j_f_dhoho_l",
-            bone_b="j_f_shoho_l",
-            parent="Head",
-            req_bones=["j_f_shoho_l", "j_f_dhoho_l"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.B.L.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True,
-                                                                                                                       skin_glue_use_tail=True,
-                                                                                                                       skin_glue_add_constraint="COPY_LOCATION_OWNER",
-                                                                                                                       skin_glue_add_constraint_influence=0.5,
-                                                                                                                       skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Cheek.B.L.glue", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Cheek.T.L.glue",
-            bone_a="j_f_dhoho_l",
-            bone_b="j_f_hoho_l",
-            parent="Head",
-            req_bones=["j_f_hoho_l", "j_f_dhoho_l"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Cheek.T.L.glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Cheek.T.L.glue", collection_name="MCH")
-            ]
-        ),
-        #Nostril Glue Bones
-        ConnectBone(
-            name="Nostril.Glue.R",
-            bone_a="j_f_hana_r",
-            bone_b="j_f_uhana",
-            parent="Head",
-            req_bones=["j_f_hana_r", "j_f_uhana"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.R", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Nostril.Glue.L",
-            bone_a="j_f_hana_l",
-            bone_b="j_f_uhana",
-            parent="Head",
-            req_bones=["j_f_hana_l", "j_f_uhana"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.L", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Nostril.Glue.R.001",
-            bone_a="Cheek.T.R.001",
-            bone_b="Nostril.R",
-            parent="Head",
-            req_bones=["Cheek.T.R.001", "Nostril.R"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.R.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.R.001", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Nostril.Glue.L.001",
-            bone_a="Cheek.T.L.001",
-            bone_b="Nostril.L",
-            parent="Head",
-            req_bones=["Cheek.T.L.001", "Nostril.L"],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Nostril.Glue.L.001", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.5)),
-                        CollectionOperation(time="Pre", bone_name="Nostril.Glue.L.001", collection_name="MCH")
-            ]
-        ),
 
-    ]
+class Side(NamedTuple):
+    """Naming of one face side."""
+
+    suffix: str
+    source: str
+
+
+RIGHT = Side(".R", "r")
+LEFT = Side(".L", "l")
+SIDES = (RIGHT, LEFT)
+
+# Lid bone numbers 001..003 and the source bone each one follows.
+UPPER_LID_SOURCES = ("j_f_mabup_02out", "j_f_mabup_01", "j_f_mabup_03in")
+LOWER_LID_SOURCES = ("j_f_mabdn_03in", "j_f_mabdn_01", "j_f_mabdn_02out")
+LID_BRIDGES = (
+    # (name, start, end, left offset, whether the end bone attaches to the bridge); the right side mirrors x of lower bridges
+    ("T.001", "T", "T.002", (0.0, -0.001, 0.001), True),
+    ("T.003", "T.002", "B", (0.0, 0.0, 0.003), False),
+    ("B.001", "B", "B.002", (-0.002, 0.0, 0.001), True),
+    ("B.003", "B.002", "T", (0.003, -0.001, -0.003), False),
 )
 
-BROW = BoneGroup(
-    name="Brow",
-    transform_link=[
-        TransformLink(target="DEF-Brow.R", bone="j_f_mayu_r"),
-        TransformLink(target="DEF-Brow.R.001", bone="j_f_mmayu_r"),
-        TransformLink(target="DEF-Brow.R.002", bone="j_f_miken_01_r"),
-        TransformLink(target="DEF-Brow.R.003", bone="j_f_miken_02_r"),
-        TransformLink(target="DEF-Brow.L", bone="j_f_mayu_l"),
-        TransformLink(target="DEF-Brow.L.001", bone="j_f_mmayu_l"),
-        TransformLink(target="DEF-Brow.L.002", bone="j_f_miken_01_l"),
-        TransformLink(target="DEF-Brow.L.003", bone="j_f_miken_02_l")
-    ],
-    generators=[
-        ConnectBone(
-            name="Brow.R",
-            bone_a="j_f_mayu_r",
-            bone_b="j_f_mmayu_r",
-            parent="Head",
-            req_bones=["j_f_mayu_r", "j_f_mmayu_r",],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Brow.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0,
-                                                                                                                         skin_control_orientation_bone="Head",
-                                                                                                                         skin_chain_falloff_length=True,
-                                                                                                                         primary_layer_extra="Face (Primary)",
-                                                                                                                         skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Brow.R", collection_name="Face (Secondary)")
-            ]
-        ),
-        ConnectBone(
-            name="Brow.R.001",
-            bone_a="j_f_mmayu_r",
-            bone_b="j_f_miken_01_r",
-            parent="Brow.R",
-            is_connected=True,
-            req_bones=["j_f_mmayu_r", "j_f_miken_01_r"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Brow.R.001", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Brow.R.002",
-            bone_a="j_f_miken_01_r",
-            bone_b="j_f_miken_02_r",
-            parent="Brow.R.001",
-            is_connected=True,
-            req_bones=["j_f_miken_01_r", "j_f_miken_02_r"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Brow.R.002", collection_name="Face (Primary)")
-            ]
-        ),
-        ExtensionBone(
-            name="Brow.R.003",
-            bone_a="Brow.R.002",
-            axis_type="local",
-            axis="Y",
-            parent="Brow.R.002",
-            is_connected=True,
-            req_bones=["j_f_miken_02_r"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Brow.R.003", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Brow.L",
-            bone_a="j_f_mayu_l",
-            bone_b="j_f_mmayu_l",
-            parent="Head",
-            req_bones=["j_f_mayu_l", "j_f_mmayu_l",],
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Brow.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=0,
-                                                                                                                         skin_control_orientation_bone="Head",
-                                                                                                                         skin_chain_falloff_length=True,
-                                                                                                                         primary_layer_extra="Face (Primary)",
-                                                                                                                         skin_chain_use_scale=[True, True, True, True])),
-                        CollectionOperation(time="Pre", bone_name="Brow.L", collection_name="Face (Secondary)")
-            ]
-        ),
-        ConnectBone(
-            name="Brow.L.001",
-            bone_a="j_f_mmayu_l",
-            bone_b="j_f_miken_01_l",
-            parent="Brow.L",
-            is_connected=True,
-            req_bones=["j_f_mmayu_l", "j_f_miken_01_l"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Brow.L.001", collection_name="Face (Primary)")
-            ]
-        ),
-        ConnectBone(
-            name="Brow.L.002",
-            bone_a="j_f_miken_01_l",
-            bone_b="j_f_miken_02_l",
-            parent="Brow.L.001",
-            is_connected=True,
-            req_bones=["j_f_miken_01_l", "j_f_miken_02_l"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Brow.L.002", collection_name="Face (Primary)")
-            ]
-        ),
-        ExtensionBone(
-            name="Brow.L.003",
-            bone_a="Brow.L.002",
-            axis_type="local",
-            axis="Y",
-            parent="Brow.L.002",
-            is_connected=True,
-            req_bones=["j_f_miken_02_l"],
-            operations=[
-                        CollectionOperation(time="Pre", bone_name="Brow.L.003", collection_name="Face (Primary)")
-            ]
+
+class Side(NamedTuple):
+    """Naming of one face side."""
+
+    suffix: str
+    source: str
+
+
+RIGHT = Side(".R", "r")
+LEFT = Side(".L", "l")
+SIDES = (RIGHT, LEFT)
+
+
+class Module(RigModule):
+    name = "XIV-Default"
+    ui_flags = ["Eye Lid Edit Mode"]
+    ui_collections = UI_Collections([
+        BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
+        BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=2, title=PRIMARY, visible=True),
+        BoneCollection(name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=2, title=SECONDARY, visible=False),
+        BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=3, title="Eyes (Macro)", visible=True),
+    ])
+
+    def meta_edit(self, rig: bpy.types.Object) -> None:
+        for side in SIDES:
+            self._brow_edit(rig, side)
+        for side in SIDES:
+            self._cheek_edit(rig, side)
+
+        center(rig, "NoseRef", ["j_f_miken_02_r", "j_f_miken_02_l"], axis="Z", parent="Head")
+        connect(rig, "Nose", "j_f_uhana", "NoseRef", parent="Head")
+        extend(rig, "Face.Suppressor", "NoseRef", axis="Y", start_point="head", parent="Head")
+
+        for side in SIDES:
+            self._nose_edit(rig, side)
+
+        occlusion_mesh = self._find_mesh(rig, OCCLUSION_SHADER)
+        if occlusion_mesh:
+            for side in SIDES:
+                self._eye_edit(rig, side, occlusion_mesh)
+            self._eye_controls_edit(rig)
+        else:
+            print("[AetherBlend] No eye occlusion mesh found; the eyes are skipped.")
+
+    def meta_pose(self, rig: bpy.types.Object) -> None:
+        for side in SIDES:
+            self._brow_pose(rig, side)
+            self._cheek_pose(rig, side)
+            self._nose_pose(rig, side)
+            if f"Eye{side.suffix}" in rig.pose.bones:
+                self._eye_pose(rig, side)
+        if "Iris.Ctrl" in rig.pose.bones:
+            self._eye_controls_pose(rig)
+
+        rigify.skin_basic_chain(rig, "Nose", chain_priority=2, control_orientation_bone="Head", use_scale=SCALE_ALL)
+        collection(rig, ["Nose"], PRIMARY)
+        link(rig, "j_f_uhana", "DEF-Nose")
+
+        rigify.skin_anchor(rig, "Face.Suppressor", hide=True)
+        collection(rig, ["Face.Suppressor", "NoseRef"], "MCH")
+
+    def final_edit(self, rig: bpy.types.Object) -> None:
+        for control in ("Iris", "Pupil", "Lid"):
+            if has_bone(rig, f"{control}.Ctrl.Master"):
+                parent(rig, f"{control}.Ctrl.Master", "head")
+                parent(rig, f"{control}.Ctrl", f"{control}.Ctrl.Master")
+
+    def final_pose(self, rig: bpy.types.Object) -> None:
+        prop(rig, "head", "head_follow", 1)
+
+        widget(rig, "Nose", scale_factor=0.6)
+        for side in SIDES:
+            widget(rig, f"Cheek.T{side.suffix}", scale_factor=0.6)
+            widget(rig, f"Cheek.B{side.suffix}.001", scale_factor=0.4)
+            widget(rig, f"Cheek.B{side.suffix}", scale_factor=0.7)
+            widget(rig, f"Nose{side.suffix}", scale_factor=1.0)
+            widget(rig, f"Nostril{side.suffix}", scale_factor=0.6)
+
+        if "Iris.Ctrl" in rig.pose.bones:
+            self._eye_controls_final_pose(rig)
+
+    @staticmethod
+    def _find_mesh(rig: bpy.types.Object, shader: str) -> bpy.types.Object | None:
+        """The first mesh deformed by the character's armature that uses the given shader package."""
+        original = rig.data.rigify_target_rig or rig
+        meshes = object_utils.find_by_armature_and_material_property(original, "ShaderPackage", shader)
+        return meshes[0] if meshes else None
+
+    @staticmethod
+    def _eye_edit(rig: bpy.types.Object, side: Side, occlusion_mesh: bpy.types.Object) -> None:
+        s, x = side.source, side.suffix
+        source_rig = rig.data.rigify_target_rig
+        eye = f"Eye{x}"
+
+        # Lid corners and centers sit on the eye occlusion mesh where each source bone weighs the most.
+        for lid, source in ((f"lid.T{x}", UPPER_LID_SOURCES[0]), (f"lid.T{x}.002", UPPER_LID_SOURCES[1]),
+                            (f"lid.B{x}", LOWER_LID_SOURCES[0]), (f"lid.B{x}.002", LOWER_LID_SOURCES[1])):
+            heaviest_vertex(rig, lid, f"{source}_{s}", occlusion_mesh, source_rig=source_rig)
+
+        copy(rig, eye, f"j_f_eyepuru_{s}", parent="Head")
+
+        mirror = -1.0 if side is RIGHT else 1.0
+        for name, start, end, (offset_x, offset_y, offset_z), connect_end in LID_BRIDGES:
+            bridge(
+                rig,
+                f"lid.{name[0]}{x}{name[1:]}",
+                f"lid.{start[0]}{x}{start[1:]}",
+                f"lid.{end[0]}{x}{end[1:]}",
+                offset=(offset_x * mirror, offset_y, offset_z),
+                start_parent=eye if connect_end else None,
+                connect_end=connect_end,
+            )
+
+        for sources, row in ((LOWER_LID_SOURCES, "B"), (UPPER_LID_SOURCES, "T")):
+            for index, source in enumerate(sources, start=1):
+                connect(rig, f"eye_tracker.{row}{x}.00{index}", f"{source}_{s}", f"lid.{row}{x}.00{index}", parent=eye)
+
+        connect(rig, f"Lower.Lid{x}.Glue", f"lid.B{x}.002", f"j_f_hoho_{s}", parent="Head")
+        connect(rig, f"Upper.Lid{x}.Glue", f"lid.T{x}.002", f"j_f_miken_02_{s}", parent="Head")
+
+    @staticmethod
+    def _eye_pose(rig: bpy.types.Object, side: Side) -> None:
+        s, x = side.source, side.suffix
+        rigify.skin_stretchy_chain(
+            rig,
+            f"lid.T{x}",
+            pivot_position=2,
+            control_orientation_bone="Head",
+            falloff=[0.0, 1.0, 0.0],
+            falloff_length=True,
+            falloff_spherical=[False, False, False],
+            primary_collection=PRIMARY,
         )
-    ]
-)
+        rigify.skin_stretchy_chain(rig, f"lid.B{x}", pivot_position=2, control_orientation_bone="Head", primary_collection=PRIMARY)
+        rigify.face_skin_eye(rig, f"Eye{x}")
+        collection(rig, [f"Eye{x}"], PRIMARY)
 
-LEFT_EYE = BoneGroup(
-    name="Eyes",
-    transform_link= [
-        TransformLink(target="lid.B.L.001", bone="j_f_mabdn_03in_l"),
-        TransformLink(target="lid.B.L.002", bone="j_f_mabdn_01_l"),
-        TransformLink(target="lid.B.L.003", bone="j_f_mabdn_02out_l"),
-        TransformLink(target="lid.T.L.001", bone="j_f_mabup_02out_l"),
-        TransformLink(target="lid.T.L.002", bone="j_f_mabup_01_l"),
-        TransformLink(target="lid.T.L.003", bone="j_f_mabup_03in_l"),
-        TransformLink(target="MCH-Eye.L", bone="j_f_eyepuru_l"),
-    ],
-    generators=[
+        lids = [f"lid.{row}{x}{number}" for row in "TB" for number in ("", ".001", ".002", ".003")]
+        collection(rig, lids, SECONDARY)
 
-        ## Skin Bone, Basicly Corner Bones for the eyes
-        SkinBone(
-            name="lid.T.L",
-            bone_a="j_f_mabup_02out_l",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabup_02out_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.T.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True)),
-                         CollectionOperation(time="Pre", bone_name="lid.T.L", collection_name="Face (Secondary)")
-            ]
-        ),
-        SkinBone(
-            name="lid.T.L.002",
-            bone_a="j_f_mabup_01_l",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabup_01_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.002", collection_name="Face (Secondary)")]
-        ),
-        SkinBone(
-            name="lid.B.L",
-            bone_a="j_f_mabdn_03in_l",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabdn_03in_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.B.L", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head")),
-                         CollectionOperation(time="Pre", bone_name="lid.B.L", collection_name="Face (Secondary)")
-            ]
-        ),
-        SkinBone(
-            name="lid.B.L.002",
-            bone_a="j_f_mabdn_01_l",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabdn_01_l"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.002", collection_name="Face (Secondary)")]
+        trackers = [f"eye_tracker.{row}{x}.00{index}" for row in "BT" for index in (1, 2, 3)]
+        for tracker in trackers:
+            rigify.skin_basic_chain(rig, tracker)
+        collection(rig, trackers, "Face")
 
-        ),
-        CopyBone(
-            name="Eye.L",
-            bone_a="j_f_eyepuru_l",
-            req_bones=["j_f_eyepuru_l"],
-            parent="Head",
-            operations=[
-                        RigifyTypeOperation(time="Pre", bone_name="Eye.L", rigify_type=rigify.types.face_skin_eye()),
-                        CollectionOperation(time="Pre", bone_name="Eye.L", collection_name="Face (Primary)")
-            ]
-        ),
-
-        # CenterBone(
-        #     name="Eye.L",
-        #     ref_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
-        #     parent="Head",
-        #     axis="Y",
-        #     inverted=True,
-        #     req_bones=["lid.T.L", "lid.T.L.002", "lid.B.L", "lid.B.L.002"],
-        #     pose_operations=PoseOperations(
-        #         rigify_settings=rigify.types.face_skin_eye(),
-        #         b_collection="Face"
-        #     )
-        # ),
-
-        BridgeBone(
-            name="lid.T.L.001",
-            bone_a="lid.T.L",
-            bone_b="lid.T.L.002",
-            offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
-            is_connected=True,
-            parent="Eye.L",
-            req_bones=["lid.T.L", "lid.T.L.002"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.001", collection_name="Face (Secondary)")
-            ]
-        ),
-
-        BridgeBone(
-            name="lid.T.L.003",
-            bone_a="lid.T.L.002",
-            bone_b="lid.B.L",
-            offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
-            is_connected=False,
-            req_bones=["lid.T.L.002", "lid.B.L"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.T.L.003", collection_name="Face (Secondary)")]
-        ),
-        BridgeBone(
-            name="lid.B.L.001",
-            bone_a="lid.B.L",
-            bone_b="lid.B.L.002",
-            offset_factor=mathutils.Vector((-0.002, 0.0, 0.001)),
-            is_connected=True,
-            parent="Eye.L",
-            req_bones=["lid.B.L", "lid.B.L.002"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.001", collection_name="Face (Secondary)")]
-        ),
-
-        BridgeBone(
-            name="lid.B.L.003",
-            bone_a="lid.B.L.002",
-            bone_b="lid.T.L",
-            offset_factor=mathutils.Vector((0.003, -0.001, -0.003)),
-            is_connected=False,
-            req_bones=["lid.B.L.002", "lid.T.L"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.L.003", collection_name="Face (Secondary)")]
-        ),
-        ConnectBone(
-            name="eye_tracker.B.L.001",
-            bone_a="j_f_mabdn_03in_l",
-            bone_b="lid.B.L.001",
-            parent="Eye.L",
-            is_connected=False,
-            req_bones=["j_f_mabdn_03in_l", "j_f_eye_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.L.001", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.L.001", collection_name="Face")]
-        ),
-
-        ConnectBone(
-            name="eye_tracker.B.L.002",
-            bone_a="j_f_mabdn_01_l",
-            bone_b="lid.B.L.002",
-            parent="Eye.L",
-            is_connected=False,
-            req_bones=["j_f_mabdn_01_l", "j_f_eye_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.L.002", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.L.002", collection_name="Face")
-            ]
-        ),
-
-        ConnectBone(
-            name="eye_tracker.B.L.003",
-            bone_a="j_f_mabdn_02out_l",
-            bone_b="lid.B.L.003",
-            parent="Eye.L",
-            is_connected=False,
-            req_bones=["j_f_mabdn_02out_l", "j_f_eye_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.L.003", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.L.003", collection_name="Face")
-            ]
-        ),
-
-        ConnectBone(
-            name="eye_tracker.T.L.001",
-            bone_a="j_f_mabup_02out_l",
-            bone_b="lid.T.L.001",
-            parent="Eye.L",
-            is_connected=False,
-            req_bones=["j_f_mabup_02out_l", "j_f_eye_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.L.001", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.L.001", collection_name="Face")
-            ]
-        ),
-
-        ConnectBone(
-            name="eye_tracker.T.L.002",
-            bone_a="j_f_mabup_01_l",
-            bone_b="lid.T.L.002",
-            parent="Eye.L",
-            is_connected=False,
-            req_bones=["j_f_mabup_01_l", "j_f_eye_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.L.002", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.L.002", collection_name="Face")
-            ]
-        ),
-
-        ConnectBone(
-            name="eye_tracker.T.L.003",
-            bone_a="j_f_mabup_03in_l",
-            bone_b="lid.T.L.003",
-            parent="Eye.L",
-            is_connected=False,
-            req_bones=["j_f_mabup_03in_l", "j_f_eye_l"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.L.003", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.L.003", collection_name="Face")
-            ]
-        ),
-        #Glue Bones
-        ConnectBone(
-            name="Lower.Lid.L.Glue",
-            bone_a="lid.B.L.002",
-            bone_b="j_f_hoho_l",
-            parent="Head",
-            is_connected=False,
-            req_bones=["j_f_hoho_l", "lid.B.L.002"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lower.Lid.L.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Lower.Lid.L.Glue", collection_name="MCH")
-            ]
-        ),
-        ConnectBone(
-            name="Upper.Lid.L.Glue",
-            bone_a="lid.T.L.002",
-            bone_b="j_f_miken_02_l",
-            parent="Head",
-            is_connected=False,
-            req_bones=["j_f_miken_02_l", "lid.T.L.002"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Upper.Lid.L.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Upper.Lid.L.Glue", collection_name="MCH")
-            ]
-        ),
-    ]
-)
-
-RIGHT_EYE = BoneGroup(
-    name="Eyes",
-    transform_link= [
-        TransformLink(target="lid.B.R.001", bone="j_f_mabdn_03in_r"),
-        TransformLink(target="lid.B.R.002", bone="j_f_mabdn_01_r"),
-        TransformLink(target="lid.B.R.003", bone="j_f_mabdn_02out_r"),
-        TransformLink(target="lid.T.R.001", bone="j_f_mabup_02out_r"),
-        TransformLink(target="lid.T.R.002", bone="j_f_mabup_01_r"),
-        TransformLink(target="lid.T.R.003", bone="j_f_mabup_03in_r"),
-        TransformLink(target="MCH-Eye.R", bone="j_f_eyepuru_r"),
-    ],
-    generators=[
-        ## Skin Bone, Basically Corner Bones for the eyes
-        SkinBone(
-            name="lid.T.R",
-            bone_a="j_f_mabup_02out_r",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabup_02out_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.T.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head", skin_chain_falloff_spherical=[False, False, False], skin_chain_falloff=[0.0, 1.0, 0.0], skin_chain_falloff_length=True)),
-                        CollectionOperation(time="Pre", bone_name="lid.T.R", collection_name="Face (Secondary)")
-            ]
-        ),
-        SkinBone(
-            name="lid.T.R.002",
-            bone_a="j_f_mabup_01_r",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabup_01_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.002", collection_name="Face (Secondary)")]
-        ),
-        SkinBone(
-            name="lid.B.R",
-            bone_a="j_f_mabdn_03in_r",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabdn_03in_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="lid.B.R", rigify_type=rigify.types.skin_stretchy_chain(skin_chain_pivot_pos=2, primary_layer_extra="Face (Primary)" ,skin_control_orientation_bone="Head")),
-                        CollectionOperation(time="Pre", bone_name="lid.B.R", collection_name="Face (Secondary)")]
-        ),
-        SkinBone(
-            name="lid.B.R.002",
-            bone_a="j_f_mabdn_01_r",
-            data_key="eye_occlusion",
-            req_bones=["j_f_mabdn_01_r"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.002", collection_name="Face (Secondary)")]
-        ),
-        CopyBone(
-            name="Eye.R",
-            bone_a="j_f_eyepuru_r",
-            req_bones=["j_f_eyepuru_r"],
-            parent="Head",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Eye.R", rigify_type=rigify.types.face_skin_eye()),
-                        CollectionOperation(time="Pre", bone_name="Eye.R", collection_name="Face (Primary)")
-            ]
-        ),
-        BridgeBone(
-            name="lid.T.R.001",
-            bone_a="lid.T.R",
-            bone_b="lid.T.R.002",
-            offset_factor=mathutils.Vector((0.0, -0.001, 0.001)),
-            is_connected=True,
-            parent="Eye.R",
-            req_bones=["lid.T.R", "lid.T.R.002"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.001", collection_name="Face (Secondary)")]
-        ),
-        BridgeBone(
-            name="lid.T.R.003",
-            bone_a="lid.T.R.002",
-            bone_b="lid.B.R",
-            offset_factor=mathutils.Vector((0.0, 0.0, 0.003)),
-            is_connected=False,
-            req_bones=["lid.T.R.002", "lid.B.R"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.T.R.003", collection_name="Face (Secondary)")]
-        ),
-        BridgeBone(
-            name="lid.B.R.001",
-            bone_a="lid.B.R",
-            bone_b="lid.B.R.002",
-            offset_factor=mathutils.Vector((0.002, 0.0, 0.001)),
-            is_connected=True,
-            parent="Eye.R",
-            req_bones=["lid.B.R", "lid.B.R.002"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.001", collection_name="Face (Secondary)")]
-        ),
-        BridgeBone(
-            name="lid.B.R.003",
-            bone_a="lid.B.R.002",
-            bone_b="lid.T.R",
-            offset_factor=mathutils.Vector((-0.003, -0.001, -0.003)),
-            is_connected=False,
-            req_bones=["lid.B.R.002", "lid.T.R"],
-            operations=[CollectionOperation(time="Pre", bone_name="lid.B.R.003", collection_name="Face (Secondary)")]
-        ),
-        ConnectBone(
-            name="eye_tracker.B.R.001",
-            bone_a="j_f_mabdn_03in_r",
-            bone_b="lid.B.R.001",
-            parent="Eye.R",
-            is_connected=False,
-            req_bones=["j_f_mabdn_03in_r", "j_f_eye_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.R.001", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.R.001", collection_name="Face")
-            ]
-        ),
-        ConnectBone(
-            name="eye_tracker.B.R.002",
-            bone_a="j_f_mabdn_01_r",
-            bone_b="lid.B.R.002",
-            parent="Eye.R",
-            is_connected=False,
-            req_bones=["j_f_mabdn_01_r", "j_f_eye_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.R.002", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.R.002", collection_name="Face")
-            ]
-        ),
-        ConnectBone(
-            name="eye_tracker.B.R.003",
-            bone_a="j_f_mabdn_02out_r",
-            bone_b="lid.B.R.003",
-            parent="Eye.R",
-            is_connected=False,
-            req_bones=["j_f_mabdn_02out_r", "j_f_eye_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.B.R.003", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.B.R.003", collection_name="Face")
-            ]
-        ),
-        ConnectBone(
-            name="eye_tracker.T.R.001",
-            bone_a="j_f_mabup_02out_r",
-            bone_b="lid.T.R.001",
-            parent="Eye.R",
-            is_connected=False,
-            req_bones=["j_f_mabup_02out_r", "j_f_eye_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.R.001", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.R.001", collection_name="Face")
-            ]
-        ),
-        ConnectBone(
-            name="eye_tracker.T.R.002",
-            bone_a="j_f_mabup_01_r",
-            bone_b="lid.T.R.002",
-            parent="Eye.R",
-            is_connected=False,
-            req_bones=["j_f_mabup_01_r", "j_f_eye_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.R.002", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.R.002", collection_name="Face")
-            ]
-        ),
-        ConnectBone(
-            name="eye_tracker.T.R.003",
-            bone_a="j_f_mabup_03in_r",
-            bone_b="lid.T.R.003",
-            parent="Eye.R",
-            is_connected=False,
-            req_bones=["j_f_mabup_03in_r", "j_f_eye_r"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="eye_tracker.T.R.003", rigify_type=rigify.types.skin_basic_chain()),
-                        CollectionOperation(time="Pre", bone_name="eye_tracker.T.R.003", collection_name="Face")
-            ]
-        ),
-        #Glue Bones
-        ConnectBone(
-            name="Lower.Lid.R.Glue",
-            bone_a="lid.B.R.002",
-            bone_b="j_f_hoho_r",
-            parent="Head",
-            is_connected=False,
-            req_bones=["j_f_hoho_r", "lid.B.R.002"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lower.Lid.R.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Lower.Lid.R.Glue", collection_name="MCH")]
-        ),
-        ConnectBone(
-            name="Upper.Lid.R.Glue",
-            bone_a="lid.T.R.002",
-            bone_b="j_f_miken_02_r",
-            parent="Head",
-            is_connected=False,
-            req_bones=["j_f_miken_02_r", "lid.T.R.002"],
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Upper.Lid.R.Glue", rigify_type=rigify.types.skin_glue(relink_constraints=True, skin_glue_use_tail=True, skin_glue_add_constraint="COPY_LOCATION_OWNER", skin_glue_add_constraint_influence=0.1, skin_glue_tail_reparent=True)),
-                        CollectionOperation(time="Pre", bone_name="Upper.Lid.R.Glue", collection_name="MCH")]
-        ),
-    ]
-)
-
-
-_IrisMinOut = 0.7
-_IrisMaxOut = 1.5
-_PupilMinOut = 0.5
-_PupilMaxOut = 2.3
-
-EYES_CONTROLS = BoneGroup(
-    name="Eyes Controls",
-    generators=[
-        #####
-        # Iris Sliders
-        #####
-        OffsetBone(
-            name="Iris.Ctrl.Master",
-            bone_a="Eye.L",
-            offset=(0.0025, 0.015, 0.051),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Iris.Ctrl.Master", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Iris.Ctrl.Master", collection_name="Eyes (Macro)"),
-                        WidgetOperation(time="Post", bone_name="Iris.Ctrl.Master", custom_object="IrisSliderFrame", rotation=(90.0,-90.0,180.0), wire_width=1.2, scale_to_bone_length=False,
-                                        color_set="CUSTOM", custom_color_normal=(0.443137, 0.541176, 1.0), custom_color_select=(0.443137, 0.541176, 1.0), custom_color_active=(0.443137, 0.541176, 1.0)),
-                        ParentBoneOperation(time="Post", bone_name="Iris.Ctrl.Master", parent=["head"]),
-                        PoseBoneOperation(time="Post", bone_name="Iris.Ctrl.Master",scale=(0.007, 0.007, 0.007)),
-                        BoneRestrictionOperation(time="Post", bone_name="Iris.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True),
-            ]
-        ),
-        OffsetBone(
-            name="Iris.Ctrl",
-            bone_a="Eye.L",
-            offset=(0.0025, 0.015, 0.051),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Iris.Ctrl", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Iris.Ctrl", collection_name="Eyes (Macro)"),
-                        WidgetOperation(time="Post", bone_name="Iris.Ctrl", custom_object="Slider", rotation=(90.0,-90.0, 180.0), wire_width=1.3, scale_to_bone_length=False),
-                        BoneRestrictionOperation(time="Post", bone_name="Iris.Ctrl", lock_location=(True, True, False), lock_rotation=True, lock_scale=True),
-                        ParentBoneOperation(time="Post", bone_name="Iris.Ctrl", parent=["Iris.Ctrl.Master"]),
-                        ConstraintOperation(
-                            bone_name="Iris.Ctrl",
-                            time="Post",
-                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1, use_transform_limit=True)),
-
-            ]
-        ),
-        #####
-        # Pupil Sliders
-        #####
-        OffsetBone(
-            name="Pupil.Ctrl.Master",
-            bone_a="Eye.L",
-            offset=(0.0025, 0.015, 0.058),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Pupil.Ctrl.Master", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Pupil.Ctrl.Master", collection_name="Eyes (Macro)"),
-                        WidgetOperation(time="Post", bone_name="Pupil.Ctrl.Master", custom_object="PupilSliderFrame", rotation=(90.0,-90.0,180.0), wire_width=1.2, scale_to_bone_length=False,
-                                        color_set="CUSTOM", custom_color_normal=(0.443137, 0.541176, 1.0), custom_color_select=(0.443137, 0.541176, 1.0), custom_color_active=(0.443137, 0.541176, 1.0)),
-                        ParentBoneOperation(time="Post", bone_name="Pupil.Ctrl.Master", parent=["head"]),
-                        PoseBoneOperation(time="Post", bone_name="Pupil.Ctrl.Master",scale=(0.007, 0.007, 0.007)),
-                        BoneRestrictionOperation(time="Post", bone_name="Pupil.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True),
-            ]
-        ),
-        OffsetBone(
-            name="Pupil.Ctrl",
-            bone_a="Eye.L",
-            offset=(0.0025, 0.015, 0.058),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Pupil.Ctrl", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Pupil.Ctrl", collection_name="Eyes (Macro)"),
-                        WidgetOperation(time="Post", bone_name="Pupil.Ctrl", custom_object="Slider", rotation=(90.0,-90.0, 180.0), wire_width=1.3, scale_to_bone_length=False),
-                        BoneRestrictionOperation(time="Post", bone_name="Pupil.Ctrl", lock_location=(True, True, False), lock_rotation=True, lock_scale=True),
-                        ParentBoneOperation(time="Post", bone_name="Pupil.Ctrl", parent=["Pupil.Ctrl.Master"]),
-                        ConstraintOperation(
-                            bone_name="Pupil.Ctrl",
-                            time="Post",
-                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=1, use_transform_limit=True)),
-
-            ]
-        ),
-
-        #####
-        # Anchor bones for EyeLid Control
-        #####
-        # - Left Eye
-        ExtensionBone(
-            name="lid.anchor.B.L.002",
-            bone_a="lid.B.L.002",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.L.002",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.L.002", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.L.002", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.anchor.B.L.002", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.L.002", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
-        ExtensionBone(
-            name="lid.anchor.B.L.001",
-            bone_a="lid.B.L.001",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.L.001",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.L.001", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.L.001", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.anchor.B.L.001", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.L.001", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
-        ExtensionBone(
-            name="lid.anchor.B.L.003",
-            bone_a="lid.B.L.003",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.L.003",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.L.003", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.L.003", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.anchor.B.L.003", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.L.003", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
-        # - Right Eye
-        ExtensionBone(
-            name="lid.anchor.B.R.002",
-            bone_a="lid.B.R.002",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.R.002",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.R.002", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.R.002", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.anchor.B.R.002", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.R.002", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
-        ExtensionBone(
-            name="lid.anchor.B.R.001",
-            bone_a="lid.B.R.001",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.R.001",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.R.001", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.R.001", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.anchor.B.R.001", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.R.001", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
-        ExtensionBone(
-            name="lid.anchor.B.R.003",
-            bone_a="lid.B.R.003",
-            axis_type="global",
-            axis="Z",
-            start="head",
-            parent="lid.B.R.003",
-            operations=[CollectionOperation(time="Pre", bone_name="lid.anchor.B.R.003", collection_name="Eyes_Anchors"),
-                        RigifyTypeOperation(time="Pre", bone_name="lid.anchor.B.R.003", rigify_type=rigify.types.basic_raw_copy()),
-                        WidgetOperation(time="Post", bone_name="lid.anchor.B.R.003", color_set="THEME01", custom_object="Pointer", wire_width=2.0),
-                        BoneRestrictionOperation(time="Post", bone_name="lid.anchor.B.R.003", lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-            ]
-        ),
-
-        #####
-        # EyeLid Controllers
-        #####
-        OffsetBone(
-            name="Lid.Ctrl.Master",
-            bone_a="Eye.L",
-            offset=(0.01, 0.015, 0.035),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lid.Ctrl.Master", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Lid.Ctrl.Master", collection_name="Eyes (Macro)"),
-                        WidgetOperation(time="Post", bone_name="Lid.Ctrl.Master", custom_object="EyeTriangle", rotation=(90.0,0.0,0.0), wire_width=1.2, scale_to_bone_length=False,
-                                        color_set="CUSTOM", custom_color_normal=(1.0, 0.435294, 0.733333), custom_color_select=(1.0, 0.435294, 0.733333), custom_color_active=(1.0, 0.435294, 0.733333)),
-                        ParentBoneOperation(time="Post", bone_name="Lid.Ctrl.Master", parent=["head"]),
-                        PoseBoneOperation(time="Post", bone_name="Lid.Ctrl.Master",scale=(0.015, 0.015, 0.015)),
-                        BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True),
-            ]
-        ),
-        OffsetBone(
-            name="Lid.Ctrl",
-            bone_a="Eye.L",
-            offset=(0.01, 0.015, 0.035),
-            parent="Eye.L",
-            operations=[RigifyTypeOperation(time="Pre", bone_name="Lid.Ctrl", rigify_type=rigify.types.basic_raw_copy()),
-                        CollectionOperation(time="Pre", bone_name="Lid.Ctrl", collection_name="Eyes (Macro)"),
-                        WidgetOperation(time="Post", bone_name="Lid.Ctrl", custom_object="Circle", rotation=(180.0,90.0,90.0), scale=(0.08,0.08,0.08), wire_width=1.3, scale_to_bone_length=False),
-                        BoneRestrictionOperation(time="Post", bone_name="Lid.Ctrl", lock_location=(False, True, False), lock_rotation=True, lock_scale=True),
-                        ParentBoneOperation(time="Post", bone_name="Lid.Ctrl", parent=["Lid.Ctrl.Master"]),
-                        ConstraintOperation(
-                            bone_name="Lid.Ctrl",
-                            time="Post",
-                            constraint=LimitLocationConstraint(use_min_z=True, min_z=-1, use_max_z=True, max_z=0,use_min_x=True, min_x=-0.667, use_max_x=True, max_x=0.667, use_transform_limit=True)),
-            ]
-        ),
-    ],
-    operations=[
-        #####
-        # Constraints for Eyelid Control
-        #####
-        # - Left Eye
-        ConstraintOperation(
-            bone_name="lid.T.L.003",
-            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.L.001", influence=0.0, name="AB_EyeLidControl"),
-            time="Post"
-        ),
-        ConstraintOperation(
-            bone_name="lid.T.L.002",
-            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.L.002", influence=0.0, name="AB_EyeLidControl"),
-            time="Post"
-        ),
-        ConstraintOperation(
-            bone_name="lid.T.L.001",
-            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.L.003", influence=0.0, name="AB_EyeLidControl"),
-            time="Post"
-        ),
-        # - Right Eye
-        ConstraintOperation(
-            bone_name="lid.T.R.003",
-            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.R.001", influence=0.0, name="AB_EyeLidControl"),
-            time="Post"
-        ),
-        ConstraintOperation(
-            bone_name="lid.T.R.002",
-            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.R.002", influence=0.0, name="AB_EyeLidControl"),
-            time="Post"
-        ),
-        ConstraintOperation(
-            bone_name="lid.T.R.001",
-            constraint= CopyLocationConstraint(target_bone="lid.anchor.B.R.003", influence=0.0, name="AB_EyeLidControl"),
-            time="Post"
-        ),
-
-        #####
-        # Drivers for Eyelid Control
-        #####
-        # - Left Eye
-        DriverOperation(
-            driver_name="EyeLidControl_lid.T.L.003",
-            time="Post",
-            bone_name="lid.T.L.003",
-            constraint_name="AB_EyeLidControl",
-            property="influence",
-            driver=Driver(
-                type="SCRIPTED",
-                expression="min(1, max(0, (-y / 1) - max(0, x / 0.667)))",
-                variables=[
-                    TransformChannelVariable(
-                        name="x",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_X",
-                        transform_space="LOCAL_SPACE"
-                    ),
-                    TransformChannelVariable(
-                        name="y",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_Z",
-                        transform_space="LOCAL_SPACE"
-                    )
-                ]
+        glue_bones = [f"Lower.Lid{x}.Glue", f"Upper.Lid{x}.Glue"]
+        for glue_bone in glue_bones:
+            rigify.skin_glue(
+                rig,
+                glue_bone,
+                relink_constraints=True,
+                use_tail=True,
+                reparent_tail=True,
+                add_constraint="COPY_LOCATION_OWNER",
+                add_constraint_influence=0.1,
             )
-        ),
-        DriverOperation(
-            driver_name="EyeLidControl_lid.T.L.002",
-            time="Post",
-            bone_name="lid.T.L.002",
-            constraint_name="AB_EyeLidControl",
-            property="influence",
-            driver=Driver(
-                type="SCRIPTED",
-                expression="min(1, max(0, (-y / 1) - max(0, x / 0.667)))",
-                variables=[
-                    TransformChannelVariable(
-                        name="x",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_X",
-                        transform_space="LOCAL_SPACE"
-                    ),
-                    TransformChannelVariable(
-                        name="y",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_Z",
-                        transform_space="LOCAL_SPACE"
-                    )
-                ]
-            )
-        ),
-        DriverOperation(
-            driver_name="EyeLidControl_lid.T.L.001",
-            time="Post",
-            bone_name="lid.T.L.001",
-            constraint_name="AB_EyeLidControl",
-            property="influence",
-            driver=Driver(
-                type="SCRIPTED",
-                expression="min(1, max(0, (-y / 1) - max(0, x / 0.667)))",
-                variables=[
-                    TransformChannelVariable(
-                        name="x",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_X",
-                        transform_space="LOCAL_SPACE"
-                    ),
-                    TransformChannelVariable(
-                        name="y",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_Z",
-                        transform_space="LOCAL_SPACE"
-                    )
-                ]
-            )
-        ),
-        # - Right Eye
-        DriverOperation(
-            driver_name="EyeLidControl_lid.T.R.003",
-            time="Post",
-            bone_name="lid.T.R.003",
-            constraint_name="AB_EyeLidControl",
-            property="influence",
-            driver=Driver(
-                type="SCRIPTED",
-                expression="min(1, max(0, (-y / 1) - max(0, -x / 0.667)))",
-                variables=[
-                    TransformChannelVariable(
-                        name="x",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_X",
-                        transform_space="LOCAL_SPACE"
-                    ),
-                    TransformChannelVariable(
-                        name="y",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_Z",
-                        transform_space="LOCAL_SPACE"
-                    )
-                ]
-            )
-        ),
-        DriverOperation(
-            driver_name="EyeLidControl_lid.T.R.002",
-            time="Post",
-            bone_name="lid.T.R.002",
-            constraint_name="AB_EyeLidControl",
-            property="influence",
-            driver=Driver(
-                type="SCRIPTED",
-                expression="min(1, max(0, (-y / 1) - max(0, -x / 0.667)))",
-                variables=[
-                    TransformChannelVariable(
-                        name="x",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_X",
-                        transform_space="LOCAL_SPACE"
-                    ),
-                    TransformChannelVariable(
-                        name="y",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_Z",
-                        transform_space="LOCAL_SPACE"
-                    )
-                ]
-            )
-        ),
-        DriverOperation(
-            driver_name="EyeLidControl_lid.T.R.001",
-            time="Post",
-            bone_name="lid.T.R.001",
-            constraint_name="AB_EyeLidControl",
-            property="influence",
-            driver=Driver(
-                type="SCRIPTED",
-                expression="min(1, max(0, (-y / 1) - max(0, -x / 0.667)))",
-                variables=[
-                    TransformChannelVariable(
-                        name="x",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_X",
-                        transform_space="LOCAL_SPACE"
-                    ),
-                    TransformChannelVariable(
-                        name="y",
-                        target_bone="Lid.Ctrl",
-                        transform_type="LOC_Z",
-                        transform_space="LOCAL_SPACE"
-                    )
-                ]
-            )
-        ),
+        collection(rig, glue_bones, "MCH")
 
-        #####
-        # Iris and Pupil Drivers
-        #####
-        # - Driver for the Object property to drive the Shader
-        DriverOperation(
-            driver_name="Iris Scale X",
-            data="iris",
-            property='["Eye Scale X"]',
-            driver=Driver(
-                type="SCRIPTED",
-                expression="1/iris_x",
-                variables=[
-                    TransformChannelVariable(name="iris_x", target_bone="j_f_irisprm_l", transform_type="SCALE_X", transform_space="LOCAL_SPACE"),
-                ]
-            ),
-            time="Post",
-        ),
-        DriverOperation(
-            driver_name="Iris Scale Y",
-            data="iris",
-            property='["Eye Scale Y"]',
-            driver=Driver(
-                type="SCRIPTED",
-                expression="1/iris_y",
-                variables=[
-                    TransformChannelVariable(name="iris_y", target_bone="j_f_irisprm_l", transform_type="SCALE_Z", transform_space="LOCAL_SPACE"),
-                    #Don't mind that it's taking the Z scale, it works
-                ]
-            ),
-            time="Post",
-        ),
-        DriverOperation(
-            driver_name="Iris Scale Z",
-            data="iris",
-            property='["Pupil Scale"]',
-            driver=Driver(
-                type="SCRIPTED",
-                expression="iris_z-1",
-                variables=[
-                    TransformChannelVariable(name="iris_z", target_bone="j_f_irisprm_l", transform_type="SCALE_Y", transform_space="LOCAL_SPACE"),
-                    #Don't mind that it's taking the Y scale, it works
-                    #Admittedly this could be hella confusing on the user end if you haven't seen the code but I'll just write it in the wiki and call people stupid if they haven't read that -Oats
-                    #Yes - Shino
-                ]
-            ),
-            time="Post",
-        ),
+        for row, sources in (("B", LOWER_LID_SOURCES), ("T", UPPER_LID_SOURCES)):
+            for index, source in enumerate(sources, start=1):
+                link(rig, f"{source}_{s}", f"lid.{row}{x}.00{index}")
+        link(rig, f"j_f_eyepuru_{s}", f"MCH-Eye{x}")
 
-        # - Driver on the FFXIV Iris Control Bones to map from our Sliders (This is is based on a trust me bro basis and i will not explain it thx, explained it anyway)
-        ## Quick math for expressions example 1 + (0.3 * var if var < 0 else 0.5 * var)
-        ## 1 - 0.3 is our min outpuut
-        ## 1 + 0.5 is our max output
-        ## Your welcome -Shino
-        ## Also look ive made helper Variables so you dont have to edit all expressions the whole time.
-        # - Left Side
-        DriverOperation(
-            driver_name="Iris.Ctrl Scale X L",
-            time="Post",
-            bone_name="j_f_irisprm_l",
-            property=("scale", 0),
-            driver=Driver(
-                type="SCRIPTED",
-                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
-                variables=[
-                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
-                ]
-            )
-        ),
-        DriverOperation(
-            driver_name="Iris.Ctrl Scale Z L",
-            time="Post",
-            bone_name="j_f_irisprm_l",
-            property=("scale", 2),
-            driver=Driver(
-                type="SCRIPTED",
-                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
-                variables=[
-                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
-                ]
-            )
-        ),
-        DriverOperation(
-            driver_name="Pupil.Ctrl Scale Y L",
-            time="Post",
-            bone_name="j_f_irisprm_l",
-            property=("scale", 1),
-            driver=Driver(
-                type="SCRIPTED",
-                expression=f"1 + ({1-_PupilMinOut} * var if var < 0 else {_PupilMaxOut-1} * var)",
-                variables=[
-                    TransformChannelVariable(name="var", target_bone="Pupil.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
-                ]
-            )
-        ),
-        # - Right Side
-        DriverOperation(
-            driver_name="Iris.Ctrl Scale X R",
-            time="Post",
-            bone_name="j_f_irisprm_r",
-            property=("scale", 0),
-            driver=Driver(
-                type="SCRIPTED",
-                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
-                variables=[
-                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
-                ]
-            )
-        ),
-        DriverOperation(
-            driver_name="Iris.Ctrl Scale Z R",
-            time="Post",
-            bone_name="j_f_irisprm_r",
-            property=("scale", 2),
-            driver=Driver(
-                type="SCRIPTED",
-                expression=f"1 + ({1-_IrisMinOut} * var if var < 0 else {_IrisMaxOut-1} * var)",
-                variables=[
-                    TransformChannelVariable(name="var", target_bone="Iris.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
-                ]
-            )
-        ),
-        DriverOperation(
-            driver_name="Pupil.Ctrl Scale Y R",
-            time="Post",
-            bone_name="j_f_irisprm_r",
-            property=("scale", 1),
-            driver=Driver(
-                type="SCRIPTED",
-                expression=f"1 + ({1-_PupilMinOut} * var if var < 0 else {_PupilMaxOut-1} * var)",
-                variables=[
-                    TransformChannelVariable(name="var", target_bone="Pupil.Ctrl", transform_type="LOC_Z", transform_space="LOCAL_SPACE"),
-                ]
-            )
-        ),
-    ]
-)
+    @staticmethod
+    def _eye_controls_edit(rig: bpy.types.Object) -> None:
+        for name, source_height in (("Iris", 0.051), ("Pupil", 0.058)):
+            for bone in (f"{name}.Ctrl.Master", f"{name}.Ctrl"):
+                offset(rig, bone, "Eye.L", (0.0025, 0.015, source_height), parent="Eye.L")
+        for bone in ("Lid.Ctrl.Master", "Lid.Ctrl"):
+            offset(rig, bone, "Eye.L", (0.01, 0.015, 0.035), parent="Eye.L")
 
-def get_rig_module() -> RigModule:
-    return RigModule(
-        name="XIV-Default",
-        type="Generation",
-        bone_groups=[BROW, HEAD, LEFT_EYE, RIGHT_EYE, EYES_CONTROLS],
-        ui_collections = UI_Collections([
-            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-            BoneCollection(name="Face (Primary)", ui=True, color_set="Face_Primary", row_index=2, title="Face (Primary)", visible=True),
-            BoneCollection(name="Face (Secondary)", ui=True, color_set="Face_Secondary", row_index=2, title="Face (Secondary)", visible=False),
-            BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=3, title="Eyes (Macro)", visible=True),
-        ]),
-        operations=[
-            #Head
-            PropOverrideOperation(bone_name="head", property_name="head_follow", value=1),
+        for side in SIDES:
+            for number in (1, 2, 3):
+                lid = f"lid.B{side.suffix}.00{number}"
+                extend(rig, f"lid.anchor.B{side.suffix}.00{number}", lid, axis="Z", axis_space="global", start_point="head", parent=lid)
 
-            #Left Face
-            WidgetOperation(bone_name="Cheek.T.L",scale_factor=0.6,),
-            WidgetOperation(bone_name="Cheek.B.L.001",scale_factor=0.4,),
-            WidgetOperation(bone_name="Cheek.B.L",scale_factor=0.7,),
-            WidgetOperation(bone_name="Nose.L",scale_factor=1.0,),
-            WidgetOperation(bone_name="Nostril.L",scale_factor=0.6,),
-            WidgetOperation(bone_name="Nose",scale_factor=0.6,),
-            #Right Face
-            WidgetOperation(bone_name="Cheek.T.R",scale_factor=0.6,),
-            WidgetOperation(bone_name="Cheek.B.R.001",scale_factor=0.4,),
-            WidgetOperation(bone_name="Cheek.B.R",scale_factor=0.7,),
-            WidgetOperation(bone_name="Nose.R",scale_factor=1.0,),
-            WidgetOperation(bone_name="Nostril.R",scale_factor=0.6,),
-        ],
-        ui_flags = ["Eye Lid Edit Mode"],
-    )
+    @staticmethod
+    def _eye_controls_pose(rig: bpy.types.Object) -> None:
+        controls = [f"{name}.Ctrl{part}" for name in ("Iris", "Pupil", "Lid") for part in (".Master", "")]
+        for control in controls:
+            rigify.basic_raw_copy(rig, control)
+        collection(rig, controls, "Eyes (Macro)")
 
+        anchors = [f"lid.anchor.B{side.suffix}.00{number}" for side in SIDES for number in (1, 2, 3)]
+        for anchor in anchors:
+            rigify.basic_raw_copy(rig, anchor)
+        collection(rig, anchors, "Eyes_Anchors")
+
+    @staticmethod
+    def _eye_controls_final_pose(rig: bpy.types.Object) -> None:
+        frames = (
+            ("Iris.Ctrl.Master", "IrisSliderFrame", (90.0, -90.0, 180.0), SLIDER_COLOR, 0.007),
+            ("Pupil.Ctrl.Master", "PupilSliderFrame", (90.0, -90.0, 180.0), SLIDER_COLOR, 0.007),
+            ("Lid.Ctrl.Master", "EyeTriangle", (90.0, 0.0, 0.0), LID_COLOR, 0.015),
+        )
+        for bone, shape, rotation, color, size in frames:
+            widget(
+                rig, bone, widget_name=shape, rotation_degrees=rotation, wire_width=1.2, scale_to_bone_length=False,
+                color_set="CUSTOM", custom_color_normal=color, custom_color_select=color, custom_color_active=color,
+            )
+            pose(rig, bone, scale=(size, size, size))
+            restrict(rig, bone, lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True)
+
+        for bone in ("Iris.Ctrl", "Pupil.Ctrl"):
+            widget(rig, bone, widget_name="Slider", rotation_degrees=(90.0, -90.0, 180.0), wire_width=1.3, scale_to_bone_length=False)
+            restrict(rig, bone, lock_location=(True, True, False), lock_rotation=True, lock_scale=True)
+            constraints.limit_location(rig, bone, minimum=(None, None, -1.0), maximum=(None, None, 1.0), use_transform_limit=True)
+
+        widget(rig, "Lid.Ctrl", widget_name="Circle", rotation_degrees=(180.0, 90.0, 90.0), scale=(0.08, 0.08, 0.08), wire_width=1.3, scale_to_bone_length=False)
+        restrict(rig, "Lid.Ctrl", lock_location=(False, True, False), lock_rotation=True, lock_scale=True)
+        constraints.limit_location(
+            rig, "Lid.Ctrl", minimum=(-0.667, None, -1.0), maximum=(0.667, None, 0.0), use_transform_limit=True,
+        )
+
+        for side in SIDES:
+            for number in (1, 2, 3):
+                anchor = f"lid.anchor.B{side.suffix}.00{number}"
+                widget(rig, anchor, widget_name="Pointer", color_set="THEME01", wire_width=2.0)
+                restrict(rig, anchor, lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
+
+            # Closing the eye with Lid.Ctrl pulls the upper lid onto the matching lower anchor.
+            x_term = "x" if side is LEFT else "-x"
+            for upper, anchor_number in ((3, 1), (2, 2), (1, 3)):
+                lid = f"lid.T{side.suffix}.00{upper}"
+                constraints.copy_location(
+                    rig, lid, f"lid.anchor.B{side.suffix}.00{anchor_number}",
+                    name="AB_EyeLidControl", target_space="POSE", owner_space="POSE", influence=0.0,
+                )
+                driver(
+                    rig, lid, "influence", constraint="AB_EyeLidControl",
+                    expression=LID_EXPRESSION.format(x=x_term),
+                    variables={
+                        "x": TransformVariable("Lid.Ctrl", "LOC_X"),
+                        "y": TransformVariable("Lid.Ctrl", "LOC_Z"),
+                    },
+                )
+
+        for side in SIDES:
+            iris = f"j_f_irisprm_{side.source}"
+            iris_minimum, iris_maximum = IRIS_RANGE
+            pupil_minimum, pupil_maximum = PUPIL_RANGE
+            iris_expression = f"1 + ({1 - iris_minimum} * var if var < 0 else {iris_maximum - 1} * var)"
+            pupil_expression = f"1 + ({1 - pupil_minimum} * var if var < 0 else {pupil_maximum - 1} * var)"
+            for index in (0, 2):
+                driver(rig, iris, "scale", index=index, expression=iris_expression, variables={"var": TransformVariable("Iris.Ctrl", "LOC_Z")})
+            driver(rig, iris, "scale", index=1, expression=pupil_expression, variables={"var": TransformVariable("Pupil.Ctrl", "LOC_Z")})
+
+        # The iris shader reads these properties from the iris mesh to undo the scale of the iris bone.
+        iris_mesh = Module._find_mesh(rig, IRIS_SHADER)
+        if iris_mesh:
+            for property_name, expression, channel in (
+                ("Eye Scale X", "1/iris", "SCALE_X"),
+                ("Eye Scale Y", "1/iris", "SCALE_Z"),
+                ("Pupil Scale", "iris-1", "SCALE_Y"),
+            ):
+                object_driver(
+                    rig, iris_mesh, f'["{property_name}"]',
+                    expression=expression,
+                    variables={"iris": TransformVariable("j_f_irisprm_l", channel)},
+                )
+
+    @staticmethod
+    def _brow_edit(rig: bpy.types.Object, side: Side) -> None:
+        s = side.source
+        brow = f"Brow{side.suffix}"
+        connect(rig, brow, f"j_f_mayu_{s}", f"j_f_mmayu_{s}", parent="Head")
+        connect(rig, f"{brow}.001", f"j_f_mmayu_{s}", f"j_f_miken_01_{s}", parent=brow, connected=True)
+        connect(rig, f"{brow}.002", f"j_f_miken_01_{s}", f"j_f_miken_02_{s}", parent=f"{brow}.001", connected=True)
+        extend(rig, f"{brow}.003", f"{brow}.002", axis="Y", parent=f"{brow}.002", connected=True)
+
+    @staticmethod
+    def _brow_pose(rig: bpy.types.Object, side: Side) -> None:
+        s = side.source
+        brow = f"Brow{side.suffix}"
+        rigify.skin_stretchy_chain(
+            rig,
+            brow,
+            control_orientation_bone="Head",
+            falloff_length=True,
+            use_scale=SCALE_ALL,
+            primary_collection=PRIMARY,
+        )
+        collection(rig, [brow], SECONDARY)
+        collection(rig, [f"{brow}.001", f"{brow}.002", f"{brow}.003"], PRIMARY)
+
+        link(rig, f"j_f_mayu_{s}", f"DEF-{brow}")
+        link(rig, f"j_f_mmayu_{s}", f"DEF-{brow}.001")
+        link(rig, f"j_f_miken_01_{s}", f"DEF-{brow}.002")
+        link(rig, f"j_f_miken_02_{s}", f"DEF-{brow}.003")
+
+    @staticmethod
+    def _cheek_edit(rig: bpy.types.Object, side: Side) -> None:
+        s, x = side.source, side.suffix
+        center(rig, f"Corner{x}", [f"j_f_uslip_{s}", f"j_f_dslip_{s}", f"j_f_shoho_{s}"], axis="Y", parent="Head")
+        connect(rig, f"Cheek{x}", f"Corner{x}", f"j_f_shoho_{s}", parent="Head")
+        connect(rig, f"Cheek.B{x}", f"j_f_shoho_{s}", f"j_f_hoho_{s}", parent=f"Cheek{x}", connected=True)
+        connect(rig, f"Cheek.B{x}.001", f"j_f_dhoho_{s}", f"j_f_hoho_{s}", parent="Head")
+        connect(rig, f"Cheek.T{x}", f"j_f_hoho_{s}", f"j_f_dmemoto_{s}", parent="Head")
+        connect(rig, f"Cheek.T{x}.001", f"j_f_dmemoto_{s}", f"j_f_hana_{s}", parent="Head")
+
+    @staticmethod
+    def _cheek_pose(rig: bpy.types.Object, side: Side) -> None:
+        s, x = side.source, side.suffix
+        rigify.skin_stretchy_chain(
+            rig,
+            f"Cheek{x}",
+            control_orientation_bone="Head",
+            falloff_length=True,
+            use_scale=SCALE_ALL,
+            primary_collection=PRIMARY,
+        )
+        for chain in (f"Cheek.B{x}.001", f"Cheek.T{x}", f"Cheek.T{x}.001"):
+            rigify.skin_basic_chain(rig, chain, control_orientation_bone="Head", use_scale=SCALE_ALL)
+
+        collection(rig, [f"Cheek{x}", f"Cheek.B{x}", f"Cheek.T{x}"], PRIMARY)
+        collection(rig, [f"Cheek.B{x}.001", f"Cheek.T{x}.001"], SECONDARY)
+        collection(rig, [f"Corner{x}"], "MCH")
+
+        link(rig, f"j_f_shoho_{s}", f"DEF-Cheek.B{x}")
+        link(rig, f"j_f_dhoho_{s}", f"DEF-Cheek.B{x}.001")
+        link(rig, f"j_f_hoho_{s}", f"DEF-Cheek.T{x}")
+        link(rig, f"j_f_dmemoto_{s}", f"DEF-Cheek.T{x}.001")
+
+    @staticmethod
+    def _nose_edit(rig: bpy.types.Object, side: Side) -> None:
+        s, x = side.source, side.suffix
+        connect(rig, f"Nose{x}", f"j_f_dmiken_{s}", f"Brow{x}.003", end_point="tail", parent="Head")
+        connect(rig, f"Nostril{x}", f"j_f_hana_{s}", "j_f_uhana", parent="Head")
+
+        # Glue bones keep the nostrils and cheeks following the surrounding chains.
+        connect(rig, f"Nostril.Glue{x}", f"j_f_hana_{s}", "j_f_uhana", parent="Head")
+        connect(rig, f"Nostril.Glue{x}.001", f"Cheek.T{x}.001", f"Nostril{x}", parent="Head")
+        connect(rig, f"Cheek.B{x}.glue", f"j_f_dhoho_{s}", f"j_f_shoho_{s}", parent="Head")
+        connect(rig, f"Cheek.T{x}.glue", f"j_f_dhoho_{s}", f"j_f_hoho_{s}", parent="Head")
+
+    @staticmethod
+    def _nose_pose(rig: bpy.types.Object, side: Side) -> None:
+        s, x = side.source, side.suffix
+        rigify.skin_basic_chain(rig, f"Nose{x}", control_orientation_bone="Head", use_scale=SCALE_ALL)
+        rigify.skin_basic_chain(rig, f"Nostril{x}", chain_priority=1, control_orientation_bone="Head", use_scale=SCALE_ALL)
+        collection(rig, [f"Nose{x}", f"Nostril{x}"], PRIMARY)
+
+        link(rig, f"j_f_dmiken_{s}", f"DEF-Nose{x}")
+        link(rig, f"j_f_hana_{s}", f"DEF-Nostril{x}")
+
+        glue_bones = [f"Nostril.Glue{x}", f"Nostril.Glue{x}.001", f"Cheek.B{x}.glue", f"Cheek.T{x}.glue"]
+        for glue_bone in glue_bones:
+            rigify.skin_glue(
+                rig,
+                glue_bone,
+                relink_constraints=True,
+                use_tail=True,
+                reparent_tail=glue_bone == f"Cheek.B{x}.glue",
+                add_constraint="COPY_LOCATION_OWNER",
+                add_constraint_influence=0.5,
+            )
+        collection(rig, glue_bones, "MCH")

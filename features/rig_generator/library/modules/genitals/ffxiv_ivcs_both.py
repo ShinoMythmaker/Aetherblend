@@ -1,24 +1,32 @@
-﻿from ....rigify.settings import BoneCollection, UI_Collections
-from ....shared import RigModule
-from .ffxiv_ivcs_female import get_rig_module as get_female_rig_module
-from .ffxiv_ivcs_male import get_rig_module as get_male_rig_module
+"""Male and female IVCS genitals together."""
+from ....module import RigModule
+from ....rigify.settings import UI_Collections
+from .ffxiv_ivcs_female import Module as FemaleGenitals
+from .ffxiv_ivcs_male import Module as MaleGenitals
 
 
-def get_rig_module() -> RigModule:
-    female_module = get_female_rig_module()
-    male_module = get_male_rig_module()
+class Module(RigModule):
+    name = "XIV-IVCS Both"
+    ui_collections = UI_Collections([
+        *MaleGenitals.ui_collections.collections,
+        *FemaleGenitals.ui_collections.collections,
+    ])
 
-    rig_module = RigModule(
-        name="XIV-IVCS Both",
-        type="Generation",
-        bone_groups=[*female_module.bone_groups, *male_module.bone_groups],
-        ui_collections = UI_Collections([
-            BoneCollection(name="Genitals (Male)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Male)", visible=False),
-            BoneCollection(name="Genitals (Female)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Female)", visible=False),
-        ]),
-        operations=[
-            *female_module.operations,
-            *male_module.operations
-        ]
-    )
-    return rig_module
+    def __init__(self):
+        self.parts = [FemaleGenitals(), MaleGenitals()]
+
+    def meta_edit(self, rig):
+        for part in self.parts:
+            part.meta_edit(rig)
+
+    def meta_pose(self, rig):
+        for part in self.parts:
+            part.meta_pose(rig)
+
+    def final_edit(self, rig):
+        for part in self.parts:
+            part.final_edit(rig)
+
+    def final_pose(self, rig):
+        for part in self.parts:
+            part.final_pose(rig)

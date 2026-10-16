@@ -1,301 +1,104 @@
-﻿from .... import rigify
-from ....bone_generators import ConnectBone, ExtensionBone
-from ....drivers import Driver, TransformChannelVariable
-from ....operations import (
-    CollectionOperation,
-    DriverOperation,
-    ParentBoneOperation,
-    PropOverrideOperation,
-    RigifyTypeOperation,
-    WidgetOperation,
-)
+﻿"""Arm module: IK/FK arms with clavicle, elbow and pauldron helpers."""
+from typing import NamedTuple
+
+import bpy
+
+from ....instructions import *
+from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
-from ....shared import BoneGroup, RigModule, TransformLink
 
-ARM_R = BoneGroup(
-        name="Right Arm",
-        description="Right arm bones including upper arm, forearm, hand, and tweak bones",
-        transform_link = [
-            TransformLink(target="DEF-upper_arm.R.001", bone="j_ude_a_r", retarget="FK-upper_arm.R"),
-            TransformLink(target="DEF-forearm.R", bone="j_ude_b_r", retarget="FK-forearm.R"),
-            TransformLink(target="DEF-hand.R", bone="j_te_r", retarget="FK-hand.R"),
-            TransformLink(target="DEF-clavicle.R", bone="j_sako_r"),
-            TransformLink(target="DEF-forearm.R.001", bone="n_hte_r"),
-            TransformLink(target="DEF-elbow.R", bone="n_hhiji_r"),
-            TransformLink(target="DEF-pauldron.R", bone="n_kataarmor_r"),
-            TransformLink(target="DEF-pauldron.L", bone="n_kataarmor_l")
-            ],
-        generators = [
-            #Right Pauldron
-            ExtensionBone(
-                name="MCH-pauldron.R",
-                bone_a="n_kataarmor_r",
-                size_factor=1,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                parent="Spine.004",
-                req_bones=["n_kataarmor_r"],
-                operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="MCH-pauldron.R", rigify_type=rigify.types.basic_raw_copy()),
-                    CollectionOperation(time="Post", bone_name="MCH-pauldron.R", collection_name="MCH"),
-                    DriverOperation(
-                        time="Post",
-                        bone_name="MCH-pauldron.R",
-                        driver_name="pauldron_rot_X",
-                        property=["rotation_quaternion", 3],
-                        driver=Driver(
-                            type="SCRIPTED",
-                            expression="RotX",
-                            variables=[
-                                TransformChannelVariable(name="RotX", target_bone="DEF-upper_arm.R", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
-                            ]
-                        )
-                    ),
-                    DriverOperation(
-                        time="Post",
-                        bone_name="MCH-pauldron.R",
-                        driver_name="pauldron_rot_X",
-                        property=["rotation_quaternion", 1],
-                        driver=Driver(
-                            type="SCRIPTED",
-                            expression="-RotZ",
-                            variables=[
-                                TransformChannelVariable(name="RotZ", target_bone="DEF-upper_arm.R", transform_type="ROT_Z", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
-                            ]
-                        )
-                    )
-                ]
-            ),
 
-            ExtensionBone(
-                name="pauldron.R",
-                bone_a="n_kataarmor_r",
-                size_factor=1,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                parent="MCH-pauldron.R",
-                req_bones=["n_kataarmor_r"],
-                operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="pauldron.R", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
-                    CollectionOperation(time="Pre", bone_name="pauldron.R", collection_name="Arm.R (Tweak)"),
-                    WidgetOperation(time="Post", bone_name="pauldron.R", custom_object="Pauldron", rotation=(0, 0, 0), wire_width=1, scale_to_bone_length=True),
-                ]
-            ),
-            #Right Clavicle
-            ConnectBone(
-                name="clavicle.R",
-                bone_a="j_sako_r",
-                bone_b="j_ude_a_r",
-                req_bones=["j_sako_r"],
-                parent="Spine.004",
-                operations=[ParentBoneOperation(time="Pre", bone_name="clavicle.R", parent=["Spine.004", "j_sebo_c"], is_connected=False),
-                    RigifyTypeOperation(time="Pre", bone_name="clavicle.R", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
-                    CollectionOperation(time="Pre", bone_name="clavicle.R", collection_name="Torso")
-                ]
-            ),
-            # Right Arm
-            ConnectBone(
-                name="upper_arm.R",
-                bone_a="j_ude_a_r",
-                bone_b="j_ude_b_r",
-                parent="clavicle.R",
-                req_bones=["j_ude_a_r", "j_ude_b_r"],
-                operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="upper_arm.R", rigify_type=rigify.types.limbs_arm(fk_coll="Arm.R (FK)", tweak_coll="Arm.R (Tweak)")),
-                    CollectionOperation(time="Pre", bone_name="upper_arm.R", collection_name="Arm.R (IK)")
-                ]
-            ),
-            ConnectBone(
-                name="forearm.R",
-                bone_a="j_ude_b_r",
-                bone_b="j_te_r",
-                parent="upper_arm.R",
-                is_connected=True,
-                req_bones=["j_ude_b_r", "j_te_r"],
-                operations=[
-                    CollectionOperation(time="Pre", bone_name="forearm.R", collection_name="Arm.R (IK)")
-                ]
-            ),
-            ExtensionBone(
-                name="hand.R",
-                bone_a="j_te_r",
-                size_factor=0.6,
-                axis_type="local",
-                axis="Y",
-                parent="forearm.R",
-                is_connected=True,
-                req_bones=["forearm.R"],
-                operations=[
-                    CollectionOperation(time="Pre", bone_name="hand.R", collection_name="Arm.R (IK)")
-                ]
-            ),
-            ExtensionBone(
-                name="elbow.R",
-                bone_a="n_hhiji_r",
-                size_factor=0.5,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                parent="forearm.R",
-                req_bones=["n_hhiji_r"],
-                operations=[
-                            RigifyTypeOperation(time="Pre", bone_name="elbow.R", rigify_type=rigify.types.basic_super_copy(widget_type="pivot_cross")),
-                            CollectionOperation(time="Pre", bone_name="elbow.R", collection_name="Arm.R (Tweak)")
-                ]
-            )
+class Side(NamedTuple):
+    """Naming of one body side and how the pauldron follows the upper arm on it."""
+
+    suffix: str
+    source: str
+    name: str
+    pauldron_twist_expression: str
+    pauldron_swing_expression: str
+
+
+LEFT = Side(".L", "l", "Left", pauldron_twist_expression="-RotX", pauldron_swing_expression="RotZ")
+RIGHT = Side(".R", "r", "Right", pauldron_twist_expression="RotX", pauldron_swing_expression="-RotZ")
+SIDES = (LEFT, RIGHT)
+
+
+def _ui_collections() -> UI_Collections:
+    collections: list[BoneCollection] = []
+    for side in SIDES:
+        collections += [
+            BoneCollection(name=f"Arm{side.suffix} (IK)", ui=True, color_set=f"IK_{side.name}", row_index=1, title=f"Arm IK{side.suffix}"),
+            BoneCollection(name=f"Arm{side.suffix} (FK)", ui=True, color_set=f"FK_{side.name}", row_index=2, title=f"Arm FK{side.suffix}", visible=False),
+            BoneCollection(name=f"Arm{side.suffix} (Tweak)", ui=True, color_set=f"Tweak_{side.name}", row_index=3, title=f"Tweak{side.suffix}", visible=False),
         ]
-    )
+    return UI_Collections(collections)
 
-ARM_L = BoneGroup(
-        name="Left Arm",
-        transform_link= [
-            TransformLink(target="DEF-upper_arm.L.001", bone="j_ude_a_l", retarget="FK-upper_arm.L"),
-            TransformLink(target="DEF-forearm.L", bone="j_ude_b_l", retarget="FK-forearm.L"),
-            TransformLink(target="DEF-hand.L", bone="j_te_l", retarget="FK-hand.L"),
-            TransformLink(target="DEF-clavicle.L", bone="j_sako_l"),
-            TransformLink(target="DEF-forearm.L.001", bone="n_hte_l"),
-            TransformLink(target="DEF-elbow.L", bone="n_hhiji_l")
-            ],
-        generators = [
-            #Left Pauldron
-            ExtensionBone(
-                name="MCH-pauldron.L",
-                bone_a="n_kataarmor_l",
-                size_factor=1,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                parent="Spine.004",
-                req_bones=["n_kataarmor_l"],
-                operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="MCH-pauldron.L", rigify_type=rigify.types.basic_raw_copy()),
-                    CollectionOperation(time="Post", bone_name="MCH-pauldron.L", collection_name="MCH"),
-                    DriverOperation(
-                        time="Post",
-                        bone_name="MCH-pauldron.L",
-                        driver_name="pauldron_rot_X",
-                        property=["rotation_quaternion", 3],
-                        driver=Driver(
-                            type="SCRIPTED",
-                            expression="-RotX",
-                            variables=[
-                                TransformChannelVariable(name="RotX", target_bone="DEF-upper_arm.L", transform_type="ROT_X", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
-                            ]
-                        )
-                    ),
-                    DriverOperation(
-                        time="Post",
-                        bone_name="MCH-pauldron.L",
-                        driver_name="pauldron_rot_X",
-                        property=["rotation_quaternion", 1],
-                        driver=Driver(
-                            type="SCRIPTED",
-                            expression="RotZ",
-                            variables=[
-                                TransformChannelVariable(name="RotZ", target_bone="DEF-upper_arm.L", transform_type="ROT_Z", rotation_mode="QUATERNION", transform_space="LOCAL_SPACE"),
-                            ]
-                        )
-                    )
-                ]
-            ),
-            ExtensionBone(
-                name="pauldron.L",
-                bone_a="n_kataarmor_l",
-                size_factor=1,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                parent="MCH-pauldron.L",
-                req_bones=["n_kataarmor_l"],
-                operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="pauldron.L", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
-                    CollectionOperation(time="Pre", bone_name="pauldron.L", collection_name="Arm.L (Tweak)"),
-                    WidgetOperation(time="Post", bone_name="pauldron.L", custom_object="Pauldron", rotation=(0, 0, 0), wire_width=1, scale_to_bone_length=True,)
-                ]
-            ),
-            #Left Clavicle
-            ConnectBone(
-                name="clavicle.L",
-                bone_a="j_sako_l",
-                bone_b="j_ude_a_l",
-                parent="Spine.004",
-                req_bones=["j_sako_l"],
-                operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="clavicle.L", rigify_type=rigify.types.basic_super_copy(widget_type="shoulder")),
-                    CollectionOperation(time="Pre", bone_name="clavicle.L", collection_name="Torso")
-                ]
-            ),
-            # Left Arm
-            ConnectBone(
-                name="upper_arm.L",
-                bone_a="j_ude_a_l",
-                bone_b="j_ude_b_l",
-                parent="clavicle.L",
-                req_bones=["j_ude_a_l", "j_ude_b_l"],
-                operations=[
-                    RigifyTypeOperation(time="Pre", bone_name="upper_arm.L", rigify_type=rigify.types.limbs_arm(fk_coll="Arm.L (FK)", tweak_coll="Arm.L (Tweak)")),
-                    CollectionOperation(time="Pre", bone_name="upper_arm.L", collection_name="Arm.L (IK)")
-                ]
-            ),
-            ConnectBone(
-                name="forearm.L",
-                bone_a="j_ude_b_l",
-                bone_b="j_te_l",
-                parent="upper_arm.L",
-                is_connected=True,
-                req_bones=["j_ude_b_l", "j_te_l"],
-                operations=[
-                    CollectionOperation(time="Pre", bone_name="forearm.L", collection_name="Arm.L (IK)")
-                ]
-            ),
-            ExtensionBone(
-                name="hand.L",
-                bone_a="j_te_l",
-                size_factor=0.6,
-                axis_type="local",
-                axis="Y",
-                parent="forearm.L",
-                is_connected=True,
-                req_bones=["forearm.L"],
-                operations=[
-                    CollectionOperation(time="Pre", bone_name="hand.L", collection_name="Arm.L (IK)")
-                ]
-            ),
-            ExtensionBone(
-                name="elbow.L",
-                bone_a="n_hhiji_l",
-                size_factor=0.5,
-                axis_type="local",
-                axis="Y",
-                start="head",
-                parent="forearm.L",
-                req_bones=["n_hhiji_l"],
-                operations=[
-                            RigifyTypeOperation(time="Pre", bone_name="elbow.L", rigify_type=rigify.types.basic_super_copy(widget_type="pivot_cross")),
-                            CollectionOperation(time="Pre", bone_name="elbow.L", collection_name="Arm.L (Tweak)")
-                        ]
+
+class Module(RigModule):
+    name = "XIV-Default"
+    requires = tuple(
+        f"{part}_{side.source}"
+        for side in SIDES
+        for part in ("j_sako", "j_ude_a", "j_ude_b", "j_te", "n_kataarmor", "n_hhiji")
+    )
+    ui_collections = _ui_collections()
+
+    def meta_edit(self, rig: bpy.types.Object) -> None:
+        for side in SIDES:
+            suffix = side.suffix
+            source_clavicle = f"j_sako_{side.source}"
+            source_upper_arm = f"j_ude_a_{side.source}"
+            source_forearm = f"j_ude_b_{side.source}"
+            source_hand = f"j_te_{side.source}"
+            source_elbow = f"n_hhiji_{side.source}"
+            source_pauldron = f"n_kataarmor_{side.source}"
+
+            extend(rig, f"MCH-pauldron{suffix}", source_pauldron, start_point="head", parent="Spine.004")
+            extend(rig, f"pauldron{suffix}", source_pauldron, start_point="head", parent=f"MCH-pauldron{suffix}")
+
+            connect(rig, f"clavicle{suffix}", source_clavicle, source_upper_arm, parent=["Spine.004", "j_sebo_c"])
+            connect(rig, f"upper_arm{suffix}", source_upper_arm, source_forearm, parent=f"clavicle{suffix}")
+            connect(rig, f"forearm{suffix}", source_forearm, source_hand, parent=f"upper_arm{suffix}", connected=True)
+            extend(rig, f"hand{suffix}", source_hand, size_factor=0.6, parent=f"forearm{suffix}", connected=True)
+            extend(rig, f"elbow{suffix}", source_elbow, start_point="head", size_factor=0.5, parent=f"forearm{suffix}")
+
+    def meta_pose(self, rig: bpy.types.Object) -> None:
+        for side in SIDES:
+            suffix = side.suffix
+
+            rigify.basic_raw_copy(rig, f"MCH-pauldron{suffix}")
+            rigify.basic_super_copy(rig, f"pauldron{suffix}", widget_type="shoulder")
+            rigify.basic_super_copy(rig, f"clavicle{suffix}", widget_type="shoulder")
+            rigify.limbs_arm(rig, f"upper_arm{suffix}", fk_collection=f"Arm{suffix} (FK)", tweak_collection=f"Arm{suffix} (Tweak)")
+            rigify.basic_super_copy(rig, f"elbow{suffix}", widget_type="pivot_cross")
+
+            collection(rig, [f"pauldron{suffix}", f"elbow{suffix}"], f"Arm{suffix} (Tweak)")
+            collection(rig, [f"upper_arm{suffix}", f"forearm{suffix}", f"hand{suffix}"], f"Arm{suffix} (IK)")
+            collection(rig, [f"clavicle{suffix}"], "Torso")
+
+            link(rig, f"j_ude_a_{side.source}", f"DEF-upper_arm{suffix}.001")
+            link(rig, f"j_ude_b_{side.source}", f"DEF-forearm{suffix}")
+            link(rig, f"j_te_{side.source}", f"DEF-hand{suffix}")
+            link(rig, f"j_sako_{side.source}", f"DEF-clavicle{suffix}")
+            link(rig, f"n_hte_{side.source}", f"DEF-forearm{suffix}.001")
+            link(rig, f"n_hhiji_{side.source}", f"DEF-elbow{suffix}")
+            link(rig, f"n_kataarmor_{side.source}", f"DEF-pauldron{suffix}")
+
+    def final_pose(self, rig: bpy.types.Object) -> None:
+        for side in SIDES:
+            suffix = side.suffix
+            deform_upper_arm = f"DEF-upper_arm{suffix}"
+
+            collection(rig, [f"MCH-pauldron{suffix}"], "MCH")
+            driver(
+                rig, f"MCH-pauldron{suffix}", "rotation_quaternion", index=3,
+                expression=side.pauldron_twist_expression,
+                variables={"RotX": TransformVariable(deform_upper_arm, "ROT_X")},
             )
-        ],
-        description ="Left arm bones including the clavicle, upper arm, forearm, and hand bones."
-    )
-
-def get_rig_module() -> RigModule:
-    return RigModule(
-        name="XIV-Default",
-        type="Generation",
-        bone_groups=[ARM_L, ARM_R],
-        ui_collections = UI_Collections([
-            BoneCollection(name="Arm.L (IK)", ui=True, color_set="IK_Left", row_index=1, title="Arm IK.L"),
-            BoneCollection(name="Arm.L (FK)", ui=True, color_set="FK_Left", row_index=2, title="Arm FK.L", visible=False),
-            BoneCollection(name="Arm.L (Tweak)", ui=True, color_set="Tweak_Left", row_index=3, title="Tweak.L", visible=False),
-            BoneCollection(name="Arm.R (IK)", ui=True, color_set="IK_Right", row_index=1, title="Arm IK.R"),
-            BoneCollection(name="Arm.R (FK)", ui=True, color_set="FK_Right", row_index=2, title="Arm FK.R", visible=False),
-            BoneCollection(name="Arm.R (Tweak)", ui=True, color_set="Tweak_Right", row_index=3, title="Tweak.R", visible=False),
-        ]),
-        operations=[
-            PropOverrideOperation(bone_name="upper_arm_parent.L", property_name="IK_Stretch", value=0),
-            PropOverrideOperation(bone_name="upper_arm_parent.R", property_name="IK_Stretch", value=0),
-        ]
-    )
+            driver(
+                rig, f"MCH-pauldron{suffix}", "rotation_quaternion", index=1,
+                expression=side.pauldron_swing_expression,
+                variables={"RotZ": TransformVariable(deform_upper_arm, "ROT_Z")},
+            )
+            widget(rig, f"pauldron{suffix}", widget_name="Pauldron", scale_to_bone_length=True, wire_width=1)
+            prop(rig, f"upper_arm_parent{suffix}", "IK_Stretch", 0)

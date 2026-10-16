@@ -1,93 +1,40 @@
-﻿from .... import rigify
-from ....generators import ConnectBone, ExtensionBone
-from ....operations import CollectionOperation, RigifyTypeOperation, WidgetOperation
+"""Female IVCS genitals."""
+from ....instructions import *
+from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
-from ....shared import BoneGroup, RigModule, TransformLink
 
-GENITALS_F = BoneGroup(
-    name="Female Genitals",
-    transform_link=[
-        TransformLink(target="DEF-Clitoris", bone="iv_kuritto"),
-        TransformLink(target="DEF-Vulva.R", bone="iv_inshin_r"),
-        TransformLink(target="DEF-Vulva.L", bone="iv_inshin_l"),
-        TransformLink(target="DEF-Vulva", bone="iv_omanko"),
-    ],
-    generators=[
-        ConnectBone(
-            name="Clitoris",
-            bone_a="iv_kuritto",
-            bone_b="j_kosi",
-            parent=["Spine.001", "j_kosi"],
-            is_connected=False,
-            req_bones=["iv_kuritto", "j_kosi"],
-            operations=[
-                RigifyTypeOperation(bone_name="Clitoris", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001")),
-                CollectionOperation(bone_name="Clitoris", collection_name="Genitals (Female)")
-                ]
-        ),
-        ConnectBone(
-            name="Vulva.R",
-            bone_a="iv_inshin_r",
-            bone_b="j_kosi",
-            parent="Spine.001",
-            is_connected=False,
-            req_bones=["iv_inshin_r", "j_kosi"],
-            operations=[
-                RigifyTypeOperation(bone_name="Vulva.R", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001")),
-                CollectionOperation(bone_name="Vulva.R", collection_name="Genitals (Female)")
-            ]
-        ),
-        ConnectBone(
-            name="Vulva.L",
-            bone_a="iv_inshin_l",
-            bone_b="j_kosi",
-            parent="Spine.001",
-            is_connected=False,
-            req_bones=["iv_inshin_l", "j_kosi"],
-            operations=[
-                RigifyTypeOperation(bone_name="Vulva.L", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001")),
-                CollectionOperation(bone_name="Vulva.L", collection_name="Genitals (Female)")
-            ]
-        ),
-        ConnectBone(
-            name="Vulva",
-            bone_a="iv_omanko",
-            bone_b="j_kosi",
-            parent="Spine.001",
-            is_connected=False,
-            req_bones=["iv_omanko", "j_kosi"],
-            operations=[
-                RigifyTypeOperation(bone_name="Vulva", rigify_type=rigify.types.skin_basic_chain(skin_control_orientation_bone="Spine.001")),
-                CollectionOperation(bone_name="Vulva", collection_name="Genitals (Female)")
-            ]
-        ),
-        ExtensionBone(
-            name="Anchor_V",
-            bone_a="Clitoris",
-            parent="Spine.001",
-            is_connected=False,
-            start="tail",
-            req_bones=["Clitoris"],
-            operations=[
-                RigifyTypeOperation(bone_name="Anchor_V", rigify_type=rigify.types.skin_anchor(skin_anchor_hide=True)),
-                CollectionOperation(bone_name="Anchor_V", collection_name="Genitals (Female)")
-            ]
-        )
-    ]
+COLLECTION = "Genitals (Female)"
+PARTS = (
+    ("Clitoris", "iv_kuritto", ["Spine.001", "j_kosi"]),
+    ("Vulva.R", "iv_inshin_r", "Spine.001"),
+    ("Vulva.L", "iv_inshin_l", "Spine.001"),
+    ("Vulva", "iv_omanko", "Spine.001"),
 )
 
-def get_rig_module() -> RigModule:
-    return RigModule(
-        name="XIV-IVCS Female",
-        type="Generation",
-        bone_groups=[GENITALS_F],
-        ui_collections = UI_Collections([
-            BoneCollection(name="Genitals (Female)", ui=True, color_set="IVCS", row_index=1, title="Genitals (Female)", visible=False),
-        ]),
-        operations=[
-            WidgetOperation(bone_name="Clitoris", scale_factor=0.2),
-            WidgetOperation(bone_name="Vulva.R", scale_factor=0.2),
-            WidgetOperation(bone_name="Vulva.L", scale_factor=0.2),
-            WidgetOperation(bone_name="Vulva", scale_factor=0.2)
-        ]
-    )
+
+class Module(RigModule):
+    name = "XIV-IVCS Female"
+    ui_collections = UI_Collections([
+        BoneCollection(name=COLLECTION, ui=True, color_set="IVCS", row_index=1, title=COLLECTION, visible=False),
+    ])
+
+    def meta_edit(self, rig):
+        for name, source, parent_bone in PARTS:
+            if has_bone(rig, source) and has_bone(rig, "j_kosi"):
+                connect(rig, name, source, "j_kosi", parent=parent_bone)
+        if has_bone(rig, "Clitoris"):
+            extend(rig, "Anchor_V", "Clitoris", parent="Spine.001")
+
+    def meta_pose(self, rig):
+        for name, source, _ in PARTS:
+            if name in rig.pose.bones:
+                rigify.skin_basic_chain(rig, name, control_orientation_bone="Spine.001")
+                collection(rig, [name], COLLECTION)
+                link(rig, source, f"DEF-{name}")
+        if "Anchor_V" in rig.pose.bones:
+            rigify.skin_anchor(rig, "Anchor_V", hide=True)
+            collection(rig, ["Anchor_V"], COLLECTION)
+
+    def final_pose(self, rig):
+        for name, _, _ in PARTS:
+            widget(rig, name, scale_factor=0.2)

@@ -1,5 +1,4 @@
-from .ffxiv_ivcs import get_rig_module as _get_ivcs_rig_module
-
-ffxiv_ivcs = _get_ivcs_rig_module()
+from .ffxiv_ivcs import Module as ffxiv_ivcs
 
 __all__ = ["ffxiv_ivcs"]
+

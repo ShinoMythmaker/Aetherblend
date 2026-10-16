@@ -1,5 +1,6 @@
 """Edit-mode instructions: create and parent bones."""
 import math
+import re
 from collections.abc import Sequence
 from typing import Literal
 
@@ -134,6 +135,175 @@ def extend(
     _create_bone(rig, name, head, tail, parent, connected, roll)
 
 
+def copy(
+    rig: bpy.types.Object,
+    name: str,
+    source_bone: str,
+    *,
+    parent: BoneNames | None = None,
+    connected: bool = False,
+    roll: float | None = None,
+) -> None:
+    """Create a bone at the position of a source bone; the roll of the source is kept unless one is given."""
+    edit_source = rig.data.edit_bones.get(source_bone)
+    if not edit_source:
+        print(f"[AetherBlend] Cannot copy '{name}': '{source_bone}' not found.")
+        return
+
+    roll_degrees = math.degrees(edit_source.roll) if roll is None else roll
+    _create_bone(rig, name, edit_source.head.copy(), edit_source.tail.copy(), parent, connected, roll_degrees)
+
+
+def center(
+    rig: bpy.types.Object,
+    name: str,
+    reference_bones: Sequence[str],
+    *,
+    size_factor: float = 1.0,
+    axis: Axis = "Z",
+    inverted: bool = False,
+    parent: BoneNames | None = None,
+    connected: bool = False,
+) -> None:
+    """Create a bone at the average head of the reference bones, as long as their average length, pointing along an armature axis."""
+    edit_bones = rig.data.edit_bones
+    references = [edit_bones[reference] for reference in reference_bones if reference in edit_bones]
+    if not references:
+        print(f"[AetherBlend] Cannot create '{name}': none of {list(reference_bones)} found.")
+        return
+
+    center_position = sum((reference.head for reference in references), mathutils.Vector((0.0, 0.0, 0.0))) / len(references)
+    average_length = sum(reference.length for reference in references) / len(references)
+    length = (average_length if average_length > 0 else 0.3) * size_factor
+
+    direction = mathutils.Vector((0.0, 0.0, 0.0))
+    direction[_AXIS_INDEX[axis]] = length
+    if inverted:
+        head, tail = center_position + direction, center_position
+    else:
+        head, tail = center_position, center_position + direction
+    _create_bone(rig, name, head, tail, parent, connected, 0.0)
+
+
+def offset(
+    rig: bpy.types.Object,
+    name: str,
+    source_bone: str,
+    local_offset: Sequence[float],
+    *,
+    size_factor: float = 1.0,
+    parent: BoneNames | None = None,
+    connected: bool = False,
+    roll: float = 0.0,
+) -> None:
+    """Create a bone shifted from a source bone by a vector in the source bone's own axes, with the source's direction and length times size_factor."""
+    edit_source = rig.data.edit_bones.get(source_bone)
+    if not edit_source:
+        print(f"[AetherBlend] Cannot offset '{name}': '{source_bone}' not found.")
+        return
+
+    head = edit_source.head + edit_source.matrix.to_3x3() @ mathutils.Vector(local_offset)
+    tail = head + (edit_source.tail - edit_source.head) * size_factor
+    _create_bone(rig, name, head, tail, parent, connected, roll)
+
+
+def bridge(
+    rig: bpy.types.Object,
+    name: str,
+    start_bone: str,
+    end_bone: str,
+    *,
+    offset: Sequence[float] = (0.0, 0.0, 0.0),
+    start_parent: BoneNames | None = None,
+    connect_end: bool = True,
+) -> None:
+    """Split the way from start_bone to end_bone with a bone at the midpoint shifted by an offset.
+
+    The start bone is shortened to end at the new bone, which continues to the head of the end bone.
+    With connect_end the end bone is attached to the new bone. start_parent re-parents the start bone.
+    """
+    edit_bones = rig.data.edit_bones
+    edit_start = edit_bones.get(start_bone)
+    edit_end = edit_bones.get(end_bone)
+    if not edit_start or not edit_end:
+        print(f"[AetherBlend] Cannot bridge '{name}': '{start_bone}' or '{end_bone}' not found.")
+        return
+
+    end_position = edit_end.head.copy()
+    bridge_head = (edit_start.head + end_position) / 2.0 + mathutils.Vector(offset)
+
+    existing_bone = edit_bones.get(name)
+    if existing_bone:
+        edit_bones.remove(existing_bone)
+
+    new_bone = edit_bones.new(name)
+    new_bone.head = bridge_head
+    new_bone.tail = end_position
+    edit_start.tail = bridge_head
+    new_bone.parent = edit_start
+    new_bone.use_connect = True
+
+    if start_parent:
+        _assign_parent(rig, start_bone, _as_list(start_parent), False)
+    if connect_end:
+        edit_end.parent = new_bone
+        edit_end.use_connect = True
+
+
+def _heaviest_vertex_position(source_rig: bpy.types.Object, mesh: bpy.types.Object, bone: str) -> mathutils.Vector | None:
+    vertex_group = mesh.vertex_groups.get(bone)
+    deformed_by_rig = any(modifier.type == "ARMATURE" and modifier.object == source_rig for modifier in mesh.modifiers)
+    if not vertex_group or not deformed_by_rig:
+        return None
+
+    evaluated_mesh_object = mesh.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    evaluated_mesh = evaluated_mesh_object.to_mesh()
+    try:
+        original_vertices = mesh.data.vertices
+        if len(evaluated_mesh.vertices) != len(original_vertices):
+            return None
+
+        best_weight = 0.0
+        best_position = None
+        for index, vertex in enumerate(original_vertices):
+            for assignment in vertex.groups:
+                if assignment.group == vertex_group.index and assignment.weight > best_weight:
+                    best_weight = assignment.weight
+                    best_position = mesh.matrix_world @ evaluated_mesh.vertices[index].co
+        return best_position
+    finally:
+        evaluated_mesh_object.to_mesh_clear()
+
+
+def heaviest_vertex(
+    rig: bpy.types.Object,
+    name: str,
+    bone: str,
+    mesh: bpy.types.Object,
+    *,
+    source_rig: bpy.types.Object,
+    size_factor: float = 1.0,
+    parent: BoneNames | None = None,
+) -> None:
+    """Create an upright bone at the vertex of the mesh that the bone's vertex group weights the most.
+
+    source_rig is the armature that deforms the mesh; the new bone is as long as the bone times size_factor.
+    """
+    edit_reference = rig.data.edit_bones.get(bone)
+    if not edit_reference:
+        print(f"[AetherBlend] Cannot place '{name}': '{bone}' not found.")
+        return
+
+    world_position = _heaviest_vertex_position(source_rig, mesh, bone)
+    if world_position is None:
+        print(f"[AetherBlend] Cannot place '{name}': no weighted vertices for '{bone}' on '{mesh.name}'.")
+        return
+
+    length = (edit_reference.length if edit_reference.length > 0 else 0.3) * size_factor
+    head = rig.matrix_world.inverted() @ world_position
+    _create_bone(rig, name, head, head + mathutils.Vector((0.0, 0.0, length)), parent, False, 0.0)
+
+
 def parallel(
     rig: bpy.types.Object,
     name: str,
@@ -180,3 +350,30 @@ def resolve_pending_parents(rig: bpy.types.Object) -> None:
     for bone_name, candidates, connected in _pending_parents:
         _assign_parent(rig, bone_name, candidates, connected)
     _pending_parents.clear()
+
+
+def find_chains(rig: bpy.types.Object, pattern: str) -> list[list[str]]:
+    """Group the bones whose name matches the regular expression into chains of matching parent and first matching child."""
+    edit_bones = rig.data.edit_bones
+    matching_names = [bone.name for bone in edit_bones if re.match(pattern, bone.name)]
+
+    chains: list[list[str]] = []
+    for name in matching_names:
+        parent_bone = edit_bones[name].parent
+        if parent_bone and re.match(pattern, parent_bone.name):
+            continue
+        chain = [name]
+        current = edit_bones[name]
+        while True:
+            matching_children = [child for child in current.children if re.match(pattern, child.name)]
+            if not matching_children:
+                break
+            current = matching_children[0]
+            chain.append(current.name)
+        chains.append(chain)
+    return chains
+
+
+def has_bone(rig: bpy.types.Object, bone: str) -> bool:
+    """Whether the bone exists in the rig while it is in edit mode."""
+    return bone in rig.data.edit_bones

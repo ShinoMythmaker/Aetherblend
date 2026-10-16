@@ -1,164 +1,64 @@
-﻿from .... import rigify
-from ....bone_generators import ConnectBone, ExtensionBone
-from ....constraints import CopyLocationConstraint, CopyTransformsConstraint
-from ....operations import (
-    CollectionOperation,
-    ConstraintOperation,
-    ParentBoneOperation,
-    RigifyTypeOperation,
-    WidgetOperation,
-)
+"""Spine module: torso, chest, neck and head with the pivot and hara links."""
+from ....instructions import *
+from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
-from ....shared import BoneGroup, RigModule, TransformLink
 
-SPINE = BoneGroup(
-        name="spine",
-        transform_link= [
-            TransformLink(target="MCH-pivot", bone="n_hara", constraint= CopyLocationConstraint(target_bone="LINK-n_hara", target_space="WORLD", owner_space="WORLD")),
-            TransformLink(target="DEF-Spine.001", bone="j_kosi", retarget="FK-Spine.001"),
-            TransformLink(target="DEF-Spine.002", bone="j_sebo_a", retarget="FK-Spine.002"),
-            TransformLink(target="DEF-Spine.003", bone="j_sebo_b", retarget="FK-Spine.003"),
-            TransformLink(target="DEF-Spine.004", bone="j_sebo_c", retarget="FK-Spine.004"),
-            TransformLink(target="DEF-Chest.R", bone="j_mune_r"),
-            TransformLink(target="DEF-Chest.L", bone="j_mune_l"),
-            TransformLink(target="DEF-Neck", bone="j_kubi"),
-            TransformLink(target="DEF-Head", bone="j_kao"),
-        ],
-        operations = [
-            ## Scuffed root bone implementation ? since when has CopyTransformConstraint a BEFORE_FULL mix mode ? - Shino
-            ConstraintOperation(time="Post", bone_name="n_root", constraint=CopyTransformsConstraint(target_bone="root", target_space="WORLD", owner_space="WORLD", mix_mode="BEFORE_FULL", influence=1.0)),
-        ],
-        generators = [
-            #Spine
-            ConnectBone(
-                name="Spine.001",
-                bone_a="j_kosi",
-                bone_b="j_kosi",
-                start="tail",
-                end="head",
-                is_connected=False,
-                req_bones=["j_kosi"],
-                operations=[
-                            RigifyTypeOperation(time="Pre", bone_name="Spine.001", rigify_type=rigify.types.spines_basic_spine(fk_coll="Torso (Tweak)", tweak_coll="Torso (Tweak)", pivot_pos=1)),
-                            CollectionOperation(time="Pre", bone_name="Spine.001", collection_name="Torso"),
-                            ]
-            ),
-            ConnectBone(
-                name="Spine.002",
-                bone_a="j_sebo_a",
-                bone_b="j_sebo_b",
-                parent="Spine.001",
-                is_connected=True,
-                req_bones=["j_sebo_a", "j_sebo_b"],
-                operations=[
-                            CollectionOperation(time="Pre", bone_name="Spine.002", collection_name="Torso"),
-                            ]
-            ),
-            ConnectBone(
-                name="Spine.003",
-                bone_a="j_sebo_b",
-                bone_b="j_sebo_c",
-                parent="Spine.002",
-                is_connected=True,
-                req_bones=["j_sebo_b", "j_sebo_c"],
-                operations=[
-                            CollectionOperation(time="Pre", bone_name="Spine.003", collection_name="Torso"),
-                            ]
-            ),
-            ConnectBone(
-                name="Spine.004",
-                bone_a="j_sebo_c",
-                bone_b="j_kubi",
-                parent="Spine.003",
-                is_connected=True,
-                req_bones=["j_sebo_c", "j_kubi"],
-                operations=[
-                            CollectionOperation(time="Pre", bone_name="Spine.004", collection_name="Torso"),
-                            ]
-            ),
-            #Chest
-            ExtensionBone(
-                name="Chest.R",
-                bone_a="j_mune_r",
-                is_optional=True,
-                start="head",
-                axis_type="local",
-                axis="Y",
-                roll=132,
-                parent="Spine.003",
-                req_bones=["j_mune_r"],
-                operations=[
-                            RigifyTypeOperation(time="Pre", bone_name="Chest.R", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
-                            CollectionOperation(time="Pre", bone_name="Chest.R", collection_name="Torso"),
-                            WidgetOperation(bone_name="Chest.R", translation=[0.0, 0.05, 0.0]),
-                            ]
-            ),
-            ExtensionBone(
-                name="Chest.L",
-                bone_a="j_mune_l",
-                is_optional=True,
-                start="head",
-                axis_type="local",
-                axis="Y",
-                roll=-132,
-                parent="Spine.003",
-                req_bones=["j_mune_l"],
-                operations=[
-                            RigifyTypeOperation(time="Pre", bone_name="Chest.L", rigify_type=rigify.types.basic_super_copy(widget_type="bone")),
-                            CollectionOperation(time="Pre", bone_name="Chest.L", collection_name="Torso"),
-                            WidgetOperation(bone_name="Chest.L", translation=[0.0, 0.05, 0.0]),
-                            ]
-            ),
-            ConnectBone(
-            name="Neck",
-            bone_a="j_kubi",
-            bone_b="j_kao",
-            req_bones=["j_kubi", "j_kao"],
-            operations=[ParentBoneOperation(time="Pre", bone_name="Neck", parent=["Spine.004", "j_sebo_c"], is_connected=False),
-                        RigifyTypeOperation(time="Pre", bone_name="Neck", rigify_type=rigify.types.spines_super_head()),
-                        CollectionOperation(time="Pre", bone_name="Neck", collection_name="Head"),
-            ]
-        ),
-        ExtensionBone(
-            name="Head",
-            bone_a="j_kao",
-            axis_type="armature",
-            axis="Z",
-            size_factor=20.0,
-            parent="Neck",
-            is_connected=True,
-            req_bones=["j_kao"],
-            operations=[CollectionOperation(time="Pre", bone_name="Head", collection_name="Head")]
-        ),
-        # This bone serves zero purposes outside of receiving n_hara's transforms when retargeting - Oats
-        ExtensionBone(
-            name="n_hara_retarget",
-            bone_a="n_hara",
-            axis_type="local",
-            axis="Y",
-            start="head",
-            size_factor=0.5,
-            parent="", #Will default to root this way
-            req_bones=["n_hara"],
-            operations=[
-                RigifyTypeOperation(bone_name="n_hara_retarget", rigify_type=rigify.types.basic_raw_copy()),
-                CollectionOperation(bone_name="n_hara_retarget", collection_name="MCH"),
-                ParentBoneOperation(bone_name="MCH-Spine.001", parent=["n_hara_retarget"], time="Post"),
-                ParentBoneOperation(bone_name="MCH-Spine.002", parent=["n_hara_retarget"], time="Post"),
-                ParentBoneOperation(bone_name="n_hara_retarget", parent=["torso"], time="Post")
-            ]
-        )
-        ],
-)
+TORSO_COLLECTION = "Torso"
+TORSO_TWEAK_COLLECTION = "Torso (Tweak)"
+HEAD_COLLECTION = "Head"
 
-def get_rig_module() -> RigModule:
-    return RigModule(
-        name="XIV-Default",
-        type="Generation",
-        bone_groups=[SPINE],
-        ui_collections = UI_Collections([
-            BoneCollection(name="Torso", ui=True, color_set="Torso", row_index=2, title="Torso"),
-            BoneCollection(name="Torso (Tweak)", ui=True, color_set="Torso_Tweak", row_index=3, title="Tweak", visible=False),
-            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-        ])
-    )
+
+class Module(RigModule):
+    name = "XIV-Default"
+    requires = ["j_kosi", "j_sebo_a", "j_sebo_b", "j_sebo_c", "j_kubi", "j_kao", "n_hara"]
+    ui_collections = UI_Collections([
+        BoneCollection(name=TORSO_COLLECTION, ui=True, color_set="Torso", row_index=2, title="Torso"),
+        BoneCollection(name=TORSO_TWEAK_COLLECTION, ui=True, color_set="Torso_Tweak", row_index=3, title="Tweak", visible=False),
+        BoneCollection(name=HEAD_COLLECTION, ui=True, color_set="Head", row_index=1, title="Head"),
+    ])
+
+    def meta_edit(self, rig):
+        connect(rig, "Spine.001", "j_kosi", "j_kosi", start_point="tail", end_point="head")
+        connect(rig, "Spine.002", "j_sebo_a", "j_sebo_b", parent="Spine.001", connected=True)
+        connect(rig, "Spine.003", "j_sebo_b", "j_sebo_c", parent="Spine.002", connected=True)
+        connect(rig, "Spine.004", "j_sebo_c", "j_kubi", parent="Spine.003", connected=True)
+
+        if has_bone(rig, "j_mune_r"):
+            extend(rig, "Chest.R", "j_mune_r", start_point="head", roll=132, parent="Spine.003")
+        if has_bone(rig, "j_mune_l"):
+            extend(rig, "Chest.L", "j_mune_l", start_point="head", roll=-132, parent="Spine.003")
+
+        connect(rig, "Neck", "j_kubi", "j_kao", parent=["Spine.004", "j_sebo_c"])
+        extend(rig, "Head", "j_kao", axis="Z", axis_space="armature", size_factor=20.0, parent="Neck", connected=True)
+        extend(rig, "n_hara_retarget", "n_hara", start_point="head", size_factor=0.5)
+
+    def meta_pose(self, rig):
+        rigify.spines_basic_spine(rig, "Spine.001", fk_collection=TORSO_TWEAK_COLLECTION, tweak_collection=TORSO_TWEAK_COLLECTION, pivot_position=1)
+        rigify.spines_super_head(rig, "Neck")
+        rigify.basic_raw_copy(rig, "n_hara_retarget")
+        for chest in ["Chest.R", "Chest.L"]:
+            rigify.basic_super_copy(rig, chest, widget_type="bone")
+
+        collection(rig, ["Spine.001", "Spine.002", "Spine.003", "Spine.004", "Chest.R", "Chest.L"], TORSO_COLLECTION)
+        collection(rig, ["Neck", "Head"], HEAD_COLLECTION)
+        collection(rig, ["n_hara_retarget"], "MCH")
+
+        link(rig, "n_hara", "MCH-pivot", location_only=True)
+        link(rig, "j_kosi", "DEF-Spine.001")
+        link(rig, "j_sebo_a", "DEF-Spine.002")
+        link(rig, "j_sebo_b", "DEF-Spine.003")
+        link(rig, "j_sebo_c", "DEF-Spine.004")
+        link(rig, "j_mune_r", "DEF-Chest.R")
+        link(rig, "j_mune_l", "DEF-Chest.L")
+        link(rig, "j_kubi", "DEF-Neck")
+        link(rig, "j_kao", "DEF-Head")
+
+    def final_edit(self, rig):
+        parent(rig, "MCH-Spine.001", "n_hara_retarget")
+        parent(rig, "MCH-Spine.002", "n_hara_retarget")
+        parent(rig, "n_hara_retarget", "torso")
+
+    def final_pose(self, rig):
+        for chest in ["Chest.R", "Chest.L"]:
+            widget(rig, chest, translation=[0, 0.05, 0])
+        constraints.copy_transforms(rig, "n_root", "root", name="AetherBlend_CopyTransform", mix_mode="BEFORE_FULL")
