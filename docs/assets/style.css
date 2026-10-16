@@ -194,7 +194,16 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 .card:hover { transform: translateY(-3px); border-color: var(--accent); text-decoration: none; }
 .card h3 { margin: 0 0 6px; color: var(--heading); font-size: 1.1rem; }
 .card p { margin: 0; color: var(--muted); font-size: .92rem; }
-.thanks { display: grid; gap: 12px; margin-top: 16px; }
+.support .card:first-child { border-color: #3a3f7a; background: linear-gradient(135deg, #1c2038, var(--panel)); }
+.support .card:first-child:hover { border-color: var(--accent-2); }
+.ico { display: block; width: 28px; height: 28px; margin-bottom: 12px; background: var(--accent);
+  -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat; }
+.support .card:first-child .ico { background: var(--accent-2); }
+.ico-chat { -webkit-mask-image: url("img/chat.svg"); mask-image: url("img/chat.svg"); }
+.ico-bug { -webkit-mask-image: url("img/bug.svg"); mask-image: url("img/bug.svg"); }
+.ico-idea { -webkit-mask-image: url("img/idea.svg"); mask-image: url("img/idea.svg"); }
+.thanks ul { list-style: none; display: grid; gap: 12px; margin: 16px 0 0; padding: 0; }
+.thanks li { margin: 0; }
 .thanks p { margin: 0; padding: 14px 18px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); }
 .banner img { width: 100%; border-radius: 16px; }
 

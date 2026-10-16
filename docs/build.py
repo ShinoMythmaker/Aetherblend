@@ -300,8 +300,7 @@ def build_index() -> str:
     note = intro.group(2) if intro else ""
     goal = render_markdown(strip_html_tags(readme_section(readme, "What is the goal")))[0]
     thanks = readme_section(readme, "Acknowledgements")
-    thanks_items = [p.strip() for p in strip_html_tags(thanks).split("\n\n") if p.strip()]
-    thanks_html = "".join(f"<p>{render_markdown(item)[0][3:-4]}</p>" for item in thanks_items)
+    thanks_html = render_markdown(strip_html_tags(thanks))[0]
     download_url = AETHERBLEND_LINK
     discord = re.search(r"https://discord\.gg/\w+", readme)
     discord_url = discord.group(0) if discord else REPO_URL
@@ -341,10 +340,14 @@ def build_index() -> str:
   </section>
   <section>
     <h2>Support &amp; Feedback</h2>
-    <p>Submit <a href="{REPO_URL}/issues">issues and suggestions</a> on GitHub, browse the documentation, or join the
-    <a href="{discord_url}">Discord</a> to follow development.</p>
-    <div class="banner"><a href="{discord_url}">
-      <img src="assets/img/discord-banner.png" alt="Join the Discord"></a></div>
+    <div class="cards support">
+      <a class="card" href="{discord_url}"><span class="ico ico-chat"></span><h3>Join the Discord</h3>
+        <p>Ask questions, share your work and follow development.</p></a>
+      <a class="card" href="{REPO_URL}/issues"><span class="ico ico-bug"></span><h3>Report a bug</h3>
+        <p>Found something broken? Open an issue on GitHub.</p></a>
+      <a class="card" href="{REPO_URL}/issues"><span class="ico ico-idea"></span><h3>Suggest a feature</h3>
+        <p>Tell us what would make AetherBlend better for you.</p></a>
+    </div>
   </section>
   <section>
     <h2>Acknowledgements</h2>
