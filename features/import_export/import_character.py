@@ -191,10 +191,6 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         split.label(text=" ")
         split.prop(self, "s_apply_pose_track")
 
-        split = col.split(factor=indent)
-        split.label(text=" ")
-        split.prop(self, "s_clear_noanim_bones")
-
         # Bone Orientation Section
         box = layout.box()
         row = box.row()

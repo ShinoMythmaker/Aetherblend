@@ -14,6 +14,7 @@ class AETHER_OT_rig_edit_set_inherit_scale(Operator):
 
     inherit_scale: bpy.props.EnumProperty(
         name="Inherit Scale",
+        description="Scale inheritance mode applied to the LINK bones",
         items=[
             ("FULL", "Full", "Full inherit scale"),
             ("FIX_SHEAR", "Aligned", "Inherit scale with shear fixed"),

@@ -23,6 +23,7 @@ class AETHER_OT_import_export_export_anim(Operator, ExportHelper):
 
     export_format: bpy.props.EnumProperty(
         name="Format",
+        description="File format of the exported animation",
         items=[("FBX", "FBX", ""), ("GLB", "GLB", "")],
         default="FBX",
     )  # type: ignore
@@ -32,16 +33,20 @@ class AETHER_OT_import_export_export_anim(Operator, ExportHelper):
             return [(a.name, a.name, "") for a in bpy.data.actions]
         return [("NONE", "No Actions", "")]
 
-    selected_action: bpy.props.EnumProperty(name="Action", items=get_actions)  # type: ignore
+    selected_action: bpy.props.EnumProperty(  # type: ignore
+        name="Action", description="Action to export", items=get_actions
+    )  # type: ignore
 
     pose_primary_axis: bpy.props.EnumProperty(
         name="Primary Axis",
+        description="Primary bone axis used for the export",
         items=AXIS_ITEMS,
         default="X",
     )  # type: ignore
 
     pose_secondary_axis: bpy.props.EnumProperty(
         name="Secondary Axis",
+        description="Secondary bone axis used for the export",
         items=AXIS_ITEMS,
         default="Y",
     )  # type: ignore

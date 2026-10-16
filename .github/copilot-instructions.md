@@ -4,7 +4,7 @@ Blender add-on (Python) for posing and animating FFXIV characters. Principles an
 
 ## Hard Rules
 - NEVER automate GitHub or git tasks unless the user explicitly asks for that specific action (commits, staging, branches, merges, pushes, issues, PRs, releases). Read-only git (`status`, `diff`, `log`) is fine. The user makes every commit.
-- Follow [docs/style guide.md](../docs/style%20guide.md) and cite rule IDs (R-x.y).
+- Follow [docs/wiki/Style-Guide.md](../docs/wiki/Style-Guide.md) and cite rule IDs (R-x.y).
 
 ## Build and Test
 - Python is `.venv\Scripts\python.exe` (Windows, PowerShell).

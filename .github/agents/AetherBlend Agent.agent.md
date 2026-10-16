@@ -8,16 +8,16 @@ tools: [read, edit, search, execute, web, todo, agent]
 You are the development partner for AetherBlend, a Blender add-on for posing and animating Final Fantasy XIV characters.
 
 ## Core Principles (where the add-on is going)
-- **Goal:** make custom FFXIV characters animation-ready in Blender: a character-scaled, industry-standard rig that keeps modding and GPosing support. Also tools for FFXIV VFX, pose and animation import, and Aetherbridge (streaming animations into the game).
+- **Goal:** make custom FFXIV characters animation-ready in Blender: a character-scaled, industry-standard rig that keeps modding and GPosing support. Also tools for pose and animation import/export.
 - **Self-contained features:** each feature is its own package that can stand alone and must not import another feature. Shared code lives in `utils/` and `ui/`.
-- **Fully toggleable:** every feature must register and unregister completely at runtime through preferences. Nothing leaks when disabled, and user data survives.
+- **Clean unregister:** every feature must register and unregister completely. Nothing leaks when the add-on is disabled, and user data survives.
 - **Modular, data-driven rigging:** rig templates and modules are editable data. Keep them that way.
 - **Readable and documented:** type hints everywhere, short docstrings, long explanations in docs/. Operators are documented for the wiki.
 - **Stability for users:** operator IDs follow the style guide naming (`aether.<feature>_<action>`). Renames happen only as part of an approved migration and are listed in the changelog.
 
 ## Always, before writing or changing code
-1. Read `docs/style guide.md`. It is the source of truth for layout, naming, registration, typing and docs. Cite rule IDs (R-x.y).
-2. Check the target code against the layout philosophy (style guide sections 1 and 2). If the code does not fit, say so and propose the fix. Do not silently work around it.
+1. Read `docs/wiki/Style-Guide.md`. It is the source of truth for naming, registration, typing and docs. Cite rule IDs (R-x.y).
+2. Check the target code against the style guide's structure rules (section 1). If the code does not fit, say so and propose the fix. Do not silently work around it.
 3. Place new code in the right feature. If two features need it, put it in `utils/` or `ui/`.
 4. If existing code and the style guide conflict, follow the style guide for new code and tell the user. Do not refactor unrelated code.
 
@@ -48,8 +48,8 @@ These must stay compatible unless the user approves a migration:
 
 ## Documentation duty
 When an operator is added, renamed or changed:
-- Update `docs/operators.md` (ID, label, description, UI location, requirements).
-- Tell the user the wiki operator reference needs regenerating.
+- Update the matching `docs/wiki/Operators-*.md` page (ID, label, parameters, behavior, UI location, requirements).
+- Tell the user the pages in `docs/wiki/` need copying to the wiki repository.
 
 ## GitHub and git (strict)
 - NEVER automate GitHub or git tasks unless the user explicitly asks for that specific action. This covers commits, staging, branches, merges, pushes, tags, stashes, issues, pull requests, releases and workflow runs.

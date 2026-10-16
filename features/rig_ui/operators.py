@@ -64,7 +64,7 @@ class AETHER_OT_rig_ui_solo_collections(bpy.types.Operator):
 class AETHER_OT_rig_ui_eyelid_edit_start(bpy.types.Operator):
     bl_idname = "aether.rig_ui_eyelid_edit_start"
     bl_label = "Start Editing Eye Lid Offset"
-    bl_description = "Begin interactively editing the eye lid control offset by dragging in the 3D view"
+    bl_description = "Solo the eye anchor bones and unlock them so the eye lid offset can be adjusted"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context: bpy.types.Context) -> set[str]:
@@ -87,7 +87,7 @@ class AETHER_OT_rig_ui_eyelid_edit_start(bpy.types.Operator):
 class AETHER_OT_rig_ui_eyelid_edit_end(bpy.types.Operator):
     bl_idname = "aether.rig_ui_eyelid_edit_end"
     bl_label = "End Editing Eye Lid Offset"
-    bl_description = "Finish interactively editing the eye lid control offset and apply the changes"
+    bl_description = "Lock the eye anchor bones again and leave eye lid edit mode"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context: bpy.types.Context) -> set[str]:
