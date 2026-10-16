@@ -4,13 +4,13 @@ group: Guides
 order: 10
 summary: Requirements and how to install the add-on.
 ---
-## Requirements 
-- Blender {{blender_min}} or newer
-- [Meddle](https://github.com/PassiveModding/Meddle) and [MeddleTools](https://github.com/PassiveModding/MeddleTools)
-- Rigify
-&nbsp;
+## Requirements
 
-**Note: Rigify ships with Blender but may need to be enabled manually**
+- Blender {{blender_min}} or newer.
+- Rigify for rig generation. It ships with Blender but may need to be enabled
+  manually.
+- Meddle Tools and FFGear are optional add-ons for their respective shader
+  imports. AetherBlend can import and rig models without them.
 
 ## Installation
 You can install AetherBlend with drag and drop, manually, or with Blender's repository feature:
@@ -31,7 +31,7 @@ The quickest way. Drag a button below into an open Blender window.
   <div class="drop-row recommended">
     <span class="tag">Recommended</span>
     <a class="drop-link subtle" href="{{meddle_link}}" draggable="true">Drag Meddle Tools into Blender</a>
-    <p>Needed to import characters with their materials and shaders. You can skip it if you only use AetherBlend's rigging tools.</p>
+    <p>Needed only for Meddle shader import. You can skip it for model import and rigging.</p>
   </div>
   <div class="drop-row optional">
     <span class="tag">Optional</span>

@@ -1,203 +1,416 @@
 """Clothing module: a skirt whose segments swing with the thighs and shins."""
 
-from typing import NamedTuple
-
 import bpy
 
-from ....definitions import RigModule
-from ....instructions import *
-from ....rigify.settings import BoneCollection, UI_Collections
-
-SKIRT_COLLECTION = "Skirt"
-AUTOMATION_PROPERTY = "skirt_automation"
-ROTATION_X_INDEX = 1
-ROTATION_Z_INDEX = 3
+from .... import definitions
+from .... import instructions as abi
+from ....rigify import settings
 
 
-class Side(NamedTuple):
-    """One body side: its naming, the middle segment roll and the signs that mirror the swing expressions."""
-
-    suffix: str
-    source: str
-    middle_roll: float
-    middle_sign: str
-    sideways_comparison: str
-
-
-LEFT = Side(".L", "l", middle_roll=-7, middle_sign="", sideways_comparison="<")
-RIGHT = Side(".R", "r", middle_roll=-173, middle_sign="-", sideways_comparison=">")
-SIDES = (LEFT, RIGHT)
-
-
-class Section(NamedTuple):
-    """A skirt segment: the control chain, the driven helper chain and the expressions that move the helper."""
-
-    control: str
-    driven: str
-    source: str
-    roll: float
-    first_forward_expression: str
-    first_sideways_expression: str
-    second_forward_expression: str
-
-
-def _sections(side: Side) -> tuple[Section, ...]:
-    sideways = side.sideways_comparison
-    sign = side.middle_sign
-    return (
-        Section(
-            control="Skirt_Front",
-            driven="MCH-Skirt_Front",
-            source="j_sk_f",
-            roll=0,
-            first_forward_expression="((RotX < 0) * (RotX * sk_auto) / (1 + (abs(RotX) - 0.8) * 0.1))",
-            first_sideways_expression=f"((RotZ {sideways} 0) * (RotZ * sk_auto) / (2 + (abs(RotZ) - 0.5) * 0.5))",
-            second_forward_expression="((RotX > 0) * (RotX * sk_auto) / (2 + (abs(RotX) - 0.5) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",  # noqa: E501
-        ),
-        Section(
-            control="Skirt_Side",
-            driven="MCH-Skirt_Middle",
-            source="j_sk_s",
-            roll=side.middle_roll,
-            first_forward_expression=f"((RotX < 0) * ({sign}RotX * sk_auto) / (3 + (abs(RotX) - 0.5) * 2))",
-            first_sideways_expression=f"((RotZ {sideways} 0) * ({sign}RotZ * sk_auto) / (1 + (abs(RotZ) - 0.1) * 1))",
-            second_forward_expression=f"((RotX > 0) * ({sign}RotX * sk_auto) / (3 + (abs(RotX) - 0.2) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",  # noqa: E501
-        ),
-        Section(
-            control="Skirt_Back",
-            driven="MCH-Skirt_Back",
-            source="j_sk_b",
-            roll=0,
-            first_forward_expression="((RotX < 0) * (RotX * sk_auto) / (5 + (abs(RotX) - 0.2) * 5)) + ((RotX > 0) * ((RotX * sk_auto) / (1 + (abs(RotX) + 0.1) * 0.2)))",  # noqa: E501
-            first_sideways_expression=f"((RotZ {sideways} 0) * (RotZ * sk_auto) / (2 + (abs(RotZ) - 0.1) * 3))",
-            second_forward_expression="((RotX > 0) * (RotX * sk_auto) / (1 + (abs(RotX) + 0.5) * 0.3)) * (abs(RotXThreshold) / (0.5 + abs(RotXThreshold))) if RotXThreshold > 0 else RotX * 0",  # noqa: E501
-        ),
-    )
-
-
-def _chain(name: str) -> list[str]:
-    return [name, f"{name}.001", f"{name}.002"]
-
-
-class Module(RigModule):
+class Module(definitions.RigModule):
     name = "XIV-Default"
     requires = [
-        f"{section.source}_{part}_{side.source}"
-        for side in SIDES
-        for section in _sections(side)
-        for part in ("a", "b", "c")
+        "j_sk_f_a_l",
+        "j_sk_f_b_l",
+        "j_sk_f_c_l",
+        "j_sk_s_a_l",
+        "j_sk_s_b_l",
+        "j_sk_s_c_l",
+        "j_sk_b_a_l",
+        "j_sk_b_b_l",
+        "j_sk_b_c_l",
+        "j_sk_f_a_r",
+        "j_sk_f_b_r",
+        "j_sk_f_c_r",
+        "j_sk_s_a_r",
+        "j_sk_s_b_r",
+        "j_sk_s_c_r",
+        "j_sk_b_a_r",
+        "j_sk_b_b_r",
+        "j_sk_b_c_r",
     ]
-    ui_collections = UI_Collections(
+    ui_collections = settings.UI_Collections(
         [
-            BoneCollection(name=SKIRT_COLLECTION, ui=True, color_set="Head", row_index=1, title="Skirt", visible=False),
+            settings.BoneCollection(
+                name="Skirt", ui=True, color_set="Head", row_index=1, title="Skirt", visible=False
+            ),
         ]
     )
     ui_flags = ("Skirt Automation",)
 
+    # ------------------------------------------------------------------------
+
     def meta_edit(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            suffix = side.suffix
-            extend(
+        for side in definitions.SIDES:
+            # Leg tracking helpers
+            abi.extend(
                 rig,
-                f"MCH-thigh_driv_tgt{suffix}",
-                f"thigh{suffix}",
+                f"MCH-thigh_driv_tgt{side.suffix}",
+                f"thigh{side.suffix}",
                 start_point="head",
                 size_factor=0.3,
                 parent="Spine.001",
             )
-            extend(
+            abi.extend(
                 rig,
-                f"MCH-shin_driv_tgt{suffix}",
-                f"shin{suffix}",
+                f"MCH-shin_driv_tgt{side.suffix}",
+                f"shin{side.suffix}",
                 start_point="head",
                 size_factor=0.3,
-                parent=f"thigh{suffix}",
+                parent=f"thigh{side.suffix}",
             )
 
-            for section in _sections(side):
-                upper, middle, lower = (f"{section.source}_{part}_{side.source}" for part in ("a", "b", "c"))
+            # Front skirt controls and automated helpers
+            abi.connect(
+                rig,
+                f"Skirt_Front{side.suffix}",
+                f"j_sk_f_a_{side.source}",
+                f"j_sk_f_b_{side.source}",
+                parent="Spine.001",
+            )
+            abi.connect(
+                rig,
+                f"Skirt_Front{side.suffix}.001",
+                f"j_sk_f_b_{side.source}",
+                f"j_sk_f_c_{side.source}",
+                parent=f"Skirt_Front{side.suffix}",
+                connected=True,
+            )
+            abi.extend(
+                rig,
+                f"Skirt_Front{side.suffix}.002",
+                f"j_sk_f_c_{side.source}",
+                start_point="head",
+                parent=f"Skirt_Front{side.suffix}.001",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"MCH-Skirt_Front{side.suffix}",
+                f"j_sk_f_a_{side.source}",
+                f"j_sk_f_b_{side.source}",
+                parent="Spine.001",
+                roll=0,
+            )
+            abi.connect(
+                rig,
+                f"MCH-Skirt_Front{side.suffix}.001",
+                f"j_sk_f_b_{side.source}",
+                f"j_sk_f_c_{side.source}",
+                parent=f"MCH-Skirt_Front{side.suffix}",
+                connected=True,
+                roll=0,
+            )
+            abi.extend(
+                rig,
+                f"MCH-Skirt_Front{side.suffix}.002",
+                f"j_sk_f_c_{side.source}",
+                start_point="head",
+                parent=f"MCH-Skirt_Front{side.suffix}.001",
+                connected=True,
+                roll=0,
+            )
 
-                control = f"{section.control}{suffix}"
-                connect(rig, control, upper, middle, parent="Spine.001")
-                connect(rig, f"{control}.001", middle, lower, parent=control, connected=True)
-                extend(rig, f"{control}.002", lower, start_point="head", parent=f"{control}.001", connected=True)
+            # Side skirt controls and automated helpers
+            abi.connect(
+                rig,
+                f"Skirt_Side{side.suffix}",
+                f"j_sk_s_a_{side.source}",
+                f"j_sk_s_b_{side.source}",
+                parent="Spine.001",
+            )
+            abi.connect(
+                rig,
+                f"Skirt_Side{side.suffix}.001",
+                f"j_sk_s_b_{side.source}",
+                f"j_sk_s_c_{side.source}",
+                parent=f"Skirt_Side{side.suffix}",
+                connected=True,
+            )
+            abi.extend(
+                rig,
+                f"Skirt_Side{side.suffix}.002",
+                f"j_sk_s_c_{side.source}",
+                start_point="head",
+                parent=f"Skirt_Side{side.suffix}.001",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"MCH-Skirt_Middle{side.suffix}",
+                f"j_sk_s_a_{side.source}",
+                f"j_sk_s_b_{side.source}",
+                parent="Spine.001",
+                roll=-7 if side is definitions.LEFT else -173,
+            )
+            abi.connect(
+                rig,
+                f"MCH-Skirt_Middle{side.suffix}.001",
+                f"j_sk_s_b_{side.source}",
+                f"j_sk_s_c_{side.source}",
+                parent=f"MCH-Skirt_Middle{side.suffix}",
+                connected=True,
+                roll=-7 if side is definitions.LEFT else -173,
+            )
+            abi.extend(
+                rig,
+                f"MCH-Skirt_Middle{side.suffix}.002",
+                f"j_sk_s_c_{side.source}",
+                start_point="head",
+                parent=f"MCH-Skirt_Middle{side.suffix}.001",
+                connected=True,
+                roll=-7 if side is definitions.LEFT else -173,
+            )
 
-                driven = f"{section.driven}{suffix}"
-                connect(rig, driven, upper, middle, parent="Spine.001", roll=section.roll)
-                connect(rig, f"{driven}.001", middle, lower, parent=driven, connected=True, roll=section.roll)
-                extend(
-                    rig,
-                    f"{driven}.002",
-                    lower,
-                    start_point="head",
-                    parent=f"{driven}.001",
-                    connected=True,
-                    roll=section.roll,
-                )
+            # Back skirt controls and automated helpers
+            abi.connect(
+                rig,
+                f"Skirt_Back{side.suffix}",
+                f"j_sk_b_a_{side.source}",
+                f"j_sk_b_b_{side.source}",
+                parent="Spine.001",
+            )
+            abi.connect(
+                rig,
+                f"Skirt_Back{side.suffix}.001",
+                f"j_sk_b_b_{side.source}",
+                f"j_sk_b_c_{side.source}",
+                parent=f"Skirt_Back{side.suffix}",
+                connected=True,
+            )
+            abi.extend(
+                rig,
+                f"Skirt_Back{side.suffix}.002",
+                f"j_sk_b_c_{side.source}",
+                start_point="head",
+                parent=f"Skirt_Back{side.suffix}.001",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"MCH-Skirt_Back{side.suffix}",
+                f"j_sk_b_a_{side.source}",
+                f"j_sk_b_b_{side.source}",
+                parent="Spine.001",
+                roll=0,
+            )
+            abi.connect(
+                rig,
+                f"MCH-Skirt_Back{side.suffix}.001",
+                f"j_sk_b_b_{side.source}",
+                f"j_sk_b_c_{side.source}",
+                parent=f"MCH-Skirt_Back{side.suffix}",
+                connected=True,
+                roll=0,
+            )
+            abi.extend(
+                rig,
+                f"MCH-Skirt_Back{side.suffix}.002",
+                f"j_sk_b_c_{side.source}",
+                start_point="head",
+                parent=f"MCH-Skirt_Back{side.suffix}.001",
+                connected=True,
+                roll=0,
+            )
+
+    # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            suffix = side.suffix
-            rigify.basic_raw_copy(rig, f"MCH-thigh_driv_tgt{suffix}")
-            rigify.basic_raw_copy(rig, f"MCH-shin_driv_tgt{suffix}")
+        for side in definitions.SIDES:
+            # Leg tracking helpers
+            abi.rigify.basic_raw_copy(rig, f"MCH-thigh_driv_tgt{side.suffix}")
+            abi.rigify.basic_raw_copy(rig, f"MCH-shin_driv_tgt{side.suffix}")
 
-            for section in _sections(side):
-                control_bones = _chain(f"{section.control}{suffix}")
-                rigify.basic_copy_chain(rig, control_bones[0])
-                collection(rig, control_bones, SKIRT_COLLECTION)
+            # Front skirt controls and mappings
+            abi.rigify.basic_copy_chain(rig, f"Skirt_Front{side.suffix}")
+            abi.collection(
+                rig,
+                [
+                    f"Skirt_Front{side.suffix}",
+                    f"Skirt_Front{side.suffix}.001",
+                    f"Skirt_Front{side.suffix}.002",
+                ],
+                "Skirt",
+            )
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Front{side.suffix}")
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Front{side.suffix}.001")
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Front{side.suffix}.002")
+            abi.link(rig, f"j_sk_f_a_{side.source}", f"DEF-Skirt_Front{side.suffix}")
+            abi.link(rig, f"j_sk_f_b_{side.source}", f"DEF-Skirt_Front{side.suffix}.001")
+            abi.link(rig, f"j_sk_f_c_{side.source}", f"DEF-Skirt_Front{side.suffix}.002")
 
-                for driven_bone in _chain(f"{section.driven}{suffix}"):
-                    rigify.basic_raw_copy(rig, driven_bone)
+            # Side skirt controls and mappings
+            abi.rigify.basic_copy_chain(rig, f"Skirt_Side{side.suffix}")
+            abi.collection(
+                rig,
+                [
+                    f"Skirt_Side{side.suffix}",
+                    f"Skirt_Side{side.suffix}.001",
+                    f"Skirt_Side{side.suffix}.002",
+                ],
+                "Skirt",
+            )
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Middle{side.suffix}")
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Middle{side.suffix}.001")
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Middle{side.suffix}.002")
+            abi.link(rig, f"j_sk_s_a_{side.source}", f"DEF-Skirt_Side{side.suffix}")
+            abi.link(rig, f"j_sk_s_b_{side.source}", f"DEF-Skirt_Side{side.suffix}.001")
+            abi.link(rig, f"j_sk_s_c_{side.source}", f"DEF-Skirt_Side{side.suffix}.002")
 
-                for part, control_bone in zip(("a", "b", "c"), control_bones):
-                    link(rig, f"{section.source}_{part}_{side.source}", f"DEF-{control_bone}")
+            # Back skirt controls and mappings
+            abi.rigify.basic_copy_chain(rig, f"Skirt_Back{side.suffix}")
+            abi.collection(
+                rig,
+                [
+                    f"Skirt_Back{side.suffix}",
+                    f"Skirt_Back{side.suffix}.001",
+                    f"Skirt_Back{side.suffix}.002",
+                ],
+                "Skirt",
+            )
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Back{side.suffix}")
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Back{side.suffix}.001")
+            abi.rigify.basic_raw_copy(rig, f"MCH-Skirt_Back{side.suffix}.002")
+            abi.link(rig, f"j_sk_b_a_{side.source}", f"DEF-Skirt_Back{side.suffix}")
+            abi.link(rig, f"j_sk_b_b_{side.source}", f"DEF-Skirt_Back{side.suffix}.001")
+            abi.link(rig, f"j_sk_b_c_{side.source}", f"DEF-Skirt_Back{side.suffix}.002")
+
+    # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            for section in _sections(side):
-                parent(rig, f"{section.control}{side.suffix}", f"{section.driven}{side.suffix}")
+        # Skirt hierarchy
+        for side in definitions.SIDES:
+            abi.parent(rig, f"Skirt_Front{side.suffix}", f"MCH-Skirt_Front{side.suffix}")
+            abi.parent(rig, f"Skirt_Side{side.suffix}", f"MCH-Skirt_Middle{side.suffix}")
+            abi.parent(rig, f"Skirt_Back{side.suffix}", f"MCH-Skirt_Back{side.suffix}")
+
+    # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
-        armature_prop(rig, AUTOMATION_PROPERTY, 1.0, minimum=0.0, maximum=1.0)
-        automation = PropertyVariable(AUTOMATION_PROPERTY)
+        # Automation control
+        abi.armature_prop(rig, "skirt_automation", 1.0, minimum=0.0, maximum=1.0)
+        automation = abi.PropertyVariable("skirt_automation")
 
-        for side in SIDES:
-            suffix = side.suffix
-            thigh_target = f"MCH-thigh_driv_tgt{suffix}"
-            shin_target = f"MCH-shin_driv_tgt{suffix}"
-            collection(rig, [thigh_target, shin_target], "MCH")
-            constraints.damped_track(rig, thigh_target, f"ORG-shin{suffix}")
-            constraints.damped_track(rig, shin_target, f"ORG-foot{suffix}")
+        for side in definitions.SIDES:
+            sideways_comparison = "<" if side is definitions.LEFT else ">"
+            middle_sign = "" if side is definitions.LEFT else "-"
 
-            thigh_forward = TransformVariable(thigh_target, "ROT_X")
-            thigh_sideways = TransformVariable(thigh_target, "ROT_Z")
-            shin_forward = TransformVariable(shin_target, "ROT_X")
+            # Leg tracking and driver variables
+            abi.collection(
+                rig,
+                [f"MCH-thigh_driv_tgt{side.suffix}", f"MCH-shin_driv_tgt{side.suffix}"],
+                "MCH",
+            )
+            abi.constraints.damped_track(rig, f"MCH-thigh_driv_tgt{side.suffix}", f"ORG-shin{side.suffix}")
+            abi.constraints.damped_track(rig, f"MCH-shin_driv_tgt{side.suffix}", f"ORG-foot{side.suffix}")
+            thigh_forward = abi.TransformVariable(f"MCH-thigh_driv_tgt{side.suffix}", "ROT_X")
+            thigh_sideways = abi.TransformVariable(f"MCH-thigh_driv_tgt{side.suffix}", "ROT_Z")
+            shin_forward = abi.TransformVariable(f"MCH-shin_driv_tgt{side.suffix}", "ROT_X")
 
-            for section in _sections(side):
-                driven_bones = _chain(f"{section.driven}{suffix}")
-                collection(rig, driven_bones, "MCH")
+            # Front skirt swing
+            abi.collection(
+                rig,
+                [
+                    f"MCH-Skirt_Front{side.suffix}",
+                    f"MCH-Skirt_Front{side.suffix}.001",
+                    f"MCH-Skirt_Front{side.suffix}.002",
+                ],
+                "MCH",
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Front{side.suffix}",
+                "rotation_quaternion",
+                index=1,
+                expression="((RotX < 0) * (RotX * sk_auto) / (1 + (abs(RotX) - 0.8) * 0.1))",
+                variables={"RotX": thigh_forward, "sk_auto": automation},
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Front{side.suffix}",
+                "rotation_quaternion",
+                index=3,
+                expression=f"((RotZ {sideways_comparison} 0) * (RotZ * sk_auto) / (2 + (abs(RotZ) - 0.5) * 0.5))",
+                variables={"RotZ": thigh_sideways, "sk_auto": automation},
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Front{side.suffix}.001",
+                "rotation_quaternion",
+                index=1,
+                expression="((RotX > 0) * (RotX * sk_auto) / (2 + (abs(RotX) - 0.5) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",  # noqa: E501
+                variables={"RotX": shin_forward, "RotXThreshold": thigh_forward, "sk_auto": automation},
+            )
 
-                driver(
-                    rig,
-                    driven_bones[0],
-                    "rotation_quaternion",
-                    index=ROTATION_X_INDEX,
-                    expression=section.first_forward_expression,
-                    variables={"RotX": thigh_forward, "sk_auto": automation},
-                )
-                driver(
-                    rig,
-                    driven_bones[0],
-                    "rotation_quaternion",
-                    index=ROTATION_Z_INDEX,
-                    expression=section.first_sideways_expression,
-                    variables={"RotZ": thigh_sideways, "sk_auto": automation},
-                )
-                driver(
-                    rig,
-                    driven_bones[1],
-                    "rotation_quaternion",
-                    index=ROTATION_X_INDEX,
-                    expression=section.second_forward_expression,
-                    variables={"RotX": shin_forward, "RotXThreshold": thigh_forward, "sk_auto": automation},
-                )
+            # Side skirt swing
+            abi.collection(
+                rig,
+                [
+                    f"MCH-Skirt_Middle{side.suffix}",
+                    f"MCH-Skirt_Middle{side.suffix}.001",
+                    f"MCH-Skirt_Middle{side.suffix}.002",
+                ],
+                "MCH",
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Middle{side.suffix}",
+                "rotation_quaternion",
+                index=1,
+                expression=f"((RotX < 0) * ({middle_sign}RotX * sk_auto) / (3 + (abs(RotX) - 0.5) * 2))",
+                variables={"RotX": thigh_forward, "sk_auto": automation},
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Middle{side.suffix}",
+                "rotation_quaternion",
+                index=3,
+                expression=(
+                    f"((RotZ {sideways_comparison} 0) * ({middle_sign}RotZ * sk_auto) "
+                    "/ (1 + (abs(RotZ) - 0.1) * 1))"
+                ),
+                variables={"RotZ": thigh_sideways, "sk_auto": automation},
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Middle{side.suffix}.001",
+                "rotation_quaternion",
+                index=1,
+                expression=f"((RotX > 0) * ({middle_sign}RotX * sk_auto) / (3 + (abs(RotX) - 0.2) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",  # noqa: E501
+                variables={"RotX": shin_forward, "RotXThreshold": thigh_forward, "sk_auto": automation},
+            )
+
+            # Back skirt swing
+            abi.collection(
+                rig,
+                [
+                    f"MCH-Skirt_Back{side.suffix}",
+                    f"MCH-Skirt_Back{side.suffix}.001",
+                    f"MCH-Skirt_Back{side.suffix}.002",
+                ],
+                "MCH",
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Back{side.suffix}",
+                "rotation_quaternion",
+                index=1,
+                expression="((RotX < 0) * (RotX * sk_auto) / (5 + (abs(RotX) - 0.2) * 5)) + ((RotX > 0) * ((RotX * sk_auto) / (1 + (abs(RotX) + 0.1) * 0.2)))",  # noqa: E501
+                variables={"RotX": thigh_forward, "sk_auto": automation},
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Back{side.suffix}",
+                "rotation_quaternion",
+                index=3,
+                expression=f"((RotZ {sideways_comparison} 0) * (RotZ * sk_auto) / (2 + (abs(RotZ) - 0.1) * 3))",
+                variables={"RotZ": thigh_sideways, "sk_auto": automation},
+            )
+            abi.driver(
+                rig,
+                f"MCH-Skirt_Back{side.suffix}.001",
+                "rotation_quaternion",
+                index=1,
+                expression="((RotX > 0) * (RotX * sk_auto) / (1 + (abs(RotX) + 0.5) * 0.3)) * (abs(RotXThreshold) / (0.5 + abs(RotXThreshold))) if RotXThreshold > 0 else RotX * 0",  # noqa: E501
+                variables={"RotX": shin_forward, "RotXThreshold": thigh_forward, "sk_auto": automation},
+            )

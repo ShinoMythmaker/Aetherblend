@@ -1,157 +1,212 @@
 """Leg module: IK/FK legs with knee and heel helpers."""
 
-from typing import NamedTuple
-
 import bpy
 
-from ....definitions import RigModule
-from ....instructions import *
+from .... import definitions
+from .... import instructions as abi
 from ....rigify.settings import BoneCollection, UI_Collections
 
 
-class Side(NamedTuple):
-    """Naming of one body side."""
+class Module(definitions.RigModule):
+    name = "XIV-Default"
+    requires = [
+        "j_asi_a_l",
+        "j_asi_b_l",
+        "j_asi_c_l",
+        "j_asi_d_l",
+        "j_asi_e_l",
+        "j_asi_a_r",
+        "j_asi_b_r",
+        "j_asi_c_r",
+        "j_asi_d_r",
+        "j_asi_e_r",
+    ]
 
-    suffix: str
-    source: str
-    name: str
-
-
-LEFT = Side(".L", "l", "Left")
-RIGHT = Side(".R", "r", "Right")
-SIDES = (LEFT, RIGHT)
-
-
-def _ui_collections() -> UI_Collections:
-    collections: list[BoneCollection] = []
-    for side in SIDES:
-        collections += [
+    ui_collections = UI_Collections(
+        [
             BoneCollection(
-                name=f"Leg{side.suffix} (IK)",
+                name="Leg.L (IK)",
                 ui=True,
-                color_set=f"IK_{side.name}",
+                color_set="IK_Left",
                 row_index=1,
-                title=f"Leg IK{side.suffix}",
+                title="Leg IK.L",
             ),
             BoneCollection(
-                name=f"Leg{side.suffix} (FK)",
+                name="Leg.L (FK)",
                 ui=True,
-                color_set=f"FK_{side.name}",
+                color_set="FK_Left",
                 row_index=2,
-                title=f"Leg FK{side.suffix}",
+                title="Leg FK.L",
                 visible=False,
             ),
             BoneCollection(
-                name=f"Leg{side.suffix} (Tweak)",
+                name="Leg.L (Tweak)",
                 ui=True,
-                color_set=f"Tweak_{side.name}",
+                color_set="Tweak_Left",
                 row_index=3,
-                title=f"Tweak{side.suffix}",
+                title="Tweak.L",
+                visible=False,
+            ),
+            BoneCollection(
+                name="Leg.R (IK)",
+                ui=True,
+                color_set="IK_Right",
+                row_index=1,
+                title="Leg IK.R",
+            ),
+            BoneCollection(
+                name="Leg.R (FK)",
+                ui=True,
+                color_set="FK_Right",
+                row_index=2,
+                title="Leg FK.R",
+                visible=False,
+            ),
+            BoneCollection(
+                name="Leg.R (Tweak)",
+                ui=True,
+                color_set="Tweak_Right",
+                row_index=3,
+                title="Tweak.R",
                 visible=False,
             ),
         ]
-    return UI_Collections(collections)
+    )
 
-
-class Module(RigModule):
-    name = "XIV-Default"
-    requires = tuple(f"j_asi_{part}_{side.source}" for side in SIDES for part in "abcde")
-    ui_collections = _ui_collections()
+    # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            suffix = side.suffix
-            source_thigh = f"j_asi_a_{side.source}"
-            source_knee = f"j_asi_b_{side.source}"
-            source_shin = f"j_asi_c_{side.source}"
-            source_ankle = f"j_asi_d_{side.source}"
-            source_toe = f"j_asi_e_{side.source}"
-
-            connect(
+        for side in definitions.SIDES:
+            # Leg chain
+            abi.connect(
                 rig,
-                f"thigh{suffix}",
-                source_thigh,
-                source_knee,
+                f"thigh{side.suffix}",
+                f"j_asi_a_{side.source}",
+                f"j_asi_b_{side.source}",
                 end_point="tail",
                 parent=["Spine.001", "j_kosi"],
                 roll=-90,
             )
-            connect(
+            abi.connect(
                 rig,
-                f"shin{suffix}",
-                source_knee,
-                source_ankle,
+                f"shin{side.suffix}",
+                f"j_asi_b_{side.source}",
+                f"j_asi_d_{side.source}",
                 start_point="tail",
-                parent=f"thigh{suffix}",
+                parent=f"thigh{side.suffix}",
                 connected=True,
                 roll=-90,
             )
-            # The left foot has never had a roll; kept so the rig stays identical.
-            foot_roll = -90 if side is RIGHT else 0
-            connect(
-                rig, f"foot{suffix}", source_ankle, source_toe, parent=f"shin{suffix}", connected=True, roll=foot_roll
-            )
-            extend(rig, f"toe{suffix}", source_toe, start_point="head", parent=f"foot{suffix}", connected=True)
-
-            parallel(
+            # The left foot has never had a roll; keep it to preserve the existing rig.
+            abi.connect(
                 rig,
-                f"heel_pivot{suffix}.helper",
-                f"toe{suffix}",
-                f"shin{suffix}",
+                f"foot{side.suffix}",
+                f"j_asi_d_{side.source}",
+                f"j_asi_e_{side.source}",
+                parent=f"shin{side.suffix}",
+                connected=True,
+                roll=0 if side is definitions.LEFT else -90,
+            )
+            abi.extend(
+                rig,
+                f"toe{side.suffix}",
+                f"j_asi_e_{side.source}",
+                start_point="head",
+                parent=f"foot{side.suffix}",
+                connected=True,
+            )
+
+            # Heel pivot
+            abi.parallel(
+                rig,
+                f"heel_pivot{side.suffix}.helper",
+                f"toe{side.suffix}",
+                f"shin{side.suffix}",
                 start_point="head",
                 end_point="tail",
                 coordinate="Y",
-                parent=f"shin{suffix}",
+                parent=f"shin{side.suffix}",
             )
-            extend(rig, f"heel_pivot{suffix}", f"heel_pivot{suffix}.helper", parent=f"foot{suffix}")
+            abi.extend(rig, f"heel_pivot{side.suffix}", f"heel_pivot{side.suffix}.helper", parent=f"foot{side.suffix}")
 
-            extend(rig, f"MCH-knee{suffix}", source_knee, start_point="head", size_factor=1.5, parent="spine.001")
-            extend(rig, f"knee{suffix}", source_knee, start_point="head", size_factor=1.5, parent="spine.001")
-            extend(
-                rig, f"MCH-knee_target{suffix}", source_shin, start_point="head", size_factor=0.2, parent="spine.001"
+            # Knee helpers
+            abi.extend(
+                rig,
+                f"MCH-knee{side.suffix}",
+                f"j_asi_b_{side.source}",
+                start_point="head",
+                size_factor=1.5,
+                parent="spine.001",
             )
+            abi.extend(
+                rig,
+                f"knee{side.suffix}",
+                f"j_asi_b_{side.source}",
+                start_point="head",
+                size_factor=1.5,
+                parent="spine.001",
+            )
+            abi.extend(
+                rig,
+                f"MCH-knee_target{side.suffix}",
+                f"j_asi_c_{side.source}",
+                start_point="head",
+                size_factor=0.2,
+                parent="spine.001",
+            )
+
+    # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            suffix = side.suffix
-
-            rigify.limbs_leg(
-                rig, f"thigh{suffix}", fk_collection=f"Leg{suffix} (FK)", tweak_collection=f"Leg{suffix} (Tweak)"
+        for side in definitions.SIDES:
+            # Leg and knee rig types
+            abi.rigify.limbs_leg(
+                rig,
+                f"thigh{side.suffix}",
+                fk_collection=f"Leg{side.suffix} (FK)",
+                tweak_collection=f"Leg{side.suffix} (Tweak)",
             )
-            rigify.basic_raw_copy(rig, f"MCH-knee{suffix}")
-            rigify.basic_super_copy(rig, f"knee{suffix}")
-            rigify.basic_raw_copy(rig, f"MCH-knee_target{suffix}")
+            abi.rigify.basic_raw_copy(rig, f"MCH-knee{side.suffix}")
+            abi.rigify.basic_super_copy(rig, f"knee{side.suffix}")
+            abi.rigify.basic_raw_copy(rig, f"MCH-knee_target{side.suffix}")
 
-            collection(
+            # Control and mechanism collections
+            abi.collection(
                 rig,
                 [
-                    f"thigh{suffix}",
-                    f"shin{suffix}",
-                    f"foot{suffix}",
-                    f"toe{suffix}",
-                    f"heel_pivot{suffix}.helper",
-                    f"heel_pivot{suffix}",
+                    f"thigh{side.suffix}",
+                    f"shin{side.suffix}",
+                    f"foot{side.suffix}",
+                    f"toe{side.suffix}",
+                    f"heel_pivot{side.suffix}.helper",
+                    f"heel_pivot{side.suffix}",
                 ],
-                f"Leg{suffix} (IK)",
+                f"Leg{side.suffix} (IK)",
             )
-            collection(rig, [f"MCH-knee{suffix}", f"knee{suffix}", f"MCH-knee_target{suffix}"], "MCH")
+            abi.collection(
+                rig, [f"MCH-knee{side.suffix}", f"knee{side.suffix}", f"MCH-knee_target{side.suffix}"], "MCH"
+            )
 
-            link(rig, f"j_asi_a_{side.source}", f"DEF-thigh{suffix}.001")
-            link(rig, f"j_asi_c_{side.source}", f"DEF-shin{suffix}.001")
-            link(rig, f"j_asi_d_{side.source}", f"DEF-foot{suffix}")
-            link(rig, f"j_asi_e_{side.source}", f"DEF-toe{suffix}")
-            link(rig, f"j_asi_b_{side.source}", f"DEF-knee{suffix}")
+            # Source-to-deform mappings
+            abi.link(rig, f"j_asi_a_{side.source}", f"DEF-thigh{side.suffix}.001")
+            abi.link(rig, f"j_asi_c_{side.source}", f"DEF-shin{side.suffix}.001")
+            abi.link(rig, f"j_asi_d_{side.source}", f"DEF-foot{side.suffix}")
+            abi.link(rig, f"j_asi_e_{side.source}", f"DEF-toe{side.suffix}")
+            abi.link(rig, f"j_asi_b_{side.source}", f"DEF-knee{side.suffix}")
+
+    # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
-        # Rigify's leg rejects its own bones as parents, so these are reparented after generation.
-        for side in SIDES:
-            suffix = side.suffix
-            parent(rig, f"MCH-knee{suffix}", f"DEF-thigh{suffix}.001")
-            parent(rig, f"knee{suffix}", f"MCH-knee{suffix}")
-            parent(rig, f"MCH-knee_target{suffix}", f"DEF-shin{suffix}")
+        for side in definitions.SIDES:
+            # Knee hierarchy
+            abi.parent(rig, f"MCH-knee{side.suffix}", f"DEF-thigh{side.suffix}.001")
+            abi.parent(rig, f"knee{side.suffix}", f"MCH-knee{side.suffix}")
+            abi.parent(rig, f"MCH-knee_target{side.suffix}", f"DEF-shin{side.suffix}")
+
+    # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            suffix = side.suffix
-            constraints.damped_track(rig, f"MCH-knee{suffix}", target=f"MCH-knee_target{suffix}")
-            prop(rig, f"thigh_parent{suffix}", "IK_Stretch", 0)
+        for side in definitions.SIDES:
+            # Knee tracking and leg stretch
+            abi.constraints.damped_track(rig, f"MCH-knee{side.suffix}", target=f"MCH-knee_target{side.suffix}")
+            abi.prop(rig, f"thigh_parent{side.suffix}", "IK_Stretch", 0)

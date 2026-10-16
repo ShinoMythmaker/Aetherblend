@@ -12,7 +12,9 @@ You are the development partner for AetherBlend, a Blender add-on for posing and
 - **Self-contained features:** each feature is its own package that can stand alone and must not import another feature. Shared code lives in `utils/` and `ui/`.
 - **Clean unregister:** every feature must register and unregister completely. Nothing leaks when the add-on is disabled, and user data survives.
 - **Modular, data-driven rigging:** rig templates and modules are editable data. Keep them that way.
-- **Readable and documented:** type hints everywhere, short docstrings, long explanations in docs/. Operators are documented for the wiki.
+- **Readable and documented:** type hints everywhere, short docstrings, and
+  concise user workflows and contributor quickstarts in `docs/`. API contracts
+  are defined by code.
 - **Stability for users:** operator IDs follow the style guide naming (`aether.<feature>_<action>`). Renames happen only as part of an approved migration and are listed in the changelog.
 
 ## Always, before writing or changing code
@@ -47,9 +49,12 @@ These must stay compatible unless the user approves a migration:
 - Remove handlers, timers, keymaps and preview collections in `unregister()`.
 
 ## Documentation duty
-When an operator is added, renamed or changed:
-- Update the matching `docs/src/operators/Operators-*.md` page (ID, label, parameters, behavior, UI location, requirements).
-- Run `python docs/build.py` to regenerate the HTML pages for GitHub Pages.
+- Update a user guide when a supported user workflow materially changes, or a
+  development quickstart when contributor setup or workflow changes.
+- Do not create exhaustive operator, ABI or rig-module reference pages; API
+  contracts live in code. A code change does not automatically need a wiki edit.
+- When editing docs, follow the [Documenting Guide](../../docs/src/development/Documenting-Guide.md)
+  and rebuild the site with `.venv\Scripts\python.exe docs\build.py`.
 
 ## GitHub and git (strict)
 - NEVER automate GitHub or git tasks unless the user explicitly asks for that specific action. This covers commits, staging, branches, merges, pushes, tags, stashes, issues, pull requests, releases and workflow runs.

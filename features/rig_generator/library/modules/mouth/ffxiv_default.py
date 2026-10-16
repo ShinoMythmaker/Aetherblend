@@ -1,163 +1,286 @@
 """Mouth module: jaw, lips, teeth and tongue."""
 
-from typing import NamedTuple
-
 import bpy
 
-from ....definitions import RigModule
-from ....instructions import *
-from ....rigify.settings import BoneCollection, UI_Collections
-
-PRIMARY = "Face (Primary)"
-SECONDARY = "Face (Secondary)"
-MISC = "Face (Misc)"
-SCALE_ALL = [True, True, True, True]
+from .... import definitions
+from .... import instructions as abi
+from ....rigify import settings
 
 
-class Side(NamedTuple):
-    """Naming of one face side."""
-
-    suffix: str
-    source: str
-
-
-RIGHT = Side(".R", "r")
-LEFT = Side(".L", "l")
-
-# Main lip chain per row: the chain's first bone starts at the mouth center, then the source bones follow.
-ROWS = (
-    ("T", "Mouth.Center", ("ulip_02", "umlip_02", "uslip")),
-    ("B", "Mouth.Center.001", ("dlip_02", "dmlip_02", "dslip")),
-)
-# Secondary lips per row: the source bones of the first and the second bone, each running from the first to the second name.  # noqa: E501
-SECONDARY_LIPS = (
-    ("T", ("ulip_01", "umlip_01"), ("umlip_01", "uslip")),
-    ("B", ("dlip_01", "dmlip_01"), ("dmlip_01", "dslip")),
-)
-
-
-class Module(RigModule):
+class Module(definitions.RigModule):
     name = "XIV-Automated"
-    ui_collections = UI_Collections(
+    ui_collections = settings.UI_Collections(
         [
-            BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=1, title=PRIMARY, visible=True),
-            BoneCollection(
-                name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=1, title=SECONDARY, visible=False
+            settings.BoneCollection(
+                name="Face (Primary)",
+                ui=True,
+                color_set="Face_Primary",
+                row_index=1,
+                title="Face (Primary)",
+                visible=True,
             ),
-            BoneCollection(name=MISC, ui=True, color_set="Face_Secondary", row_index=2, title=MISC, visible=False),
+            settings.BoneCollection(
+                name="Face (Secondary)",
+                ui=True,
+                color_set="Face_Secondary",
+                row_index=1,
+                title="Face (Secondary)",
+                visible=False,
+            ),
+            settings.BoneCollection(
+                name="Face (Misc)",
+                ui=True,
+                color_set="Face_Secondary",
+                row_index=2,
+                title="Face (Misc)",
+                visible=False,
+            ),
         ]
     )
 
+    # ------------------------------------------------------------------------
+
     def meta_edit(self, rig: bpy.types.Object) -> None:
-        center(rig, "jaw_master_ref", ["j_f_dlip_01_r", "j_f_dlip_01_l"], axis="Y", parent="Head")
-        connect(rig, "jaw_master", "j_f_ago", "jaw_master_ref", parent="Head")
+        # Jaw chain
+        abi.center(rig, "jaw_master_ref", ["j_f_dlip_01_r", "j_f_dlip_01_l"], axis="Y", parent="Head")
+        abi.connect(rig, "jaw_master", "j_f_ago", "jaw_master_ref", parent="Head")
 
-        center(rig, "Mouth.Center", ["j_f_ulip_02_r", "j_f_ulip_02_l"], axis="Z", parent="Head")
-        center(rig, "Mouth.Center.001", ["j_f_dlip_02_r", "j_f_dlip_02_l"], axis="Z", parent="Head")
+        # Lip centers
+        abi.center(rig, "Mouth.Center", ["j_f_ulip_02_r", "j_f_ulip_02_l"], axis="Z", parent="Head")
+        abi.center(rig, "Mouth.Center.001", ["j_f_dlip_02_r", "j_f_dlip_02_l"], axis="Z", parent="Head")
 
-        for side in (RIGHT, LEFT):
-            self._lips_edit(rig, side)
+        # Main and secondary lip chains
+        for side in definitions.SIDES:
+            abi.connect(
+                rig,
+                f"Lip.T{side.suffix}",
+                "Mouth.Center",
+                f"j_f_ulip_02_{side.source}",
+                connected=False,
+                parent="jaw_master",
+            )
+            abi.connect(
+                rig,
+                f"Lip.T{side.suffix}.001",
+                f"j_f_ulip_02_{side.source}",
+                f"j_f_umlip_02_{side.source}",
+                parent=f"Lip.T{side.suffix}",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"Lip.T{side.suffix}.002",
+                f"j_f_umlip_02_{side.source}",
+                f"j_f_uslip_{side.source}",
+                parent=f"Lip.T{side.suffix}.001",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"Lip.T{side.suffix}.003",
+                f"j_f_uslip_{side.source}",
+                f"Corner{side.suffix}",
+                parent=f"Lip.T{side.suffix}.002",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"Lip.B{side.suffix}",
+                "Mouth.Center.001",
+                f"j_f_dlip_02_{side.source}",
+                connected=False,
+                parent="jaw_master",
+            )
+            abi.connect(
+                rig,
+                f"Lip.B{side.suffix}.001",
+                f"j_f_dlip_02_{side.source}",
+                f"j_f_dmlip_02_{side.source}",
+                parent=f"Lip.B{side.suffix}",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"Lip.B{side.suffix}.002",
+                f"j_f_dmlip_02_{side.source}",
+                f"j_f_dslip_{side.source}",
+                parent=f"Lip.B{side.suffix}.001",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"Lip.B{side.suffix}.003",
+                f"j_f_dslip_{side.source}",
+                f"Corner{side.suffix}",
+                parent=f"Lip.B{side.suffix}.002",
+                connected=True,
+            )
 
-        extend(rig, "Teeth.T", "j_f_hagukiup", axis="Y", start_point="head", parent="Head")
-        extend(rig, "Teeth.B", "j_f_hagukidn", axis="Y", start_point="head", parent="jaw_master")
+            abi.connect(
+                rig,
+                f"Lip.Sec.T{side.suffix}",
+                f"j_f_ulip_01_{side.source}",
+                f"j_f_umlip_01_{side.source}",
+                parent="Head",
+            )
+            abi.connect(
+                rig,
+                f"Lip.Sec.T{side.suffix}.001",
+                f"j_f_umlip_01_{side.source}",
+                f"j_f_uslip_{side.source}",
+                parent=f"Lip.Sec.T{side.suffix}",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"Lip.Sec.B{side.suffix}",
+                f"j_f_dlip_01_{side.source}",
+                f"j_f_dmlip_01_{side.source}",
+                parent="Head",
+            )
+            abi.connect(
+                rig,
+                f"Lip.Sec.B{side.suffix}.001",
+                f"j_f_dmlip_01_{side.source}",
+                f"j_f_dslip_{side.source}",
+                parent=f"Lip.Sec.B{side.suffix}",
+                connected=True,
+            )
 
-        connect(rig, "Tongue", "j_f_bero_01", "j_f_bero_02", parent="jaw_master")
-        connect(rig, "Tongue.001", "j_f_bero_02", "j_f_bero_03", parent="Tongue", connected=True)
-        extend(rig, "Tongue.002", "Tongue.001", axis="Y", parent="Tongue.001", connected=True)
+            # Upper lip glue
+            abi.connect(
+                rig,
+                f"Lip.T{side.suffix}.001.glue",
+                f"j_f_hana_{side.source}",
+                f"j_f_ulip_01_{side.source}",
+                parent="Head",
+            )
+
+        # Teeth and tongue chain
+        abi.extend(rig, "Teeth.T", "j_f_hagukiup", axis="Y", start_point="head", parent="Head")
+        abi.extend(rig, "Teeth.B", "j_f_hagukidn", axis="Y", start_point="head", parent="jaw_master")
+        abi.connect(rig, "Tongue", "j_f_bero_01", "j_f_bero_02", parent="jaw_master")
+        abi.connect(rig, "Tongue.001", "j_f_bero_02", "j_f_bero_03", parent="Tongue", connected=True)
+        abi.extend(rig, "Tongue.002", "Tongue.001", axis="Y", parent="Tongue.001", connected=True)
+
+    # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
-        rigify.face_skin_jaw(rig, "jaw_master", jaw_mouth_influence=1)
-        collection(rig, ["jaw_master"], PRIMARY)
-        collection(rig, ["jaw_master_ref", "Mouth.Center", "Mouth.Center.001"], "MCH")
-        link(rig, "j_f_ago", "DEF-jaw_master")
+        # Jaw controls
+        abi.rigify.face_skin_jaw(rig, "jaw_master", jaw_mouth_influence=1)
+        abi.collection(rig, ["jaw_master"], "Face (Primary)")
+        abi.collection(rig, ["jaw_master_ref", "Mouth.Center", "Mouth.Center.001"], "MCH")
+        abi.link(rig, "j_f_ago", "DEF-jaw_master")
 
-        for side in (RIGHT, LEFT):
-            self._lips_pose(rig, side)
-
-        for teeth, source in (("Teeth.T", "j_f_hagukiup"), ("Teeth.B", "j_f_hagukidn")):
-            rigify.basic_super_copy(rig, teeth, widget_type="teeth")
-            collection(rig, [teeth], MISC)
-            link(rig, source, f"DEF-{teeth}")
-
-        rigify.skin_stretchy_chain(rig, "Tongue", control_orientation_bone="Mouth.Center")
-        collection(rig, ["Tongue", "Tongue.001", "Tongue.002"], MISC)
-        for name, source in (("Tongue", "j_f_bero_01"), ("Tongue.001", "j_f_bero_02"), ("Tongue.002", "j_f_bero_03")):
-            link(rig, source, f"DEF-{name}")
-
-    def final_edit(self, rig: bpy.types.Object) -> None:
-        # The secondary lips follow the offset bones rigify made for the main lips.
-        for side in (RIGHT, LEFT):
-            for row, _, _ in SECONDARY_LIPS:
-                parent(rig, f"Lip.Sec.{row}{side.suffix}", f"MCH-Lip_offset.{row}{side.suffix}.001")
-                parent(rig, f"Lip.Sec.{row}{side.suffix}.001", f"MCH-Lip_offset.{row}{side.suffix}.002")
-
-    def final_pose(self, rig: bpy.types.Object) -> None:
-        for teeth in ("Teeth.T", "Teeth.B"):
-            widget(rig, teeth, rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
-        widget(rig, "jaw_master_mouth", scale=(0.6, 1.0, 0.3))
-        for side in (RIGHT, LEFT):
-            for row in "TB":
-                for suffix in ("", ".001"):
-                    widget(rig, f"Lip.Middle.{row}{side.suffix}{suffix}", scale_factor=0.1)
-
-    @staticmethod
-    def _lips_edit(rig: bpy.types.Object, side: Side) -> None:
-        s, x = side.source, side.suffix
-        for row, center_bone, sources in ROWS:
-            lip = f"Lip.{row}{x}"
-            names = [lip, f"{lip}.001", f"{lip}.002", f"{lip}.003"]
-            starts = [center_bone, f"j_f_{sources[0]}_{s}", f"j_f_{sources[1]}_{s}", f"j_f_{sources[2]}_{s}"]
-            ends = [f"j_f_{sources[0]}_{s}", f"j_f_{sources[1]}_{s}", f"j_f_{sources[2]}_{s}", f"Corner{x}"]
-            for index, (name, start, end) in enumerate(zip(names, starts, ends)):
-                connect(
-                    rig,
-                    name,
-                    start,
-                    end,
-                    parent="jaw_master" if index == 0 else names[index - 1],
-                    connected=index > 0,
-                )
-
-        for row, first, second in SECONDARY_LIPS:
-            lip = f"Lip.Sec.{row}{x}"
-            connect(rig, lip, f"j_f_{first[0]}_{s}", f"j_f_{first[1]}_{s}", parent="Head")
-            connect(rig, f"{lip}.001", f"j_f_{second[0]}_{s}", f"j_f_{second[1]}_{s}", parent=lip, connected=True)
-
-        connect(rig, f"Lip.T{x}.001.glue", f"j_f_hana_{s}", f"j_f_ulip_01_{s}", parent="Head")
-
-    @staticmethod
-    def _lips_pose(rig: bpy.types.Object, side: Side) -> None:
-        s, x = side.source, side.suffix
-        for row, _, sources in ROWS:
-            lip = f"Lip.{row}{x}"
-            rigify.skin_stretchy_chain(
+        # Main and secondary lip controls
+        for side in definitions.SIDES:
+            abi.rigify.skin_stretchy_chain(
                 rig,
-                lip,
+                f"Lip.T{side.suffix}",
                 control_orientation_bone="Mouth.Center",
                 falloff_length=True,
                 falloff=[0.0, 0.0, -1.0],
-                primary_collection=PRIMARY,
-                use_scale=SCALE_ALL,
+                primary_collection="Face (Primary)",
+                use_scale=[True, True, True, True],
             )
-            collection(rig, [lip, f"{lip}.001", f"{lip}.002", f"{lip}.003"], SECONDARY)
-            for number, source in enumerate(sources, start=1):
-                link(rig, f"j_f_{source}_{s}", f"DEF-{lip}.00{number}")
+            abi.collection(
+                rig,
+                [
+                    f"Lip.T{side.suffix}",
+                    f"Lip.T{side.suffix}.001",
+                    f"Lip.T{side.suffix}.002",
+                    f"Lip.T{side.suffix}.003",
+                ],
+                "Face (Secondary)",
+            )
+            abi.link(rig, f"j_f_ulip_02_{side.source}", f"DEF-Lip.T{side.suffix}.001")
+            abi.link(rig, f"j_f_umlip_02_{side.source}", f"DEF-Lip.T{side.suffix}.002")
+            abi.link(rig, f"j_f_uslip_{side.source}", f"DEF-Lip.T{side.suffix}.003")
 
-        for row, first, second in SECONDARY_LIPS:
-            lip = f"Lip.Sec.{row}{x}"
-            rigify.skin_basic_chain(rig, lip, control_orientation_bone="Mouth.Center")
-            collection(rig, [lip, f"{lip}.001"], SECONDARY)
-            link(rig, f"j_f_{first[0]}_{s}", f"DEF-{lip}")
-            link(rig, f"j_f_{second[0]}_{s}", f"DEF-{lip}.001")
+            abi.rigify.skin_stretchy_chain(
+                rig,
+                f"Lip.B{side.suffix}",
+                control_orientation_bone="Mouth.Center",
+                falloff_length=True,
+                falloff=[0.0, 0.0, -1.0],
+                primary_collection="Face (Primary)",
+                use_scale=[True, True, True, True],
+            )
+            abi.collection(
+                rig,
+                [
+                    f"Lip.B{side.suffix}",
+                    f"Lip.B{side.suffix}.001",
+                    f"Lip.B{side.suffix}.002",
+                    f"Lip.B{side.suffix}.003",
+                ],
+                "Face (Secondary)",
+            )
+            abi.link(rig, f"j_f_dlip_02_{side.source}", f"DEF-Lip.B{side.suffix}.001")
+            abi.link(rig, f"j_f_dmlip_02_{side.source}", f"DEF-Lip.B{side.suffix}.002")
+            abi.link(rig, f"j_f_dslip_{side.source}", f"DEF-Lip.B{side.suffix}.003")
 
-        glue = f"Lip.T{x}.001.glue"
-        rigify.skin_glue(
-            rig,
-            glue,
-            relink_constraints=True,
-            use_tail=True,
-            reparent_tail=True,
-            add_constraint="COPY_LOCATION_OWNER",
-            add_constraint_influence=0.2,
-        )
-        collection(rig, [glue], "MCH")
+            abi.rigify.skin_basic_chain(rig, f"Lip.Sec.T{side.suffix}", control_orientation_bone="Mouth.Center")
+            abi.collection(
+                rig,
+                [f"Lip.Sec.T{side.suffix}", f"Lip.Sec.T{side.suffix}.001"],
+                "Face (Secondary)",
+            )
+            abi.link(rig, f"j_f_ulip_01_{side.source}", f"DEF-Lip.Sec.T{side.suffix}")
+            abi.link(rig, f"j_f_umlip_01_{side.source}", f"DEF-Lip.Sec.T{side.suffix}.001")
+            abi.rigify.skin_basic_chain(rig, f"Lip.Sec.B{side.suffix}", control_orientation_bone="Mouth.Center")
+            abi.collection(
+                rig,
+                [f"Lip.Sec.B{side.suffix}", f"Lip.Sec.B{side.suffix}.001"],
+                "Face (Secondary)",
+            )
+            abi.link(rig, f"j_f_dlip_01_{side.source}", f"DEF-Lip.Sec.B{side.suffix}")
+            abi.link(rig, f"j_f_dmlip_01_{side.source}", f"DEF-Lip.Sec.B{side.suffix}.001")
+
+            # Upper lip glue
+            abi.rigify.skin_glue(
+                rig,
+                f"Lip.T{side.suffix}.001.glue",
+                relink_constraints=True,
+                use_tail=True,
+                reparent_tail=True,
+                add_constraint="COPY_LOCATION_OWNER",
+                add_constraint_influence=0.2,
+            )
+            abi.collection(rig, [f"Lip.T{side.suffix}.001.glue"], "MCH")
+
+        # Teeth and tongue controls and source-to-deform mappings
+        abi.rigify.basic_super_copy(rig, "Teeth.T", widget_type="teeth")
+        abi.collection(rig, ["Teeth.T"], "Face (Misc)")
+        abi.link(rig, "j_f_hagukiup", "DEF-Teeth.T")
+        abi.rigify.basic_super_copy(rig, "Teeth.B", widget_type="teeth")
+        abi.collection(rig, ["Teeth.B"], "Face (Misc)")
+        abi.link(rig, "j_f_hagukidn", "DEF-Teeth.B")
+        abi.rigify.skin_stretchy_chain(rig, "Tongue", control_orientation_bone="Mouth.Center")
+        abi.collection(rig, ["Tongue", "Tongue.001", "Tongue.002"], "Face (Misc)")
+        abi.link(rig, "j_f_bero_01", "DEF-Tongue")
+        abi.link(rig, "j_f_bero_02", "DEF-Tongue.001")
+        abi.link(rig, "j_f_bero_03", "DEF-Tongue.002")
+
+    # ------------------------------------------------------------------------
+
+    def final_edit(self, rig: bpy.types.Object) -> None:
+        # Secondary lips follow the offset bones made for the main lip chains.
+        for side in definitions.SIDES:
+            abi.parent(rig, f"Lip.Sec.T{side.suffix}", f"MCH-Lip_offset.T{side.suffix}.001")
+            abi.parent(rig, f"Lip.Sec.T{side.suffix}.001", f"MCH-Lip_offset.T{side.suffix}.002")
+            abi.parent(rig, f"Lip.Sec.B{side.suffix}", f"MCH-Lip_offset.B{side.suffix}.001")
+            abi.parent(rig, f"Lip.Sec.B{side.suffix}.001", f"MCH-Lip_offset.B{side.suffix}.002")
+
+    # ------------------------------------------------------------------------
+
+    def final_pose(self, rig: bpy.types.Object) -> None:
+        # Teeth and mouth widgets
+        abi.widget(rig, "Teeth.T", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
+        abi.widget(rig, "Teeth.B", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
+        abi.widget(rig, "jaw_master_mouth", scale=(0.6, 1.0, 0.3))
+        for side in definitions.SIDES:
+            abi.widget(rig, f"Lip.Middle.T{side.suffix}", scale_factor=0.1)
+            abi.widget(rig, f"Lip.Middle.T{side.suffix}.001", scale_factor=0.1)
+            abi.widget(rig, f"Lip.Middle.B{side.suffix}", scale_factor=0.1)
+            abi.widget(rig, f"Lip.Middle.B{side.suffix}.001", scale_factor=0.1)

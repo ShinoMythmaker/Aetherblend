@@ -1,478 +1,749 @@
 """Face module: brows, cheeks, nose, nostrils and eyes as skin chains."""
 
-from typing import NamedTuple
-
 import bpy
 
 from ......utils import object as object_utils
-from ....definitions import RigModule
-from ....instructions import *
-from ....rigify.settings import BoneCollection, UI_Collections
-
-PRIMARY = "Face (Primary)"
-SECONDARY = "Face (Secondary)"
-SCALE_ALL = [True, True, True, True]
-
-OCCLUSION_SHADER = "characterocclusion.shpk"
-IRIS_SHADER = "iris.shpk"
-SLIDER_COLOR = (0.443137, 0.541176, 1.0)
-LID_COLOR = (1.0, 0.435294, 0.733333)
-IRIS_RANGE = (0.7, 1.5)
-PUPIL_RANGE = (0.5, 2.3)
-LID_EXPRESSION = "min(1, max(0, (-y / 1) - max(0, {x} / 0.667)))"
+from .... import definitions
+from .... import instructions as abi
+from ....rigify import settings
 
 
-class Side(NamedTuple):
-    """Naming of one face side."""
-
-    suffix: str
-    source: str
-
-
-RIGHT = Side(".R", "r")
-LEFT = Side(".L", "l")
-SIDES = (RIGHT, LEFT)
-
-# Lid bone numbers 001..003 and the source bone each one follows.
-UPPER_LID_SOURCES = ("j_f_mabup_02out", "j_f_mabup_01", "j_f_mabup_03in")
-LOWER_LID_SOURCES = ("j_f_mabdn_03in", "j_f_mabdn_01", "j_f_mabdn_02out")
-LID_BRIDGES = (
-    # (name, start, end, left offset, whether the end bone attaches to the bridge); the right side mirrors x of lower bridges  # noqa: E501
-    ("T.001", "T", "T.002", (0.0, -0.001, 0.001), True),
-    ("T.003", "T.002", "B", (0.0, 0.0, 0.003), False),
-    ("B.001", "B", "B.002", (-0.002, 0.0, 0.001), True),
-    ("B.003", "B.002", "T", (0.003, -0.001, -0.003), False),
-)
-
-
-class Side(NamedTuple):
-    """Naming of one face side."""
-
-    suffix: str
-    source: str
-
-
-RIGHT = Side(".R", "r")
-LEFT = Side(".L", "l")
-SIDES = (RIGHT, LEFT)
-
-
-class Module(RigModule):
+class Module(definitions.RigModule):
     name = "XIV-Default"
     ui_flags = ["Eye Lid Edit Mode"]
-    ui_collections = UI_Collections(
+    ui_collections = settings.UI_Collections(
         [
-            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-            BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=2, title=PRIMARY, visible=True),
-            BoneCollection(
-                name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=2, title=SECONDARY, visible=False
+            settings.BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
+            settings.BoneCollection(
+                name="Face (Primary)",
+                ui=True,
+                color_set="Face_Primary",
+                row_index=2,
+                title="Face (Primary)",
+                visible=True,
             ),
-            BoneCollection(
+            settings.BoneCollection(
+                name="Face (Secondary)",
+                ui=True,
+                color_set="Face_Secondary",
+                row_index=2,
+                title="Face (Secondary)",
+                visible=False,
+            ),
+            settings.BoneCollection(
                 name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=3, title="Eyes (Macro)", visible=True
             ),
         ]
     )
 
+    # ------------------------------------------------------------------------
+
     def meta_edit(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            self._brow_edit(rig, side)
-        for side in SIDES:
-            self._cheek_edit(rig, side)
+        """Build the facial chains and optional eye controls."""
+        # Brow chains
+        for side in definitions.SIDES:
+            abi.connect(rig, f"Brow{side.suffix}", f"j_f_mayu_{side.source}", f"j_f_mmayu_{side.source}", parent="Head")
+            abi.connect(
+                rig,
+                f"Brow{side.suffix}.001",
+                f"j_f_mmayu_{side.source}",
+                f"j_f_miken_01_{side.source}",
+                parent=f"Brow{side.suffix}",
+                connected=True,
+            )
+            abi.connect(
+                rig,
+                f"Brow{side.suffix}.002",
+                f"j_f_miken_01_{side.source}",
+                f"j_f_miken_02_{side.source}",
+                parent=f"Brow{side.suffix}.001",
+                connected=True,
+            )
+            abi.extend(
+                rig,
+                f"Brow{side.suffix}.003",
+                f"Brow{side.suffix}.002",
+                axis="Y",
+                parent=f"Brow{side.suffix}.002",
+                connected=True,
+            )
 
-        center(rig, "NoseRef", ["j_f_miken_02_r", "j_f_miken_02_l"], axis="Z", parent="Head")
-        connect(rig, "Nose", "j_f_uhana", "NoseRef", parent="Head")
-        extend(rig, "Face.Suppressor", "NoseRef", axis="Y", start_point="head", parent="Head")
+        # Mouth corner and cheek chains
+        for side in definitions.SIDES:
+            abi.center(
+                rig,
+                f"Corner{side.suffix}",
+                [f"j_f_uslip_{side.source}", f"j_f_dslip_{side.source}", f"j_f_shoho_{side.source}"],
+                axis="Y",
+                parent="Head",
+            )
+            abi.connect(rig, f"Cheek{side.suffix}", f"Corner{side.suffix}", f"j_f_shoho_{side.source}", parent="Head")
+            abi.connect(
+                rig,
+                f"Cheek.B{side.suffix}",
+                f"j_f_shoho_{side.source}",
+                f"j_f_hoho_{side.source}",
+                parent=f"Cheek{side.suffix}",
+                connected=True,
+            )
+            abi.connect(
+                rig, f"Cheek.B{side.suffix}.001", f"j_f_dhoho_{side.source}", f"j_f_hoho_{side.source}", parent="Head"
+            )
+            abi.connect(
+                rig, f"Cheek.T{side.suffix}", f"j_f_hoho_{side.source}", f"j_f_dmemoto_{side.source}", parent="Head"
+            )
+            abi.connect(
+                rig, f"Cheek.T{side.suffix}.001", f"j_f_dmemoto_{side.source}", f"j_f_hana_{side.source}", parent="Head"
+            )
 
-        for side in SIDES:
-            self._nose_edit(rig, side)
+        # Nose and face suppressor
+        abi.center(rig, "NoseRef", ["j_f_miken_02_r", "j_f_miken_02_l"], axis="Z", parent="Head")
+        abi.connect(rig, "Nose", "j_f_uhana", "NoseRef", parent="Head")
+        abi.extend(rig, "Face.Suppressor", "NoseRef", axis="Y", start_point="head", parent="Head")
 
-        occlusion_mesh = self._find_mesh(rig, OCCLUSION_SHADER)
+        # Nose, nostril and glue chains
+        for side in definitions.SIDES:
+            abi.connect(
+                rig,
+                f"Nose{side.suffix}",
+                f"j_f_dmiken_{side.source}",
+                f"Brow{side.suffix}.003",
+                end_point="tail",
+                parent="Head",
+            )
+            abi.connect(rig, f"Nostril{side.suffix}", f"j_f_hana_{side.source}", "j_f_uhana", parent="Head")
+            abi.connect(rig, f"Nostril.Glue{side.suffix}", f"j_f_hana_{side.source}", "j_f_uhana", parent="Head")
+            abi.connect(
+                rig,
+                f"Nostril.Glue{side.suffix}.001",
+                f"Cheek.T{side.suffix}.001",
+                f"Nostril{side.suffix}",
+                parent="Head",
+            )
+            abi.connect(
+                rig, f"Cheek.B{side.suffix}.glue", f"j_f_dhoho_{side.source}", f"j_f_shoho_{side.source}", parent="Head"
+            )
+            abi.connect(
+                rig, f"Cheek.T{side.suffix}.glue", f"j_f_dhoho_{side.source}", f"j_f_hoho_{side.source}", parent="Head"
+            )
+
+        # Eyes and lid controls
+        meshes = object_utils.find_by_armature_and_material_property(
+            rig.data.rigify_target_rig or rig, "ShaderPackage", "characterocclusion.shpk"
+        )
+        occlusion_mesh = meshes[0] if meshes else None
         if occlusion_mesh:
-            for side in SIDES:
-                self._eye_edit(rig, side, occlusion_mesh)
-            self._eye_controls_edit(rig)
+            source_rig = rig.data.rigify_target_rig
+            for side in definitions.SIDES:
+                # Lid corners and centers follow the heaviest source weights on the occlusion mesh.
+                abi.heaviest_vertex(
+                    rig,
+                    f"lid.T{side.suffix}",
+                    f"j_f_mabup_02out_{side.source}",
+                    occlusion_mesh,
+                    source_rig=source_rig,
+                )
+                abi.heaviest_vertex(
+                    rig,
+                    f"lid.T{side.suffix}.002",
+                    f"j_f_mabup_01_{side.source}",
+                    occlusion_mesh,
+                    source_rig=source_rig,
+                )
+                abi.heaviest_vertex(
+                    rig,
+                    f"lid.B{side.suffix}",
+                    f"j_f_mabdn_03in_{side.source}",
+                    occlusion_mesh,
+                    source_rig=source_rig,
+                )
+                abi.heaviest_vertex(
+                    rig,
+                    f"lid.B{side.suffix}.002",
+                    f"j_f_mabdn_01_{side.source}",
+                    occlusion_mesh,
+                    source_rig=source_rig,
+                )
+                abi.copy(rig, f"Eye{side.suffix}", f"j_f_eyepuru_{side.source}", parent="Head")
+
+                # Lid bridges
+                abi.bridge(
+                    rig,
+                    f"lid.T{side.suffix}.001",
+                    f"lid.T{side.suffix}",
+                    f"lid.T{side.suffix}.002",
+                    offset=(0.0 if side is definitions.LEFT else -0.0, -0.001, 0.001),
+                    start_parent=f"Eye{side.suffix}",
+                    connect_end=True,
+                )
+                abi.bridge(
+                    rig,
+                    f"lid.T{side.suffix}.003",
+                    f"lid.T{side.suffix}.002",
+                    f"lid.B{side.suffix}",
+                    offset=(0.0 if side is definitions.LEFT else -0.0, 0.0, 0.003),
+                    start_parent=None,
+                    connect_end=False,
+                )
+                abi.bridge(
+                    rig,
+                    f"lid.B{side.suffix}.001",
+                    f"lid.B{side.suffix}",
+                    f"lid.B{side.suffix}.002",
+                    offset=(-0.002 if side is definitions.LEFT else 0.002, 0.0, 0.001),
+                    start_parent=f"Eye{side.suffix}",
+                    connect_end=True,
+                )
+                abi.bridge(
+                    rig,
+                    f"lid.B{side.suffix}.003",
+                    f"lid.B{side.suffix}.002",
+                    f"lid.T{side.suffix}",
+                    offset=(0.003 if side is definitions.LEFT else -0.003, -0.001, -0.003),
+                    start_parent=None,
+                    connect_end=False,
+                )
+
+                # Lid trackers
+                abi.connect(
+                    rig,
+                    f"eye_tracker.B{side.suffix}.001",
+                    f"j_f_mabdn_03in_{side.source}",
+                    f"lid.B{side.suffix}.001",
+                    parent=f"Eye{side.suffix}",
+                )
+                abi.connect(
+                    rig,
+                    f"eye_tracker.B{side.suffix}.002",
+                    f"j_f_mabdn_01_{side.source}",
+                    f"lid.B{side.suffix}.002",
+                    parent=f"Eye{side.suffix}",
+                )
+                abi.connect(
+                    rig,
+                    f"eye_tracker.B{side.suffix}.003",
+                    f"j_f_mabdn_02out_{side.source}",
+                    f"lid.B{side.suffix}.003",
+                    parent=f"Eye{side.suffix}",
+                )
+                abi.connect(
+                    rig,
+                    f"eye_tracker.T{side.suffix}.001",
+                    f"j_f_mabup_02out_{side.source}",
+                    f"lid.T{side.suffix}.001",
+                    parent=f"Eye{side.suffix}",
+                )
+                abi.connect(
+                    rig,
+                    f"eye_tracker.T{side.suffix}.002",
+                    f"j_f_mabup_01_{side.source}",
+                    f"lid.T{side.suffix}.002",
+                    parent=f"Eye{side.suffix}",
+                )
+                abi.connect(
+                    rig,
+                    f"eye_tracker.T{side.suffix}.003",
+                    f"j_f_mabup_03in_{side.source}",
+                    f"lid.T{side.suffix}.003",
+                    parent=f"Eye{side.suffix}",
+                )
+                abi.connect(
+                    rig,
+                    f"Lower.Lid{side.suffix}.Glue",
+                    f"lid.B{side.suffix}.002",
+                    f"j_f_hoho_{side.source}",
+                    parent="Head",
+                )
+                abi.connect(
+                    rig,
+                    f"Upper.Lid{side.suffix}.Glue",
+                    f"lid.T{side.suffix}.002",
+                    f"j_f_miken_02_{side.source}",
+                    parent="Head",
+                )
+
+            # Iris, pupil and lid controls
+            for bone in ("Iris.Ctrl.Master", "Iris.Ctrl"):
+                abi.offset(rig, bone, "Eye.L", (0.0025, 0.015, 0.051), parent="Eye.L")
+            for bone in ("Pupil.Ctrl.Master", "Pupil.Ctrl"):
+                abi.offset(rig, bone, "Eye.L", (0.0025, 0.015, 0.058), parent="Eye.L")
+            for bone in ("Lid.Ctrl.Master", "Lid.Ctrl"):
+                abi.offset(rig, bone, "Eye.L", (0.01, 0.015, 0.035), parent="Eye.L")
+
+            # Lower lid anchors
+            for side in definitions.SIDES:
+                for number in (1, 2, 3):
+                    abi.extend(
+                        rig,
+                        f"lid.anchor.B{side.suffix}.00{number}",
+                        f"lid.B{side.suffix}.00{number}",
+                        axis="Z",
+                        axis_space="global",
+                        start_point="head",
+                        parent=f"lid.B{side.suffix}.00{number}",
+                    )
         else:
             print("[AetherBlend] No eye occlusion mesh found; the eyes are skipped.")
 
+    # ------------------------------------------------------------------------
+
     def meta_pose(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            self._brow_pose(rig, side)
-            self._cheek_pose(rig, side)
-            self._nose_pose(rig, side)
-            if f"Eye{side.suffix}" in rig.pose.bones:
-                self._eye_pose(rig, side)
-        if "Iris.Ctrl" in rig.pose.bones:
-            self._eye_controls_pose(rig)
-
-        rigify.skin_basic_chain(rig, "Nose", chain_priority=2, control_orientation_bone="Head", use_scale=SCALE_ALL)
-        collection(rig, ["Nose"], PRIMARY)
-        link(rig, "j_f_uhana", "DEF-Nose")
-
-        rigify.skin_anchor(rig, "Face.Suppressor", hide=True)
-        collection(rig, ["Face.Suppressor", "NoseRef"], "MCH")
-
-    def final_edit(self, rig: bpy.types.Object) -> None:
-        for control in ("Iris", "Pupil", "Lid"):
-            if has_bone(rig, f"{control}.Ctrl.Master"):
-                parent(rig, f"{control}.Ctrl.Master", "head")
-                parent(rig, f"{control}.Ctrl", f"{control}.Ctrl.Master")
-
-    def final_pose(self, rig: bpy.types.Object) -> None:
-        prop(rig, "head", "head_follow", 1)
-
-        widget(rig, "Nose", scale_factor=0.6)
-        for side in SIDES:
-            widget(rig, f"Cheek.T{side.suffix}", scale_factor=0.6)
-            widget(rig, f"Cheek.B{side.suffix}.001", scale_factor=0.4)
-            widget(rig, f"Cheek.B{side.suffix}", scale_factor=0.7)
-            widget(rig, f"Nose{side.suffix}", scale_factor=1.0)
-            widget(rig, f"Nostril{side.suffix}", scale_factor=0.6)
-
-        if "Iris.Ctrl" in rig.pose.bones:
-            self._eye_controls_final_pose(rig)
-
-    @staticmethod
-    def _find_mesh(rig: bpy.types.Object, shader: str) -> bpy.types.Object | None:
-        """Return the first mesh deformed by the character's armature that uses the given shader package."""
-        original = rig.data.rigify_target_rig or rig
-        meshes = object_utils.find_by_armature_and_material_property(original, "ShaderPackage", shader)
-        return meshes[0] if meshes else None
-
-    @staticmethod
-    def _eye_edit(rig: bpy.types.Object, side: Side, occlusion_mesh: bpy.types.Object) -> None:
-        s, x = side.source, side.suffix
-        source_rig = rig.data.rigify_target_rig
-        eye = f"Eye{x}"
-
-        # Lid corners and centers sit on the eye occlusion mesh where each source bone weighs the most.
-        for lid, source in (
-            (f"lid.T{x}", UPPER_LID_SOURCES[0]),
-            (f"lid.T{x}.002", UPPER_LID_SOURCES[1]),
-            (f"lid.B{x}", LOWER_LID_SOURCES[0]),
-            (f"lid.B{x}.002", LOWER_LID_SOURCES[1]),
-        ):
-            heaviest_vertex(rig, lid, f"{source}_{s}", occlusion_mesh, source_rig=source_rig)
-
-        copy(rig, eye, f"j_f_eyepuru_{s}", parent="Head")
-
-        mirror = -1.0 if side is RIGHT else 1.0
-        for name, start, end, (offset_x, offset_y, offset_z), connect_end in LID_BRIDGES:
-            bridge(
+        """Configure facial rig types, collections and source mappings."""
+        for side in definitions.SIDES:
+            # Brow controls and mappings
+            abi.rigify.skin_stretchy_chain(
                 rig,
-                f"lid.{name[0]}{x}{name[1:]}",
-                f"lid.{start[0]}{x}{start[1:]}",
-                f"lid.{end[0]}{x}{end[1:]}",
-                offset=(offset_x * mirror, offset_y, offset_z),
-                start_parent=eye if connect_end else None,
-                connect_end=connect_end,
+                f"Brow{side.suffix}",
+                control_orientation_bone="Head",
+                falloff_length=True,
+                use_scale=[True, True, True, True],
+                primary_collection="Face (Primary)",
             )
+            abi.collection(rig, [f"Brow{side.suffix}"], "Face (Secondary)")
+            abi.collection(
+                rig, [f"Brow{side.suffix}.001", f"Brow{side.suffix}.002", f"Brow{side.suffix}.003"], "Face (Primary)"
+            )
+            abi.link(rig, f"j_f_mayu_{side.source}", f"DEF-Brow{side.suffix}")
+            abi.link(rig, f"j_f_mmayu_{side.source}", f"DEF-Brow{side.suffix}.001")
+            abi.link(rig, f"j_f_miken_01_{side.source}", f"DEF-Brow{side.suffix}.002")
+            abi.link(rig, f"j_f_miken_02_{side.source}", f"DEF-Brow{side.suffix}.003")
 
-        for sources, row in ((LOWER_LID_SOURCES, "B"), (UPPER_LID_SOURCES, "T")):
-            for index, source in enumerate(sources, start=1):
-                connect(rig, f"eye_tracker.{row}{x}.00{index}", f"{source}_{s}", f"lid.{row}{x}.00{index}", parent=eye)
-
-        connect(rig, f"Lower.Lid{x}.Glue", f"lid.B{x}.002", f"j_f_hoho_{s}", parent="Head")
-        connect(rig, f"Upper.Lid{x}.Glue", f"lid.T{x}.002", f"j_f_miken_02_{s}", parent="Head")
-
-    @staticmethod
-    def _eye_pose(rig: bpy.types.Object, side: Side) -> None:
-        s, x = side.source, side.suffix
-        rigify.skin_stretchy_chain(
-            rig,
-            f"lid.T{x}",
-            pivot_position=2,
-            control_orientation_bone="Head",
-            falloff=[0.0, 1.0, 0.0],
-            falloff_length=True,
-            falloff_spherical=[False, False, False],
-            primary_collection=PRIMARY,
-        )
-        rigify.skin_stretchy_chain(
-            rig, f"lid.B{x}", pivot_position=2, control_orientation_bone="Head", primary_collection=PRIMARY
-        )
-        rigify.face_skin_eye(rig, f"Eye{x}")
-        collection(rig, [f"Eye{x}"], PRIMARY)
-
-        lids = [f"lid.{row}{x}{number}" for row in "TB" for number in ("", ".001", ".002", ".003")]
-        collection(rig, lids, SECONDARY)
-
-        trackers = [f"eye_tracker.{row}{x}.00{index}" for row in "BT" for index in (1, 2, 3)]
-        for tracker in trackers:
-            rigify.skin_basic_chain(rig, tracker)
-        collection(rig, trackers, "Face")
-
-        glue_bones = [f"Lower.Lid{x}.Glue", f"Upper.Lid{x}.Glue"]
-        for glue_bone in glue_bones:
-            rigify.skin_glue(
+            # Cheek controls and mappings
+            abi.rigify.skin_stretchy_chain(
                 rig,
-                glue_bone,
-                relink_constraints=True,
-                use_tail=True,
-                reparent_tail=True,
-                add_constraint="COPY_LOCATION_OWNER",
-                add_constraint_influence=0.1,
+                f"Cheek{side.suffix}",
+                control_orientation_bone="Head",
+                falloff_length=True,
+                use_scale=[True, True, True, True],
+                primary_collection="Face (Primary)",
             )
-        collection(rig, glue_bones, "MCH")
+            for chain in (f"Cheek.B{side.suffix}.001", f"Cheek.T{side.suffix}", f"Cheek.T{side.suffix}.001"):
+                abi.rigify.skin_basic_chain(
+                    rig, chain, control_orientation_bone="Head", use_scale=[True, True, True, True]
+                )
+            abi.collection(
+                rig, [f"Cheek{side.suffix}", f"Cheek.B{side.suffix}", f"Cheek.T{side.suffix}"], "Face (Primary)"
+            )
+            abi.collection(rig, [f"Cheek.B{side.suffix}.001", f"Cheek.T{side.suffix}.001"], "Face (Secondary)")
+            abi.collection(rig, [f"Corner{side.suffix}"], "MCH")
+            abi.link(rig, f"j_f_shoho_{side.source}", f"DEF-Cheek.B{side.suffix}")
+            abi.link(rig, f"j_f_dhoho_{side.source}", f"DEF-Cheek.B{side.suffix}.001")
+            abi.link(rig, f"j_f_hoho_{side.source}", f"DEF-Cheek.T{side.suffix}")
+            abi.link(rig, f"j_f_dmemoto_{side.source}", f"DEF-Cheek.T{side.suffix}.001")
 
-        for row, sources in (("B", LOWER_LID_SOURCES), ("T", UPPER_LID_SOURCES)):
-            for index, source in enumerate(sources, start=1):
-                link(rig, f"{source}_{s}", f"lid.{row}{x}.00{index}")
-        link(rig, f"j_f_eyepuru_{s}", f"MCH-Eye{x}")
+            # Nose and nostril controls and mappings
+            abi.rigify.skin_basic_chain(
+                rig, f"Nose{side.suffix}", control_orientation_bone="Head", use_scale=[True, True, True, True]
+            )
+            abi.rigify.skin_basic_chain(
+                rig,
+                f"Nostril{side.suffix}",
+                chain_priority=1,
+                control_orientation_bone="Head",
+                use_scale=[True, True, True, True],
+            )
+            abi.collection(rig, [f"Nose{side.suffix}", f"Nostril{side.suffix}"], "Face (Primary)")
+            abi.link(rig, f"j_f_dmiken_{side.source}", f"DEF-Nose{side.suffix}")
+            abi.link(rig, f"j_f_hana_{side.source}", f"DEF-Nostril{side.suffix}")
 
-    @staticmethod
-    def _eye_controls_edit(rig: bpy.types.Object) -> None:
-        for name, source_height in (("Iris", 0.051), ("Pupil", 0.058)):
-            for bone in (f"{name}.Ctrl.Master", f"{name}.Ctrl"):
-                offset(rig, bone, "Eye.L", (0.0025, 0.015, source_height), parent="Eye.L")
-        for bone in ("Lid.Ctrl.Master", "Lid.Ctrl"):
-            offset(rig, bone, "Eye.L", (0.01, 0.015, 0.035), parent="Eye.L")
-
-        for side in SIDES:
-            for number in (1, 2, 3):
-                lid = f"lid.B{side.suffix}.00{number}"
-                extend(
+            # Glue keeps the nostrils and cheeks following the surrounding chains.
+            for bone in (
+                f"Nostril.Glue{side.suffix}",
+                f"Nostril.Glue{side.suffix}.001",
+                f"Cheek.B{side.suffix}.glue",
+                f"Cheek.T{side.suffix}.glue",
+            ):
+                abi.rigify.skin_glue(
                     rig,
-                    f"lid.anchor.B{side.suffix}.00{number}",
-                    lid,
-                    axis="Z",
-                    axis_space="global",
-                    start_point="head",
-                    parent=lid,
+                    bone,
+                    relink_constraints=True,
+                    use_tail=True,
+                    reparent_tail=bone == f"Cheek.B{side.suffix}.glue",
+                    add_constraint="COPY_LOCATION_OWNER",
+                    add_constraint_influence=0.5,
+                )
+            abi.collection(
+                rig,
+                [
+                    f"Nostril.Glue{side.suffix}",
+                    f"Nostril.Glue{side.suffix}.001",
+                    f"Cheek.B{side.suffix}.glue",
+                    f"Cheek.T{side.suffix}.glue",
+                ],
+                "MCH",
+            )
+
+            # Eye and lid controls
+            if f"Eye{side.suffix}" in rig.pose.bones:
+                abi.rigify.skin_stretchy_chain(
+                    rig,
+                    f"lid.T{side.suffix}",
+                    pivot_position=2,
+                    control_orientation_bone="Head",
+                    falloff=[0.0, 1.0, 0.0],
+                    falloff_length=True,
+                    falloff_spherical=[False, False, False],
+                    primary_collection="Face (Primary)",
+                )
+                abi.rigify.skin_stretchy_chain(
+                    rig,
+                    f"lid.B{side.suffix}",
+                    pivot_position=2,
+                    control_orientation_bone="Head",
+                    primary_collection="Face (Primary)",
+                )
+                abi.rigify.face_skin_eye(rig, f"Eye{side.suffix}")
+                abi.collection(rig, [f"Eye{side.suffix}"], "Face (Primary)")
+                abi.collection(
+                    rig,
+                    [
+                        f"lid.T{side.suffix}",
+                        f"lid.T{side.suffix}.001",
+                        f"lid.T{side.suffix}.002",
+                        f"lid.T{side.suffix}.003",
+                        f"lid.B{side.suffix}",
+                        f"lid.B{side.suffix}.001",
+                        f"lid.B{side.suffix}.002",
+                        f"lid.B{side.suffix}.003",
+                    ],
+                    "Face (Secondary)",
                 )
 
-    @staticmethod
-    def _eye_controls_pose(rig: bpy.types.Object) -> None:
-        controls = [f"{name}.Ctrl{part}" for name in ("Iris", "Pupil", "Lid") for part in (".Master", "")]
-        for control in controls:
-            rigify.basic_raw_copy(rig, control)
-        collection(rig, controls, "Eyes (Macro)")
+                # Lid trackers
+                abi.rigify.skin_basic_chain(rig, f"eye_tracker.B{side.suffix}.001")
+                abi.rigify.skin_basic_chain(rig, f"eye_tracker.B{side.suffix}.002")
+                abi.rigify.skin_basic_chain(rig, f"eye_tracker.B{side.suffix}.003")
+                abi.rigify.skin_basic_chain(rig, f"eye_tracker.T{side.suffix}.001")
+                abi.rigify.skin_basic_chain(rig, f"eye_tracker.T{side.suffix}.002")
+                abi.rigify.skin_basic_chain(rig, f"eye_tracker.T{side.suffix}.003")
+                abi.collection(
+                    rig,
+                    [
+                        f"eye_tracker.B{side.suffix}.001",
+                        f"eye_tracker.B{side.suffix}.002",
+                        f"eye_tracker.B{side.suffix}.003",
+                        f"eye_tracker.T{side.suffix}.001",
+                        f"eye_tracker.T{side.suffix}.002",
+                        f"eye_tracker.T{side.suffix}.003",
+                    ],
+                    "Face",
+                )
+                for bone in (f"Lower.Lid{side.suffix}.Glue", f"Upper.Lid{side.suffix}.Glue"):
+                    abi.rigify.skin_glue(
+                        rig,
+                        bone,
+                        relink_constraints=True,
+                        use_tail=True,
+                        reparent_tail=True,
+                        add_constraint="COPY_LOCATION_OWNER",
+                        add_constraint_influence=0.1,
+                    )
+                abi.collection(rig, [f"Lower.Lid{side.suffix}.Glue", f"Upper.Lid{side.suffix}.Glue"], "MCH")
 
-        anchors = [f"lid.anchor.B{side.suffix}.00{number}" for side in SIDES for number in (1, 2, 3)]
-        for anchor in anchors:
-            rigify.basic_raw_copy(rig, anchor)
-        collection(rig, anchors, "Eyes_Anchors")
+                # Lid and eye source mappings
+                abi.link(rig, f"j_f_mabdn_03in_{side.source}", f"lid.B{side.suffix}.001")
+                abi.link(rig, f"j_f_mabdn_01_{side.source}", f"lid.B{side.suffix}.002")
+                abi.link(rig, f"j_f_mabdn_02out_{side.source}", f"lid.B{side.suffix}.003")
+                abi.link(rig, f"j_f_mabup_02out_{side.source}", f"lid.T{side.suffix}.001")
+                abi.link(rig, f"j_f_mabup_01_{side.source}", f"lid.T{side.suffix}.002")
+                abi.link(rig, f"j_f_mabup_03in_{side.source}", f"lid.T{side.suffix}.003")
+                abi.link(rig, f"j_f_eyepuru_{side.source}", f"MCH-Eye{side.suffix}")
 
-    @staticmethod
-    def _eye_controls_final_pose(rig: bpy.types.Object) -> None:
-        frames = (
-            ("Iris.Ctrl.Master", "IrisSliderFrame", (90.0, -90.0, 180.0), SLIDER_COLOR, 0.007),
-            ("Pupil.Ctrl.Master", "PupilSliderFrame", (90.0, -90.0, 180.0), SLIDER_COLOR, 0.007),
-            ("Lid.Ctrl.Master", "EyeTriangle", (90.0, 0.0, 0.0), LID_COLOR, 0.015),
-        )
-        for bone, shape, rotation, color, size in frames:
-            widget(
+        # Macro controls and lid anchors
+        if "Iris.Ctrl" in rig.pose.bones:
+            for bone in (
+                "Iris.Ctrl.Master",
+                "Iris.Ctrl",
+                "Pupil.Ctrl.Master",
+                "Pupil.Ctrl",
+                "Lid.Ctrl.Master",
+                "Lid.Ctrl",
+            ):
+                abi.rigify.basic_raw_copy(rig, bone)
+            abi.collection(
                 rig,
-                bone,
-                widget_name=shape,
-                rotation_degrees=rotation,
+                ["Iris.Ctrl.Master", "Iris.Ctrl", "Pupil.Ctrl.Master", "Pupil.Ctrl", "Lid.Ctrl.Master", "Lid.Ctrl"],
+                "Eyes (Macro)",
+            )
+            for side in definitions.SIDES:
+                for number in (1, 2, 3):
+                    abi.rigify.basic_raw_copy(rig, f"lid.anchor.B{side.suffix}.00{number}")
+            abi.collection(
+                rig,
+                [
+                    "lid.anchor.B.L.001",
+                    "lid.anchor.B.L.002",
+                    "lid.anchor.B.L.003",
+                    "lid.anchor.B.R.001",
+                    "lid.anchor.B.R.002",
+                    "lid.anchor.B.R.003",
+                ],
+                "Eyes_Anchors",
+            )
+
+        # Nose control
+        abi.rigify.skin_basic_chain(
+            rig, "Nose", chain_priority=2, control_orientation_bone="Head", use_scale=[True, True, True, True]
+        )
+        abi.collection(rig, ["Nose"], "Face (Primary)")
+        abi.link(rig, "j_f_uhana", "DEF-Nose")
+
+        # Face suppressor
+        abi.rigify.skin_anchor(rig, "Face.Suppressor", hide=True)
+        abi.collection(rig, ["Face.Suppressor", "NoseRef"], "MCH")
+
+    # ------------------------------------------------------------------------
+
+    def final_edit(self, rig: bpy.types.Object) -> None:
+        """Parent the macro controls to the generated head."""
+        # Eye control hierarchy
+        for control in ("Iris", "Pupil", "Lid"):
+            if abi.has_bone(rig, f"{control}.Ctrl.Master"):
+                abi.parent(rig, f"{control}.Ctrl.Master", "head")
+                abi.parent(rig, f"{control}.Ctrl", f"{control}.Ctrl.Master")
+
+    # ------------------------------------------------------------------------
+
+    def final_pose(self, rig: bpy.types.Object) -> None:
+        """Configure facial widgets and optional eye automation."""
+        # Head follow and face widgets
+        abi.prop(rig, "head", "head_follow", 1)
+
+        abi.widget(rig, "Nose", scale_factor=0.6)
+        for side in definitions.SIDES:
+            abi.widget(rig, f"Cheek.T{side.suffix}", scale_factor=0.6)
+            abi.widget(rig, f"Cheek.B{side.suffix}.001", scale_factor=0.4)
+            abi.widget(rig, f"Cheek.B{side.suffix}", scale_factor=0.7)
+            abi.widget(rig, f"Nose{side.suffix}", scale_factor=1.0)
+            abi.widget(rig, f"Nostril{side.suffix}", scale_factor=0.6)
+
+        # Eye widgets and automation
+        if "Iris.Ctrl" in rig.pose.bones:
+            # Iris control frame
+            abi.widget(
+                rig,
+                "Iris.Ctrl.Master",
+                widget_name="IrisSliderFrame",
+                rotation_degrees=(90.0, -90.0, 180.0),
                 wire_width=1.2,
                 scale_to_bone_length=False,
                 color_set="CUSTOM",
-                custom_color_normal=color,
-                custom_color_select=color,
-                custom_color_active=color,
+                custom_color_normal=(0.443137, 0.541176, 1.0),
+                custom_color_select=(0.443137, 0.541176, 1.0),
+                custom_color_active=(0.443137, 0.541176, 1.0),
             )
-            pose(rig, bone, scale=(size, size, size))
-            restrict(rig, bone, lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True)
+            abi.pose(rig, "Iris.Ctrl.Master", scale=(0.007, 0.007, 0.007))
+            abi.restrict(
+                rig, "Iris.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True
+            )
 
-        for bone in ("Iris.Ctrl", "Pupil.Ctrl"):
-            widget(
+            # Pupil control frame
+            abi.widget(
                 rig,
-                bone,
-                widget_name="Slider",
+                "Pupil.Ctrl.Master",
+                widget_name="PupilSliderFrame",
                 rotation_degrees=(90.0, -90.0, 180.0),
+                wire_width=1.2,
+                scale_to_bone_length=False,
+                color_set="CUSTOM",
+                custom_color_normal=(0.443137, 0.541176, 1.0),
+                custom_color_select=(0.443137, 0.541176, 1.0),
+                custom_color_active=(0.443137, 0.541176, 1.0),
+            )
+            abi.pose(rig, "Pupil.Ctrl.Master", scale=(0.007, 0.007, 0.007))
+            abi.restrict(
+                rig, "Pupil.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True
+            )
+
+            # Lid control frame
+            abi.widget(
+                rig,
+                "Lid.Ctrl.Master",
+                widget_name="EyeTriangle",
+                rotation_degrees=(90.0, 0.0, 0.0),
+                wire_width=1.2,
+                scale_to_bone_length=False,
+                color_set="CUSTOM",
+                custom_color_normal=(1.0, 0.435294, 0.733333),
+                custom_color_select=(1.0, 0.435294, 0.733333),
+                custom_color_active=(1.0, 0.435294, 0.733333),
+            )
+            abi.pose(rig, "Lid.Ctrl.Master", scale=(0.015, 0.015, 0.015))
+            abi.restrict(
+                rig, "Lid.Ctrl.Master", lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True
+            )
+
+            # Iris and pupil sliders
+            for bone in ("Iris.Ctrl", "Pupil.Ctrl"):
+                abi.widget(
+                    rig,
+                    bone,
+                    widget_name="Slider",
+                    rotation_degrees=(90.0, -90.0, 180.0),
+                    wire_width=1.3,
+                    scale_to_bone_length=False,
+                )
+                abi.restrict(rig, bone, lock_location=(True, True, False), lock_rotation=True, lock_scale=True)
+                abi.constraints.limit_location(
+                    rig, bone, minimum=(None, None, -1.0), maximum=(None, None, 1.0), use_transform_limit=True
+                )
+
+            # Lid control
+            abi.widget(
+                rig,
+                "Lid.Ctrl",
+                widget_name="Circle",
+                rotation_degrees=(180.0, 90.0, 90.0),
+                scale=(0.08, 0.08, 0.08),
                 wire_width=1.3,
                 scale_to_bone_length=False,
             )
-            restrict(rig, bone, lock_location=(True, True, False), lock_rotation=True, lock_scale=True)
-            constraints.limit_location(
-                rig, bone, minimum=(None, None, -1.0), maximum=(None, None, 1.0), use_transform_limit=True
+            abi.restrict(rig, "Lid.Ctrl", lock_location=(False, True, False), lock_rotation=True, lock_scale=True)
+            abi.constraints.limit_location(
+                rig,
+                "Lid.Ctrl",
+                minimum=(-0.667, None, -1.0),
+                maximum=(0.667, None, 0.0),
+                use_transform_limit=True,
             )
 
-        widget(
-            rig,
-            "Lid.Ctrl",
-            widget_name="Circle",
-            rotation_degrees=(180.0, 90.0, 90.0),
-            scale=(0.08, 0.08, 0.08),
-            wire_width=1.3,
-            scale_to_bone_length=False,
-        )
-        restrict(rig, "Lid.Ctrl", lock_location=(False, True, False), lock_rotation=True, lock_scale=True)
-        constraints.limit_location(
-            rig,
-            "Lid.Ctrl",
-            minimum=(-0.667, None, -1.0),
-            maximum=(0.667, None, 0.0),
-            use_transform_limit=True,
-        )
+            for side in definitions.SIDES:
+                # Lower lid anchor widgets
+                for number in (1, 2, 3):
+                    abi.widget(
+                        rig,
+                        f"lid.anchor.B{side.suffix}.00{number}",
+                        widget_name="Pointer",
+                        color_set="THEME01",
+                        wire_width=2.0,
+                    )
+                    abi.restrict(
+                        rig,
+                        f"lid.anchor.B{side.suffix}.00{number}",
+                        lock_rotation=True,
+                        lock_scale=True,
+                        inherit_rotation=False,
+                        inherit_scale="NONE",
+                    )
 
-        for side in SIDES:
-            for number in (1, 2, 3):
-                anchor = f"lid.anchor.B{side.suffix}.00{number}"
-                widget(rig, anchor, widget_name="Pointer", color_set="THEME01", wire_width=2.0)
-                restrict(rig, anchor, lock_rotation=True, lock_scale=True, inherit_rotation=False, inherit_scale="NONE")
-
-            # Closing the eye with Lid.Ctrl pulls the upper lid onto the matching lower anchor.
-            x_term = "x" if side is LEFT else "-x"
-            for upper, anchor_number in ((3, 1), (2, 2), (1, 3)):
-                lid = f"lid.T{side.suffix}.00{upper}"
-                constraints.copy_location(
+                # Closing the eye pulls each upper lid onto the opposite-numbered lower anchor.
+                abi.constraints.copy_location(
                     rig,
-                    lid,
-                    f"lid.anchor.B{side.suffix}.00{anchor_number}",
+                    f"lid.T{side.suffix}.003",
+                    f"lid.anchor.B{side.suffix}.001",
                     name="AB_EyeLidControl",
                     target_space="POSE",
                     owner_space="POSE",
                     influence=0.0,
                 )
-                driver(
+                abi.driver(
                     rig,
-                    lid,
+                    f"lid.T{side.suffix}.003",
                     "influence",
                     constraint="AB_EyeLidControl",
-                    expression=LID_EXPRESSION.format(x=x_term),
+                    expression=(
+                        "min(1, max(0, (-y / 1) - max(0, x / 0.667)))"
+                        if side is definitions.LEFT
+                        else "min(1, max(0, (-y / 1) - max(0, -x / 0.667)))"
+                    ),
                     variables={
-                        "x": TransformVariable("Lid.Ctrl", "LOC_X"),
-                        "y": TransformVariable("Lid.Ctrl", "LOC_Z"),
+                        "x": abi.TransformVariable("Lid.Ctrl", "LOC_X"),
+                        "y": abi.TransformVariable("Lid.Ctrl", "LOC_Z"),
+                    },
+                )
+                abi.constraints.copy_location(
+                    rig,
+                    f"lid.T{side.suffix}.002",
+                    f"lid.anchor.B{side.suffix}.002",
+                    name="AB_EyeLidControl",
+                    target_space="POSE",
+                    owner_space="POSE",
+                    influence=0.0,
+                )
+                abi.driver(
+                    rig,
+                    f"lid.T{side.suffix}.002",
+                    "influence",
+                    constraint="AB_EyeLidControl",
+                    expression=(
+                        "min(1, max(0, (-y / 1) - max(0, x / 0.667)))"
+                        if side is definitions.LEFT
+                        else "min(1, max(0, (-y / 1) - max(0, -x / 0.667)))"
+                    ),
+                    variables={
+                        "x": abi.TransformVariable("Lid.Ctrl", "LOC_X"),
+                        "y": abi.TransformVariable("Lid.Ctrl", "LOC_Z"),
+                    },
+                )
+                abi.constraints.copy_location(
+                    rig,
+                    f"lid.T{side.suffix}.001",
+                    f"lid.anchor.B{side.suffix}.003",
+                    name="AB_EyeLidControl",
+                    target_space="POSE",
+                    owner_space="POSE",
+                    influence=0.0,
+                )
+                abi.driver(
+                    rig,
+                    f"lid.T{side.suffix}.001",
+                    "influence",
+                    constraint="AB_EyeLidControl",
+                    expression=(
+                        "min(1, max(0, (-y / 1) - max(0, x / 0.667)))"
+                        if side is definitions.LEFT
+                        else "min(1, max(0, (-y / 1) - max(0, -x / 0.667)))"
+                    ),
+                    variables={
+                        "x": abi.TransformVariable("Lid.Ctrl", "LOC_X"),
+                        "y": abi.TransformVariable("Lid.Ctrl", "LOC_Z"),
                     },
                 )
 
-        for side in SIDES:
-            iris = f"j_f_irisprm_{side.source}"
-            iris_minimum, iris_maximum = IRIS_RANGE
-            pupil_minimum, pupil_maximum = PUPIL_RANGE
-            iris_expression = f"1 + ({1 - iris_minimum} * var if var < 0 else {iris_maximum - 1} * var)"
-            pupil_expression = f"1 + ({1 - pupil_minimum} * var if var < 0 else {pupil_maximum - 1} * var)"
-            for index in (0, 2):
-                driver(
+            # Iris and pupil scale drivers retain the original computed float strings.
+            for side in definitions.SIDES:
+                for index in (0, 2):
+                    abi.driver(
+                        rig,
+                        f"j_f_irisprm_{side.source}",
+                        "scale",
+                        index=index,
+                        expression="1 + (0.30000000000000004 * var if var < 0 else 0.5 * var)",
+                        variables={"var": abi.TransformVariable("Iris.Ctrl", "LOC_Z")},
+                    )
+                abi.driver(
                     rig,
-                    iris,
+                    f"j_f_irisprm_{side.source}",
                     "scale",
-                    index=index,
-                    expression=iris_expression,
-                    variables={"var": TransformVariable("Iris.Ctrl", "LOC_Z")},
+                    index=1,
+                    expression="1 + (0.5 * var if var < 0 else 1.2999999999999998 * var)",
+                    variables={"var": abi.TransformVariable("Pupil.Ctrl", "LOC_Z")},
                 )
-            driver(
-                rig,
-                iris,
-                "scale",
-                index=1,
-                expression=pupil_expression,
-                variables={"var": TransformVariable("Pupil.Ctrl", "LOC_Z")},
-            )
 
-        # The iris shader reads these properties from the iris mesh to undo the scale of the iris bone.
-        iris_mesh = Module._find_mesh(rig, IRIS_SHADER)
-        if iris_mesh:
-            for property_name, expression, channel in (
-                ("Eye Scale X", "1/iris", "SCALE_X"),
-                ("Eye Scale Y", "1/iris", "SCALE_Z"),
-                ("Pupil Scale", "iris-1", "SCALE_Y"),
-            ):
-                object_driver(
+            # The iris shader reads these mesh properties to undo the scale of the iris bone.
+            meshes = object_utils.find_by_armature_and_material_property(
+                rig.data.rigify_target_rig or rig, "ShaderPackage", "iris.shpk"
+            )
+            iris_mesh = meshes[0] if meshes else None
+            if iris_mesh:
+                abi.object_driver(
                     rig,
                     iris_mesh,
-                    f'["{property_name}"]',
-                    expression=expression,
-                    variables={"iris": TransformVariable("j_f_irisprm_l", channel)},
+                    '["Eye Scale X"]',
+                    expression="1/iris",
+                    variables={"iris": abi.TransformVariable("j_f_irisprm_l", "SCALE_X")},
                 )
-
-    @staticmethod
-    def _brow_edit(rig: bpy.types.Object, side: Side) -> None:
-        s = side.source
-        brow = f"Brow{side.suffix}"
-        connect(rig, brow, f"j_f_mayu_{s}", f"j_f_mmayu_{s}", parent="Head")
-        connect(rig, f"{brow}.001", f"j_f_mmayu_{s}", f"j_f_miken_01_{s}", parent=brow, connected=True)
-        connect(rig, f"{brow}.002", f"j_f_miken_01_{s}", f"j_f_miken_02_{s}", parent=f"{brow}.001", connected=True)
-        extend(rig, f"{brow}.003", f"{brow}.002", axis="Y", parent=f"{brow}.002", connected=True)
-
-    @staticmethod
-    def _brow_pose(rig: bpy.types.Object, side: Side) -> None:
-        s = side.source
-        brow = f"Brow{side.suffix}"
-        rigify.skin_stretchy_chain(
-            rig,
-            brow,
-            control_orientation_bone="Head",
-            falloff_length=True,
-            use_scale=SCALE_ALL,
-            primary_collection=PRIMARY,
-        )
-        collection(rig, [brow], SECONDARY)
-        collection(rig, [f"{brow}.001", f"{brow}.002", f"{brow}.003"], PRIMARY)
-
-        link(rig, f"j_f_mayu_{s}", f"DEF-{brow}")
-        link(rig, f"j_f_mmayu_{s}", f"DEF-{brow}.001")
-        link(rig, f"j_f_miken_01_{s}", f"DEF-{brow}.002")
-        link(rig, f"j_f_miken_02_{s}", f"DEF-{brow}.003")
-
-    @staticmethod
-    def _cheek_edit(rig: bpy.types.Object, side: Side) -> None:
-        s, x = side.source, side.suffix
-        center(rig, f"Corner{x}", [f"j_f_uslip_{s}", f"j_f_dslip_{s}", f"j_f_shoho_{s}"], axis="Y", parent="Head")
-        connect(rig, f"Cheek{x}", f"Corner{x}", f"j_f_shoho_{s}", parent="Head")
-        connect(rig, f"Cheek.B{x}", f"j_f_shoho_{s}", f"j_f_hoho_{s}", parent=f"Cheek{x}", connected=True)
-        connect(rig, f"Cheek.B{x}.001", f"j_f_dhoho_{s}", f"j_f_hoho_{s}", parent="Head")
-        connect(rig, f"Cheek.T{x}", f"j_f_hoho_{s}", f"j_f_dmemoto_{s}", parent="Head")
-        connect(rig, f"Cheek.T{x}.001", f"j_f_dmemoto_{s}", f"j_f_hana_{s}", parent="Head")
-
-    @staticmethod
-    def _cheek_pose(rig: bpy.types.Object, side: Side) -> None:
-        s, x = side.source, side.suffix
-        rigify.skin_stretchy_chain(
-            rig,
-            f"Cheek{x}",
-            control_orientation_bone="Head",
-            falloff_length=True,
-            use_scale=SCALE_ALL,
-            primary_collection=PRIMARY,
-        )
-        for chain in (f"Cheek.B{x}.001", f"Cheek.T{x}", f"Cheek.T{x}.001"):
-            rigify.skin_basic_chain(rig, chain, control_orientation_bone="Head", use_scale=SCALE_ALL)
-
-        collection(rig, [f"Cheek{x}", f"Cheek.B{x}", f"Cheek.T{x}"], PRIMARY)
-        collection(rig, [f"Cheek.B{x}.001", f"Cheek.T{x}.001"], SECONDARY)
-        collection(rig, [f"Corner{x}"], "MCH")
-
-        link(rig, f"j_f_shoho_{s}", f"DEF-Cheek.B{x}")
-        link(rig, f"j_f_dhoho_{s}", f"DEF-Cheek.B{x}.001")
-        link(rig, f"j_f_hoho_{s}", f"DEF-Cheek.T{x}")
-        link(rig, f"j_f_dmemoto_{s}", f"DEF-Cheek.T{x}.001")
-
-    @staticmethod
-    def _nose_edit(rig: bpy.types.Object, side: Side) -> None:
-        s, x = side.source, side.suffix
-        connect(rig, f"Nose{x}", f"j_f_dmiken_{s}", f"Brow{x}.003", end_point="tail", parent="Head")
-        connect(rig, f"Nostril{x}", f"j_f_hana_{s}", "j_f_uhana", parent="Head")
-
-        # Glue bones keep the nostrils and cheeks following the surrounding chains.
-        connect(rig, f"Nostril.Glue{x}", f"j_f_hana_{s}", "j_f_uhana", parent="Head")
-        connect(rig, f"Nostril.Glue{x}.001", f"Cheek.T{x}.001", f"Nostril{x}", parent="Head")
-        connect(rig, f"Cheek.B{x}.glue", f"j_f_dhoho_{s}", f"j_f_shoho_{s}", parent="Head")
-        connect(rig, f"Cheek.T{x}.glue", f"j_f_dhoho_{s}", f"j_f_hoho_{s}", parent="Head")
-
-    @staticmethod
-    def _nose_pose(rig: bpy.types.Object, side: Side) -> None:
-        s, x = side.source, side.suffix
-        rigify.skin_basic_chain(rig, f"Nose{x}", control_orientation_bone="Head", use_scale=SCALE_ALL)
-        rigify.skin_basic_chain(
-            rig, f"Nostril{x}", chain_priority=1, control_orientation_bone="Head", use_scale=SCALE_ALL
-        )
-        collection(rig, [f"Nose{x}", f"Nostril{x}"], PRIMARY)
-
-        link(rig, f"j_f_dmiken_{s}", f"DEF-Nose{x}")
-        link(rig, f"j_f_hana_{s}", f"DEF-Nostril{x}")
-
-        glue_bones = [f"Nostril.Glue{x}", f"Nostril.Glue{x}.001", f"Cheek.B{x}.glue", f"Cheek.T{x}.glue"]
-        for glue_bone in glue_bones:
-            rigify.skin_glue(
-                rig,
-                glue_bone,
-                relink_constraints=True,
-                use_tail=True,
-                reparent_tail=glue_bone == f"Cheek.B{x}.glue",
-                add_constraint="COPY_LOCATION_OWNER",
-                add_constraint_influence=0.5,
-            )
-        collection(rig, glue_bones, "MCH")
+                abi.object_driver(
+                    rig,
+                    iris_mesh,
+                    '["Eye Scale Y"]',
+                    expression="1/iris",
+                    variables={"iris": abi.TransformVariable("j_f_irisprm_l", "SCALE_Z")},
+                )
+                abi.object_driver(
+                    rig,
+                    iris_mesh,
+                    '["Pupil Scale"]',
+                    expression="iris-1",
+                    variables={"iris": abi.TransformVariable("j_f_irisprm_l", "SCALE_Y")},
+                )

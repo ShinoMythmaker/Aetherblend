@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Working on the Docs · AetherBlend</title>
+<title>Documenting Guide · AetherBlend</title>
 <meta name="description" content="">
 <link rel="icon" href="assets/img/logo.png">
 <link rel="stylesheet" href="assets/style.css">
@@ -15,7 +15,7 @@
   <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
   <nav class="header-links">
     <a href="installation.html">Guides</a>
-    <a href="contributing.html">Development</a>
+    <a href="development-guide.html">Development</a>
     <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
     <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
   </nav>
@@ -23,27 +23,31 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="">Installation</a>
+<a href="import-and-rig-character.html" class="">Import and Rig a Character</a>
 <h4>Development</h4>
-<a href="contributing.html" class="">Contributing</a>
-<a href="working-on-the-docs.html" class="active">Working on the Docs</a>
-<a href="style-guide.html" class="">Style Guide</a>
-<a href="operators.html" class="">Operator Reference</a>
-<a href="operators-import-export.html" class="sub">Import / Export</a>
-<a href="operators-preferences.html" class="sub">Preferences</a>
-<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
-<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
-<a href="operators-rig-ui.html" class="sub">Rig UI</a>
-<a href="operators-shaders.html" class="sub">Shaders</a></aside>
+<a href="development-guide.html" class="">Development Guide</a>
+<a href="documenting-guide.html" class="active">Documenting Guide</a>
+<a href="style-guide.html" class="">Style Guide</a></aside>
 <main><article>
-<h1>Working on the Docs</h1>
-<p>The website is generated. You edit Markdown in <code>docs/src/</code>, run <code>build.py</code>, and it writes plain HTML pages into <code>docs/</code>, which GitHub Pages serves. The HTML files are committed, so always rebuild before you commit documentation changes.</p>
+<h1>Documenting Guide</h1>
+<p>Write only useful task guides for AetherBlend users and practical setup or
+quickstart pages for contributors. Put user workflows in <strong>Guides</strong> and
+contributor workflows or conventions in <strong>Development</strong>. Keep API details in
+the code rather than maintaining operator, ABI or rig-module catalogs.</p>
+<p>The site is built from Markdown in <code>docs/src/</code>; <code>docs/build.py</code> generates the
+HTML served from <code>docs/</code>. The generated pages are committed, so rebuild after
+editing Markdown.</p>
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
-<p>Use the virtual environment from <a href="contributing.html">Contributing</a>. Its setup command already installs the two packages the build needs. If you set up the environment another way, install them:</p>
+<p>Use the virtual environment from <a href="development-guide.html">Development Guide</a>. Its setup command already installs the two packages the build needs. If you set up the environment another way, install them:</p>
 <div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">markdown</span> <span class="n">pygments</span>
 </code></pre></div>
 
-<h2 id="adding-or-editing-a-page">Adding or Editing a Page<a class="headerlink" href="#adding-or-editing-a-page" title="Permanent link">#</a></h2>
-<p>Every Markdown file under <code>docs/src/</code> that has a <code>group</code> in its frontmatter becomes a page in the navigation:</p>
+<h2 id="choose-and-edit-a-page">Choose and Edit a Page<a class="headerlink" href="#choose-and-edit-a-page" title="Permanent link">#</a></h2>
+<p>First update an existing guide if it covers the workflow. Add a page only for
+a distinct user task or contributor workflow. Keep navigable sources in
+<code>guides/</code> or <code>development/</code>; <code>Home.md</code> is the landing page. Every Markdown
+source with a <code>group</code> frontmatter value appears in navigation, so use only
+<code>Guides</code> or <code>Development</code>.</p>
 <div class="codehilite"><pre><span></span><code>---
 title: My Page
 group: Development
@@ -86,60 +90,63 @@ Content here.
 </tr>
 <tr>
 <td><code>aliases</code></td>
-<td>Comma separated extra names that link to this page</td>
+<td>Comma-separated names that resolve source links to this page; they do not create HTML redirects</td>
 </tr>
 </tbody>
 </table></div>
-<p>Rules to keep in mind:</p>
 <ul>
 <li>File names must be unique across all folders. The output is flat, so <code>Style-Guide.md</code> becomes <code>style-guide.html</code>.</li>
 <li>Link to other pages by file name without extension, like <code>[Style Guide](Style-Guide)</code>. The build turns it into the right HTML link.</li>
 <li>Code blocks with a language (<code>```python</code>) are syntax highlighted.</li>
-<li>Operator pages must list the ID, label, parameters, behavior, UI location and requirements.</li>
+<li>Code blocks wrap on narrow screens and have a <strong>Copy</strong> button; keep examples
+  focused and ensure they copy as intended.</li>
+<li>A user guide should state prerequisites, give short numbered steps and say
+  what success looks like. A development page should help a contributor finish
+  one practical setup or workflow.</li>
+<li>Keep pages concise and low-maintenance. Include verified details needed for
+  the task; avoid API inventories, implementation tours and duplicated
+  instructions. Use a link to an existing guide or a short inline fact when
+  useful.</li>
 </ul>
 <h2 id="build-the-site">Build the Site<a class="headerlink" href="#build-the-site" title="Permanent link">#</a></h2>
 <p>From the repository root:</p>
-<div class="codehilite"><pre><span></span><code><span class="nb">cd </span><span class="n">docs</span>
-<span class="p">..</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">build</span><span class="p">.</span><span class="n">py</span>
+<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">docs</span><span class="p">\</span><span class="n">build</span><span class="p">.</span><span class="n">py</span>
 </code></pre></div>
 
-<p>What it does:</p>
-<ul>
-<li>Reads the version and minimum Blender version from <code>blender_manifest.toml</code> and fills them into the pages.</li>
-<li>Renders every Markdown page and the landing page, then rewrites the HTML files in <code>docs/</code>.</li>
-<li>Updates the drag-and-drop download link in <code>README.md</code>.</li>
-<li>Reads the master <code>repo.json</code> online to build the Meddle Tools and FFGear links. Without a connection it prints a warning and falls back to the plain release page links.</li>
-</ul>
-<p>Check <code>git status</code> afterwards. You should see your Markdown change plus the regenerated HTML files.</p>
+<p>The builder reads version and minimum Blender facts from
+<code>blender_manifest.toml</code>, renders Markdown to HTML and fetches the master
+<code>repo.json</code> for dependency links. If that request fails, it warns and uses
+release-page fallbacks.</p>
+<p>Inspect the build output and <code>git status</code>. Confirm the changed page, navigation
+and links look right, and check generated diffs for unrelated changes.</p>
 <h2 id="preview-in-vs-code">Preview in VS Code<a class="headerlink" href="#preview-in-vs-code" title="Permanent link">#</a></h2>
 <p>The pages use relative links, so serve the <code>docs</code> folder with a small local web server:</p>
 <ol>
 <li>Open a terminal in VS Code and run:</li>
 </ol>
 <p><code>powershell
-   cd docs
-   ..venv\Scripts\python.exe -m http.server 8000</code></p>
+   .venv\Scripts\python.exe -m http.server 8000 --directory docs</code></p>
 <ol>
 <li>Open the Command Palette (<code>Ctrl+Shift+P</code>), run <strong>Simple Browser: Show</strong> and enter <code>http://localhost:8000</code>.</li>
 <li>Edit Markdown, run the build again and refresh the preview (the server keeps running).</li>
 <li>Stop the server with <code>Ctrl+C</code> when you are done.</li>
 </ol>
 <p>You can also open <code>docs\index.html</code> directly in a normal browser, but a server matches how GitHub Pages serves the site.</p>
-<h2 id="before-you-commit">Before You Commit<a class="headerlink" href="#before-you-commit" title="Permanent link">#</a></h2>
+<h2 id="before-you-finish">Before You Finish<a class="headerlink" href="#before-you-finish" title="Permanent link">#</a></h2>
 <ul>
-<li>Rebuild with <code>docs\build.py</code> so the HTML matches the Markdown.</li>
-<li>Click through the changed pages in the preview, including navigation and links.</li>
-<li>Commit the Markdown and the generated HTML together.</li>
+<li>Rebuild so generated HTML matches the Markdown.</li>
+<li>Preview the changed page and check its navigation and local links.</li>
+<li>Include the Markdown source and generated HTML in the change.</li>
 </ul>
-<div class="page-nav"><a class="prev" href="contributing.html"><small>Previous</small>Contributing</a><a class="next" href="style-guide.html"><small>Next</small>Style Guide</a></div>
+<div class="page-nav"><a class="prev" href="development-guide.html"><small>Previous</small>Development Guide</a><a class="next" href="style-guide.html"><small>Next</small>Style Guide</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>
 <li><a href="#setup">Setup</a></li>
-<li><a href="#adding-or-editing-a-page">Adding or Editing a Page</a></li>
+<li><a href="#choose-and-edit-a-page">Choose and Edit a Page</a></li>
 <li><a href="#build-the-site">Build the Site</a></li>
 <li><a href="#preview-in-vs-code">Preview in VS Code</a></li>
-<li><a href="#before-you-commit">Before You Commit</a></li>
+<li><a href="#before-you-finish">Before You Finish</a></li>
 </ul>
 </div>
 </aside>

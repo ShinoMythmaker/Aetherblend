@@ -2,29 +2,38 @@
 
 import bpy
 
-from ....definitions import RigModule
-from ....instructions import *
-from ....rigify.settings import BoneCollection, UI_Collections
-
-HEAD_COLLECTION = "Head"
+from .... import definitions
+from .... import instructions as abi
+from ....rigify import settings
 
 
-class Module(RigModule):
+class Module(definitions.RigModule):
     name = "XIV-Miqo"
-    ui_collections = UI_Collections(
+    ui_collections = settings.UI_Collections(
         [
-            BoneCollection(name=HEAD_COLLECTION, ui=True, color_set="Head", row_index=0, title="Head", visible=True),
+            settings.BoneCollection(name="Head", ui=True, color_set="Head", row_index=0, title="Head", visible=True),
         ]
     )
 
+    # ------------------------------------------------------------------------
+
     def meta_edit(self, rig: bpy.types.Object) -> None:
-        extend(rig, "Ear.R", "j_mimi_r", start_point="head", roll=150, parent=["Head", "j_kao"])
-        extend(rig, "Ear.L", "j_mimi_l", start_point="head", roll=-150, parent=["Head", "j_kao"])
+        # Ear bones
+        for side in definitions.SIDES:
+            abi.extend(
+                rig,
+                f"Ear{side.suffix}",
+                f"j_mimi_{side.source}",
+                start_point="head",
+                roll=-150 if side is definitions.LEFT else 150,
+                parent=["Head", "j_kao"],
+            )
+
+    # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
-        for ear in ["Ear.R", "Ear.L"]:
-            rigify.basic_super_copy(rig, ear, widget_type="bone")
-            collection(rig, [ear], HEAD_COLLECTION)
-
-        link(rig, "j_mimi_r", "DEF-Ear.R")
-        link(rig, "j_mimi_l", "DEF-Ear.L")
+        # Ear controls
+        for side in definitions.SIDES:
+            abi.rigify.basic_super_copy(rig, f"Ear{side.suffix}", widget_type="bone")
+            abi.collection(rig, [f"Ear{side.suffix}"], "Head")
+            abi.link(rig, f"j_mimi_{side.source}", f"DEF-Ear{side.suffix}")

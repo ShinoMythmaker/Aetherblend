@@ -15,7 +15,7 @@
   <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
   <nav class="header-links">
     <a href="installation.html">Guides</a>
-    <a href="contributing.html">Development</a>
+    <a href="development-guide.html">Development</a>
     <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
     <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
   </nav>
@@ -23,234 +23,95 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="">Installation</a>
+<a href="import-and-rig-character.html" class="">Import and Rig a Character</a>
 <h4>Development</h4>
-<a href="contributing.html" class="">Contributing</a>
-<a href="working-on-the-docs.html" class="">Working on the Docs</a>
-<a href="style-guide.html" class="active">Style Guide</a>
-<a href="operators.html" class="">Operator Reference</a>
-<a href="operators-import-export.html" class="sub">Import / Export</a>
-<a href="operators-preferences.html" class="sub">Preferences</a>
-<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
-<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
-<a href="operators-rig-ui.html" class="sub">Rig UI</a>
-<a href="operators-shaders.html" class="sub">Shaders</a></aside>
+<a href="development-guide.html" class="">Development Guide</a>
+<a href="documenting-guide.html" class="">Documenting Guide</a>
+<a href="style-guide.html" class="active">Style Guide</a></aside>
 <main><article>
 <h1>AetherBlend Style Guide</h1>
-<p>These are conventions, not a map of the repository. The add-on is in beta and its structure changes often. The rules below describe how code is written and organised, and they should stay true when folders move or features are added. If a rule needs an edit because a file moved, the rule is too specific.</p>
-<p>Python target and lint rules live in <code>ruff.toml</code>. Run <code>ruff check .</code> before every change.</p>
-<h2 id="1-structure">1. Structure<a class="headerlink" href="#1-structure" title="Permanent link">#</a></h2>
+<p>Use these principles to keep code readable and safe to disable. They describe
+conventions, not repository layout; cite stable IDs (<code>R-x.y</code>) in reviews.
+Lint settings live in <code>ruff.toml</code>; run <code>.venv\Scripts\python.exe -m ruff check .</code>.</p>
+<h2 id="structure">Structure<a class="headerlink" href="#structure" title="Permanent link">#</a></h2>
 <ul>
-<li>R-1.1 A feature MUST be a self-contained package. It owns its operators, panels, properties and helpers. Removing the package and its registry entry MUST leave the rest of the add-on working.</li>
-<li>R-1.2 A feature MUST NOT import another feature except through that feature's <code>__all__</code>.</li>
-<li>R-1.3 Code needed by 2+ features MUST move to the shared packages. Group shared helpers by what they act on (armatures, objects, collections), not by who calls them.</li>
-<li>R-1.4 Every package <code>__init__.py</code> MUST have a one-line docstring. A feature's <code>__init__.py</code> MUST also define <code>__all__</code> (its public API), <code>register()</code> and <code>unregister()</code>.</li>
-<li>R-1.5 Put each kind of code in a file named after it: <code>operators</code>, <code>panels</code>, <code>properties</code>. The name states the type, so file names MUST NOT carry <code>_ot</code>, <code>_pt</code> or <code>_prop</code> suffixes.</li>
-<li>R-1.6 Files SHOULD stay under ~300 lines. Split an oversized <code>operators</code> file into an <code>operators</code> package with one operator per file.</li>
-<li>R-1.7 Files and names that are not public API start with <code>_</code>.</li>
-<li>R-1.8 Data-driven content (templates, presets, definitions) SHOULD be editable data, not logic buried in operators.</li>
+<li><strong>R-1.1</strong> Features are self-contained; removing one and its registry entry
+  must leave other features working.</li>
+<li><strong>R-1.2</strong> A feature imports another only through its <code>__all__</code>.</li>
+<li><strong>R-1.3</strong> Shared code belongs in shared packages, grouped by what it operates on.</li>
+<li><strong>R-1.4</strong> Each package has a one-line docstring. Feature packages define
+  <code>__all__</code>, <code>register()</code> and <code>unregister()</code>.</li>
 </ul>
-<h2 id="2-registration-and-cleanup">2. Registration and Cleanup<a class="headerlink" href="#2-registration-and-cleanup" title="Permanent link">#</a></h2>
+<h2 id="lifecycle-and-user-data">Lifecycle and user data<a class="headerlink" href="#lifecycle-and-user-data" title="Permanent link">#</a></h2>
 <ul>
-<li>R-2.1 A feature's <code>register()</code> and <code>unregister()</code> MUST go through one ordered tuple of modules: register in order, unregister in reverse.</li>
-<li>R-2.2 <code>unregister()</code> MUST remove everything the feature added: operators, panels, menus, property groups, <code>Scene</code>/<code>Object</code>/<code>Armature</code> pointer properties, handlers, timers, keymaps and icons.</li>
-<li>R-2.3 <code>register()</code> and <code>unregister()</code> MUST be idempotent. Calling either twice MUST NOT raise.</li>
-<li>R-2.4 Imports MUST be side-effect free. Nothing registers or runs Blender code at import time.</li>
-<li>R-2.5 Data a feature stores in <code>.blend</code> files MUST survive an unregister and register. Unregistering MUST NOT delete user data.</li>
-<li>R-2.6 Disabling and re-enabling the add-on in Blender MUST be tested before merging.</li>
-<li>R-2.7 Every Blender class MUST be registered with an explicit <code>bpy.utils.register_class(...)</code> in the <code>register()</code> of the file that defines it, and removed in that file's <code>unregister()</code> in reverse order. Auto-discovery of Blender classes is forbidden.</li>
-<li>R-2.8 Within a feature, register property groups first, then operators, then panels. Unregister in reverse.</li>
+<li><strong>R-2.1</strong> Register feature modules in order and unregister them in reverse.</li>
+<li><strong>R-2.2</strong> Cleanup removes everything the feature registers, including classes,
+  properties, handlers, timers, keymaps and icons.</li>
+<li><strong>R-2.3</strong> Registration and cleanup are idempotent.</li>
+<li><strong>R-2.4</strong> Imports have no registration or Blender-data side effects.</li>
+<li><strong>R-2.5</strong> Data stored in <code>.blend</code> files survives add-on disable and re-enable.</li>
+<li><strong>R-2.7</strong> Register Blender classes explicitly in their defining module;
+  unregister them there in reverse order.</li>
+<li><strong>R-2.8</strong> Register property groups, then operators, then panels; unregister
+  in reverse.</li>
 </ul>
-<h2 id="3-naming">3. Naming<a class="headerlink" href="#3-naming" title="Permanent link">#</a></h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Item</th>
-<th>Convention</th>
-<th>Example</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Operator <code>bl_idname</code></td>
-<td><code>aether.&lt;feature&gt;_&lt;action&gt;</code></td>
-<td><code>aether.example_do_thing</code></td>
-</tr>
-<tr>
-<td>Operator class</td>
-<td><code>AETHER_OT_&lt;feature&gt;_&lt;action&gt;</code></td>
-<td><code>AETHER_OT_example_do_thing</code></td>
-</tr>
-<tr>
-<td>Panel class and <code>bl_idname</code></td>
-<td><code>AETHER_PT_&lt;feature&gt;_&lt;name&gt;</code></td>
-<td><code>AETHER_PT_example_main</code></td>
-</tr>
-<tr>
-<td>Menu class and <code>bl_idname</code></td>
-<td><code>AETHER_MT_&lt;feature&gt;_&lt;name&gt;</code></td>
-<td><code>AETHER_MT_example_presets</code></td>
-</tr>
-<tr>
-<td>Property group class</td>
-<td><code>AETHER_PG_&lt;feature&gt;_&lt;name&gt;</code></td>
-<td><code>AETHER_PG_example_settings</code></td>
-</tr>
-<tr>
-<td>Scene/Object/Armature property</td>
-<td><code>aether_&lt;name&gt;</code></td>
-<td><code>object.aether_rig</code></td>
-</tr>
-<tr>
-<td>Function, variable</td>
-<td><code>lower_snake_case</code></td>
-<td><code>get_bone_chain</code></td>
-</tr>
-<tr>
-<td>Constant</td>
-<td><code>ALL_CAPS</code></td>
-<td><code>DEFAULT_BONE_SIZE</code></td>
-</tr>
-<tr>
-<td>Private helper</td>
-<td>leading <code>_</code></td>
-<td><code>_collect_bones</code></td>
-</tr>
-</tbody>
-</table></div>
+<h2 id="names-and-imports">Names and imports<a class="headerlink" href="#names-and-imports" title="Permanent link">#</a></h2>
 <ul>
-<li>R-3.1 <code>&lt;feature&gt;</code> in IDs and class names MUST equal the feature's package name.</li>
-<li>R-3.2 <code>bl_idname</code> MUST be lowercase with exactly one dot.</li>
-<li>R-3.3 A panel's <code>bl_idname</code> MUST equal its class name.</li>
-<li>R-3.4 Blender class names follow the table, not CapWords. Ruff ignores N801 for that reason.</li>
-<li>R-3.5 Operator IDs are public API for users' scripts. Renaming one MUST be listed in the changelog.</li>
+<li><strong>R-3.1</strong> Feature IDs and class names use the feature package name.</li>
+<li><strong>R-3.2</strong> Operator IDs are lowercase with exactly one dot.</li>
+<li><strong>R-3.3</strong> A panel's <code>bl_idname</code> matches its class name.</li>
+<li><strong>R-3.4</strong> Blender classes use <code>AETHER_&lt;TYPE&gt;_&lt;feature&gt;_&lt;name&gt;</code>. Functions and
+  variables use <code>lower_snake_case</code>, constants use <code>ALL_CAPS</code>, and private
+  helpers start with <code>_</code>.</li>
+<li><strong>R-3.5</strong> Operator IDs are public to scripts; list renames in the changelog.</li>
+<li><strong>R-8.1</strong> Order imports: standard library, third party, then local.</li>
+<li><strong>R-8.2</strong> Prefer module imports. Wildcard imports require an explicit <code>__all__</code>.</li>
+<li><strong>R-8.3</strong> Use relative imports within a feature; follow <strong>R-1.2</strong> across features.</li>
+<li><strong>R-8.4</strong> Keep imports at module scope unless a local import prevents a
+  circular import; explain that exception in a comment.</li>
 </ul>
-<h2 id="4-operators">4. Operators<a class="headerlink" href="#4-operators" title="Permanent link">#</a></h2>
+<h2 id="functions-and-blender-interaction">Functions and Blender interaction<a class="headerlink" href="#functions-and-blender-interaction" title="Permanent link">#</a></h2>
 <ul>
-<li>R-4.1 An operator MUST define <code>bl_idname</code>, <code>bl_label</code> and <code>bl_description</code>. It MUST NOT have a docstring.</li>
-<li>R-4.2 An operator MUST only contain <code>poll</code>, <code>invoke</code>/<code>execute</code>/<code>modal</code>, <code>draw</code> and user reporting. Logic MUST live in helpers or the feature's own modules.</li>
-<li>R-4.3 MUST report through <code>self.report</code> with a clear, actionable message.</li>
-<li>R-4.4 Operators that change data SHOULD include <code>"UNDO"</code> in <code>bl_options</code>.</li>
-<li>R-4.5 Every operator property MUST have <code>name</code> and <code>description</code>. Hidden helper properties (for example <code>filter_glob</code>) are exempt.</li>
-<li>R-4.6 An operator that changes mode, selection, cursor or the active object MUST restore it on exit, including on error.</li>
+<li><strong>R-4.2</strong> Keep operators focused on Blender's operator lifecycle and reporting;
+  put reusable logic in helpers or feature modules.</li>
+<li><strong>R-4.3</strong> Operator messages are clear and actionable.</li>
+<li><strong>R-4.4</strong> Data-changing operators should support undo.</li>
+<li><strong>R-4.5</strong> Operator properties have a <code>name</code> and <code>description</code>.</li>
+<li><strong>R-4.6</strong> Restore changed mode, selection, cursor and active object, including
+  on errors.</li>
+<li><strong>R-5.1</strong> Type every function argument and return value.</li>
+<li><strong>R-5.2</strong> Prefer specific Blender types; use <code>Any</code> only when no better type fits.</li>
+<li><strong>R-5.3</strong> Operator <code>execute</code>, <code>invoke</code> and <code>modal</code> return <code>set[str]</code>;
+  <code>poll</code> returns <code>bool</code>.</li>
+<li><strong>R-6.2</strong> Public functions have a one-line imperative docstring.</li>
+<li><strong>R-6.5</strong> Blender properties have a user-facing description.</li>
+<li><strong>R-6.7</strong> Comments explain why, not what.</li>
+<li><strong>R-7.2</strong> Utilities changing mode restore the original mode, including on errors.</li>
 </ul>
-<h2 id="5-type-hints">5. Type Hints<a class="headerlink" href="#5-type-hints" title="Permanent link">#</a></h2>
+<h2 id="errors-and-output">Errors and output<a class="headerlink" href="#errors-and-output" title="Permanent link">#</a></h2>
 <ul>
-<li>R-5.1 Every function MUST type all arguments and the return value.</li>
-<li>R-5.2 MUST use Blender types (<code>bpy.types.Object</code>, <code>bpy.types.Context</code>, ...). <code>Any</code> only when no better type exists.</li>
-<li>R-5.3 <code>execute</code>, <code>invoke</code> and <code>modal</code> return <code>set[str]</code>. <code>poll</code> returns <code>bool</code> (wrap truthy values in <code>bool()</code>).</li>
+<li><strong>R-9.1</strong> Console output starts with <code>[AetherBlend]</code>.</li>
+<li><strong>R-9.2</strong> Operators use <code>self.report</code>; utilities use <code>print</code>.</li>
+<li><strong>R-9.3</strong> Never use a bare <code>except:</code>; catch specific exceptions.</li>
 </ul>
-<h2 id="6-documentation-in-code">6. Documentation in Code<a class="headerlink" href="#6-documentation-in-code" title="Permanent link">#</a></h2>
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">#</a></h2>
 <ul>
-<li>R-6.1 Each module MUST start with a one-line docstring.</li>
-<li>R-6.2 Each public function MUST have a one-line imperative docstring:
-  <code>python
-  def exist(armature: bpy.types.Object, name: str) -&gt; bool:
-      """Return True if the armature has a bone with this name."""</code></li>
-<li>R-6.3 <code>Args:</code>, <code>Returns:</code>, <code>Raises:</code> sections are only allowed when name and types do not explain the function.</li>
-<li>R-6.4 Private <code>_helpers</code> need no docstring when name and types are clear.</li>
-<li>R-6.5 Properties MUST have <code>description=</code>. Operators use <code>bl_description</code>. These are the UI tooltips.</li>
-<li>R-6.6 Explanations longer than a few lines MUST go on the wiki, not in code.</li>
-<li>R-6.7 Comments explain <em>why</em>, never <em>what</em>.</li>
+<li><strong>R-10.1</strong> Edit Markdown in <code>docs/src/</code>, not generated HTML. Rebuild with
+  <code>.venv\Scripts\python.exe docs\build.py</code>; keep page names unique and use
+  <code>Guides</code> or <code>Development</code> frontmatter. Use build placeholders for version
+  and minimum Blender facts.</li>
+<li><strong>R-10.4</strong> Keep this guide at <code>docs/src/development/Style-Guide.md</code>.</li>
 </ul>
-<h2 id="7-utilities">7. Utilities<a class="headerlink" href="#7-utilities" title="Permanent link">#</a></h2>
-<ul>
-<li>R-7.1 Name functions without the module name: <code>armature.get_pose_bone()</code>, not <code>armature.armature_get_pose_bone()</code>.</li>
-<li>R-7.2 Utilities that change mode MUST restore the original mode on exit, including on error.</li>
-</ul>
-<h2 id="8-imports">8. Imports<a class="headerlink" href="#8-imports" title="Permanent link">#</a></h2>
-<ul>
-<li>R-8.1 Order: standard library, third party (<code>bpy</code>, <code>mathutils</code>), local.</li>
-<li>R-8.2 MUST import modules, not names: <code>from . import bone</code>. A wildcard import is only allowed from a module that defines <code>__all__</code>, so it brings in exactly the public API.</li>
-<li>R-8.3 Inside a feature use relative imports. Another feature is reached only through its <code>__all__</code> (R-1.2).</li>
-<li>R-8.4 Import at the top of the file. Do not import inside functions unless it avoids a circular import, and then say so in a comment.</li>
-</ul>
-<h2 id="9-console-and-errors">9. Console and Errors<a class="headerlink" href="#9-console-and-errors" title="Permanent link">#</a></h2>
-<ul>
-<li>R-9.1 Console output MUST start with <code>[AetherBlend]</code>.</li>
-<li>R-9.2 Operators use <code>self.report</code>. Utilities use <code>print</code>.</li>
-<li>R-9.3 MUST NOT use a bare <code>except:</code>. Catch the specific exceptions.</li>
-</ul>
-<h2 id="10-wiki-documentation">10. Wiki Documentation<a class="headerlink" href="#10-wiki-documentation" title="Permanent link">#</a></h2>
-<ul>
-<li>R-10.1 The documentation site is built from Markdown in <code>docs/src/</code> with <code>python docs/build.py</code> and published with GitHub Pages from <code>docs/</code>. Sources live in topic subfolders (<code>guides/</code>, <code>operators/</code>, <code>development/</code>; <code>Home.md</code> stays at the root); the folder is for organisation only and does not affect the URL or navigation. File names must be unique across folders. Edit the Markdown, never the generated HTML, and commit both. A page appears in the navigation through its frontmatter (<code>title</code>, <code>group</code>, <code>order</code>, <code>sub</code>, <code>summary</code>, <code>aliases</code>). Never hard-code the add-on version or minimum Blender version; use the placeholders defined in <code>docs/build.py</code>.</li>
-<li>R-10.2 Every operator MUST be documented in the operator reference. An entry gives: ID, label, what it does, where it appears, requirements, parameters, errors and a Python call example.</li>
-<li>R-10.3 When an operator is added, renamed, removed or gets a new parameter, its documentation entry MUST change in the same change.</li>
-<li>R-10.4 Changes to this style guide are made in <code>docs/src/development/Style-Guide.md</code>.</li>
-</ul>
-<h2 id="11-rig-modules">11. Rig Modules<a class="headerlink" href="#11-rig-modules" title="Permanent link">#</a></h2>
-<p>Rig module authoring has its own page: <a href="Writing-Rig-Modules">Writing Rig Modules</a>.</p>
-<h2 id="12-checklist-for-new-or-changed-code">12. Checklist for New or Changed Code<a class="headerlink" href="#12-checklist-for-new-or-changed-code" title="Permanent link">#</a></h2>
-<ul>
-<li>[ ] Lives in the right feature, with no cross-feature imports (R-1.2)</li>
-<li>[ ] <code>register()</code>/<code>unregister()</code> removes everything (R-2.2) and the add-on was toggled off and on (R-2.6)</li>
-<li>[ ] IDs and class names follow section 3</li>
-<li>[ ] Operators have <code>bl_label</code>, <code>bl_description</code> and described properties (R-4.1, R-4.5)</li>
-<li>[ ] Types on all functions (R-5.1); one-line docstrings on public ones (R-6.2)</li>
-<li>[ ] Operator reference updated and <code>docs/build.py</code> run (R-10.3)</li>
-<li>[ ] <code>ruff check .</code> and <code>ruff format --check .</code> pass</li>
-</ul>
-<h2 id="13-example">13. Example<a class="headerlink" href="#13-example" title="Permanent link">#</a></h2>
-<p>An operator, in a feature's operators file:</p>
-<div class="codehilite"><pre><span></span><code><span class="sd">"""Operators that do example things."""</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">bpy</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">...utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">armature</span> <span class="k">as</span> <span class="n">armature_utils</span>
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">AETHER_OT_example_do_thing</span><span class="p">(</span><span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Operator</span><span class="p">):</span>
-    <span class="n">bl_idname</span> <span class="o">=</span> <span class="s2">"aether.example_do_thing"</span>
-    <span class="n">bl_label</span> <span class="o">=</span> <span class="s2">"Do Thing"</span>
-    <span class="n">bl_description</span> <span class="o">=</span> <span class="s2">"Hide every bone in the active armature that matches the prefix"</span>
-    <span class="n">bl_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"REGISTER"</span><span class="p">,</span> <span class="s2">"UNDO"</span><span class="p">}</span>
-
-    <span class="n">prefix</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">props</span><span class="o">.</span><span class="n">StringProperty</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">"Prefix"</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">"Bones whose name starts with this text are hidden"</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">"tmp_"</span><span class="p">,</span>
-    <span class="p">)</span>  <span class="c1"># type: ignore</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">poll</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">active_object</span>
-        <span class="k">return</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">"ARMATURE"</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">bpy</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">armature</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">active_object</span>
-        <span class="n">count</span> <span class="o">=</span> <span class="n">armature_utils</span><span class="o">.</span><span class="n">hide_bones_with_prefix</span><span class="p">(</span><span class="n">armature</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">report</span><span class="p">({</span><span class="s2">"WARNING"</span><span class="p">},</span> <span class="sa">f</span><span class="s2">"No bones start with '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">"CANCELLED"</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">report</span><span class="p">({</span><span class="s2">"INFO"</span><span class="p">},</span> <span class="sa">f</span><span class="s2">"Hid </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> bones"</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"FINISHED"</span><span class="p">}</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Register this module's classes."""</span>
-    <span class="n">bpy</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_class</span><span class="p">(</span><span class="n">AETHER_OT_example_do_thing</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">unregister</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Unregister this module's classes."""</span>
-    <span class="n">bpy</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">unregister_class</span><span class="p">(</span><span class="n">AETHER_OT_example_do_thing</span><span class="p">)</span>
-</code></pre></div>
-<div class="page-nav"><a class="prev" href="working-on-the-docs.html"><small>Previous</small>Working on the Docs</a><a class="next" href="operators.html"><small>Next</small>Operator Reference</a></div>
+<div class="page-nav"><a class="prev" href="documenting-guide.html"><small>Previous</small>Documenting Guide</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>
-<li><a href="#1-structure">1. Structure</a></li>
-<li><a href="#2-registration-and-cleanup">2. Registration and Cleanup</a></li>
-<li><a href="#3-naming">3. Naming</a></li>
-<li><a href="#4-operators">4. Operators</a></li>
-<li><a href="#5-type-hints">5. Type Hints</a></li>
-<li><a href="#6-documentation-in-code">6. Documentation in Code</a></li>
-<li><a href="#7-utilities">7. Utilities</a></li>
-<li><a href="#8-imports">8. Imports</a></li>
-<li><a href="#9-console-and-errors">9. Console and Errors</a></li>
-<li><a href="#10-wiki-documentation">10. Wiki Documentation</a></li>
-<li><a href="#11-rig-modules">11. Rig Modules</a></li>
-<li><a href="#12-checklist-for-new-or-changed-code">12. Checklist for New or Changed Code</a></li>
-<li><a href="#13-example">13. Example</a></li>
+<li><a href="#structure">Structure</a></li>
+<li><a href="#lifecycle-and-user-data">Lifecycle and user data</a></li>
+<li><a href="#names-and-imports">Names and imports</a></li>
+<li><a href="#functions-and-blender-interaction">Functions and Blender interaction</a></li>
+<li><a href="#errors-and-output">Errors and output</a></li>
+<li><a href="#documentation">Documentation</a></li>
 </ul>
 </div>
 </aside>

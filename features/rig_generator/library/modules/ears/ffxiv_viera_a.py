@@ -1,8 +1,8 @@
 """Viera ears, variant A."""
 
-from ._viera import VieraEars
+from . import _viera
 
 
-class Module(VieraEars):
+class Module(_viera.VieraEars):
     name = "XIV-Viera A"
     prefix = "j_zera"

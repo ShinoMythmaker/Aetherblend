@@ -2,11 +2,24 @@
 
 from collections.abc import Container, Sequence
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, NamedTuple
 
 import bpy
 
 from . import rigify
+
+
+class Side(NamedTuple):
+    """Naming conventions for one body side."""
+
+    suffix: str
+    source: str
+    name: str
+
+
+LEFT = Side(".L", "l", "Left")
+RIGHT = Side(".R", "r", "Right")
+SIDES = (LEFT, RIGHT)
 
 
 class RigModule:

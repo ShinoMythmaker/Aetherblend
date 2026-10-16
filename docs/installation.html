@@ -15,7 +15,7 @@
   <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
   <nav class="header-links">
     <a href="installation.html">Guides</a>
-    <a href="contributing.html">Development</a>
+    <a href="development-guide.html">Development</a>
     <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
     <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
   </nav>
@@ -23,26 +23,21 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="active">Installation</a>
+<a href="import-and-rig-character.html" class="">Import and Rig a Character</a>
 <h4>Development</h4>
-<a href="contributing.html" class="">Contributing</a>
-<a href="working-on-the-docs.html" class="">Working on the Docs</a>
-<a href="style-guide.html" class="">Style Guide</a>
-<a href="operators.html" class="">Operator Reference</a>
-<a href="operators-import-export.html" class="sub">Import / Export</a>
-<a href="operators-preferences.html" class="sub">Preferences</a>
-<a href="operators-rig-edit.html" class="sub">Rig Edit</a>
-<a href="operators-rig-generator.html" class="sub">Rig Generator</a>
-<a href="operators-rig-ui.html" class="sub">Rig UI</a>
-<a href="operators-shaders.html" class="sub">Shaders</a></aside>
+<a href="development-guide.html" class="">Development Guide</a>
+<a href="documenting-guide.html" class="">Documenting Guide</a>
+<a href="style-guide.html" class="">Style Guide</a></aside>
 <main><article>
 <h1>Installation</h1>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">#</a></h2>
 <ul>
-<li>Blender 5.2 or newer</li>
-<li><a href="https://github.com/PassiveModding/Meddle">Meddle</a> and <a href="https://github.com/PassiveModding/MeddleTools">MeddleTools</a></li>
-<li>Rigify</li>
+<li>Blender 5.2 or newer.</li>
+<li>Rigify for rig generation. It ships with Blender but may need to be enabled
+  manually.</li>
+<li>Meddle Tools and FFGear are optional add-ons for their respective shader
+  imports. AetherBlend can import and rig models without them.</li>
 </ul>
-<p><strong>Note: Rigify ships with Blender but may need to be enabled manually</strong></p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
 <p>You can install AetherBlend with drag and drop, manually, or with Blender's repository feature:</p>
 <h3 id="drag-and-drop">Drag and drop<a class="headerlink" href="#drag-and-drop" title="Permanent link">#</a></h3>
@@ -61,7 +56,7 @@
   <div class="drop-row recommended">
     <span class="tag">Recommended</span>
     <a class="drop-link subtle" href="https://github.com/PassiveModding/MeddleTools/releases/download/0.2.0/MeddleTools-0.2.0.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&blender_version_min=5.2.0" draggable="true">Drag Meddle Tools into Blender</a>
-    <p>Needed to import characters with their materials and shaders. You can skip it if you only use AetherBlend's rigging tools.</p>
+    <p>Needed only for Meddle shader import. You can skip it for model import and rigging.</p>
   </div>
   <div class="drop-row optional">
     <span class="tag">Optional</span>
@@ -95,7 +90,7 @@
 <li>Open your preferences menu in Blender and navigate to the add-ons section</li>
 <li>From the dropdown in the top right of the window, select "Install from Disk" and navigate to your downloaded release of AetherBlend</li>
 </ol>
-<div class="page-nav"><a class="next" href="contributing.html"><small>Next</small>Contributing</a></div>
+<div class="page-nav"><a class="next" href="import-and-rig-character.html"><small>Next</small>Import and Rig a Character</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>

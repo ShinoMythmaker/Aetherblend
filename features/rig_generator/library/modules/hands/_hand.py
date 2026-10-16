@@ -1,22 +1,15 @@
 """Hands shared by every hand variant; a variant only decides whether the fingers have IVCS tip bones."""
 
-from typing import NamedTuple
+import typing
 
 import bpy
 
-from ....definitions import RigModule
-from ....instructions import *
-from ....rigify.settings import BoneCollection, UI_Collections
+from .... import definitions
+from .... import instructions as abi
+from ....rigify import settings
 
 
-class Side(NamedTuple):
-    suffix: str
-    letter: str
-    palm_roll: float
-    color_set: str
-
-
-class Finger(NamedTuple):
+class Finger(typing.NamedTuple):
     """A finger's rigify name, the name used for it in the source bones and the number of its palm bone."""
 
     name: str
@@ -24,10 +17,6 @@ class Finger(NamedTuple):
     palm: str | None
 
 
-SIDES = (
-    Side(".R", "r", 135, "Fingers_Right"),
-    Side(".L", "l", -135, "Fingers_Left"),
-)
 THUMB = Finger("thumb", "oya", None)
 LONG_FINGERS = (
     Finger("index", "hito", "palm.01"),
@@ -35,112 +24,359 @@ LONG_FINGERS = (
     Finger("ring", "kusu", "palm.03"),
     Finger("pinky", "ko", "palm.04"),
 )
-THUMB_ROLL = -15
 
 
 def required_bones(has_tip_bones: bool) -> list[str]:
+    """Return the legacy hand bone sequence for callers outside the variants."""
     bones = []
-    for side in SIDES:
+    for side in definitions.SIDES:
         for finger in (THUMB, *LONG_FINGERS):
-            bones += [f"j_{finger.source}_a_{side.letter}", f"j_{finger.source}_b_{side.letter}"]
+            bones += [f"j_{finger.source}_a_{side.source}", f"j_{finger.source}_b_{side.source}"]
             if has_tip_bones and finger is not THUMB:
-                bones.append(f"iv_{finger.source}_c_{side.letter}")
+                bones.append(f"iv_{finger.source}_c_{side.source}")
     return bones
 
 
-def ui_collections() -> UI_Collections:
-    return UI_Collections(
+def ui_collections() -> settings.UI_Collections:
+    """Build finger control collections in shared side order."""
+    return settings.UI_Collections(
         [
-            BoneCollection(
+            settings.BoneCollection(
                 name=f"Fingers{side.suffix}",
                 ui=True,
-                color_set=side.color_set,
+                color_set=f"Fingers_{side.name}",
                 row_index=1,
                 title=f"Fingers{side.suffix}",
                 visible=False,
             )
-            for side in SIDES
+            for side in definitions.SIDES
         ]
     )
 
 
-class Hands(RigModule):
+class Hands(definitions.RigModule):
     has_tip_bones = False
 
+    # ------------------------------------------------------------------------
+
     def meta_edit(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            hand_parents = [f"hand{side.suffix}", f"j_te_{side.letter}"]
+        for side in definitions.SIDES:
+            # Palm bones
+            abi.extend(
+                rig,
+                f"palm.01{side.suffix}",
+                f"j_hito_a_{side.source}",
+                start_point="head",
+                parent=f"hand{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
+            abi.extend(
+                rig,
+                f"palm.02{side.suffix}",
+                f"j_naka_a_{side.source}",
+                start_point="head",
+                parent=f"hand{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
+            abi.extend(
+                rig,
+                f"palm.03{side.suffix}",
+                f"j_kusu_a_{side.source}",
+                start_point="head",
+                parent=f"hand{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
+            abi.extend(
+                rig,
+                f"palm.04{side.suffix}",
+                f"j_ko_a_{side.source}",
+                start_point="head",
+                parent=f"hand{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
 
-            for finger in LONG_FINGERS:
-                extend(
-                    rig,
-                    f"{finger.palm}{side.suffix}",
-                    f"j_{finger.source}_a_{side.letter}",
-                    start_point="head",
-                    parent=f"hand{side.suffix}",
-                    roll=side.palm_roll,
-                )
-
-            thumb_master = f"DEF-thumb_master{side.suffix}"
-            copy(rig, thumb_master, f"j_oya_a_{side.letter}", parent=hand_parents)
-            connect(
+            # Thumb chain
+            abi.copy(
+                rig,
+                f"DEF-thumb_master{side.suffix}",
+                f"j_oya_a_{side.source}",
+                parent=[f"hand{side.suffix}", f"j_te_{side.source}"],
+            )
+            abi.connect(
                 rig,
                 f"thumb{side.suffix}",
-                f"j_oya_a_{side.letter}",
-                f"j_oya_b_{side.letter}",
-                parent=thumb_master,
-                roll=THUMB_ROLL,
+                f"j_oya_a_{side.source}",
+                f"j_oya_b_{side.source}",
+                parent=f"DEF-thumb_master{side.suffix}",
+                roll=-15,
             )
-            extend(
+            abi.extend(
                 rig,
                 f"thumb{side.suffix}.001",
-                f"j_oya_b_{side.letter}",
+                f"j_oya_b_{side.source}",
                 size_factor=0.2,
                 start_point="head",
                 parent=f"thumb{side.suffix}",
                 connected=True,
             )
 
-            for finger in LONG_FINGERS:
-                base = f"{finger.name}{side.suffix}"
-                lower, upper = f"j_{finger.source}_a_{side.letter}", f"j_{finger.source}_b_{side.letter}"
-                connect(rig, base, lower, upper, parent=f"{finger.palm}{side.suffix}", roll=side.palm_roll)
-
-                if self.has_tip_bones:
-                    tip = f"iv_{finger.source}_c_{side.letter}"
-                    connect(rig, f"{base}.001", upper, tip, parent=base, connected=True)
-                    extend(rig, f"{base}.002", tip, start_point="head", parent=f"{base}.001", connected=True)
-                else:
-                    extend(rig, f"{base}.001", upper, start_point="head", parent=base, connected=True)
-
-    def meta_pose(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            fingers_collection = f"Fingers{side.suffix}"
-            thumb_master = f"DEF-thumb_master{side.suffix}"
-
-            rigify.limbs_super_palm(rig, f"palm.01{side.suffix}", palm_both_sides=True)
-            collection(rig, [f"{finger.palm}{side.suffix}" for finger in LONG_FINGERS], fingers_collection)
-
-            rigify.basic_raw_copy(rig, thumb_master, relink_constraints=True, parent="DEF")
-            collection(rig, [thumb_master], "DEF")
-
-            tip_count = 2 if self.has_tip_bones else 1
-            for finger in (THUMB, *LONG_FINGERS):
-                base = f"{finger.name}{side.suffix}"
-                rigify.limbs_super_finger(
-                    rig, base, extra_ik_control=True, extra_ik_collection=f"{fingers_collection} (IK)"
+            # Finger chains
+            abi.connect(
+                rig,
+                f"index{side.suffix}",
+                f"j_hito_a_{side.source}",
+                f"j_hito_b_{side.source}",
+                parent=f"palm.01{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
+            if self.has_tip_bones:
+                abi.connect(
+                    rig,
+                    f"index{side.suffix}.001",
+                    f"j_hito_b_{side.source}",
+                    f"iv_hito_c_{side.source}",
+                    parent=f"index{side.suffix}",
+                    connected=True,
+                )
+                abi.extend(
+                    rig,
+                    f"index{side.suffix}.002",
+                    f"iv_hito_c_{side.source}",
+                    start_point="head",
+                    parent=f"index{side.suffix}.001",
+                    connected=True,
+                )
+            else:
+                abi.extend(
+                    rig,
+                    f"index{side.suffix}.001",
+                    f"j_hito_b_{side.source}",
+                    start_point="head",
+                    parent=f"index{side.suffix}",
+                    connected=True,
                 )
 
-                segment_count = 1 if finger is THUMB else tip_count
-                segments = [base] + [f"{base}.{number:03}" for number in range(1, segment_count + 1)]
-                collection(rig, segments, fingers_collection)
+            abi.connect(
+                rig,
+                f"middle{side.suffix}",
+                f"j_naka_a_{side.source}",
+                f"j_naka_b_{side.source}",
+                parent=f"palm.02{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
+            if self.has_tip_bones:
+                abi.connect(
+                    rig,
+                    f"middle{side.suffix}.001",
+                    f"j_naka_b_{side.source}",
+                    f"iv_naka_c_{side.source}",
+                    parent=f"middle{side.suffix}",
+                    connected=True,
+                )
+                abi.extend(
+                    rig,
+                    f"middle{side.suffix}.002",
+                    f"iv_naka_c_{side.source}",
+                    start_point="head",
+                    parent=f"middle{side.suffix}.001",
+                    connected=True,
+                )
+            else:
+                abi.extend(
+                    rig,
+                    f"middle{side.suffix}.001",
+                    f"j_naka_b_{side.source}",
+                    start_point="head",
+                    parent=f"middle{side.suffix}",
+                    connected=True,
+                )
 
-                link(rig, f"j_{finger.source}_a_{side.letter}", f"DEF-{base}")
-                link(rig, f"j_{finger.source}_b_{side.letter}", f"DEF-{base}.001")
-                if self.has_tip_bones and finger is not THUMB:
-                    link(rig, f"iv_{finger.source}_c_{side.letter}", f"DEF-{base}.002")
+            abi.connect(
+                rig,
+                f"ring{side.suffix}",
+                f"j_kusu_a_{side.source}",
+                f"j_kusu_b_{side.source}",
+                parent=f"palm.03{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
+            if self.has_tip_bones:
+                abi.connect(
+                    rig,
+                    f"ring{side.suffix}.001",
+                    f"j_kusu_b_{side.source}",
+                    f"iv_kusu_c_{side.source}",
+                    parent=f"ring{side.suffix}",
+                    connected=True,
+                )
+                abi.extend(
+                    rig,
+                    f"ring{side.suffix}.002",
+                    f"iv_kusu_c_{side.source}",
+                    start_point="head",
+                    parent=f"ring{side.suffix}.001",
+                    connected=True,
+                )
+            else:
+                abi.extend(
+                    rig,
+                    f"ring{side.suffix}.001",
+                    f"j_kusu_b_{side.source}",
+                    start_point="head",
+                    parent=f"ring{side.suffix}",
+                    connected=True,
+                )
+
+            abi.connect(
+                rig,
+                f"pinky{side.suffix}",
+                f"j_ko_a_{side.source}",
+                f"j_ko_b_{side.source}",
+                parent=f"palm.04{side.suffix}",
+                roll=-135 if side is definitions.LEFT else 135,
+            )
+            if self.has_tip_bones:
+                abi.connect(
+                    rig,
+                    f"pinky{side.suffix}.001",
+                    f"j_ko_b_{side.source}",
+                    f"iv_ko_c_{side.source}",
+                    parent=f"pinky{side.suffix}",
+                    connected=True,
+                )
+                abi.extend(
+                    rig,
+                    f"pinky{side.suffix}.002",
+                    f"iv_ko_c_{side.source}",
+                    start_point="head",
+                    parent=f"pinky{side.suffix}.001",
+                    connected=True,
+                )
+            else:
+                abi.extend(
+                    rig,
+                    f"pinky{side.suffix}.001",
+                    f"j_ko_b_{side.source}",
+                    start_point="head",
+                    parent=f"pinky{side.suffix}",
+                    connected=True,
+                )
+
+    # ------------------------------------------------------------------------
+
+    def meta_pose(self, rig: bpy.types.Object) -> None:
+        for side in definitions.SIDES:
+            fingers_collection = f"Fingers{side.suffix}"
+
+            # Palm controls
+            abi.rigify.limbs_super_palm(rig, f"palm.01{side.suffix}", palm_both_sides=True)
+            abi.collection(
+                rig,
+                [
+                    f"palm.01{side.suffix}",
+                    f"palm.02{side.suffix}",
+                    f"palm.03{side.suffix}",
+                    f"palm.04{side.suffix}",
+                ],
+                fingers_collection,
+            )
+
+            # Thumb master
+            abi.rigify.basic_raw_copy(rig, f"DEF-thumb_master{side.suffix}", relink_constraints=True, parent="DEF")
+            abi.collection(rig, [f"DEF-thumb_master{side.suffix}"], "DEF")
+
+            # Finger controls and source-to-deform mappings
+            abi.rigify.limbs_super_finger(
+                rig,
+                f"thumb{side.suffix}",
+                extra_ik_control=True,
+                extra_ik_collection=f"{fingers_collection} (IK)",
+            )
+            abi.collection(rig, [f"thumb{side.suffix}", f"thumb{side.suffix}.001"], fingers_collection)
+            abi.link(rig, f"j_oya_a_{side.source}", f"DEF-thumb{side.suffix}")
+            abi.link(rig, f"j_oya_b_{side.source}", f"DEF-thumb{side.suffix}.001")
+
+            abi.rigify.limbs_super_finger(
+                rig,
+                f"index{side.suffix}",
+                extra_ik_control=True,
+                extra_ik_collection=f"{fingers_collection} (IK)",
+            )
+            if self.has_tip_bones:
+                abi.collection(
+                    rig,
+                    [f"index{side.suffix}", f"index{side.suffix}.001", f"index{side.suffix}.002"],
+                    fingers_collection,
+                )
+            else:
+                abi.collection(rig, [f"index{side.suffix}", f"index{side.suffix}.001"], fingers_collection)
+            abi.link(rig, f"j_hito_a_{side.source}", f"DEF-index{side.suffix}")
+            abi.link(rig, f"j_hito_b_{side.source}", f"DEF-index{side.suffix}.001")
+            if self.has_tip_bones:
+                abi.link(rig, f"iv_hito_c_{side.source}", f"DEF-index{side.suffix}.002")
+
+            abi.rigify.limbs_super_finger(
+                rig,
+                f"middle{side.suffix}",
+                extra_ik_control=True,
+                extra_ik_collection=f"{fingers_collection} (IK)",
+            )
+            if self.has_tip_bones:
+                abi.collection(
+                    rig,
+                    [f"middle{side.suffix}", f"middle{side.suffix}.001", f"middle{side.suffix}.002"],
+                    fingers_collection,
+                )
+            else:
+                abi.collection(rig, [f"middle{side.suffix}", f"middle{side.suffix}.001"], fingers_collection)
+            abi.link(rig, f"j_naka_a_{side.source}", f"DEF-middle{side.suffix}")
+            abi.link(rig, f"j_naka_b_{side.source}", f"DEF-middle{side.suffix}.001")
+            if self.has_tip_bones:
+                abi.link(rig, f"iv_naka_c_{side.source}", f"DEF-middle{side.suffix}.002")
+
+            abi.rigify.limbs_super_finger(
+                rig,
+                f"ring{side.suffix}",
+                extra_ik_control=True,
+                extra_ik_collection=f"{fingers_collection} (IK)",
+            )
+            if self.has_tip_bones:
+                abi.collection(
+                    rig,
+                    [f"ring{side.suffix}", f"ring{side.suffix}.001", f"ring{side.suffix}.002"],
+                    fingers_collection,
+                )
+            else:
+                abi.collection(rig, [f"ring{side.suffix}", f"ring{side.suffix}.001"], fingers_collection)
+            abi.link(rig, f"j_kusu_a_{side.source}", f"DEF-ring{side.suffix}")
+            abi.link(rig, f"j_kusu_b_{side.source}", f"DEF-ring{side.suffix}.001")
+            if self.has_tip_bones:
+                abi.link(rig, f"iv_kusu_c_{side.source}", f"DEF-ring{side.suffix}.002")
+
+            abi.rigify.limbs_super_finger(
+                rig,
+                f"pinky{side.suffix}",
+                extra_ik_control=True,
+                extra_ik_collection=f"{fingers_collection} (IK)",
+            )
+            if self.has_tip_bones:
+                abi.collection(
+                    rig,
+                    [f"pinky{side.suffix}", f"pinky{side.suffix}.001", f"pinky{side.suffix}.002"],
+                    fingers_collection,
+                )
+            else:
+                abi.collection(rig, [f"pinky{side.suffix}", f"pinky{side.suffix}.001"], fingers_collection)
+            abi.link(rig, f"j_ko_a_{side.source}", f"DEF-pinky{side.suffix}")
+            abi.link(rig, f"j_ko_b_{side.source}", f"DEF-pinky{side.suffix}.001")
+            if self.has_tip_bones:
+                abi.link(rig, f"iv_ko_c_{side.source}", f"DEF-pinky{side.suffix}.002")
+
+    # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
-        for side in SIDES:
-            for finger in LONG_FINGERS:
-                parent(rig, f"{finger.palm}{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.letter}"])
+        # Palm hierarchy
+        for side in definitions.SIDES:
+            abi.parent(rig, f"palm.01{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])
+            abi.parent(rig, f"palm.02{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])
+            abi.parent(rig, f"palm.03{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])
+            abi.parent(rig, f"palm.04{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])

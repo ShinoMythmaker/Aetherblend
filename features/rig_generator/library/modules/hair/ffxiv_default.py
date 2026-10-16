@@ -1,19 +1,15 @@
 """Hair module: every hair and head accessory bone chain becomes a controllable chain."""
 
-from typing import NamedTuple
+import typing
 
 import bpy
 
-from ....definitions import RigModule
-from ....instructions import *
-from ....rigify.settings import BoneCollection, UI_Collections
-
-HEAD_PARENT = ["Head", "j_kao"]
-BONE_PREFIX = "HAIR"
-SINGLE_BONE_SIZE_FACTOR = 10.0
+from .... import definitions
+from .... import instructions as abi
+from ....rigify import settings
 
 
-class Pattern(NamedTuple):
+class Pattern(typing.NamedTuple):
     """Source bone names to rig, and the bone collection their controls go to."""
 
     regex: str
@@ -27,63 +23,72 @@ PATTERNS = (
 )
 
 
-class Module(RigModule):
+class Module(definitions.RigModule):
     name = "XIV-Default"
-    ui_collections = UI_Collections(
+    ui_collections = settings.UI_Collections(
         [
-            BoneCollection(name="Hair", ui=True, color_set="Head", row_index=1, title="Hair", visible=False),
-            BoneCollection(name="Accessory", ui=True, color_set="Head", row_index=1, title="Accessory", visible=False),
+            settings.BoneCollection(name="Hair", ui=True, color_set="Head", row_index=1, title="Hair", visible=False),
+            settings.BoneCollection(
+                name="Accessory", ui=True, color_set="Head", row_index=1, title="Accessory", visible=False
+            ),
         ]
     )
 
     def __init__(self) -> None:
         self.chains: list[tuple[list[str], str]] = []
 
+    # ------------------------------------------------------------------------
+
     def meta_edit(self, rig: bpy.types.Object) -> None:
         self.chains = []
+        # Hair and accessory chains
         for pattern in PATTERNS:
-            for chain in find_chains(rig, pattern.regex):
+            for chain in abi.find_chains(rig, pattern.regex):
                 self.chains.append((chain, pattern.collection))
 
                 if len(chain) == 1:
-                    extend(
+                    abi.extend(
                         rig,
-                        f"{BONE_PREFIX}_{chain[0]}",
+                        f"HAIR_{chain[0]}",
                         chain[0],
                         start_point="head",
-                        size_factor=SINGLE_BONE_SIZE_FACTOR,
-                        parent=HEAD_PARENT,
+                        size_factor=10.0,
+                        parent=["Head", "j_kao"],
                     )
                     continue
 
                 for index, source in enumerate(chain[:-1]):
-                    parent_bone = HEAD_PARENT if index == 0 else f"{BONE_PREFIX}_{chain[index - 1]}"
-                    connect(
+                    parent_bone = ["Head", "j_kao"] if index == 0 else f"HAIR_{chain[index - 1]}"
+                    abi.connect(
                         rig,
-                        f"{BONE_PREFIX}_{source}",
+                        f"HAIR_{source}",
                         source,
                         chain[index + 1],
                         parent=parent_bone,
                         connected=index > 0,
                     )
                 last = chain[-1]
-                extend(
+                abi.extend(
                     rig,
-                    f"{BONE_PREFIX}_{last}",
+                    f"HAIR_{last}",
                     last,
                     start_point="head",
-                    parent=f"{BONE_PREFIX}_{chain[-2]}",
+                    parent=f"HAIR_{chain[-2]}",
                     connected=True,
                 )
 
-    def meta_pose(self, rig: bpy.types.Object) -> None:
-        for chain, collection_name in self.chains:
-            bones = [f"{BONE_PREFIX}_{source}" for source in chain]
-            if len(chain) == 1:
-                rigify.basic_super_copy(rig, bones[0], widget_type="bone")
-            else:
-                rigify.basic_copy_chain(rig, bones[0])
-            collection(rig, bones, collection_name)
+    # ------------------------------------------------------------------------
 
+    def meta_pose(self, rig: bpy.types.Object) -> None:
+        # Chain controls
+        for chain, collection_name in self.chains:
+            bones = [f"HAIR_{source}" for source in chain]
+            if len(chain) == 1:
+                abi.rigify.basic_super_copy(rig, bones[0], widget_type="bone")
+            else:
+                abi.rigify.basic_copy_chain(rig, bones[0])
+            abi.collection(rig, bones, collection_name)
+
+            # Source-to-deform mappings
             for source, bone in zip(chain, bones):
-                link(rig, source, f"DEF-{bone}")
+                abi.link(rig, source, f"DEF-{bone}")
