@@ -1,4 +1,5 @@
 """Face module: brows, cheeks, nose, nostrils and eyes as skin chains."""
+
 from typing import NamedTuple
 
 import bpy
@@ -36,7 +37,7 @@ SIDES = (RIGHT, LEFT)
 UPPER_LID_SOURCES = ("j_f_mabup_02out", "j_f_mabup_01", "j_f_mabup_03in")
 LOWER_LID_SOURCES = ("j_f_mabdn_03in", "j_f_mabdn_01", "j_f_mabdn_02out")
 LID_BRIDGES = (
-    # (name, start, end, left offset, whether the end bone attaches to the bridge); the right side mirrors x of lower bridges
+    # (name, start, end, left offset, whether the end bone attaches to the bridge); the right side mirrors x of lower bridges  # noqa: E501
     ("T.001", "T", "T.002", (0.0, -0.001, 0.001), True),
     ("T.003", "T.002", "B", (0.0, 0.0, 0.003), False),
     ("B.001", "B", "B.002", (-0.002, 0.0, 0.001), True),
@@ -59,12 +60,18 @@ SIDES = (RIGHT, LEFT)
 class Module(RigModule):
     name = "XIV-Default"
     ui_flags = ["Eye Lid Edit Mode"]
-    ui_collections = UI_Collections([
-        BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-        BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=2, title=PRIMARY, visible=True),
-        BoneCollection(name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=2, title=SECONDARY, visible=False),
-        BoneCollection(name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=3, title="Eyes (Macro)", visible=True),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
+            BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=2, title=PRIMARY, visible=True),
+            BoneCollection(
+                name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=2, title=SECONDARY, visible=False
+            ),
+            BoneCollection(
+                name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=3, title="Eyes (Macro)", visible=True
+            ),
+        ]
+    )
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
@@ -126,7 +133,7 @@ class Module(RigModule):
 
     @staticmethod
     def _find_mesh(rig: bpy.types.Object, shader: str) -> bpy.types.Object | None:
-        """The first mesh deformed by the character's armature that uses the given shader package."""
+        """Return the first mesh deformed by the character's armature that uses the given shader package."""
         original = rig.data.rigify_target_rig or rig
         meshes = object_utils.find_by_armature_and_material_property(original, "ShaderPackage", shader)
         return meshes[0] if meshes else None
@@ -138,8 +145,12 @@ class Module(RigModule):
         eye = f"Eye{x}"
 
         # Lid corners and centers sit on the eye occlusion mesh where each source bone weighs the most.
-        for lid, source in ((f"lid.T{x}", UPPER_LID_SOURCES[0]), (f"lid.T{x}.002", UPPER_LID_SOURCES[1]),
-                            (f"lid.B{x}", LOWER_LID_SOURCES[0]), (f"lid.B{x}.002", LOWER_LID_SOURCES[1])):
+        for lid, source in (
+            (f"lid.T{x}", UPPER_LID_SOURCES[0]),
+            (f"lid.T{x}.002", UPPER_LID_SOURCES[1]),
+            (f"lid.B{x}", LOWER_LID_SOURCES[0]),
+            (f"lid.B{x}.002", LOWER_LID_SOURCES[1]),
+        ):
             heaviest_vertex(rig, lid, f"{source}_{s}", occlusion_mesh, source_rig=source_rig)
 
         copy(rig, eye, f"j_f_eyepuru_{s}", parent="Head")
@@ -176,7 +187,9 @@ class Module(RigModule):
             falloff_spherical=[False, False, False],
             primary_collection=PRIMARY,
         )
-        rigify.skin_stretchy_chain(rig, f"lid.B{x}", pivot_position=2, control_orientation_bone="Head", primary_collection=PRIMARY)
+        rigify.skin_stretchy_chain(
+            rig, f"lid.B{x}", pivot_position=2, control_orientation_bone="Head", primary_collection=PRIMARY
+        )
         rigify.face_skin_eye(rig, f"Eye{x}")
         collection(rig, [f"Eye{x}"], PRIMARY)
 
@@ -217,7 +230,15 @@ class Module(RigModule):
         for side in SIDES:
             for number in (1, 2, 3):
                 lid = f"lid.B{side.suffix}.00{number}"
-                extend(rig, f"lid.anchor.B{side.suffix}.00{number}", lid, axis="Z", axis_space="global", start_point="head", parent=lid)
+                extend(
+                    rig,
+                    f"lid.anchor.B{side.suffix}.00{number}",
+                    lid,
+                    axis="Z",
+                    axis_space="global",
+                    start_point="head",
+                    parent=lid,
+                )
 
     @staticmethod
     def _eye_controls_pose(rig: bpy.types.Object) -> None:
@@ -240,21 +261,50 @@ class Module(RigModule):
         )
         for bone, shape, rotation, color, size in frames:
             widget(
-                rig, bone, widget_name=shape, rotation_degrees=rotation, wire_width=1.2, scale_to_bone_length=False,
-                color_set="CUSTOM", custom_color_normal=color, custom_color_select=color, custom_color_active=color,
+                rig,
+                bone,
+                widget_name=shape,
+                rotation_degrees=rotation,
+                wire_width=1.2,
+                scale_to_bone_length=False,
+                color_set="CUSTOM",
+                custom_color_normal=color,
+                custom_color_select=color,
+                custom_color_active=color,
             )
             pose(rig, bone, scale=(size, size, size))
             restrict(rig, bone, lock_location=True, lock_rotation=True, lock_scale=True, hide_select=True)
 
         for bone in ("Iris.Ctrl", "Pupil.Ctrl"):
-            widget(rig, bone, widget_name="Slider", rotation_degrees=(90.0, -90.0, 180.0), wire_width=1.3, scale_to_bone_length=False)
+            widget(
+                rig,
+                bone,
+                widget_name="Slider",
+                rotation_degrees=(90.0, -90.0, 180.0),
+                wire_width=1.3,
+                scale_to_bone_length=False,
+            )
             restrict(rig, bone, lock_location=(True, True, False), lock_rotation=True, lock_scale=True)
-            constraints.limit_location(rig, bone, minimum=(None, None, -1.0), maximum=(None, None, 1.0), use_transform_limit=True)
+            constraints.limit_location(
+                rig, bone, minimum=(None, None, -1.0), maximum=(None, None, 1.0), use_transform_limit=True
+            )
 
-        widget(rig, "Lid.Ctrl", widget_name="Circle", rotation_degrees=(180.0, 90.0, 90.0), scale=(0.08, 0.08, 0.08), wire_width=1.3, scale_to_bone_length=False)
+        widget(
+            rig,
+            "Lid.Ctrl",
+            widget_name="Circle",
+            rotation_degrees=(180.0, 90.0, 90.0),
+            scale=(0.08, 0.08, 0.08),
+            wire_width=1.3,
+            scale_to_bone_length=False,
+        )
         restrict(rig, "Lid.Ctrl", lock_location=(False, True, False), lock_rotation=True, lock_scale=True)
         constraints.limit_location(
-            rig, "Lid.Ctrl", minimum=(-0.667, None, -1.0), maximum=(0.667, None, 0.0), use_transform_limit=True,
+            rig,
+            "Lid.Ctrl",
+            minimum=(-0.667, None, -1.0),
+            maximum=(0.667, None, 0.0),
+            use_transform_limit=True,
         )
 
         for side in SIDES:
@@ -268,11 +318,19 @@ class Module(RigModule):
             for upper, anchor_number in ((3, 1), (2, 2), (1, 3)):
                 lid = f"lid.T{side.suffix}.00{upper}"
                 constraints.copy_location(
-                    rig, lid, f"lid.anchor.B{side.suffix}.00{anchor_number}",
-                    name="AB_EyeLidControl", target_space="POSE", owner_space="POSE", influence=0.0,
+                    rig,
+                    lid,
+                    f"lid.anchor.B{side.suffix}.00{anchor_number}",
+                    name="AB_EyeLidControl",
+                    target_space="POSE",
+                    owner_space="POSE",
+                    influence=0.0,
                 )
                 driver(
-                    rig, lid, "influence", constraint="AB_EyeLidControl",
+                    rig,
+                    lid,
+                    "influence",
+                    constraint="AB_EyeLidControl",
                     expression=LID_EXPRESSION.format(x=x_term),
                     variables={
                         "x": TransformVariable("Lid.Ctrl", "LOC_X"),
@@ -287,8 +345,22 @@ class Module(RigModule):
             iris_expression = f"1 + ({1 - iris_minimum} * var if var < 0 else {iris_maximum - 1} * var)"
             pupil_expression = f"1 + ({1 - pupil_minimum} * var if var < 0 else {pupil_maximum - 1} * var)"
             for index in (0, 2):
-                driver(rig, iris, "scale", index=index, expression=iris_expression, variables={"var": TransformVariable("Iris.Ctrl", "LOC_Z")})
-            driver(rig, iris, "scale", index=1, expression=pupil_expression, variables={"var": TransformVariable("Pupil.Ctrl", "LOC_Z")})
+                driver(
+                    rig,
+                    iris,
+                    "scale",
+                    index=index,
+                    expression=iris_expression,
+                    variables={"var": TransformVariable("Iris.Ctrl", "LOC_Z")},
+                )
+            driver(
+                rig,
+                iris,
+                "scale",
+                index=1,
+                expression=pupil_expression,
+                variables={"var": TransformVariable("Pupil.Ctrl", "LOC_Z")},
+            )
 
         # The iris shader reads these properties from the iris mesh to undo the scale of the iris bone.
         iris_mesh = Module._find_mesh(rig, IRIS_SHADER)
@@ -299,7 +371,9 @@ class Module(RigModule):
                 ("Pupil Scale", "iris-1", "SCALE_Y"),
             ):
                 object_driver(
-                    rig, iris_mesh, f'["{property_name}"]',
+                    rig,
+                    iris_mesh,
+                    f'["{property_name}"]',
                     expression=expression,
                     variables={"iris": TransformVariable("j_f_irisprm_l", channel)},
                 )
@@ -382,7 +456,9 @@ class Module(RigModule):
     def _nose_pose(rig: bpy.types.Object, side: Side) -> None:
         s, x = side.source, side.suffix
         rigify.skin_basic_chain(rig, f"Nose{x}", control_orientation_bone="Head", use_scale=SCALE_ALL)
-        rigify.skin_basic_chain(rig, f"Nostril{x}", chain_priority=1, control_orientation_bone="Head", use_scale=SCALE_ALL)
+        rigify.skin_basic_chain(
+            rig, f"Nostril{x}", chain_priority=1, control_orientation_bone="Head", use_scale=SCALE_ALL
+        )
         collection(rig, [f"Nose{x}", f"Nostril{x}"], PRIMARY)
 
         link(rig, f"j_f_dmiken_{s}", f"DEF-Nose{x}")

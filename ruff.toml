@@ -10,6 +10,8 @@ ignore = [
     "D102",          # same for their methods
     "ANN401",        # allow Any where Blender types are unknown
     "N801",          # Blender class names like AETHER_OT_x
+    "N999",          # the add-on folder is named AetherBlend
+    "N813",          # rig modules are imported as `from .x import Module as x`
     "F403", "F405",  # wildcard imports are allowed from modules with __all__ (R-9.2), checked in review
 ]
 

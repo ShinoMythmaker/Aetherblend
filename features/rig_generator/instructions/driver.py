@@ -1,4 +1,5 @@
 """Driver instruction: drive a property of a bone with an expression."""
+
 from collections.abc import Mapping
 from typing import NamedTuple
 
@@ -66,7 +67,7 @@ def object_driver(
 
 def _apply_driver(
     rig: bpy.types.Object,
-    owner,
+    owner: bpy.types.ID,
     property_path: str,
     index: int,
     expression: str,

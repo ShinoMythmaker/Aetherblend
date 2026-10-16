@@ -1,67 +1,70 @@
+"""Operators that convert and clean up a generated rig."""
+
 import bpy
 from bpy.types import Operator
 
 from ...utils import armature as armature_utils
 
 
-class AETHER_OT_SetBoneInheritScale(Operator):
+class AETHER_OT_rig_edit_set_inherit_scale(Operator):
     bl_idname = "aether.rig_edit_set_inherit_scale"
     bl_label = "Set Inherit Scale"
     bl_description = "Set inherit scale for bones in LINK collection"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
     inherit_scale: bpy.props.EnumProperty(
         name="Inherit Scale",
         items=[
-            ('FULL', "Full", "Full inherit scale"),
-            ('FIX_SHEAR', "Aligned", "Inherit scale with shear fixed"),
-            ('AVERAGE', "Average", "Average scale inheritance"),
-            ('NONE', "None", "No scale inheritance"),
-            ('NONE_LEGACY', "None (Legacy)", "No scale inheritance (legacy)"),
+            ("FULL", "Full", "Full inherit scale"),
+            ("FIX_SHEAR", "Aligned", "Inherit scale with shear fixed"),
+            ("AVERAGE", "Average", "Average scale inheritance"),
+            ("NONE", "None", "No scale inheritance"),
+            ("NONE_LEGACY", "None (Legacy)", "No scale inheritance (legacy)"),
         ],
-        default='FULL',
-    ) # type: ignore
+        default="FULL",
+    )  # type: ignore
 
-    def execute(self, context):
+    def execute(self, context: bpy.types.Context) -> set[str]:
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
-            self.report({'ERROR'}, "Select an armature")
-            return {'CANCELLED'}
+        if not armature or armature.type != "ARMATURE":
+            self.report({"ERROR"}, "Select an armature")
+            return {"CANCELLED"}
 
-        link_collection = armature.data.collections.get('LINK')
+        link_collection = armature.data.collections.get("LINK")
         if not link_collection:
-            self.report({'ERROR'}, "LINK collection not found")
-            return {'CANCELLED'}
+            self.report({"ERROR"}, "LINK collection not found")
+            return {"CANCELLED"}
 
-        aether_rig = getattr(armature, 'aether_rig', None)
+        aether_rig = getattr(armature, "aether_rig", None)
         if aether_rig:
             aether_rig.link_inherit_scale = self.inherit_scale
 
         bone_count = 0
         for bone in armature.pose.bones:
-            if bone.bone.collections.get('LINK'):
+            if bone.bone.collections.get("LINK"):
                 bone.bone.inherit_scale = self.inherit_scale
                 bone_count += 1
 
-        self.report({'INFO'}, f"Updated {bone_count} bones in LINK collection")
-        return {'FINISHED'}
+        self.report({"INFO"}, f"Updated {bone_count} bones in LINK collection")
+        return {"FINISHED"}
 
-class AETHER_OT_DeleteNoAnim(Operator):
+
+class AETHER_OT_rig_edit_delete_no_anim(Operator):
     bl_idname = "aether.rig_edit_delete_no_anim"
     bl_label = "Delete NoAnim"
     bl_description = "Deletes all bones containing the 'noanim' flag."
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
-    def execute(self, context):
+    def execute(self, context: bpy.types.Context) -> set[str]:
         pattern = "noanim"
         armature = context.active_object
         original_mode = context.active_object.mode
 
-        if not armature or armature.type != 'ARMATURE':
-            self.report({'ERROR'}, "Select an armature")
-            return {'CANCELLED'}
+        if not armature or armature.type != "ARMATURE":
+            self.report({"ERROR"}, "Select an armature")
+            return {"CANCELLED"}
 
-        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode="EDIT")
 
         edit_bones = armature.data.edit_bones
 
@@ -70,32 +73,32 @@ class AETHER_OT_DeleteNoAnim(Operator):
                 edit_bones.remove(bone)
 
         bpy.ops.object.mode_set(mode=original_mode)
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
-class AETHER_OT_RemoveGameSupport(Operator):
+class AETHER_OT_rig_edit_remove_game_support(Operator):
     bl_idname = "aether.rig_edit_remove_game_support"
     bl_label = "Remove Game Support"
     bl_description = (
         "Removes bones and systems used for game/engine compatibility. "
         "This is irreversible, but animation data persists."
     )
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
-    def invoke(self, context, event):
+    def invoke(self, context: bpy.types.Context, event: bpy.types.Event) -> set[str]:
         return context.window_manager.invoke_props_dialog(self)
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context) -> None:
         layout = self.layout
         row = layout.row(align=True)
-        row.label(text="Are you sure? This is irreversible!", icon='ERROR')
+        row.label(text="Are you sure? This is irreversible!", icon="ERROR")
 
-    def execute(self, context):
+    def execute(self, context: bpy.types.Context) -> set[str]:
         ## What we do here is actually quite simple. Rename all vertex groups to the Rigify DEF bones.
         ## Then delete all LINK and orginal bones that have no longer any influence
         ## At last we reparent all remaining children to there new parents.
         ## Since we are not changing any rigify bones, this can be done without harming animation data.
-        ## Downsides are, no backwards compatibility with the game/engine, other meshes with old vertex groups will no longer work.
+        ## Downsides are, no backwards compatibility with the game/engine, other meshes with old vertex groups will no longer work.  # noqa: E501
         ## Since the original bones no longer exist.
 
         ## How could we implement a reverse of this ?
@@ -103,19 +106,19 @@ class AETHER_OT_RemoveGameSupport(Operator):
         ## However what about the vertex groups ? I dont want to store the mapping in blender.
         ## We would have more options if the user would have something like "restore to backup"
         ## then regenerates. Cause then we have basicly the mappings again and could re-rename the vertex groups.
-        ## All that wuld be easier if we would store transformLink pairs during rig generation on a custom property from teh armature.
-        ## I know i jsut said that i dont want to store the mapping in blender, but this would be a good use case for it.
+        ## All that wuld be easier if we would store transformLink pairs during rig generation on a custom property from teh armature.  # noqa: E501
+        ## I know i jsut said that i dont want to store the mapping in blender, but this would be a good use case for it.  # noqa: E501
         ## There are many places where we could use it.
         ## Maybe for another time (Shino)
 
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
-            self.report({'ERROR'}, "Select an armature")
-            return {'CANCELLED'}
+        if not armature or armature.type != "ARMATURE":
+            self.report({"ERROR"}, "Select an armature")
+            return {"CANCELLED"}
 
-        original_mode = armature_utils._set_mode(armature, 'POSE')
+        original_mode = armature_utils._set_mode(armature, "POSE")
         try:
-            bpy.context.window.cursor_set('WAIT')
+            bpy.context.window.cursor_set("WAIT")
 
             transplant_map: dict[str, str] = {}
             reparent_map: dict[str, str] = {}
@@ -128,7 +131,7 @@ class AETHER_OT_RemoveGameSupport(Operator):
                     continue
 
                 for constraint in pose_bone.constraints:
-                    if constraint.type != 'COPY_TRANSFORMS' or not constraint.name.startswith("AB-LINK"):
+                    if constraint.type != "COPY_TRANSFORMS" or not constraint.name.startswith("AB-LINK"):
                         continue
 
                     if not (constraint.target and constraint.subtarget):
@@ -156,7 +159,7 @@ class AETHER_OT_RemoveGameSupport(Operator):
                     if new_name:
                         vertex_group.name = new_name
 
-            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.object.mode_set(mode="EDIT")
             edit_bones = armature.data.edit_bones
 
             for old_bone_name, new_bone_name in transplant_map.items():
@@ -177,22 +180,26 @@ class AETHER_OT_RemoveGameSupport(Operator):
                 if child_bone and new_parent_bone:
                     child_bone.parent = new_parent_bone
 
-            aether_rig = getattr(armature, 'aether_rig', None)
+            aether_rig = getattr(armature, "aether_rig", None)
             if aether_rig is not None:
                 aether_rig.converted = True
 
         finally:
             armature_utils._restore_mode(armature, original_mode)
-            bpy.context.window.cursor_set('DEFAULT')
+            bpy.context.window.cursor_set("DEFAULT")
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
-def register():
-    bpy.utils.register_class(AETHER_OT_RemoveGameSupport)
-    bpy.utils.register_class(AETHER_OT_DeleteNoAnim)
-    bpy.utils.register_class(AETHER_OT_SetBoneInheritScale)
 
-def unregister():
-    bpy.utils.unregister_class(AETHER_OT_DeleteNoAnim)
-    bpy.utils.unregister_class(AETHER_OT_SetBoneInheritScale)
-    bpy.utils.unregister_class(AETHER_OT_RemoveGameSupport)
+def register() -> None:
+    """Register this module's classes."""
+    bpy.utils.register_class(AETHER_OT_rig_edit_remove_game_support)
+    bpy.utils.register_class(AETHER_OT_rig_edit_delete_no_anim)
+    bpy.utils.register_class(AETHER_OT_rig_edit_set_inherit_scale)
+
+
+def unregister() -> None:
+    """Unregister this module's classes."""
+    bpy.utils.unregister_class(AETHER_OT_rig_edit_delete_no_anim)
+    bpy.utils.unregister_class(AETHER_OT_rig_edit_set_inherit_scale)
+    bpy.utils.unregister_class(AETHER_OT_rig_edit_remove_game_support)

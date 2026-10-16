@@ -1,4 +1,7 @@
 """Male IVCS genitals."""
+
+import bpy
+
 from ....definitions import RigModule
 from ....instructions import *
 from ....rigify.settings import BoneCollection, UI_Collections
@@ -11,22 +14,31 @@ TESTICLES = (("Testicle.R", "iv_kougan_r"), ("Testicle.L", "iv_kougan_l"))
 
 class Module(RigModule):
     name = "XIV-IVCS Male"
-    ui_collections = UI_Collections([
-        BoneCollection(name=COLLECTION, ui=True, color_set="IVCS", row_index=1, title=COLLECTION, visible=False),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name=COLLECTION, ui=True, color_set="IVCS", row_index=1, title=COLLECTION, visible=False),
+        ]
+    )
 
-    def meta_edit(self, rig):
+    def meta_edit(self, rig: bpy.types.Object) -> None:
         if has_bone(rig, PENIS_SOURCES[0]) and has_bone(rig, PENIS_SOURCES[1]):
             connect(rig, "Penis", PENIS_SOURCES[0], PENIS_SOURCES[1], parent=["Spine.001", "j_kosi"])
             for index in range(1, 5):
-                connect(rig, PENIS_BONES[index], PENIS_SOURCES[index], PENIS_SOURCES[index + 1], parent=PENIS_BONES[index - 1], connected=True)
+                connect(
+                    rig,
+                    PENIS_BONES[index],
+                    PENIS_SOURCES[index],
+                    PENIS_SOURCES[index + 1],
+                    parent=PENIS_BONES[index - 1],
+                    connected=True,
+                )
             extend(rig, "Penis.005", PENIS_SOURCES[5], parent="Penis.004", connected=True)
 
         for name, source in TESTICLES:
             if has_bone(rig, source):
                 extend(rig, name, source, start_point="head", size_factor=0.5, parent=["Spine.001", "j_kosi"])
 
-    def meta_pose(self, rig):
+    def meta_pose(self, rig: bpy.types.Object) -> None:
         if "Penis" in rig.pose.bones:
             rigify.limbs_spline_tentacle(rig, "Penis", sik_stretch_control="MANUAL_STRETCH")
             collection(rig, PENIS_BONES, COLLECTION)

@@ -1,5 +1,8 @@
 """Hands shared by every hand variant; a variant only decides whether the fingers have IVCS tip bones."""
+
 from typing import NamedTuple
+
+import bpy
 
 from ....definitions import RigModule
 from ....instructions import *
@@ -46,29 +49,57 @@ def required_bones(has_tip_bones: bool) -> list[str]:
 
 
 def ui_collections() -> UI_Collections:
-    return UI_Collections([
-        BoneCollection(name=f"Fingers{side.suffix}", ui=True, color_set=side.color_set, row_index=1, title=f"Fingers{side.suffix}", visible=False)
-        for side in SIDES
-    ])
+    return UI_Collections(
+        [
+            BoneCollection(
+                name=f"Fingers{side.suffix}",
+                ui=True,
+                color_set=side.color_set,
+                row_index=1,
+                title=f"Fingers{side.suffix}",
+                visible=False,
+            )
+            for side in SIDES
+        ]
+    )
 
 
 class Hands(RigModule):
     has_tip_bones = False
 
-    def meta_edit(self, rig):
+    def meta_edit(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             hand_parents = [f"hand{side.suffix}", f"j_te_{side.letter}"]
 
             for finger in LONG_FINGERS:
                 extend(
-                    rig, f"{finger.palm}{side.suffix}", f"j_{finger.source}_a_{side.letter}",
-                    start_point="head", parent=f"hand{side.suffix}", roll=side.palm_roll,
+                    rig,
+                    f"{finger.palm}{side.suffix}",
+                    f"j_{finger.source}_a_{side.letter}",
+                    start_point="head",
+                    parent=f"hand{side.suffix}",
+                    roll=side.palm_roll,
                 )
 
             thumb_master = f"DEF-thumb_master{side.suffix}"
             copy(rig, thumb_master, f"j_oya_a_{side.letter}", parent=hand_parents)
-            connect(rig, f"thumb{side.suffix}", f"j_oya_a_{side.letter}", f"j_oya_b_{side.letter}", parent=thumb_master, roll=THUMB_ROLL)
-            extend(rig, f"thumb{side.suffix}.001", f"j_oya_b_{side.letter}", size_factor=0.2, start_point="head", parent=f"thumb{side.suffix}", connected=True)
+            connect(
+                rig,
+                f"thumb{side.suffix}",
+                f"j_oya_a_{side.letter}",
+                f"j_oya_b_{side.letter}",
+                parent=thumb_master,
+                roll=THUMB_ROLL,
+            )
+            extend(
+                rig,
+                f"thumb{side.suffix}.001",
+                f"j_oya_b_{side.letter}",
+                size_factor=0.2,
+                start_point="head",
+                parent=f"thumb{side.suffix}",
+                connected=True,
+            )
 
             for finger in LONG_FINGERS:
                 base = f"{finger.name}{side.suffix}"
@@ -82,7 +113,7 @@ class Hands(RigModule):
                 else:
                     extend(rig, f"{base}.001", upper, start_point="head", parent=base, connected=True)
 
-    def meta_pose(self, rig):
+    def meta_pose(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             fingers_collection = f"Fingers{side.suffix}"
             thumb_master = f"DEF-thumb_master{side.suffix}"
@@ -96,7 +127,9 @@ class Hands(RigModule):
             tip_count = 2 if self.has_tip_bones else 1
             for finger in (THUMB, *LONG_FINGERS):
                 base = f"{finger.name}{side.suffix}"
-                rigify.limbs_super_finger(rig, base, extra_ik_control=True, extra_ik_collection=f"{fingers_collection} (IK)")
+                rigify.limbs_super_finger(
+                    rig, base, extra_ik_control=True, extra_ik_collection=f"{fingers_collection} (IK)"
+                )
 
                 segment_count = 1 if finger is THUMB else tip_count
                 segments = [base] + [f"{base}.{number:03}" for number in range(1, segment_count + 1)]
@@ -107,7 +140,7 @@ class Hands(RigModule):
                 if self.has_tip_bones and finger is not THUMB:
                     link(rig, f"iv_{finger.source}_c_{side.letter}", f"DEF-{base}.002")
 
-    def final_edit(self, rig):
+    def final_edit(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             for finger in LONG_FINGERS:
                 parent(rig, f"{finger.palm}{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.letter}"])

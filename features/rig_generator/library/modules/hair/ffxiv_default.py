@@ -1,5 +1,8 @@
 """Hair module: every hair and head accessory bone chain becomes a controllable chain."""
+
 from typing import NamedTuple
+
+import bpy
 
 from ....definitions import RigModule
 from ....instructions import *
@@ -26,31 +29,54 @@ PATTERNS = (
 
 class Module(RigModule):
     name = "XIV-Default"
-    ui_collections = UI_Collections([
-        BoneCollection(name="Hair", ui=True, color_set="Head", row_index=1, title="Hair", visible=False),
-        BoneCollection(name="Accessory", ui=True, color_set="Head", row_index=1, title="Accessory", visible=False),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name="Hair", ui=True, color_set="Head", row_index=1, title="Hair", visible=False),
+            BoneCollection(name="Accessory", ui=True, color_set="Head", row_index=1, title="Accessory", visible=False),
+        ]
+    )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.chains: list[tuple[list[str], str]] = []
 
-    def meta_edit(self, rig):
+    def meta_edit(self, rig: bpy.types.Object) -> None:
         self.chains = []
         for pattern in PATTERNS:
             for chain in find_chains(rig, pattern.regex):
                 self.chains.append((chain, pattern.collection))
 
                 if len(chain) == 1:
-                    extend(rig, f"{BONE_PREFIX}_{chain[0]}", chain[0], start_point="head", size_factor=SINGLE_BONE_SIZE_FACTOR, parent=HEAD_PARENT)
+                    extend(
+                        rig,
+                        f"{BONE_PREFIX}_{chain[0]}",
+                        chain[0],
+                        start_point="head",
+                        size_factor=SINGLE_BONE_SIZE_FACTOR,
+                        parent=HEAD_PARENT,
+                    )
                     continue
 
                 for index, source in enumerate(chain[:-1]):
                     parent_bone = HEAD_PARENT if index == 0 else f"{BONE_PREFIX}_{chain[index - 1]}"
-                    connect(rig, f"{BONE_PREFIX}_{source}", source, chain[index + 1], parent=parent_bone, connected=index > 0)
+                    connect(
+                        rig,
+                        f"{BONE_PREFIX}_{source}",
+                        source,
+                        chain[index + 1],
+                        parent=parent_bone,
+                        connected=index > 0,
+                    )
                 last = chain[-1]
-                extend(rig, f"{BONE_PREFIX}_{last}", last, start_point="head", parent=f"{BONE_PREFIX}_{chain[-2]}", connected=True)
+                extend(
+                    rig,
+                    f"{BONE_PREFIX}_{last}",
+                    last,
+                    start_point="head",
+                    parent=f"{BONE_PREFIX}_{chain[-2]}",
+                    connected=True,
+                )
 
-    def meta_pose(self, rig):
+    def meta_pose(self, rig: bpy.types.Object) -> None:
         for chain, collection_name in self.chains:
             bones = [f"{BONE_PREFIX}_{source}" for source in chain]
             if len(chain) == 1:

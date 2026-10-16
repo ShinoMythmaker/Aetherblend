@@ -1,7 +1,11 @@
+"""Collection helpers."""
+
+from collections.abc import Iterable
+
 import bpy
 
 
-def link_to_collection(objects, collection):
+def link_to_collection(objects: Iterable[bpy.types.Object], collection: bpy.types.Collection) -> None:
     """Links objects to a collection."""
     for obj in objects:
         try:
@@ -11,14 +15,16 @@ def link_to_collection(objects, collection):
         except ReferenceError:
             print(f"[AetherBlend] Skipping deleted object: {obj}")
 
-def create_collection(name="Collection"):
-    """Creates a Collection"""
+
+def create_collection(name: str = "Collection") -> bpy.types.Collection:
+    """Create a Collection."""
     new_collection = bpy.data.collections.new(name)
     bpy.context.scene.collection.children.link(new_collection)
     return new_collection
 
-def get_collection(obj):
-    """Returns the first collection that contains this object."""
+
+def get_collection(obj: bpy.types.Object) -> bpy.types.Collection | None:
+    """Return the first collection that contains this object."""
     for collection in bpy.data.collections:
         if any(obj is coll_obj for coll_obj in collection.objects):
             return collection
@@ -26,7 +32,7 @@ def get_collection(obj):
 
 
 def collection_tree(root_collection: bpy.types.Collection) -> list[bpy.types.Collection]:
-    """Returns the root collection and all descendants."""
+    """Return the root collection and all descendants."""
     collections: list[bpy.types.Collection] = []
     stack = [root_collection]
     seen: set[str] = set()
@@ -48,7 +54,7 @@ def find_object_name_in_prefixed_collections(
     name_prefix: str,
     object_name_match: callable,
 ) -> str | None:
-    """Finds the first object name in collections whose names start with prefix and match predicate."""
+    """Find the first object name in collections whose names start with prefix and match predicate."""
     uppercase_prefix = name_prefix.upper()
     for collection in collections:
         if not collection.name.upper().startswith(uppercase_prefix):

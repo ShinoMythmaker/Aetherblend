@@ -6,11 +6,10 @@ Modules are named after the primary context they operate on.
 from . import addon_dependencies, armature, axis_conversion, collection, import_export, object
 
 __all__ = [
-	'armature',
-	'addon_dependencies',
-	'axis_conversion',
-	'collection',
-	'import_export',
-	'object',
+    "armature",
+    "addon_dependencies",
+    "axis_conversion",
+    "collection",
+    "import_export",
+    "object",
 ]
-

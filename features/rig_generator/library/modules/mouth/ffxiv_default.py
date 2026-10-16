@@ -1,4 +1,5 @@
 """Mouth module: jaw, lips, teeth and tongue."""
+
 from typing import NamedTuple
 
 import bpy
@@ -28,7 +29,7 @@ ROWS = (
     ("T", "Mouth.Center", ("ulip_02", "umlip_02", "uslip")),
     ("B", "Mouth.Center.001", ("dlip_02", "dmlip_02", "dslip")),
 )
-# Secondary lips per row: the source bones of the first and the second bone, each running from the first to the second name.
+# Secondary lips per row: the source bones of the first and the second bone, each running from the first to the second name.  # noqa: E501
 SECONDARY_LIPS = (
     ("T", ("ulip_01", "umlip_01"), ("umlip_01", "uslip")),
     ("B", ("dlip_01", "dmlip_01"), ("dmlip_01", "dslip")),
@@ -37,11 +38,15 @@ SECONDARY_LIPS = (
 
 class Module(RigModule):
     name = "XIV-Automated"
-    ui_collections = UI_Collections([
-        BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=1, title=PRIMARY, visible=True),
-        BoneCollection(name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=1, title=SECONDARY, visible=False),
-        BoneCollection(name=MISC, ui=True, color_set="Face_Secondary", row_index=2, title=MISC, visible=False),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=1, title=PRIMARY, visible=True),
+            BoneCollection(
+                name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=1, title=SECONDARY, visible=False
+            ),
+            BoneCollection(name=MISC, ui=True, color_set="Face_Secondary", row_index=2, title=MISC, visible=False),
+        ]
+    )
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
         center(rig, "jaw_master_ref", ["j_f_dlip_01_r", "j_f_dlip_01_l"], axis="Y", parent="Head")
@@ -105,7 +110,10 @@ class Module(RigModule):
             ends = [f"j_f_{sources[0]}_{s}", f"j_f_{sources[1]}_{s}", f"j_f_{sources[2]}_{s}", f"Corner{x}"]
             for index, (name, start, end) in enumerate(zip(names, starts, ends)):
                 connect(
-                    rig, name, start, end,
+                    rig,
+                    name,
+                    start,
+                    end,
                     parent="jaw_master" if index == 0 else names[index - 1],
                     connected=index > 0,
                 )

@@ -1,5 +1,8 @@
 """Clothing module: a skirt whose segments swing with the thighs and shins."""
+
 from typing import NamedTuple
+
+import bpy
 
 from ....definitions import RigModule
 from ....instructions import *
@@ -49,7 +52,7 @@ def _sections(side: Side) -> tuple[Section, ...]:
             roll=0,
             first_forward_expression="((RotX < 0) * (RotX * sk_auto) / (1 + (abs(RotX) - 0.8) * 0.1))",
             first_sideways_expression=f"((RotZ {sideways} 0) * (RotZ * sk_auto) / (2 + (abs(RotZ) - 0.5) * 0.5))",
-            second_forward_expression="((RotX > 0) * (RotX * sk_auto) / (2 + (abs(RotX) - 0.5) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",
+            second_forward_expression="((RotX > 0) * (RotX * sk_auto) / (2 + (abs(RotX) - 0.5) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",  # noqa: E501
         ),
         Section(
             control="Skirt_Side",
@@ -58,16 +61,16 @@ def _sections(side: Side) -> tuple[Section, ...]:
             roll=side.middle_roll,
             first_forward_expression=f"((RotX < 0) * ({sign}RotX * sk_auto) / (3 + (abs(RotX) - 0.5) * 2))",
             first_sideways_expression=f"((RotZ {sideways} 0) * ({sign}RotZ * sk_auto) / (1 + (abs(RotZ) - 0.1) * 1))",
-            second_forward_expression=f"((RotX > 0) * ({sign}RotX * sk_auto) / (3 + (abs(RotX) - 0.2) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",
+            second_forward_expression=f"((RotX > 0) * ({sign}RotX * sk_auto) / (3 + (abs(RotX) - 0.2) * 2)) * (abs(RotXThreshold) / (0.2 + abs(RotXThreshold))) if RotXThreshold < 0 else RotX * 0",  # noqa: E501
         ),
         Section(
             control="Skirt_Back",
             driven="MCH-Skirt_Back",
             source="j_sk_b",
             roll=0,
-            first_forward_expression="((RotX < 0) * (RotX * sk_auto) / (5 + (abs(RotX) - 0.2) * 5)) + ((RotX > 0) * ((RotX * sk_auto) / (1 + (abs(RotX) + 0.1) * 0.2)))",
+            first_forward_expression="((RotX < 0) * (RotX * sk_auto) / (5 + (abs(RotX) - 0.2) * 5)) + ((RotX > 0) * ((RotX * sk_auto) / (1 + (abs(RotX) + 0.1) * 0.2)))",  # noqa: E501
             first_sideways_expression=f"((RotZ {sideways} 0) * (RotZ * sk_auto) / (2 + (abs(RotZ) - 0.1) * 3))",
-            second_forward_expression="((RotX > 0) * (RotX * sk_auto) / (1 + (abs(RotX) + 0.5) * 0.3)) * (abs(RotXThreshold) / (0.5 + abs(RotXThreshold))) if RotXThreshold > 0 else RotX * 0",
+            second_forward_expression="((RotX > 0) * (RotX * sk_auto) / (1 + (abs(RotX) + 0.5) * 0.3)) * (abs(RotXThreshold) / (0.5 + abs(RotXThreshold))) if RotXThreshold > 0 else RotX * 0",  # noqa: E501
         ),
     )
 
@@ -78,17 +81,38 @@ def _chain(name: str) -> list[str]:
 
 class Module(RigModule):
     name = "XIV-Default"
-    requires = [f"{section.source}_{part}_{side.source}" for side in SIDES for section in _sections(side) for part in ("a", "b", "c")]
-    ui_collections = UI_Collections([
-        BoneCollection(name=SKIRT_COLLECTION, ui=True, color_set="Head", row_index=1, title="Skirt", visible=False),
-    ])
+    requires = [
+        f"{section.source}_{part}_{side.source}"
+        for side in SIDES
+        for section in _sections(side)
+        for part in ("a", "b", "c")
+    ]
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name=SKIRT_COLLECTION, ui=True, color_set="Head", row_index=1, title="Skirt", visible=False),
+        ]
+    )
     ui_flags = ("Skirt Automation",)
 
-    def meta_edit(self, rig):
+    def meta_edit(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             suffix = side.suffix
-            extend(rig, f"MCH-thigh_driv_tgt{suffix}", f"thigh{suffix}", start_point="head", size_factor=0.3, parent="Spine.001")
-            extend(rig, f"MCH-shin_driv_tgt{suffix}", f"shin{suffix}", start_point="head", size_factor=0.3, parent=f"thigh{suffix}")
+            extend(
+                rig,
+                f"MCH-thigh_driv_tgt{suffix}",
+                f"thigh{suffix}",
+                start_point="head",
+                size_factor=0.3,
+                parent="Spine.001",
+            )
+            extend(
+                rig,
+                f"MCH-shin_driv_tgt{suffix}",
+                f"shin{suffix}",
+                start_point="head",
+                size_factor=0.3,
+                parent=f"thigh{suffix}",
+            )
 
             for section in _sections(side):
                 upper, middle, lower = (f"{section.source}_{part}_{side.source}" for part in ("a", "b", "c"))
@@ -101,9 +125,17 @@ class Module(RigModule):
                 driven = f"{section.driven}{suffix}"
                 connect(rig, driven, upper, middle, parent="Spine.001", roll=section.roll)
                 connect(rig, f"{driven}.001", middle, lower, parent=driven, connected=True, roll=section.roll)
-                extend(rig, f"{driven}.002", lower, start_point="head", parent=f"{driven}.001", connected=True, roll=section.roll)
+                extend(
+                    rig,
+                    f"{driven}.002",
+                    lower,
+                    start_point="head",
+                    parent=f"{driven}.001",
+                    connected=True,
+                    roll=section.roll,
+                )
 
-    def meta_pose(self, rig):
+    def meta_pose(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             suffix = side.suffix
             rigify.basic_raw_copy(rig, f"MCH-thigh_driv_tgt{suffix}")
@@ -120,12 +152,12 @@ class Module(RigModule):
                 for part, control_bone in zip(("a", "b", "c"), control_bones):
                     link(rig, f"{section.source}_{part}_{side.source}", f"DEF-{control_bone}")
 
-    def final_edit(self, rig):
+    def final_edit(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             for section in _sections(side):
                 parent(rig, f"{section.control}{side.suffix}", f"{section.driven}{side.suffix}")
 
-    def final_pose(self, rig):
+    def final_pose(self, rig: bpy.types.Object) -> None:
         armature_prop(rig, AUTOMATION_PROPERTY, 1.0, minimum=0.0, maximum=1.0)
         automation = PropertyVariable(AUTOMATION_PROPERTY)
 
@@ -146,17 +178,26 @@ class Module(RigModule):
                 collection(rig, driven_bones, "MCH")
 
                 driver(
-                    rig, driven_bones[0], "rotation_quaternion", index=ROTATION_X_INDEX,
+                    rig,
+                    driven_bones[0],
+                    "rotation_quaternion",
+                    index=ROTATION_X_INDEX,
                     expression=section.first_forward_expression,
                     variables={"RotX": thigh_forward, "sk_auto": automation},
                 )
                 driver(
-                    rig, driven_bones[0], "rotation_quaternion", index=ROTATION_Z_INDEX,
+                    rig,
+                    driven_bones[0],
+                    "rotation_quaternion",
+                    index=ROTATION_Z_INDEX,
                     expression=section.first_sideways_expression,
                     variables={"RotZ": thigh_sideways, "sk_auto": automation},
                 )
                 driver(
-                    rig, driven_bones[1], "rotation_quaternion", index=ROTATION_X_INDEX,
+                    rig,
+                    driven_bones[1],
+                    "rotation_quaternion",
+                    index=ROTATION_X_INDEX,
                     expression=section.second_forward_expression,
                     variables={"RotX": shin_forward, "RotXThreshold": thigh_forward, "sk_auto": automation},
                 )

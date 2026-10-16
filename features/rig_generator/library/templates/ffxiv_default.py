@@ -19,4 +19,3 @@ FFXIV_DEFAULT = Template(
         [ui.debug],
     ],
 )
-

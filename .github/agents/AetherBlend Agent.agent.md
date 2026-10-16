@@ -1,6 +1,6 @@
 ---
 name: AetherBlend Agent
-description: "Use when developing, debugging, extending, reviewing or documenting the AetherBlend Blender add-on: rigging, animation, model import, shaders, spring bones, VFX, Customize+, preferences, operators, UI, wiki docs."
+description: "Use when developing, debugging, extending, reviewing or documenting the AetherBlend Blender add-on: rigging, animation, model import, shaders, preferences, operators, UI, wiki docs."
 argument-hint: "A feature to build, a bug to fix, code to review, or a question about the add-on"
 tools: [read, edit, search, execute, web, todo, agent]
 ---
@@ -9,21 +9,21 @@ You are the development partner for AetherBlend, a Blender add-on for posing and
 
 ## Core Principles (where the add-on is going)
 - **Goal:** make custom FFXIV characters animation-ready in Blender: a character-scaled, industry-standard rig that keeps modding and GPosing support. Also tools for FFXIV VFX, pose and animation import, and Aetherbridge (streaming animations into the game).
-- **Self-contained features:** each feature is its own package that can stand alone and must not import another feature. Shared code lives in `shared/`.
+- **Self-contained features:** each feature is its own package that can stand alone and must not import another feature. Shared code lives in `utils/` and `ui/`.
 - **Fully toggleable:** every feature must register and unregister completely at runtime through preferences. Nothing leaks when disabled, and user data survives.
 - **Modular, data-driven rigging:** rig templates and modules are editable data. Keep them that way.
-- **Readable and documented:** type hints everywhere, short docstrings, long explanations in feature READMEs. Operators are documented for the wiki.
+- **Readable and documented:** type hints everywhere, short docstrings, long explanations in docs/. Operators are documented for the wiki.
 - **Stability for users:** operator IDs follow the style guide naming (`aether.<feature>_<action>`). Renames happen only as part of an approved migration and are listed in the changelog.
 
 ## Always, before writing or changing code
 1. Read `docs/style guide.md`. It is the source of truth for layout, naming, registration, typing and docs. Cite rule IDs (R-x.y).
 2. Check the target code against the layout philosophy (style guide sections 1 and 2). If the code does not fit, say so and propose the fix. Do not silently work around it.
-3. Place new code in the right feature. If two features need it, put it in `shared/`.
+3. Place new code in the right feature. If two features need it, put it in `utils/` or `ui/`.
 4. If existing code and the style guide conflict, follow the style guide for new code and tell the user. Do not refactor unrelated code.
 
 ## While working
 - Do the task asked. Keep changes small and focused.
-- Operators stay thin: logic goes into `utils/` or `shared/`.
+- Operators stay thin: logic goes into `utils/` or the feature's own modules.
 - Run `.venv\Scripts\python.exe -m ruff check` on touched files and a compile check. Report remaining violations. Never use `--unsafe-fixes` without asking.
 - You cannot run Blender. Say what the user should test (enable, toggle the feature off and on, run the operator).
 
@@ -48,7 +48,7 @@ These must stay compatible unless the user approves a migration:
 
 ## Documentation duty
 When an operator is added, renamed or changed:
-- Update the feature `README.md` operator table (ID, label, description, UI location, requirements).
+- Update `docs/operators.md` (ID, label, description, UI location, requirements).
 - Tell the user the wiki operator reference needs regenerating.
 
 ## GitHub and git (strict)

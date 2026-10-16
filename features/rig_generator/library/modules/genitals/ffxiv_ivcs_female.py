@@ -1,4 +1,7 @@
 """Female IVCS genitals."""
+
+import bpy
+
 from ....definitions import RigModule
 from ....instructions import *
 from ....rigify.settings import BoneCollection, UI_Collections
@@ -14,18 +17,20 @@ PARTS = (
 
 class Module(RigModule):
     name = "XIV-IVCS Female"
-    ui_collections = UI_Collections([
-        BoneCollection(name=COLLECTION, ui=True, color_set="IVCS", row_index=1, title=COLLECTION, visible=False),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name=COLLECTION, ui=True, color_set="IVCS", row_index=1, title=COLLECTION, visible=False),
+        ]
+    )
 
-    def meta_edit(self, rig):
+    def meta_edit(self, rig: bpy.types.Object) -> None:
         for name, source, parent_bone in PARTS:
             if has_bone(rig, source) and has_bone(rig, "j_kosi"):
                 connect(rig, name, source, "j_kosi", parent=parent_bone)
         if has_bone(rig, "Clitoris"):
             extend(rig, "Anchor_V", "Clitoris", parent="Spine.001")
 
-    def meta_pose(self, rig):
+    def meta_pose(self, rig: bpy.types.Object) -> None:
         for name, source, _ in PARTS:
             if name in rig.pose.bones:
                 rigify.skin_basic_chain(rig, name, control_orientation_bone="Spine.001")
@@ -35,6 +40,6 @@ class Module(RigModule):
             rigify.skin_anchor(rig, "Anchor_V", hide=True)
             collection(rig, ["Anchor_V"], COLLECTION)
 
-    def final_pose(self, rig):
+    def final_pose(self, rig: bpy.types.Object) -> None:
         for name, _, _ in PARTS:
             widget(rig, name, scale_factor=0.2)

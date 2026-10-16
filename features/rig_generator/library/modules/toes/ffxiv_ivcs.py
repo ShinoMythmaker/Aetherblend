@@ -1,5 +1,8 @@
 """IVCS toes: five toes per foot with finger-style Rigify controls."""
+
 from typing import NamedTuple
+
+import bpy
 
 from ....definitions import RigModule
 from ....instructions import *
@@ -25,13 +28,19 @@ SIDES = (".L", ".R")
 
 class Module(RigModule):
     name = "XIV-IVCS"
-    requires = [f"iv_asi_{toe.source}_{part}_{side[1].lower()}" for toe in TOES for part in ("a", "b") for side in SIDES]
-    ui_collections = UI_Collections([
-        BoneCollection(name=f"IVCS_Toes{side}", ui=True, color_set="IVCS", row_index=1, title=f"Toes{side}", visible=False)
-        for side in SIDES
-    ])
+    requires = [
+        f"iv_asi_{toe.source}_{part}_{side[1].lower()}" for toe in TOES for part in ("a", "b") for side in SIDES
+    ]
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(
+                name=f"IVCS_Toes{side}", ui=True, color_set="IVCS", row_index=1, title=f"Toes{side}", visible=False
+            )
+            for side in SIDES
+        ]
+    )
 
-    def meta_edit(self, rig):
+    def meta_edit(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             for toe in TOES:
                 base = f"{toe.name}_Toe{side}"
@@ -40,7 +49,7 @@ class Module(RigModule):
                 connect(rig, base, source_base, source_tip, parent=[f"toe{side}", f"j_asi_e_{side[1].lower()}"])
                 extend(rig, f"{base}.001", source_tip, parent=base, connected=True)
 
-    def meta_pose(self, rig):
+    def meta_pose(self, rig: bpy.types.Object) -> None:
         for side in SIDES:
             for toe in TOES:
                 base = f"{toe.name}_Toe{side}"

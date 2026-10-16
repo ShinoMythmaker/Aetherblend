@@ -1,4 +1,5 @@
 """Pose-mode instructions: bone collections, custom properties and links."""
+
 from collections.abc import Sequence
 
 import bpy
@@ -32,7 +33,7 @@ def restrict(
     inherit_rotation: bool | None = None,
     inherit_scale: str | None = None,
 ) -> None:
-    """Lock transform channels, make a bone unselectable or change what it inherits; a single bool applies to all axes."""
+    """Lock transform channels, make a bone unselectable or change what it inherits."""
     pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
@@ -76,7 +77,14 @@ def link(rig: bpy.types.Object, source_bone: str, target: str, *, location_only:
     link_pose_bone[LINKED_PROPERTY] = True
 
 
-def armature_prop(rig: bpy.types.Object, property_name: str, value: float, *, minimum: float | None = None, maximum: float | None = None) -> None:
+def armature_prop(
+    rig: bpy.types.Object,
+    property_name: str,
+    value: float,
+    *,
+    minimum: float | None = None,
+    maximum: float | None = None,
+) -> None:
     """Define a float property on the armature data, set its value and make it available to drivers and the UI."""
     options = {}
     if minimum is not None:

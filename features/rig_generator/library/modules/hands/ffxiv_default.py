@@ -1,4 +1,5 @@
 """Hands with two bones per finger."""
+
 from ._hand import Hands, required_bones, ui_collections
 
 

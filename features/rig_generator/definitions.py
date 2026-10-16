@@ -1,4 +1,5 @@
 """Definitions a rig is built from: modules, templates and UI links."""
+
 from collections.abc import Container, Sequence
 from dataclasses import dataclass
 from typing import Literal
@@ -50,7 +51,7 @@ UI_Type = Literal["checkbox", "slider", "dropdown"]
 
 @dataclass
 class UILink:
-    """Defines a link between a bone or armature property and a UI element"""
+    """Defines a link between a bone or armature property and a UI element."""
 
     title: str
     property_name: str | None = None
@@ -59,28 +60,30 @@ class UILink:
     white_list: list[str] | None = None  # List of bone names that have to be selected for the UI to show.
     ui_type: UI_Type | None = "checkbox"
     ui_params: dict | None = None  # Additional parameters for the UI element
-    override: Literal["EyeLidControl"] | None = None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)
+    override: Literal["EyeLidControl"] | None = (
+        None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)  # noqa: E501
+    )
 
-    def eye_lid_control_draw(self, context, layout: bpy.types.UILayout):
+    def eye_lid_control_draw(self, context: bpy.types.Context, layout: bpy.types.UILayout) -> None:
 
         armature = context.active_object
         rig_props = armature.aether_rig
         if rig_props.eye_lid_edit_mode:
-            layout.operator("aether.rig_ui_eyelid_edit_end", text="Exit Eye Lid Edit Mode", icon='CANCEL')
+            layout.operator("aether.rig_ui_eyelid_edit_end", text="Exit Eye Lid Edit Mode", icon="CANCEL")
         else:
-            layout.operator("aether.rig_ui_eyelid_edit_start", text="Enter Eye Lid Edit Mode", icon='EDITMODE_HLT')
+            layout.operator("aether.rig_ui_eyelid_edit_start", text="Enter Eye Lid Edit Mode", icon="EDITMODE_HLT")
 
         return
 
-    def draw(self, context, layout: bpy.types.UILayout):
+    def draw(self, context: bpy.types.Context, layout: bpy.types.UILayout) -> None:
         """Draws the UI element for this link."""
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        if not armature or armature.type != "ARMATURE":
             return
 
         # Collect selected pose bones (only available in POSE mode).
         selected_bones: set[str] = set()
-        if context.mode == 'POSE':
+        if context.mode == "POSE":
             try:
                 selected_bones = set(bone.name for bone in (context.selected_pose_bones or []))
                 if context.active_pose_bone:

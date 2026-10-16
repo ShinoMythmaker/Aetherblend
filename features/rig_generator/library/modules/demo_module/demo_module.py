@@ -13,6 +13,7 @@ The generator runs the steps in this order, and each step gets the rig to work o
     final_pose  - generated rig, pose mode: constraints and custom properties.
 A step you do not need can simply be deleted.
 """
+
 import bpy
 
 from ....definitions import RigModule
@@ -28,10 +29,12 @@ class Module(RigModule):
     requires = ("j_example_bone",)
 
     # Bone collections shown in the rig UI.
-    ui_collections = UI_Collections([
-        BoneCollection(name="Demo (IK)", ui=True, color_set="IK_Left", row_index=1, title="Demo IK"),
-        BoneCollection(name="Demo (FK)", ui=True, color_set="FK_Left", row_index=2, title="Demo FK", visible=False),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name="Demo (IK)", ui=True, color_set="IK_Left", row_index=1, title="Demo IK"),
+            BoneCollection(name="Demo (FK)", ui=True, color_set="FK_Left", row_index=2, title="Demo FK", visible=False),
+        ]
+    )
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
         # Create a bone from one source bone to another.

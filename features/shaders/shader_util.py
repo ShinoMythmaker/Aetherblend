@@ -1,12 +1,18 @@
+"""Helpers for building shader node trees."""
+
 import os
+from collections.abc import Iterable
 from pathlib import Path
+from typing import Any
 
 import bpy
 
 _ASSET_DIR = Path(__file__).resolve().parents[2] / "assets" / "blend"
 _NODE_GROUPS_BLEND = _ASSET_DIR / "node_groups.blend"
 
-def append_node_group(group_name):
+
+def append_node_group(group_name: str) -> bpy.types.NodeTree:
+    """Append a node group from the add-on assets."""
     if not _NODE_GROUPS_BLEND.exists():
         raise FileNotFoundError(f"Node group asset not found: {_NODE_GROUPS_BLEND}")
 
@@ -17,23 +23,31 @@ def append_node_group(group_name):
             raise ValueError(f"Node group '{group_name}' not found in {_NODE_GROUPS_BLEND}")
     return bpy.data.node_groups[group_name]
 
+
 def add_node_group_to_node_tree(material: bpy.types.Material, node_group: bpy.types.NodeTree) -> bpy.types.Node:
+    """Add a group node to the material's node tree."""
     if not material.node_tree:
         raise ValueError(f"Material '{material.name}' does not have a node tree.")
 
     node_tree = material.node_tree
-    group_node = node_tree.nodes.new('ShaderNodeGroup')
+    group_node = node_tree.nodes.new("ShaderNodeGroup")
     group_node.node_tree = node_group
     group_node.label = node_group.name
     group_node.name = node_group.name
     return group_node
 
-def remove_group_node_from_node_tree(node_tree: bpy.types.NodeTree, group_node_name: str):
+
+def remove_group_node_from_node_tree(node_tree: bpy.types.NodeTree, group_node_name: str) -> None:
+    """Remove a group node from the node tree by name."""
     group_node = node_tree.nodes.get(group_node_name)
     if group_node:
         node_tree.nodes.remove(group_node)
 
-def get_value_from_material_property(material: bpy.types.Material, property_name: str, default=None, index: int | None = None):
+
+def get_value_from_material_property(
+    material: bpy.types.Material, property_name: str, default: Any = None, index: int | None = None
+) -> Any:
+    """Read a value from a material's custom property."""
     if property_name in material:
         value = material[property_name]
         if index is not None:
@@ -44,10 +58,14 @@ def get_value_from_material_property(material: bpy.types.Material, property_name
         return value
     return default
 
-def connect_sockets(node_tree: bpy.types.NodeTree, group_node: bpy.types.Node, input_dict: dict, output_dict: dict):
+
+def connect_sockets(
+    node_tree: bpy.types.NodeTree, group_node: bpy.types.Node, input_dict: dict, output_dict: dict
+) -> None:
     ###########
     # Connect Outputs
     ###########
+    """Connect the group node sockets to the mapped nodes."""
     for output_name, connections in output_dict.items():
         output_socket = group_node.outputs.get(output_name)
         if not output_socket:
@@ -72,7 +90,8 @@ def connect_sockets(node_tree: bpy.types.NodeTree, group_node: bpy.types.Node, i
                 continue
             node_tree.links.new(target_socket, input_socket)
 
-def apply_material_property_to_socket(input_socket, material_prop):
+
+def apply_material_property_to_socket(input_socket: bpy.types.NodeSocket, material_prop: Any) -> None:
     """Apply a material custom property to a node input socket default value."""
     if material_prop is None:
         return
@@ -103,7 +122,10 @@ def apply_material_property_to_socket(input_socket, material_prop):
         input_socket.default_value[idx] = source_values[idx]
 
 
-def get_input_socket_by_node_name(node_tree, node_name, socket_name):
+def get_input_socket_by_node_name(
+    node_tree: bpy.types.NodeTree, node_name: str, socket_name: str
+) -> bpy.types.NodeSocket | None:
+    """Find an input socket on a named node."""
     for node in node_tree.nodes:
         if node.name == node_name:
             for socket in node.inputs:
@@ -111,7 +133,11 @@ def get_input_socket_by_node_name(node_tree, node_name, socket_name):
                     return socket
     return None
 
-def get_output_socket_by_node_name(node_tree, node_name, socket_name):
+
+def get_output_socket_by_node_name(
+    node_tree: bpy.types.NodeTree, node_name: str, socket_name: str
+) -> bpy.types.NodeSocket | None:
+    """Find an output socket on a named node."""
     for node in node_tree.nodes:
         if node.name == node_name:
             for socket in node.outputs:
@@ -119,7 +145,10 @@ def get_output_socket_by_node_name(node_tree, node_name, socket_name):
                     return socket
     return None
 
-def refresh_shader_dependency_state(context, objects, material):
+
+def refresh_shader_dependency_state(
+    context: bpy.types.Context, objects: Iterable[bpy.types.Object], material: bpy.types.Material
+) -> None:
     """Force evaluation so object-property-driven shader nodes update immediately."""
     for obj in objects:
         if obj is None:
@@ -153,15 +182,16 @@ def refresh_shader_dependency_state(context, objects, material):
     scene.frame_set(scene.frame_current)
     context.view_layer.update()
 
+
 def find_material_by_property(
     meshes: list[bpy.types.Object],
     property_name: str,
-    property_value=None,
+    property_value: Any = None,
 ) -> list[tuple[bpy.types.Object, bpy.types.Material]]:
-    """Finds materials used by meshes driven by the armature that have a custom property matching the filter criteria."""
+    """Find materials used by meshes driven by the armature that have a custom property matching the filter criteria."""
     materials = set()
     for mesh in meshes:
-        if not mesh.data or not hasattr(mesh.data, 'materials'):
+        if not mesh.data or not hasattr(mesh.data, "materials"):
             continue
 
         for material_slot in mesh.material_slots:
@@ -174,71 +204,80 @@ def find_material_by_property(
 
     return list(materials)
 
-def pop_default_mappings(material, group_node):
+
+def pop_default_mappings(material: bpy.types.Material, group_node: bpy.types.Node) -> None:
+    """Populate the group node from the default mappings."""
     inputs = group_node.inputs
     for input in inputs:
         material_prop = get_value_from_material_property(material, input.name)
         if material_prop is not None:
             apply_material_property_to_socket(input, material_prop)
 
-def pop_custom_mappings(material, group_node, mapping: list[tuple[str, str, int | None]]):
+
+def pop_custom_mappings(
+    material: bpy.types.Material, group_node: bpy.types.Node, mapping: list[tuple[str, str, int | None]]
+) -> None:
+    """Populate the group node from custom mappings."""
     for target_socket_name, material_prop_name, index in mapping:
-                input = group_node.inputs.get(target_socket_name)
-                if input is None:
-                    print(f"[AetherBlend] Warning: Target socket '{target_socket_name}' not found in node group '{group_node.name}'. Skipping custom mapping for this socket.")
-                    continue
+        input = group_node.inputs.get(target_socket_name)
+        if input is None:
+            print(
+                f"[AetherBlend] Warning: Target socket '{target_socket_name}' not found in node group '{group_node.name}'. Skipping custom mapping for this socket."  # noqa: E501
+            )
+            continue
 
-                material_prop = get_value_from_material_property(material, material_prop_name, index=index)
+        material_prop = get_value_from_material_property(material, material_prop_name, index=index)
 
-                if material_prop is not None:
-                    apply_material_property_to_socket(input, material_prop)
-                else:
-                    print(f"[AetherBlend] Warning: Material property '{material_prop_name}' not found in material '{material.name}'. Skipping custom mapping for this socket.")
-                    continue
+        if material_prop is not None:
+            apply_material_property_to_socket(input, material_prop)
+        else:
+            print(
+                f"[AetherBlend] Warning: Material property '{material_prop_name}' not found in material '{material.name}'. Skipping custom mapping for this socket."  # noqa: E501
+            )
+            continue
 
 
-
-
-def import_ffgear_shader(filepath, objects):
-    """Imports FFGear shaders for the given objects."""
+def import_ffgear_shader(filepath: str, objects: Iterable[bpy.types.Object]) -> bool:
+    """Import FFGear shaders for the given objects."""
     for obj in objects:
         try:
             if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")
+            print(f"[AetherBlend] Skipping deleted object: {obj}")
 
     character_directory = os.path.dirname(filepath)
-    ffgear_cache_directory = os.path.join(character_directory, "cache","")
+    ffgear_cache_directory = os.path.join(character_directory, "cache", "")
 
     try:
         result = bpy.ops.ffgear.meddle_setup(
-            'EXEC_DEFAULT',
+            "EXEC_DEFAULT",
             directory=ffgear_cache_directory,
             filepath=ffgear_cache_directory,
             use_selected=True,
         )
-        return 'FINISHED' in result
+        return "FINISHED" in result
     except Exception as e:
         print(f"[AetherBlend] Failed to append FFGear shaders: {e}")
         return False
 
-def import_meddle_shader(filepath, objects):
-    """Imports Meddle shaders for the given objects."""
+
+def import_meddle_shader(filepath: str, objects: Iterable[bpy.types.Object]) -> bool:
+    """Import Meddle shaders for the given objects."""
     for obj in objects:
         try:
             if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")
+            print(f"[AetherBlend] Skipping deleted object: {obj}")
 
     character_directory = os.path.dirname(filepath)
-    meddle_cache_directory = os.path.join(character_directory, "cache","")
+    meddle_cache_directory = os.path.join(character_directory, "cache", "")
 
     try:
-        result_import = bpy.ops.meddle.import_shaders('EXEC_DEFAULT')
-        result_apply = bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)
-        return ('FINISHED' in result_import) and ('FINISHED' in result_apply)
+        result_import = bpy.ops.meddle.import_shaders("EXEC_DEFAULT")
+        result_apply = bpy.ops.meddle.apply_to_selected("EXEC_DEFAULT", directory=meddle_cache_directory)
+        return ("FINISHED" in result_import) and ("FINISHED" in result_apply)
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")
         return False

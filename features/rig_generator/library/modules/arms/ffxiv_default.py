@@ -1,4 +1,5 @@
 """Arm module: IK/FK arms with clavicle, elbow and pauldron helpers."""
+
 from typing import NamedTuple
 
 import bpy
@@ -27,9 +28,29 @@ def _ui_collections() -> UI_Collections:
     collections: list[BoneCollection] = []
     for side in SIDES:
         collections += [
-            BoneCollection(name=f"Arm{side.suffix} (IK)", ui=True, color_set=f"IK_{side.name}", row_index=1, title=f"Arm IK{side.suffix}"),
-            BoneCollection(name=f"Arm{side.suffix} (FK)", ui=True, color_set=f"FK_{side.name}", row_index=2, title=f"Arm FK{side.suffix}", visible=False),
-            BoneCollection(name=f"Arm{side.suffix} (Tweak)", ui=True, color_set=f"Tweak_{side.name}", row_index=3, title=f"Tweak{side.suffix}", visible=False),
+            BoneCollection(
+                name=f"Arm{side.suffix} (IK)",
+                ui=True,
+                color_set=f"IK_{side.name}",
+                row_index=1,
+                title=f"Arm IK{side.suffix}",
+            ),
+            BoneCollection(
+                name=f"Arm{side.suffix} (FK)",
+                ui=True,
+                color_set=f"FK_{side.name}",
+                row_index=2,
+                title=f"Arm FK{side.suffix}",
+                visible=False,
+            ),
+            BoneCollection(
+                name=f"Arm{side.suffix} (Tweak)",
+                ui=True,
+                color_set=f"Tweak_{side.name}",
+                row_index=3,
+                title=f"Tweak{side.suffix}",
+                visible=False,
+            ),
         ]
     return UI_Collections(collections)
 
@@ -69,7 +90,9 @@ class Module(RigModule):
             rigify.basic_raw_copy(rig, f"MCH-pauldron{suffix}")
             rigify.basic_super_copy(rig, f"pauldron{suffix}", widget_type="shoulder")
             rigify.basic_super_copy(rig, f"clavicle{suffix}", widget_type="shoulder")
-            rigify.limbs_arm(rig, f"upper_arm{suffix}", fk_collection=f"Arm{suffix} (FK)", tweak_collection=f"Arm{suffix} (Tweak)")
+            rigify.limbs_arm(
+                rig, f"upper_arm{suffix}", fk_collection=f"Arm{suffix} (FK)", tweak_collection=f"Arm{suffix} (Tweak)"
+            )
             rigify.basic_super_copy(rig, f"elbow{suffix}", widget_type="pivot_cross")
 
             collection(rig, [f"pauldron{suffix}", f"elbow{suffix}"], f"Arm{suffix} (Tweak)")
@@ -91,12 +114,18 @@ class Module(RigModule):
 
             collection(rig, [f"MCH-pauldron{suffix}"], "MCH")
             driver(
-                rig, f"MCH-pauldron{suffix}", "rotation_quaternion", index=3,
+                rig,
+                f"MCH-pauldron{suffix}",
+                "rotation_quaternion",
+                index=3,
                 expression=side.pauldron_twist_expression,
                 variables={"RotX": TransformVariable(deform_upper_arm, "ROT_X")},
             )
             driver(
-                rig, f"MCH-pauldron{suffix}", "rotation_quaternion", index=1,
+                rig,
+                f"MCH-pauldron{suffix}",
+                "rotation_quaternion",
+                index=1,
                 expression=side.pauldron_swing_expression,
                 variables={"RotZ": TransformVariable(deform_upper_arm, "ROT_Z")},
             )

@@ -1,4 +1,4 @@
-
+"""The rig generation pipeline: runs rig modules and rigify."""
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +16,7 @@ _ASSET_DIR = Path(__file__).resolve().parents[2] / "assets" / "blend"
 _WGTS_FILE = _ASSET_DIR / "wgts.blend"
 _WGTS_PREFIX = "AB_WGT_"
 _WGTS_COLLECTION_NAME = "WGTS"
+
 
 @dataclass
 class RigGenerationState:
@@ -38,9 +39,11 @@ class AetherRigGenerator:
 
     name: str
     module_groups: list[list[RigModule]]  # instances created from the template's module classes
-    color_sets: 'dict[str, rigify.ColorSet]'
+    color_sets: "dict[str, rigify.ColorSet]"
 
-    def __init__(self, name: str, color_sets: 'dict[str, rigify.ColorSet]', modules: list[list[type[RigModule]]] | None = None):
+    def __init__(
+        self, name: str, color_sets: "dict[str, rigify.ColorSet]", modules: list[list[type[RigModule]]] | None = None
+    ) -> None:
         self.name = name
         self.color_sets = color_sets
         self.module_groups = [[module_class() for module_class in group] for group in (modules or []) if group]
@@ -107,18 +110,18 @@ class AetherRigGenerator:
         self._finalize_generated_rig(armature, meta_rig)
         return True
 
-    def reveal_meta_rig(self, state: RigGenerationState):
+    def reveal_meta_rig(self, state: RigGenerationState) -> None:
         """Show meta rig for manual adjustments and hide the source armature."""
         self._set_meta_rig_visibility(state.meta_rig, visible=True)
         state.armature.hide_set(True)
         state.armature.hide_viewport = True
         utils.object.select_only(state.meta_rig)
-        bpy.ops.object.mode_set(mode='POSE')
+        bpy.ops.object.mode_set(mode="POSE")
 
     # ------------------------------
     # Internal helpers
     # ------------------------------
-    def _set_meta_rig_visibility(self, meta_rig: bpy.types.Object, visible: bool):
+    def _set_meta_rig_visibility(self, meta_rig: bpy.types.Object, visible: bool) -> None:
         utils.object.set_visibility(meta_rig, visible)
 
     def _prepare_source_armature(
@@ -126,7 +129,7 @@ class AetherRigGenerator:
         armature: bpy.types.Object,
         cleanup_existing: Callable[[], object] | None,
     ) -> bool:
-        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode="OBJECT")
 
         utils.armature.reset_transforms(armature)
 
@@ -146,8 +149,9 @@ class AetherRigGenerator:
 
         return True
 
-    def _append_widgets(self, armature: bpy.types.Object):
+    def _append_widgets(self, armature: bpy.types.Object) -> None:
         """Append widget objects from wgts.blend and place them in the armature's WGTS collection."""
+
         def _base_object_name(object_name: str) -> str:
             # Blender duplicate suffixes use the pattern ".001", ".002", etc.
             if len(object_name) > 4 and object_name[-4] == "." and object_name[-3:].isdigit():
@@ -199,11 +203,7 @@ class AetherRigGenerator:
         widget_base_names = {_base_object_name(name) for name in widget_names}
         existing_widgets = _widgets_by_base()
 
-        missing_widget_names = [
-            name
-            for name in widget_names
-            if _base_object_name(name) not in existing_widgets
-        ]
+        missing_widget_names = [name for name in widget_names if _base_object_name(name) not in existing_widgets]
 
         if missing_widget_names:
             with bpy.data.libraries.load(str(_WGTS_FILE), link=False) as (_, data_to):
@@ -228,7 +228,7 @@ class AetherRigGenerator:
         self._join_link_rig(armature, meta_rig)
         return meta_rig
 
-    def _ensure_meta_rig_collections(self, meta_rig: bpy.types.Object):
+    def _ensure_meta_rig_collections(self, meta_rig: bpy.types.Object) -> None:
         linked_coll = meta_rig.data.collections.get("Linked")
         unlinked_coll = meta_rig.data.collections.get("Unlinked")
         original_coll = meta_rig.data.collections.get("Original")
@@ -245,7 +245,7 @@ class AetherRigGenerator:
         collections.move(unlinked_coll.index, 1)
         collections.move(original_coll.index, 2)
 
-    def _join_link_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object):
+    def _join_link_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object) -> None:
         link_rig = utils.armature.duplicate(armature)
         utils.armature.add_bone_prefix(link_rig, "LINK-")
 
@@ -255,7 +255,7 @@ class AetherRigGenerator:
         utils.armature.b_collection.assign_bones(link_rig, list(link_rig.data.bones.keys()), "LINK", clear=True)
         utils.armature.join(src=link_rig, target=meta_rig)
 
-    def _configure_meta_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object):
+    def _configure_meta_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object) -> None:
         bpy.context.view_layer.objects.active = meta_rig
         meta_rig.show_in_front = True
         meta_rig.data.rigify_target_rig = armature
@@ -283,13 +283,13 @@ class AetherRigGenerator:
 
         return valid
 
-    def _run_meta_edit(self, meta_rig: bpy.types.Object, modules: list[RigModule]):
+    def _run_meta_edit(self, meta_rig: bpy.types.Object, modules: list[RigModule]) -> None:
         enter_mode(meta_rig, "EDIT")
         for module in modules:
             module.meta_edit(meta_rig)
         resolve_pending_parents(meta_rig)
 
-    def _sort_original_bones(self, meta_rig: bpy.types.Object):
+    def _sort_original_bones(self, meta_rig: bpy.types.Object) -> None:
         """Move original bones into Linked or Unlinked and drop the LINK bones that nothing uses."""
         enter_mode(meta_rig, "OBJECT")
         original_collection = meta_rig.data.collections.get("Original")
@@ -315,7 +315,9 @@ class AetherRigGenerator:
         link_pose_bone = meta_rig.pose.bones.get(f"LINK-{bone_name}")
         return bool(link_pose_bone and link_pose_bone.get(LINKED_PROPERTY))
 
-    def _run_meta_pose(self, meta_rig: bpy.types.Object, modules: list[RigModule], original_bone_names: set[str]):
+    def _run_meta_pose(
+        self, meta_rig: bpy.types.Object, modules: list[RigModule], original_bone_names: set[str]
+    ) -> None:
         enter_mode(meta_rig, "POSE")
         for bone_name in original_bone_names:
             if bone_name in meta_rig.pose.bones:
@@ -324,7 +326,7 @@ class AetherRigGenerator:
         for module in modules:
             module.meta_pose(meta_rig)
 
-    def _run_final_steps(self, armature: bpy.types.Object, modules: list[RigModule]):
+    def _run_final_steps(self, armature: bpy.types.Object, modules: list[RigModule]) -> None:
         enter_mode(armature, "EDIT")
         for module in modules:
             module.final_edit(armature)
@@ -335,14 +337,16 @@ class AetherRigGenerator:
         for module in modules:
             module.final_pose(armature)
 
-    def _sync_ui_flags_property(self, armature: bpy.types.Object, modules: list[RigModule]):
+    def _sync_ui_flags_property(self, armature: bpy.types.Object, modules: list[RigModule]) -> None:
         flags = {flag for module in modules for flag in module.ui_flags}
         armature.aether_rig.ui_flags.clear()
         for flag in sorted(flags):
             item = armature.aether_rig.ui_flags.add()
             item.value = flag
 
-    def _create_ui_collections(self, meta_rig: bpy.types.Object, ui_collections: rigify.settings.UI_Collections) -> list[bpy.types.BoneCollection]:
+    def _create_ui_collections(
+        self, meta_rig: bpy.types.Object, ui_collections: rigify.settings.UI_Collections
+    ) -> list[bpy.types.BoneCollection]:
         visible_collections: list[bpy.types.BoneCollection] = []
 
         for collection in ui_collections.collections:
@@ -353,15 +357,15 @@ class AetherRigGenerator:
 
         return visible_collections
 
-    def _finalize_meta_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object):
+    def _finalize_meta_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object) -> None:
         armature.aether_rig.meta_rig = meta_rig
 
-        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode="OBJECT")
         meta_rig.parent = armature
         self._set_meta_rig_visibility(meta_rig, visible=False)
         utils.object.select_only(armature)
 
-    def _set_all_collections_visibility(self, armature: bpy.types.Object, visible: bool):
+    def _set_all_collections_visibility(self, armature: bpy.types.Object, visible: bool) -> None:
         for collection in armature.data.collections:
             collection.is_visible = visible
 
@@ -369,28 +373,30 @@ class AetherRigGenerator:
         self._set_meta_rig_visibility(meta_rig, visible=True)
         utils.object.select_only(meta_rig)
 
-        if bpy.ops.pose.rigify_generate() == {'FINISHED'}:
+        if bpy.ops.pose.rigify_generate() == {"FINISHED"}:
             return True
 
         self._set_meta_rig_visibility(meta_rig, visible=False)
         return False
 
-    def _update_deform_bones(self, armature: bpy.types.Object):
-        bpy.ops.object.mode_set(mode='OBJECT')
+    def _update_deform_bones(self, armature: bpy.types.Object) -> None:
+        bpy.ops.object.mode_set(mode="OBJECT")
 
         original_bone_names = set(utils.armature.b_collection.get_bones(armature, "Original").keys())
         for bone in armature.data.bones.values():
             bone.use_deform = bone.name in original_bone_names
 
-    def _hide_generated_collections(self, armature: bpy.types.Object, visible_collections: list[bpy.types.BoneCollection]):
+    def _hide_generated_collections(
+        self, armature: bpy.types.Object, visible_collections: list[bpy.types.BoneCollection]
+    ) -> None:
         self._set_all_collections_visibility(armature, visible=False)
         visible_names = {coll.name for coll in visible_collections}
         for collection in armature.data.collections:
             if collection.name in visible_names:
                 collection.is_visible = True
 
-    def _finalize_generated_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object):
-        bpy.ops.object.mode_set(mode='OBJECT')
+    def _finalize_generated_rig(self, armature: bpy.types.Object, meta_rig: bpy.types.Object) -> None:
+        bpy.ops.object.mode_set(mode="OBJECT")
         armature.aether_rig.rigified = True
         self._set_meta_rig_visibility(meta_rig, visible=False)
         utils.object.select_only(armature)

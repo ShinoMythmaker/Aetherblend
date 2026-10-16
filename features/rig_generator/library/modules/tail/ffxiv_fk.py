@@ -1,4 +1,7 @@
 """Tail module: a chain of FK controls following the tail bones."""
+
+import bpy
+
 from ....definitions import RigModule
 from ....instructions import *
 from ....rigify.settings import BoneCollection, UI_Collections
@@ -9,18 +12,20 @@ TAIL_COLLECTION = "Tail"
 class Module(RigModule):
     name = "XIV-FK"
     requires = ["n_sippo_a", "n_sippo_b", "n_sippo_c", "n_sippo_d", "n_sippo_e"]
-    ui_collections = UI_Collections([
-        BoneCollection(name=TAIL_COLLECTION, ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name=TAIL_COLLECTION, ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),
+        ]
+    )
 
-    def meta_edit(self, rig):
+    def meta_edit(self, rig: bpy.types.Object) -> None:
         connect(rig, "Tail", "n_sippo_a", "n_sippo_b", parent=["Spine.001", "j_kosi"])
         connect(rig, "Tail.001", "n_sippo_b", "n_sippo_c", parent="Tail", connected=True)
         connect(rig, "Tail.002", "n_sippo_c", "n_sippo_d", parent="Tail.001", connected=True)
         connect(rig, "Tail.003", "n_sippo_d", "n_sippo_e", parent="Tail.002", connected=True)
         extend(rig, "Tail.004", "Tail.003", parent="Tail.003", connected=True)
 
-    def meta_pose(self, rig):
+    def meta_pose(self, rig: bpy.types.Object) -> None:
         rigify.basic_copy_chain(rig, "Tail")
         collection(rig, ["Tail", "Tail.001", "Tail.002", "Tail.003", "Tail.004"], TAIL_COLLECTION)
 
@@ -30,6 +35,6 @@ class Module(RigModule):
         link(rig, "n_sippo_d", "DEF-Tail.003")
         link(rig, "n_sippo_e", "DEF-Tail.004")
 
-    def final_pose(self, rig):
+    def final_pose(self, rig: bpy.types.Object) -> None:
         for control in ["Tail-end", "Tail-end01", "Tail-mid01", "Tail-start01", "Tail-master"]:
             widget(rig, control, scale_factor=0.5)

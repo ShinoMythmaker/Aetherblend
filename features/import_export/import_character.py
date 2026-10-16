@@ -1,6 +1,5 @@
 """Character import operators."""
 
-
 import bpy
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 
@@ -11,56 +10,78 @@ from ...utils import addon_dependencies
 from ...utils.axis_conversion import AXIS_ITEMS
 
 
-class AETHER_OT_Character_Import(bpy.types.Operator):
-    """Import a character model into Blender with various options."""
-
+class AETHER_OT_import_export_import_character(bpy.types.Operator):
     bl_idname = "aether.import_export_import_character"
     bl_label = "Import Character"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_description = "Import a character model into Blender with various options"
+    bl_options = {"REGISTER", "UNDO"}
 
     filepath: StringProperty(subtype="FILE_PATH")  # type: ignore
-    filter_glob: StringProperty(default='*.gltf;*.glb;*.fbx', options={'HIDDEN'})  # type: ignore
+    filter_glob: StringProperty(default="*.gltf;*.glb;*.fbx", options={"HIDDEN"})  # type: ignore
 
     s_pack_images: BoolProperty(name="Pack-Images", description="Pack all Images into .blend file", default=True)  # type: ignore
-    s_merge_vertices: BoolProperty(name="Merge Vertices", description="The glTF format requires discontinuous normals, UVs, and other vertex attributes to be stored as separate vertices, as required for rendering on typical graphics hardware. This option attempts to combine co -located vertices where possible. Currently cannot combine verts with different normals.", default=False)  # type: ignore
-    s_import_collection: BoolProperty(name="Import-Collection", description="Stores all import in a seperatre Collection", default=True)  # type: ignore
+    s_merge_vertices: BoolProperty(
+        name="Merge Vertices",
+        description="The glTF format requires discontinuous normals, UVs, and other vertex attributes to be stored as separate vertices, as required for rendering on typical graphics hardware. This option attempts to combine co -located vertices where possible. Currently cannot combine verts with different normals.",  # noqa: E501
+        default=False,
+    )  # type: ignore
+    s_import_collection: BoolProperty(
+        name="Import-Collection", description="Stores all import in a seperatre Collection", default=True
+    )  # type: ignore
 
     s_merge_skin: BoolProperty(name="Merge Skin", description="Merges all skin objects", default=True)  # type: ignore
-    s_merge_by_material: BoolProperty(name="Merge by Material", description="Merges all objects with the same material", default=True)  # type: ignore
+    s_merge_by_material: BoolProperty(
+        name="Merge by Material", description="Merges all objects with the same material", default=True
+    )  # type: ignore
 
-    s_import_with_meddle_shaders: BoolProperty(name="Use Meddle Shaders", description="Applies Meddle Shaders to equipment and character features using the Meddle shader cache", default=True)  # type: ignore
-    s_import_ab_iris_shader: BoolProperty(name="AB Iris Shader", description="Apply the built-in AetherBlend Iris shader setup after Meddle shader import", default=True)  # type: ignore
-    s_import_ab_limbal_shader: BoolProperty(name="AB Limbal Shader", description="Apply the built-in AetherBlend Limbal shader setup after Meddle shader import", default=True)  # type: ignore
-    s_import_with_ffgear_shaders: BoolProperty(name="Use FFGear Shaders", description="Applies FFGear Shaders to equipment using the Meddle shader cache", default=True) # type: ignore
+    s_import_with_meddle_shaders: BoolProperty(
+        name="Use Meddle Shaders",
+        description="Applies Meddle Shaders to equipment and character features using the Meddle shader cache",
+        default=True,
+    )  # type: ignore
+    s_import_ab_iris_shader: BoolProperty(
+        name="AB Iris Shader",
+        description="Apply the built-in AetherBlend Iris shader setup after Meddle shader import",
+        default=True,
+    )  # type: ignore
+    s_import_ab_limbal_shader: BoolProperty(
+        name="AB Limbal Shader",
+        description="Apply the built-in AetherBlend Limbal shader setup after Meddle shader import",
+        default=True,
+    )  # type: ignore
+    s_import_with_ffgear_shaders: BoolProperty(
+        name="Use FFGear Shaders",
+        description="Applies FFGear Shaders to equipment using the Meddle shader cache",
+        default=True,
+    )  # type: ignore
 
-    s_disable_bone_shape: BoolProperty(name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True)  # type: ignore
-    s_apply_pose_track: BoolProperty(name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False)  # type: ignore
-
-
+    s_disable_bone_shape: BoolProperty(
+        name="Disable Bone Shapes", description="Disables the generation of Bone Shapes on Import", default=True
+    )  # type: ignore
+    s_apply_pose_track: BoolProperty(
+        name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False
+    )  # type: ignore
 
     # Bone Axis Orientation (FBX-style)
     primary_bone_axis: EnumProperty(
         name="Primary Bone Axis",
         description="Primary axis for bone orientation (the bone's length direction).",
         items=AXIS_ITEMS,
-        default='X',
+        default="X",
     )  # type: ignore
 
     secondary_bone_axis: EnumProperty(
         name="Secondary Bone Axis",
         description="Secondary axis for bone orientation (determines bone roll).",
         items=AXIS_ITEMS,
-        default='Y',
+        default="Y",
     )  # type: ignore
 
     use_bone_axis_conversion: BoolProperty(
-        name="Use Bone Axis Conversion",
-        description="Apply bone axis conversion (similar to FBX import).",
-        default=True
+        name="Use Bone Axis Conversion", description="Apply bone axis conversion (similar to FBX import).", default=True
     )  # type: ignore
 
-
-    def invoke(self, context, event):
+    def invoke(self, context: bpy.types.Context, event: bpy.types.Event) -> set[str]:
         prefs = get_preferences()
         if prefs.default_meddle_import_path:
             self.filepath = prefs.default_meddle_import_path
@@ -73,9 +94,9 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             self.s_import_with_ffgear_shaders = False
 
         context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
+        return {"RUNNING_MODAL"}
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context) -> None:
         indent = 0.3
         indent_nested = 0.3
         layout = self.layout
@@ -128,8 +149,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         col = box.column(align=True)
         split = col.split(factor=indent)
         left = split.row(align=True)
-        left.alignment = 'RIGHT'
-        left.label(text="", icon='BLANK1' if has_meddle else 'ERROR')
+        left.alignment = "RIGHT"
+        left.label(text="", icon="BLANK1" if has_meddle else "ERROR")
 
         meddle_toggle = split.row(align=True)
         meddle_toggle.enabled = has_meddle
@@ -149,8 +170,8 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
 
         split = col.split(factor=indent)
         left = split.row(align=True)
-        left.alignment = 'RIGHT'
-        left.label(text="", icon='BLANK1' if has_ffgear else 'ERROR')
+        left.alignment = "RIGHT"
+        left.label(text="", icon="BLANK1" if has_ffgear else "ERROR")
 
         ffgear_toggle = split.row(align=True)
         ffgear_toggle.enabled = has_ffgear
@@ -187,25 +208,31 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
         if self.use_bone_axis_conversion:
             split = col.split(factor=indent)
             left = split.row()
-            left.alignment = 'RIGHT'
+            left.alignment = "RIGHT"
             left.label(text="Primary")
             split.prop(self, "primary_bone_axis", text="")
 
             split = col.split(factor=indent)
             left = split.row()
-            left.alignment = 'RIGHT'
+            left.alignment = "RIGHT"
             left.label(text="Secondary")
             split.prop(self, "secondary_bone_axis", text="")
 
-    def execute(self, context):
-        bpy.context.window.cursor_set('WAIT')
+    def execute(self, context: bpy.types.Context) -> set[str]:
+        bpy.context.window.cursor_set("WAIT")
 
-        if not self.filepath or not (self.filepath.lower().endswith(".gltf") or self.filepath.lower().endswith(".glb") or self.filepath.lower().endswith(".fbx")):
-            self.report({'ERROR'}, "[AetherBlend] Invalid file format. Please select a .gltf, .glb, or .fbx file.")
-            return {'CANCELLED'}
+        if not self.filepath or not (
+            self.filepath.lower().endswith(".gltf")
+            or self.filepath.lower().endswith(".glb")
+            or self.filepath.lower().endswith(".fbx")
+        ):
+            self.report({"ERROR"}, "[AetherBlend] Invalid file format. Please select a .gltf, .glb, or .fbx file.")
+            return {"CANCELLED"}
 
         # Import the model
-        imported_objects = utils.import_export.import_model(self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices)
+        imported_objects = utils.import_export.import_model(
+            self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices
+        )
 
         # Process the imported objects with settings in mind
         if self.s_import_collection:
@@ -217,7 +244,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
             imported_objects = utils.object.merge_by_material(imported_objects)
 
         if self.s_merge_skin:
-            imported_objects = utils.object.merge_by_name(imported_objects, 'skin')
+            imported_objects = utils.object.merge_by_name(imported_objects, "skin")
 
         meddle_shader_ok = False
         if self.s_import_with_meddle_shaders:
@@ -225,23 +252,29 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
                 ok = utils.object.import_meddle_shader(self.filepath, imported_objects)
                 meddle_shader_ok = bool(ok)
                 if not ok:
-                    self.report({'WARNING'}, "[AetherBlend] Meddle shader import skipped or failed; keeping default shaders")
+                    self.report(
+                        {"WARNING"}, "[AetherBlend] Meddle shader import skipped or failed; keeping default shaders"
+                    )
             except Exception as e:
-                self.report({'ERROR'}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}")
+                self.report(
+                    {"ERROR"}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}"
+                )
         if self.s_import_with_ffgear_shaders:
             try:
                 ok = utils.object.import_ffgear_shader(self.filepath, imported_objects)
                 if not ok:
-                    self.report({'WARNING'}, "[AetherBlend] FFGear shader import skipped or failed; keeping default shaders")
+                    self.report(
+                        {"WARNING"}, "[AetherBlend] FFGear shader import skipped or failed; keeping default shaders"
+                    )
             except Exception as e:
-                self.report({'ERROR'}, f"[AetherBlend] Failed to import FFGear Shaders. Applying default shaders instead: {e}")
+                self.report(
+                    {"ERROR"}, f"[AetherBlend] Failed to import FFGear Shaders. Applying default shaders instead: {e}"
+                )
 
-
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.select_all(action="DESELECT")
 
         armature = utils.armature.find_armature_in_objects(imported_objects)
         if armature:
-
             # First apply pose track to rest pose.
             if self.s_apply_pose_track:
                 apply_pose_to_rest_pose(armature)
@@ -255,38 +288,37 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
                     armature, self.primary_bone_axis, self.secondary_bone_axis
                 )
 
-
             bpy.context.view_layer.objects.active = armature
-            bpy.ops.object.mode_set(mode='EDIT')
-            bpy.ops.armature.select_all(action='SELECT')
+            bpy.ops.object.mode_set(mode="EDIT")
+            bpy.ops.armature.select_all(action="SELECT")
             bpy.ops.armature.assign_to_collection(new_collection_name="Original")
-            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.mode_set(mode="OBJECT")
 
             utils.object.select_only(armature)
 
             if meddle_shader_ok and self.s_import_ab_iris_shader:
                 try:
-                    result = bpy.ops.aether.shaders_iris('EXEC_DEFAULT')
-                    if 'FINISHED' not in result:
-                        self.report({'WARNING'}, "[AetherBlend] AB Iris shader setup did not finish")
+                    result = bpy.ops.aether.shaders_iris("EXEC_DEFAULT")
+                    if "FINISHED" not in result:
+                        self.report({"WARNING"}, "[AetherBlend] AB Iris shader setup did not finish")
                 except Exception as e:
-                    self.report({'WARNING'}, f"[AetherBlend] AB Iris shader setup failed: {e}")
+                    self.report({"WARNING"}, f"[AetherBlend] AB Iris shader setup failed: {e}")
 
             if meddle_shader_ok and self.s_import_ab_limbal_shader:
                 try:
-                    result = bpy.ops.aether.shaders_limbal('EXEC_DEFAULT')
-                    if 'FINISHED' not in result:
-                        self.report({'WARNING'}, "[AetherBlend] AB Limbal shader setup did not finish")
+                    result = bpy.ops.aether.shaders_limbal("EXEC_DEFAULT")
+                    if "FINISHED" not in result:
+                        self.report({"WARNING"}, "[AetherBlend] AB Limbal shader setup did not finish")
                 except Exception as e:
-                    self.report({'WARNING'}, f"[AetherBlend] AB Limbal shader setup failed: {e}")
+                    self.report({"WARNING"}, f"[AetherBlend] AB Limbal shader setup failed: {e}")
 
-        self.report({'INFO'}, "[AetherBlend] Model imported and processed successfully.")
+        self.report({"INFO"}, "[AetherBlend] Model imported and processed successfully.")
 
-        if get_preferences().auto_navigate_tabs == 'ON':
-            set_active_tab(context, 'GENERATE')
+        if get_preferences().auto_navigate_tabs == "ON":
+            set_active_tab(context, "GENERATE")
 
-        bpy.context.window.cursor_set('DEFAULT')
-        return {'FINISHED'}
+        bpy.context.window.cursor_set("DEFAULT")
+        return {"FINISHED"}
 
 
 def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
@@ -299,14 +331,14 @@ def apply_pose_to_rest_pose(armature: bpy.types.Object) -> None:
         print("[AetherBlend] No animation data found on armature.")
         return
 
-    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode="OBJECT")
     bpy.context.view_layer.objects.active = armature
 
     utils.armature.apply_all_as_shapekey(armature, shapekey_name="ImportedPose")
     utils.armature.new_rest_pose(armature)
 
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode="OBJECT")
+    bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = armature
 
     print("[AetherBlend] Applied pose to rest pose successfully.")
@@ -325,9 +357,11 @@ def clear_animation_data(armature: bpy.types.Object) -> None:
         print(f"[AetherBlend] Warning: Could not clear '{armature.name}''s animation_data: {e}")
 
 
-def register():
-    bpy.utils.register_class(AETHER_OT_Character_Import)
+def register() -> None:
+    """Register this module's classes."""
+    bpy.utils.register_class(AETHER_OT_import_export_import_character)
 
 
-def unregister():
-    bpy.utils.unregister_class(AETHER_OT_Character_Import)
+def unregister() -> None:
+    """Unregister this module's classes."""
+    bpy.utils.unregister_class(AETHER_OT_import_export_import_character)

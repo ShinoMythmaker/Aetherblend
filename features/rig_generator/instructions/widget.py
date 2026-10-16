@@ -1,4 +1,5 @@
 """Widget instruction: set the custom shape of a bone."""
+
 import math
 
 import bpy
@@ -12,7 +13,9 @@ _WIDGET_OBJECT_PREFIX = "AB_WGT_"
 
 def _find_widget_name(rig: bpy.types.Object, widget_name: str) -> str | None:
     """Find a widget object by name in the rig's WGTS collections, falling back to the whole blend file."""
-    expected_name = widget_name if widget_name.startswith(_WIDGET_OBJECT_PREFIX) else f"{_WIDGET_OBJECT_PREFIX}{widget_name}"
+    expected_name = (
+        widget_name if widget_name.startswith(_WIDGET_OBJECT_PREFIX) else f"{_WIDGET_OBJECT_PREFIX}{widget_name}"
+    )
 
     def matches(object_name: str) -> bool:
         return object_name == expected_name
@@ -20,14 +23,20 @@ def _find_widget_name(rig: bpy.types.Object, widget_name: str) -> str | None:
     rig_collections: list[bpy.types.Collection] = []
     for rig_collection in rig.users_collection:
         rig_collections.extend(utils.collection.collection_tree(rig_collection))
-    found_name = utils.collection.find_object_name_in_prefixed_collections(rig_collections, _WIDGET_COLLECTION_PREFIX, matches)
+    found_name = utils.collection.find_object_name_in_prefixed_collections(
+        rig_collections, _WIDGET_COLLECTION_PREFIX, matches
+    )
     if found_name:
         return found_name
 
     blend_file_collections = [
-        collection for collection in bpy.data.collections if collection.name.upper().startswith(_WIDGET_COLLECTION_PREFIX)
+        collection
+        for collection in bpy.data.collections
+        if collection.name.upper().startswith(_WIDGET_COLLECTION_PREFIX)
     ]
-    found_name = utils.collection.find_object_name_in_prefixed_collections(blend_file_collections, _WIDGET_COLLECTION_PREFIX, matches)
+    found_name = utils.collection.find_object_name_in_prefixed_collections(
+        blend_file_collections, _WIDGET_COLLECTION_PREFIX, matches
+    )
     if not found_name:
         print(f"[AetherBlend] No widget '{expected_name}' found for '{rig.name}'.")
     return found_name

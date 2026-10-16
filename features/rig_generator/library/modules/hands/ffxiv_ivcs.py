@@ -1,4 +1,5 @@
 """Hands whose fingers have an additional IVCS tip bone."""
+
 from ._hand import Hands, required_bones, ui_collections
 
 

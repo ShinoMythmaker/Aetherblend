@@ -1,3 +1,5 @@
+"""Rig generation panel."""
+
 import bpy
 
 from ...ui.tabs import get_active_tab
@@ -5,40 +7,40 @@ from ...ui.visibility import visible_in_current_area
 from ...utils import addon_dependencies
 
 
-class AETHER_PT_RigCreation(bpy.types.Panel):
+class AETHER_PT_rig_generator_creation(bpy.types.Panel):
     bl_label = "Create Rig"
-    bl_idname = "AETHER_PT_rig_creation_panel"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
+    bl_idname = "AETHER_PT_rig_generator_creation"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AetherBlend"
     bl_order = 4
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls, context: bpy.types.Context) -> bool:
         if not visible_in_current_area(context):
             return False
-        if get_active_tab(context) != 'GENERATE':
+        if get_active_tab(context) != "GENERATE":
             return False
 
         armature = context.active_object
-        return (
+        return bool(
             armature is not None
             and armature.visible_get()
-            and armature.type == 'ARMATURE'
-            and getattr(armature, 'aether_rig', None)
+            and armature.type == "ARMATURE"
+            and getattr(armature, "aether_rig", None)
         )
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context) -> None:
         addon_enabled = addon_dependencies.is_addon_enabled(module_name="rigify")
         if not addon_enabled:
             layout = self.layout
             box = layout.box()
-            box.label(text="Rigify addon is not enabled", icon='ERROR')
+            box.label(text="Rigify addon is not enabled", icon="ERROR")
             return None
 
         layout = self.layout
         armature = context.active_object
-        aether_rig = getattr(armature, 'aether_rig', None)
+        aether_rig = getattr(armature, "aether_rig", None)
         if not aether_rig:
             return
 
@@ -55,7 +57,6 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         unlink.scale_x = 1.3
         unlink.operator("aether.rig_generator_clean_up", text="", icon="UNLINKED")
 
-
         reset = full_rig_button.column(align=False)
         reset.scale_x = 1.3
         reset.operator("aether.rig_generator_reset", text="", icon="RESTRICT_INSTANCED_ON")
@@ -65,16 +66,19 @@ class AETHER_PT_RigCreation(bpy.types.Panel):
         meta_rig_button.operator("aether.rig_generator_generate_meta", text="Generate Meta Rig", icon="ARMATURE_DATA")
 
         row = layout.row(align=True)
-        row.label(text="Template", icon='PRESET')
+        row.label(text="Template", icon="PRESET")
         row.prop(aether_rig, "template", text="")
 
         row = layout.row(align=True)
-        row.label(text="Colorset", icon='COLOR')
+        row.label(text="Colorset", icon="COLOR")
         row.prop(aether_rig, "selected_colorset", text="")
 
 
-def register():
-    bpy.utils.register_class(AETHER_PT_RigCreation)
+def register() -> None:
+    """Register this module's classes."""
+    bpy.utils.register_class(AETHER_PT_rig_generator_creation)
 
-def unregister():
-    bpy.utils.unregister_class(AETHER_PT_RigCreation)
+
+def unregister() -> None:
+    """Unregister this module's classes."""
+    bpy.utils.unregister_class(AETHER_PT_rig_generator_creation)

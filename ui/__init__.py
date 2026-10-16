@@ -1,13 +1,19 @@
+"""Shared UI: tabs, info panel and Properties editor mirrors."""
+
 from . import info_panel, properties_bridge, tabs
 
 modules = (tabs, info_panel, properties_bridge)
 
-def register():
+
+def register() -> None:
+    """Register this module's classes."""
     for mod in modules:
-        if hasattr(mod, 'register'):
+        if hasattr(mod, "register"):
             mod.register()
 
-def unregister():
+
+def unregister() -> None:
+    """Unregister this module's classes."""
     for mod in reversed(modules):
-        if hasattr(mod, 'unregister'):
+        if hasattr(mod, "unregister"):
             mod.unregister()

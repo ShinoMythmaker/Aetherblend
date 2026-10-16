@@ -17,4 +17,3 @@ FFXIV_PRE_DT = Template(
         [ui.debug],
     ],
 )
-

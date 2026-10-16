@@ -1,4 +1,5 @@
 """Mouth module: manual controls, one plain control per lip, teeth and tongue bone."""
+
 import bpy
 
 from ....definitions import RigModule
@@ -20,11 +21,15 @@ TONGUE = (("Tongue", "j_f_bero_01"), ("Tongue.001", "j_f_bero_02"), ("Tongue.002
 
 class Module(RigModule):
     name = "XIV-Manual"
-    ui_collections = UI_Collections([
-        BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=1, title=PRIMARY, visible=True),
-        BoneCollection(name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=1, title=SECONDARY, visible=False),
-        BoneCollection(name=MISC, ui=True, color_set="Face_Secondary", row_index=2, title=MISC, visible=False),
-    ])
+    ui_collections = UI_Collections(
+        [
+            BoneCollection(name=PRIMARY, ui=True, color_set="Face_Primary", row_index=1, title=PRIMARY, visible=True),
+            BoneCollection(
+                name=SECONDARY, ui=True, color_set="Face_Secondary", row_index=1, title=SECONDARY, visible=False
+            ),
+            BoneCollection(name=MISC, ui=True, color_set="Face_Secondary", row_index=2, title=MISC, visible=False),
+        ]
+    )
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
         center(rig, "jaw_ref", ["j_f_dlip_01_r", "j_f_dlip_01_l"], axis="Y", parent="Head")
@@ -34,19 +39,39 @@ class Module(RigModule):
             for row, _, sources in ROWS:
                 parent_bone = "Jaw" if row == "B" else "Head"
                 for index, src in enumerate(sources):
-                    extend(rig, f"Lip.{row}{suffix}{self._number(index)}", f"j_f_{src}_{source}",
-                           axis="Y", start_point="head", size_factor=0.3, parent=parent_bone)
+                    extend(
+                        rig,
+                        f"Lip.{row}{suffix}{self._number(index)}",
+                        f"j_f_{src}_{source}",
+                        axis="Y",
+                        start_point="head",
+                        size_factor=0.3,
+                        parent=parent_bone,
+                    )
                 for index, src in enumerate(INNER[row]):
-                    extend(rig, f"Lip.{row}{suffix}.{index + 3:03d}", f"j_f_{src}_{source}",
-                           axis="Y", start_point="head", size_factor=0.3,
-                           parent=f"Lip.{row}{suffix}{self._number(index)}")
+                    extend(
+                        rig,
+                        f"Lip.{row}{suffix}.{index + 3:03d}",
+                        f"j_f_{src}_{source}",
+                        axis="Y",
+                        start_point="head",
+                        size_factor=0.3,
+                        parent=f"Lip.{row}{suffix}{self._number(index)}",
+                    )
 
         extend(rig, "Teeth.T", "j_f_hagukiup", axis="Y", start_point="head", parent="Head")
         extend(rig, "Teeth.B", "j_f_hagukidn", axis="Y", start_point="head", parent="Jaw")
 
         for index, (name, source) in enumerate(TONGUE):
-            extend(rig, name, source, axis="Y", start_point="head", size_factor=0.3,
-                   parent="Jaw" if index == 0 else TONGUE[index - 1][0])
+            extend(
+                rig,
+                name,
+                source,
+                axis="Y",
+                start_point="head",
+                size_factor=0.3,
+                parent="Jaw" if index == 0 else TONGUE[index - 1][0],
+            )
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
         collection(rig, ["jaw_ref"], "MCH")

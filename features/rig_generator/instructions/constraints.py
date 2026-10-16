@@ -1,4 +1,5 @@
 """Constraint instructions: add a constraint to a bone of the rig."""
+
 import bpy
 
 from .... import utils

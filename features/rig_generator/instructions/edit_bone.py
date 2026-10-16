@@ -1,4 +1,5 @@
 """Edit-mode instructions: create and parent bones."""
+
 import math
 import re
 from collections.abc import Sequence
@@ -27,7 +28,9 @@ def _point(edit_bone: bpy.types.EditBone, point: Point) -> mathutils.Vector:
     return edit_bone.tail.copy() if point == "tail" else edit_bone.head.copy()
 
 
-def _axis_direction(rig: bpy.types.Object, reference: bpy.types.EditBone, axis: Axis, axis_space: AxisSpace) -> mathutils.Vector:
+def _axis_direction(
+    rig: bpy.types.Object, reference: bpy.types.EditBone, axis: Axis, axis_space: AxisSpace
+) -> mathutils.Vector:
     index = _AXIS_INDEX[axis]
     if axis_space == "local":
         return mathutils.Vector(reference.matrix.to_3x3().inverted()[index])
@@ -165,14 +168,16 @@ def center(
     parent: BoneNames | None = None,
     connected: bool = False,
 ) -> None:
-    """Create a bone at the average head of the reference bones, as long as their average length, pointing along an armature axis."""
+    """Create a bone at the average head of the reference bones, pointing along an armature axis."""
     edit_bones = rig.data.edit_bones
     references = [edit_bones[reference] for reference in reference_bones if reference in edit_bones]
     if not references:
         print(f"[AetherBlend] Cannot create '{name}': none of {list(reference_bones)} found.")
         return
 
-    center_position = sum((reference.head for reference in references), mathutils.Vector((0.0, 0.0, 0.0))) / len(references)
+    center_position = sum((reference.head for reference in references), mathutils.Vector((0.0, 0.0, 0.0))) / len(
+        references
+    )
     average_length = sum(reference.length for reference in references) / len(references)
     length = (average_length if average_length > 0 else 0.3) * size_factor
 
@@ -196,7 +201,7 @@ def offset(
     connected: bool = False,
     roll: float = 0.0,
 ) -> None:
-    """Create a bone shifted from a source bone by a vector in the source bone's own axes, with the source's direction and length times size_factor."""
+    """Create a bone shifted from a source bone by a vector in the source bone's own axes."""
     edit_source = rig.data.edit_bones.get(source_bone)
     if not edit_source:
         print(f"[AetherBlend] Cannot offset '{name}': '{source_bone}' not found.")
@@ -250,7 +255,9 @@ def bridge(
         edit_end.use_connect = True
 
 
-def _heaviest_vertex_position(source_rig: bpy.types.Object, mesh: bpy.types.Object, bone: str) -> mathutils.Vector | None:
+def _heaviest_vertex_position(
+    source_rig: bpy.types.Object, mesh: bpy.types.Object, bone: str
+) -> mathutils.Vector | None:
     vertex_group = mesh.vertex_groups.get(bone)
     deformed_by_rig = any(modifier.type == "ARMATURE" and modifier.object == source_rig for modifier in mesh.modifiers)
     if not vertex_group or not deformed_by_rig:
@@ -353,7 +360,7 @@ def resolve_pending_parents(rig: bpy.types.Object) -> None:
 
 
 def find_chains(rig: bpy.types.Object, pattern: str) -> list[list[str]]:
-    """Group the bones whose name matches the regular expression into chains of matching parent and first matching child."""
+    """Group the bones whose name matches the regular expression into parent-child chains."""
     edit_bones = rig.data.edit_bones
     matching_names = [bone.name for bone in edit_bones if re.match(pattern, bone.name)]
 

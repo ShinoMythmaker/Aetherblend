@@ -55,6 +55,7 @@ def is_common_feature_set(token: str) -> bool:
     """Return whether the token represents the always-on common feature set."""
     return token == COMMON_FEATURE_SET_TOKEN
 
+
 def get_addon_feature_sets(entry: dict[str, object]) -> tuple[str, ...]:
     """Return feature-set tags for an add-on definition."""
     raw = entry.get("feature_sets")
@@ -200,7 +201,7 @@ def is_addon_enabled(*, module_name: str | None = None, display_name: str | None
         if resolved_module and resolved_module not in candidates:
             last_part_of_module_name = resolved_module.split(".")[-1]
             candidates.append(_normalize_addon_name(last_part_of_module_name))
-    # candidates is now ["ffgear", "ffgear"] or ["meddle", "meddletools"], etc. Second entry depends on what the module is actually named, and is generally more accurate.
+    # candidates is now ["ffgear", "ffgear"] or ["meddle", "meddletools"], etc. Second entry depends on what the module is actually named, and is generally more accurate.  # noqa: E501
 
     if not candidates:
         return False

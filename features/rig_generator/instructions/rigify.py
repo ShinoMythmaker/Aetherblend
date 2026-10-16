@@ -1,4 +1,5 @@
 """Rigify type instructions: give a bone a rigify type and its parameters."""
+
 from collections.abc import Sequence
 
 import bpy
@@ -11,7 +12,9 @@ def _activate(rig: bpy.types.Object, pose_bone: bpy.types.PoseBone, rigify_type:
     pose_bone.rigify_type = rigify_type
 
 
-def _set_collection_reference(rigify_parameters, reference_property: str, collection_name: str) -> None:
+def _set_collection_reference(
+    rigify_parameters: bpy.types.PropertyGroup, reference_property: str, collection_name: str
+) -> None:
     """Replace a rigify collection reference list with a single reference to the named collection."""
     references = getattr(rigify_parameters, reference_property)
     references.clear()
@@ -211,7 +214,13 @@ def limbs_super_palm(rig: bpy.types.Object, bone: str, *, palm_both_sides: bool 
         pose_bone.rigify_parameters.palm_both_sides = True
 
 
-def _extra_layer(rig: bpy.types.Object, rigify_parameters, layers_flag: str, reference_property: str, collection_name: str) -> None:
+def _extra_layer(
+    rig: bpy.types.Object,
+    rigify_parameters: bpy.types.PropertyGroup,
+    layers_flag: str,
+    reference_property: str,
+    collection_name: str,
+) -> None:
     """Show a skin chain's controls in an extra bone collection, if that collection exists."""
     setattr(rigify_parameters, layers_flag, True)
     getattr(rigify_parameters, reference_property).clear()
@@ -221,7 +230,7 @@ def _extra_layer(rig: bpy.types.Object, rigify_parameters, layers_flag: str, ref
 
 def _skin_chain_parameters(
     rig: bpy.types.Object,
-    rigify_parameters,
+    rigify_parameters: bpy.types.PropertyGroup,
     *,
     chain_priority: int | None,
     control_orientation_bone: str | None,

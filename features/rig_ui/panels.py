@@ -1,5 +1,8 @@
 """Panels for using a generated rig: bone collection layers, rig UI and bake settings."""
+
 import collections
+from collections.abc import Iterable, Iterator
+from typing import Any
 
 import bpy
 
@@ -8,36 +11,36 @@ from ...ui.visibility import visible_in_current_area
 from ..rig_generator import library
 
 
-def _flatten_children(iterable):
+def _flatten_children(iterable: Iterable[Any]) -> Iterator[Any]:
     """Enumerate the iterator items as well as their children in the tree order."""
     for item in iterable:
         yield item
         yield from _flatten_children(item.children)
 
 
-class AETHER_PT_RigLayersPanel(bpy.types.Panel):
+class AETHER_PT_rig_ui_layers(bpy.types.Panel):
     bl_label = "Rig Layers"
-    bl_idname = "AETHER_PT_rig_layers"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
+    bl_idname = "AETHER_PT_rig_ui_layers"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AetherBlend"
     bl_order = 6
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls, context: bpy.types.Context) -> bool:
         if not visible_in_current_area(context):
             return False
-        if get_active_tab(context) != 'RIG_LAYERS':
+        if get_active_tab(context) != "RIG_LAYERS":
             return False
 
         try:
-            return (context.active_object.data.get("rig_id") is not None)
+            return context.active_object.data.get("rig_id") is not None
         except (AttributeError, KeyError, TypeError):
             return False
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context) -> None:
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        if not armature or armature.type != "ARMATURE":
             return
 
         if not armature.data.get("rig_id"):
@@ -47,12 +50,12 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
         any_soloed = any(collection.is_solo for collection in armature.data.collections)
 
         ## AB Additions
-        if context.mode == 'POSE':
+        if context.mode == "POSE":
             row = layout.row(align=True)
             row.operator(
                 "aether.rig_ui_solo_collections",
                 text="Unsolo All" if any_soloed else "Solo Selected",
-                icon='SOLO_ON' if any_soloed else 'SOLO_OFF',
+                icon="SOLO_ON" if any_soloed else "SOLO_OFF",
                 depress=any_soloed,
             )
             layout.separator()
@@ -86,28 +89,36 @@ class AETHER_PT_RigLayersPanel(bpy.types.Panel):
                         solo = row2.row(align=True)
 
                     visibility.enabled = coll.is_visible_ancestors and not any_soloed
-                    visibility.prop(coll, 'is_visible', toggle=True, text=title, translate=False)
-                    solo.prop(coll, 'is_solo', toggle=True, text="", icon='RADIOBUT_OFF' if not coll.is_solo else 'RADIOBUT_ON', translate=False)
+                    visibility.prop(coll, "is_visible", toggle=True, text=title, translate=False)
+                    solo.prop(
+                        coll,
+                        "is_solo",
+                        toggle=True,
+                        text="",
+                        icon="RADIOBUT_OFF" if not coll.is_solo else "RADIOBUT_ON",
+                        translate=False,
+                    )
             else:
                 row.separator()
 
-class AETHER_PT_RigUIPanel(bpy.types.Panel):
+
+class AETHER_PT_rig_ui_main(bpy.types.Panel):
     bl_label = "Rig UI"
-    bl_idname = "AETHER_PT_rig_ui"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
+    bl_idname = "AETHER_PT_rig_ui_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AetherBlend"
     bl_order = 7
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls, context: bpy.types.Context) -> bool:
         if not visible_in_current_area(context):
             return False
-        if get_active_tab(context) != 'RIG_UI':
+        if get_active_tab(context) != "RIG_UI":
             return False
 
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        if not armature or armature.type != "ARMATURE":
             return False
 
         rig_id = armature.data.get("rig_id")
@@ -117,21 +128,21 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
         panel_name = "VIEW3D_PT_rig_ui_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
 
-        if panel_class and hasattr(panel_class, 'poll'):
+        if panel_class and hasattr(panel_class, "poll"):
             return panel_class.poll(context)
 
         return False
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context) -> None:
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        if not armature or armature.type != "ARMATURE":
             return
 
         rig_id = armature.data.get("rig_id")
         if not rig_id:
             return
 
-        aether_rig = getattr(armature, 'aether_rig', None)
+        aether_rig = getattr(armature, "aether_rig", None)
         # if not aether_rig:
         #     return
 
@@ -148,7 +159,7 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
             ui_link.draw(context, self.layout)
 
         ## Draw Rigify UI
-        if panel_class and hasattr(panel_class, 'draw'):
+        if panel_class and hasattr(panel_class, "draw"):
             panel_class.draw(self, context)
         else:
             # Fallback to default behavior if panel not found
@@ -156,23 +167,23 @@ class AETHER_PT_RigUIPanel(bpy.types.Panel):
             layout.label(text=f"Rig UI panel not found for: {rig_id}")
 
 
-class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
+class AETHER_PT_rig_ui_bake_settings(bpy.types.Panel):
     bl_label = "Rig Bake Settings"
-    bl_idname = "AETHER_PT_rig_bake_settings"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
+    bl_idname = "AETHER_PT_rig_ui_bake_settings"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AetherBlend"
     bl_order = 9
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls, context: bpy.types.Context) -> bool:
         if not visible_in_current_area(context):
             return False
-        if get_active_tab(context) != 'RIG_UI':
+        if get_active_tab(context) != "RIG_UI":
             return False
 
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        if not armature or armature.type != "ARMATURE":
             return False
 
         # Get rig_id from armature custom properties
@@ -183,14 +194,14 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
         panel_name = "VIEW3D_PT_rig_bake_settings_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
 
-        if panel_class and hasattr(panel_class, 'poll'):
+        if panel_class and hasattr(panel_class, "poll"):
             return panel_class.poll(context)
 
         return False
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context) -> None:
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        if not armature or armature.type != "ARMATURE":
             return
 
         # Get rig_id from armature custom properties
@@ -201,7 +212,7 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
         panel_name = "VIEW3D_PT_rig_bake_settings_" + rig_id
         panel_class = getattr(bpy.types, panel_name, None)
 
-        if panel_class and hasattr(panel_class, 'draw'):
+        if panel_class and hasattr(panel_class, "draw"):
             panel_class.draw(self, context)
         else:
             # Fallback to default behavior if panel not found
@@ -209,13 +220,15 @@ class AETHER_PT_RigBakeSettingsPanel(bpy.types.Panel):
             layout.label(text=f"Rig bake settings panel not found for: {rig_id}")
 
 
-def register():
-    bpy.utils.register_class(AETHER_PT_RigLayersPanel)
-    bpy.utils.register_class(AETHER_PT_RigUIPanel)
-    bpy.utils.register_class(AETHER_PT_RigBakeSettingsPanel)
+def register() -> None:
+    """Register this module's classes."""
+    bpy.utils.register_class(AETHER_PT_rig_ui_layers)
+    bpy.utils.register_class(AETHER_PT_rig_ui_main)
+    bpy.utils.register_class(AETHER_PT_rig_ui_bake_settings)
 
 
-def unregister():
-    bpy.utils.unregister_class(AETHER_PT_RigBakeSettingsPanel)
-    bpy.utils.unregister_class(AETHER_PT_RigUIPanel)
-    bpy.utils.unregister_class(AETHER_PT_RigLayersPanel)
+def unregister() -> None:
+    """Unregister this module's classes."""
+    bpy.utils.unregister_class(AETHER_PT_rig_ui_bake_settings)
+    bpy.utils.unregister_class(AETHER_PT_rig_ui_main)
+    bpy.utils.unregister_class(AETHER_PT_rig_ui_layers)

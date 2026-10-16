@@ -1,3 +1,5 @@
+"""Bone collection and rig UI setting types."""
+
 from dataclasses import dataclass
 
 import bpy
@@ -13,8 +15,8 @@ class BoneCollection:
     visible: bool = True
 
     def create(self, armature: bpy.types.Object) -> bpy.types.BoneCollection | None:
-        """Creates the bone collection in the armature."""
-        if not armature or armature.type != 'ARMATURE':
+        """Create the bone collection in the armature."""
+        if not armature or armature.type != "ARMATURE":
             print("[AetherBlend] Invalid armature provided for bone collection creation.")
             return None
 
@@ -25,8 +27,8 @@ class BoneCollection:
         return coll
 
     def create_ui(self, armature: bpy.types.Object) -> type[tuple[bpy.types.BoneCollection | None, bool]]:
-        """Creates the bone collection UI in the armature."""
-        if not armature or armature.type != 'ARMATURE':
+        """Create the bone collection UI in the armature."""
+        if not armature or armature.type != "ARMATURE":
             return None, False
 
         coll = armature.data.collections.get(self.name)
@@ -41,17 +43,18 @@ class BoneCollection:
             if not self.visible:
                 show_collection = False
 
-            return coll,  show_collection
+            return coll, show_collection
         return None, True
+
 
 class UI_Collections:
     collections: list[BoneCollection]
 
-    def __init__(self, collections: list[BoneCollection] | None = None):
+    def __init__(self, collections: list[BoneCollection] | None = None) -> None:
         self.collections = collections if collections else []
 
-    def add(self, diff: 'UI_Collections'):
-        """Adds another UI_Collections to this one, changing row IDs to avoid conflicts."""
+    def add(self, diff: "UI_Collections") -> None:
+        """Add another UI_Collections to this one, changing row IDs to avoid conflicts."""
         max_row_index = max((coll.row_index for coll in self.collections), default=0)
 
         for coll in diff.collections:
@@ -61,9 +64,10 @@ class UI_Collections:
                 color_set=coll.color_set,
                 row_index=coll.row_index + max_row_index + 1,
                 title=coll.title,
-                visible=coll.visible
+                visible=coll.visible,
             )
             self.collections.append(new_coll)
+
 
 @dataclass(frozen=True)
 class ColorSet:
@@ -73,14 +77,14 @@ class ColorSet:
     active: str = "#FFFF00"
 
     def add(self, armature: bpy.types.Object) -> None:
-        """Applies the color set to the given rigify armature."""
-        if not armature or armature.type != 'ARMATURE':
+        """Apply the color set to the given rigify armature."""
+        if not armature or armature.type != "ARMATURE":
             print("[AetherBlend] Invalid armature provided for color set application.")
             return
 
         ## make sure armature is selected
         bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode="OBJECT")
 
         bpy.ops.armature.rigify_color_set_add()
         color_set = armature.data.rigify_colors[-1]
@@ -91,8 +95,8 @@ class ColorSet:
         color_set.active = self._hex_to_rgb(self.active)
 
     def _hex_to_rgb(self, hex_color: str) -> tuple[float, float, float]:
-        """Converts a hex color string to an RGB tuple with sRGB gamma correction."""
-        hex_color = hex_color.lstrip('#')
+        """Convert a hex color string to an RGB tuple with sRGB gamma correction."""
+        hex_color = hex_color.lstrip("#")
         lv = len(hex_color)
 
         def srgb_to_linear(value: float) -> float:
@@ -102,4 +106,4 @@ class ColorSet:
                 return value / 12.92
             return ((value + 0.055) / 1.055) ** 2.4
 
-        return tuple(srgb_to_linear(int(hex_color[i:i + lv // 3], 16)) for i in range(0, lv, lv // 3))
+        return tuple(srgb_to_linear(int(hex_color[i : i + lv // 3], 16)) for i in range(0, lv, lv // 3))
