@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AetherBlend Documentation</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github-dark.min.css">
+<style>
+  :root { --bg:#14161a; --panel:#1b1e24; --text:#d8dce3; --muted:#8b93a1; --accent:#6aa8ff; --border:#2a2e37; --code:#0f1115; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.65 system-ui, "Segoe UI", sans-serif; display:flex; min-height:100vh; }
+  nav { width:270px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--border); padding:20px 16px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+  nav h1 { font-size:1.15rem; margin:0 0 16px; }
+  nav h1 a { color:var(--text); text-decoration:none; }
+  nav .group { margin:16px 0 4px; font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+  nav a { display:block; padding:4px 10px; border-radius:6px; color:var(--text); text-decoration:none; font-size:.95rem; }
+  nav a.sub { margin-left:12px; }
+  nav a:hover { background:var(--border); }
+  nav a.active { background:var(--accent); color:#0b1220; font-weight:600; }
+  main { flex:1; min-width:0; padding:32px 48px 80px; max-width:980px; }
+  main h1, main h2, main h3 { line-height:1.25; }
+  main h1 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+  main h2 { border-bottom:1px solid var(--border); padding-bottom:.25em; margin-top:2em; }
+  main a { color:var(--accent); }
+  code { background:var(--code); padding:.15em .4em; border-radius:5px; font-size:.9em; }
+  pre { background:var(--code); padding:14px 16px; border-radius:8px; overflow-x:auto; border:1px solid var(--border); }
+  pre code { background:none; padding:0; }
+  table { border-collapse:collapse; display:block; overflow-x:auto; margin:1em 0; }
+  th, td { border:1px solid var(--border); padding:6px 12px; text-align:left; vertical-align:top; }
+  th { background:var(--panel); }
+  blockquote { margin:1em 0; padding:.2em 1em; border-left:4px solid var(--accent); color:var(--muted); }
+  @media (max-width: 800px) {
+    body { flex-direction:column; }
+    nav { width:100%; height:auto; position:static; border-right:0; border-bottom:1px solid var(--border); }
+    main { padding:20px; }
+  }
+</style>
+</head>
+<body>
+<nav id="nav"></nav>
+<main id="content">Loading…</main>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/common.min.js"></script>
+<script>
+  // Pages live in ./wiki/<Page>.md. Add new pages here to show them in the sidebar.
+  const NAV = [
+    { group: "Operators" },
+    { page: "Operators", title: "Overview" },
+    { page: "Operators-Import-Export", title: "Import / Export", sub: true },
+    { page: "Operators-Rig-Generator", title: "Rig Generator", sub: true },
+    { page: "Operators-Rig-Edit", title: "Rig Edit", sub: true },
+    { page: "Operators-Rig-UI", title: "Rig UI", sub: true },
+    { page: "Operators-Shaders", title: "Shaders", sub: true },
+    { page: "Operators-Preferences", title: "Preferences", sub: true },
+    { group: "Development" },
+    { page: "Style-Guide", title: "Style Guide" },
+    { page: "Writing-Rig-Modules", title: "Writing Rig Modules", sub: true },
+  ];
+  const DEFAULT_PAGE = "Operators";
+  const KNOWN = new Set(NAV.filter(n => n.page).map(n => n.page));
+
+  const nav = document.getElementById("nav");
+  nav.innerHTML = '<h1><a href="#/' + DEFAULT_PAGE + '">AetherBlend Docs</a></h1>' + NAV.map(n =>
+    n.group ? '<div class="group">' + n.group + '</div>'
+            : '<a href="#/' + n.page + '" data-page="' + n.page + '"' + (n.sub ? ' class="sub"' : '') + '>' + n.title + '</a>'
+  ).join("");
+
+  function toPage(text) { return text.trim().replace(/\s+/g, "-"); }
+
+  async function load() {
+    const page = decodeURIComponent(location.hash.replace(/^#\/?/, "")) || DEFAULT_PAGE;
+    const content = document.getElementById("content");
+    nav.querySelectorAll("a[data-page]").forEach(a => a.classList.toggle("active", a.dataset.page === page));
+    try {
+      const res = await fetch("wiki/" + page + ".md");
+      if (!res.ok) throw new Error(res.status);
+      let md = await res.text();
+      md = md.replace(/\[\[([^\]]+)\]\]/g, (_, t) => "[" + t + "](" + toPage(t) + ")");
+      content.innerHTML = marked.parse(md);
+      content.querySelectorAll("a").forEach(a => {
+        const href = a.getAttribute("href");
+        if (href && !/^([a-z]+:|#|\/)/i.test(href) && KNOWN.has(href.replace(/\.md$/, ""))) {
+          a.setAttribute("href", "#/" + href.replace(/\.md$/, ""));
+        }
+      });
+      content.querySelectorAll("pre code").forEach(el => hljs.highlightElement(el));
+      document.title = (content.querySelector("h1")?.textContent || page) + " – AetherBlend";
+      window.scrollTo(0, 0);
+    } catch (e) {
+      content.innerHTML = "<h1>Page not found</h1><p>Could not load <code>" + page + "</code>.</p>";
+    }
+  }
+
+  window.addEventListener("hashchange", load);
+  load();
+</script>
+</body>
+</html>
