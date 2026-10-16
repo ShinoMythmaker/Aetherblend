@@ -150,12 +150,20 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 }
 .btn:hover { text-decoration: none; border-color: var(--accent); }
 .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #07111c; border: 0; }
-.btn.download { display: inline-flex; align-items: center; gap: 14px; padding: 10px 26px 10px 18px; text-align: left; }
-.btn.download img { flex: none; }
-.btn.download span { display: flex; flex-direction: column; line-height: 1.25; }
-.btn.download small { font-weight: 500; font-size: .78rem; opacity: .75; }
-.drop-link { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 8px; border: 1px dashed var(--accent); font-weight: 600; }
-.drop-link img { flex: none; }
+.drop-link {
+  display: inline-flex; align-items: center; gap: 10px; margin: 4px 8px 4px 0; padding: 10px 20px; border-radius: 12px;
+  border: 2px dashed var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; cursor: grab;
+  transition: background .15s, box-shadow .15s, transform .15s;
+}
+.drop-link:hover {
+  background: rgba(91, 192, 222, 0.2); box-shadow: 0 0 0 4px rgba(91, 192, 222, 0.08); text-decoration: none;
+  transform: translateY(-1px);
+}
+.drop-link::before {
+  content: ""; width: 1.15em; height: 1.15em; flex: none; background: currentColor;
+  -webkit-mask: url("img/move.svg") center / contain no-repeat; mask: url("img/move.svg") center / contain no-repeat;
+}
+.drop-link.large { padding: 14px 30px; font-size: 1.05rem; background: rgba(91, 192, 222, 0.16); color: var(--heading); }
 .landing { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
 .landing section { margin-top: 72px; }
 .landing h2 { font-size: 1.7rem; color: var(--heading); margin: 0 0 .5em; }

@@ -322,11 +322,8 @@ def build_index() -> str:
   <p class="lead">{html.escape(lead)}</p>
   <p class="note">{html.escape(note)}</p>
   <div class="btn-row">
-    <a class="btn primary download" data-latest-zip href="{html.escape(download_url)}" draggable="true"
-       title="Drag this button into a Blender window to install">
-      <img src="assets/img/blender.svg" alt="" width="34" height="34">
-      <span><strong>Download for Blender</strong><small>or drag &amp; drop this button into Blender</small></span>
-    </a>
+    <a class="drop-link large" data-latest-zip href="{html.escape(download_url)}" draggable="true"
+       title="Drag this button into a Blender window to install">Drag into Blender</a>
     <a class="btn" href="installation.html">Installation guide</a>
     <a class="btn" href="{REPO_URL}">View on GitHub</a>
   </div>

@@ -23,9 +23,9 @@ The quickest way. Drag a button below into an open Blender window.
 3. Meddle Tools and FFGear come from the same repository, so once it is added they need only **one drop each**.
 
 <p>
-<a class="drop-link" href="{{aetherblend_link}}" draggable="true"><img src="assets/img/blender.svg" alt="" width="22" height="22">AetherBlend</a>
-<a class="drop-link" href="{{meddle_link}}" draggable="true"><img src="assets/img/blender.svg" alt="" width="22" height="22">Meddle Tools</a>
-<a class="drop-link" href="{{ffgear_link}}" draggable="true"><img src="assets/img/blender.svg" alt="" width="22" height="22">FFGear</a>
+<a class="drop-link" href="{{aetherblend_link}}" draggable="true">Drag AetherBlend into Blender</a>
+<a class="drop-link" href="{{meddle_link}}" draggable="true">Drag Meddle Tools into Blender</a>
+<a class="drop-link" href="{{ffgear_link}}" draggable="true">Drag FFGear into Blender</a>
 </p>
 
 All three buttons use the shared [FFXIV Blender Plugins](https://github.com/ShinoMythmaker/FFXIV-Blender-Plugins) repository. Because it is a repository, Blender keeps the installed add-ons updated afterwards.
