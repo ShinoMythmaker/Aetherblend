@@ -5,7 +5,6 @@ import bpy
 import mathutils
 
 from .... import utils
-from ._bones import get_pose_bone
 
 _WIDGET_COLLECTION_PREFIX = "WGTS"
 _WIDGET_OBJECT_PREFIX = "AB_WGT_"
@@ -54,7 +53,7 @@ def widget(
     wire_width: float = 1.0,
 ) -> None:
     """Set the widget shape and its transform for a bone."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 

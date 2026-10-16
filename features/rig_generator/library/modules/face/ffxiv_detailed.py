@@ -4,8 +4,8 @@ from typing import NamedTuple
 import bpy
 
 from ......utils import object as object_utils
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 PRIMARY = "Face (Primary)"

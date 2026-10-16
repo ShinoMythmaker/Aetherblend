@@ -1,9 +1,8 @@
 from types import SimpleNamespace
 
 import bpy
-from mathutils import Vector
 
-from . import b_collection
+from . import b_collection  # noqa: F401  (used as utils.armature.b_collection)
 
 
 def _select_single(obj: bpy.types.Object):
@@ -31,6 +30,13 @@ def find_armature_in_objects(objects):
             print(f"[AetherBlend] Skipping deleted object: {obj}")
     return None
 
+def get_pose_bone(rig: bpy.types.Object, bone_name: str) -> bpy.types.PoseBone | None:
+    """Return the pose bone, or print a warning and return None when it does not exist."""
+    pose_bone = rig.pose.bones.get(bone_name)
+    if not pose_bone:
+        print(f"[AetherBlend] Pose bone '{bone_name}' not found in '{rig.name}'.")
+    return pose_bone
+
 def reset_pose_bones(armature: bpy.types.Object) -> None:
     """Reset all pose bone transforms (location/rotation/scale) to default."""
     if not armature or armature.type != 'ARMATURE':
@@ -47,13 +53,6 @@ def reset_pose_bones(armature: bpy.types.Object) -> None:
     bpy.ops.object.mode_set(mode=original_mode)
     print(f"[AetherBlend] Pose bones of armature '{armature.name}' reset to default.")
 
-def unparent_all_bones(armature: bpy.types.Object) -> None:
-    """Unparents all bones in the given armature."""
-    original_mode = armature.mode
-    bpy.ops.object.mode_set(mode='EDIT')
-    for bone in armature.data.edit_bones:
-        bone.parent = None
-    bpy.ops.object.mode_set(mode=original_mode)
 
 def find_meshes(armature: bpy.types.Object) -> list[bpy.types.Object]:
     """Returns all mesh objects that use the given armature modifier."""
@@ -117,27 +116,6 @@ def new_rest_pose(armature: bpy.types.Object) -> None:
     bpy.ops.object.mode_set(mode=original_mode)
 
 
-def snapshot_parenting(armature: bpy.types.Object) -> dict:
-    """Returns a mapping of bone names to their current parent names."""
-    original_mode = armature.mode
-    bpy.ops.object.mode_set(mode='EDIT')
-    parent_map = {}
-    for bone in armature.data.edit_bones:
-        parent_map[bone.name] = bone.parent.name if bone.parent else None
-    bpy.ops.object.mode_set(mode=original_mode)
-    return parent_map
-
-def restore_bone_parenting(armature: bpy.types.Object, parent_map: dict) -> None:
-    """Restores bone parenting from a map produced by snapshot_parenting."""
-    original_mode = armature.mode
-    bpy.ops.object.mode_set(mode='EDIT')
-    edit_bones = armature.data.edit_bones
-    for bone_name, parent_name in parent_map.items():
-        bone = edit_bones.get(bone_name)
-        if bone:
-            bone.parent = edit_bones.get(parent_name) if parent_name else None
-    bpy.ops.object.mode_set(mode=original_mode)
-
 def duplicate(armature: bpy.types.Object) -> bpy.types.Object:
     """Duplicates the given armature object."""
     _select_single(armature)
@@ -172,14 +150,6 @@ def _set_mode(obj: bpy.types.Object, mode: str) -> str:
 def _restore_mode(obj: bpy.types.Object, mode: str) -> None:
     if obj.mode != mode:
         bpy.ops.object.mode_set(mode=mode)
-
-
-def _get_data_bones(armature: bpy.types.Object, bone_names: list[str]) -> list[bpy.types.Bone]:
-    return [armature.data.bones.get(name) for name in bone_names if armature.data.bones.get(name)]
-
-
-def _get_pose_bones(armature: bpy.types.Object, bone_names: list[str]) -> list[bpy.types.PoseBone]:
-    return [armature.pose.bones.get(name) for name in bone_names if armature.pose.bones.get(name)]
 
 
 def get_bone_visibility(armature: bpy.types.Object, bone_names: list[str]) -> dict[str, tuple[bool, bool]]:

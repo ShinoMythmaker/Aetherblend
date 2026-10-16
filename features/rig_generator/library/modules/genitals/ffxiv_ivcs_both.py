@@ -1,5 +1,5 @@
 """Male and female IVCS genitals together."""
-from ....module import RigModule
+from ....definitions import RigModule
 from ....rigify.settings import UI_Collections
 from .ffxiv_ivcs_female import Module as FemaleGenitals
 from .ffxiv_ivcs_male import Module as MaleGenitals

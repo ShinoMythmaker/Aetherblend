@@ -1,4 +1,4 @@
-﻿from ...rigify.settings import ColorSet
+from ...rigify.settings import ColorSet
 
 CS_AETHER_BLEND = {
         "ik_right": ColorSet(name="IK_Right", normal="#9BFCBB", select="#FFFFFF", active="#FFE7B4"),

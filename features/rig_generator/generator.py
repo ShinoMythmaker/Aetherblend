@@ -8,10 +8,9 @@ import bpy
 
 from ... import utils
 from . import instructions, rigify
+from .definitions import RigModule
 from .instructions import resolve_pending_parents
 from .instructions.pose_bone import LINKED_PROPERTY
-from .module import RigModule
-from .operations import WidgetOperation
 
 _ASSET_DIR = Path(__file__).resolve().parents[2] / "assets" / "blend"
 _WGTS_FILE = _ASSET_DIR / "wgts.blend"
@@ -332,7 +331,7 @@ class AetherRigGenerator:
         resolve_pending_parents(armature)
 
         enter_mode(armature, "POSE")
-        WidgetOperation(bone_name="root", scale_factor=0.2).apply(armature)
+        instructions.widget(armature, "root", scale_factor=0.2)
         for module in modules:
             module.final_pose(armature)
 

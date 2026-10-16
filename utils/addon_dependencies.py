@@ -74,14 +74,6 @@ def get_addon_feature_sets(entry: dict[str, object]) -> tuple[str, ...]:
     return tuple(values)
 
 
-def get_addon_feature_label(entry: dict[str, object]) -> str:
-    """Return a human-readable label for an add-on's feature sets."""
-    labels: list[str] = []
-    for feature_set in get_addon_feature_sets(entry):
-        labels.append(get_feature_set_label(feature_set))
-    return " + ".join(labels)
-
-
 def is_addon_required_for_feature_sets(entry: dict[str, object], feature_sets: set[str] | None) -> bool:
     """Return whether an add-on applies to the active feature-set selection."""
     addon_feature_sets = set(get_addon_feature_sets(entry))
@@ -110,20 +102,6 @@ def get_addons_for_feature_set(feature_set: str) -> list[dict[str, object]]:
         if feature_set in get_addon_feature_sets(entry):
             addons.append(entry)
     return addons
-
-
-def get_addon_entry(*, module_name: str | None = None, display_name: str | None = None) -> dict[str, object] | None:
-    """Return metadata entry for a dependency add-on."""
-    if not module_name and not display_name:
-        return None
-
-    for entry in REQUIRED_ADDONS:
-        if module_name and entry.get("module") == module_name:
-            return entry
-        if display_name and entry.get("name") == display_name:
-            return entry
-
-    return None
 
 
 def get_addon_source(entry: dict[str, object]) -> str:

@@ -6,7 +6,7 @@ from bpy.props import BoolProperty, EnumProperty, StringProperty
 
 from ... import utils
 from ...preferences import get_preferences
-from ...properties.tab_prop import set_active_tab
+from ...ui.tabs import set_active_tab
 from ...utils import addon_dependencies
 from ...utils.axis_conversion import AXIS_ITEMS
 
@@ -14,7 +14,7 @@ from ...utils.axis_conversion import AXIS_ITEMS
 class AETHER_OT_Character_Import(bpy.types.Operator):
     """Import a character model into Blender with various options."""
 
-    bl_idname = "aether.character_import"
+    bl_idname = "aether.model_import_character"
     bl_label = "Import Character"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -266,7 +266,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
 
             if meddle_shader_ok and self.s_import_ab_iris_shader:
                 try:
-                    result = bpy.ops.aether.shader_iris('EXEC_DEFAULT')
+                    result = bpy.ops.aether.shaders_iris('EXEC_DEFAULT')
                     if 'FINISHED' not in result:
                         self.report({'WARNING'}, "[AetherBlend] AB Iris shader setup did not finish")
                 except Exception as e:
@@ -274,7 +274,7 @@ class AETHER_OT_Character_Import(bpy.types.Operator):
 
             if meddle_shader_ok and self.s_import_ab_limbal_shader:
                 try:
-                    result = bpy.ops.aether.shader_limbal('EXEC_DEFAULT')
+                    result = bpy.ops.aether.shaders_limbal('EXEC_DEFAULT')
                     if 'FINISHED' not in result:
                         self.report({'WARNING'}, "[AetherBlend] AB Limbal shader setup did not finish")
                 except Exception as e:

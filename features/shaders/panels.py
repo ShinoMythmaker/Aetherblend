@@ -1,8 +1,8 @@
 import bpy
 
-from ...properties.tab_prop import get_active_tab
+from ...ui.tabs import get_active_tab
+from ...ui.visibility import visible_in_current_area
 from ...utils import addon_dependencies
-from ...utils.ui_visibility import visible_in_current_area
 
 
 def shader_panel_poll(context):
@@ -32,22 +32,6 @@ def draw_action_row(layout, label: str, operator_id: str, *, enabled: bool):
     right.enabled = enabled
     right.operator(operator_id, text="Apply", icon='TRIA_DOWN_BAR')
 
-def draw_toggle_row(layout, label: str, operator_id: str, *, enabled: bool):
-    row = layout.row(align=True)
-    # Keep enough width for operator text; very high factors collapse labels to icon-only.
-    split = row.split(factor=0.6, align=True)
-
-    left = split.row(align=True)
-    left.alignment = 'RIGHT'
-    if enabled:
-        left.label(text=label)
-    else:
-        left.label(text=label, icon='ERROR')
-
-    right = split.row(align=True)
-    right.ui_units_x = 7.0
-    right.enabled = enabled
-    right.operator(operator_id, text="Toggle", icon='NODE_MATERIAL')
 
 
 
@@ -86,8 +70,8 @@ class AETHER_PT_shaders_materials(bpy.types.Panel):
         has_meddle = addon_dependencies.is_addon_enabled(module_name="meddle", display_name="Meddle Tools")
         has_ffgear = addon_dependencies.is_addon_enabled(module_name="ffgear", display_name="FFGear")
 
-        draw_action_row(layout, "Meddle Shader", "aether.shader_meddle", enabled=has_meddle)
-        draw_action_row(layout, "FFGear Shader", "aether.shader_ffgear", enabled=has_ffgear)
+        draw_action_row(layout, "Meddle Shader", "aether.shaders_meddle", enabled=has_meddle)
+        draw_action_row(layout, "FFGear Shader", "aether.shaders_ffgear", enabled=has_ffgear)
 
 
 class AETHER_PT_shaders_node_trees(bpy.types.Panel):
@@ -107,8 +91,8 @@ class AETHER_PT_shaders_node_trees(bpy.types.Panel):
         has_meddle = addon_dependencies.is_addon_enabled(module_name="meddle", display_name="Meddle Tools")
 
         # AB Iris/Limbal rely on Meddle-import shader context.
-        draw_action_row(layout, "AB Iris Shader", "aether.shader_iris", enabled=has_meddle)
-        draw_action_row(layout, "AB Limbal Shader", "aether.shader_limbal", enabled=has_meddle)
+        draw_action_row(layout, "AB Iris Shader", "aether.shaders_iris", enabled=has_meddle)
+        draw_action_row(layout, "AB Limbal Shader", "aether.shaders_limbal", enabled=has_meddle)
 
 
 def register():

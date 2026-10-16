@@ -1,4 +1,4 @@
-from ...module import Template
+from ...definitions import Template
 from ..modules import arms, clothing, ears, genitals, hair, hands, legs, spine, tail, toes, ui
 
 FFXIV_PRE_DT = Template(

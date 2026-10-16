@@ -1,6 +1,6 @@
-from . import info_panel, properties_bridge
+from . import info_panel, properties_bridge, tabs
 
-modules = (info_panel, properties_bridge)
+modules = (tabs, info_panel, properties_bridge)
 
 def register():
     for mod in modules:

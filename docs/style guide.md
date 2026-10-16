@@ -6,32 +6,34 @@ Scope: all Python in this add-on. Python target: see `ruff.toml`. Linter: `ruff`
 ## 1. Layout
 
 ```
-aetherblend/
-  __init__.py          # feature registry + register()/unregister()
-  preferences/         # add-on preferences + feature toggles
-  shared/              # code used by 2+ features ONLY
-    utils/  data/
-  features/rig_generator/  # rig generation: modules, instructions, pipeline, UI
-  features/<feature>/
-    __init__.py        # FEATURE metadata, register(), unregister(), public API
-    operators/
-      __init__.py      # CLASSES tuple
-      <action>.py      # exactly one operator per file
-    ui/
-      __init__.py      # CLASSES tuple
-      <name>.py        # panels / menus
-    properties.py      # or properties/ package when large
-    utils/             # helpers private to this feature
-    constants.py
-    README.md          # operator table (source for wiki)
+AetherBlend/
+  __init__.py            # register()/unregister() for the whole add-on
+  preferences.py         # add-on preferences + feature toggles
+  ui/                    # shared UI: tabs.py (active tab state), visibility.py, info panel
+  utils/                 # helpers shared by 2+ features, grouped by what they act on
+  features/
+    __init__.py          # registry of features
+    <feature>/
+      __init__.py        # docstring, __all__ (public API), register(), unregister()
+      operators.py       # operators (or operators/<action>.py when large)
+      panels.py          # panels and menus
+      properties.py      # property groups
+    rig_generator/
+      definitions.py     # RigModule, Template, UILink
+      generator.py       # the generation pipeline
+      instructions/      # functions a rig module calls to build the rig
+      library/           # modules/, templates/, colorsets/, ui_links.py
+      rigify/            # rigify settings (collections, colorsets)
 ```
 
-- R-1.1 A feature MUST be a self-contained package under `features/`.
-- R-1.2 A feature MAY import `shared/`. A feature MUST NOT import another feature.
-- R-1.3 Code needed by 2+ features MUST move to `shared/`.
-- R-1.4 Cross-feature interaction MUST go through the feature's public API in `__init__.py` or through Blender properties. Deep imports are forbidden.
-- R-1.5 Files SHOULD stay under ~300 lines. Split when longer.
+Features: `animation`, `model_import`, `shaders`, `rig_generator` (build a rig), `rig_edit` (convert and clean up a generated rig), `rig_ui` (use a generated rig: layers, rig UI, eyelid editing).
 
+- R-1.1 A feature MUST be a self-contained package under `features/`.
+- R-1.2 A feature MAY import `utils/`, `ui/` and `preferences`. A feature MUST NOT import another feature except through the names in that feature's `__all__` (for example `from ..rig_generator import instructions`).
+- R-1.3 Code needed by 2+ features MUST move to `utils/` or `ui/`.
+- R-1.4 Every feature `__init__.py` MUST have a one-line docstring and an `__all__`.
+- R-1.5 Files SHOULD stay under ~300 lines. Split when longer.
+- R-1.6 Operator IDs follow `aether.<feature>_<action>` (section 3), so the ID tells which feature owns the operator.
 ## 2. Feature Toggle (REQUIRED)
 
 Every feature MUST be fully enableable and disableable at runtime from preferences, with no Blender restart.

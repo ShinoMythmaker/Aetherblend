@@ -1,5 +1,5 @@
-﻿"""Backend template lookup and rig generator construction."""
-from .aether_rig_generator import AetherRigGenerator
+"""Backend template lookup and rig generator construction."""
+from .generator import AetherRigGenerator
 from .library import CS_COLORSETS, DEFAULT_TEMPLATE_NAME, TEMPLATES
 
 DEFAULT_COLORSET_NAME = 'AetherBlend'

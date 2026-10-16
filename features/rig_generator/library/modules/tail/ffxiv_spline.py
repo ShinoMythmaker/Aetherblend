@@ -1,6 +1,6 @@
 """Tail module: a spline-driven tail with stretch control."""
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 TAIL_COLLECTION = "Tail"

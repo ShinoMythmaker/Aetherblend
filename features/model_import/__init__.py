@@ -1,6 +1,9 @@
-from . import ffxiv_character_ot, panels
+"""Model import feature: import FFXIV characters."""
+from . import operators, panels
 
-modules = (ffxiv_character_ot, panels)
+__all__ = ['operators', 'panels']
+
+modules = (operators, panels)
 
 def register():
     for mod in modules:

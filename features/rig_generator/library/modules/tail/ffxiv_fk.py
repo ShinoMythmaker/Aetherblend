@@ -1,6 +1,6 @@
 """Tail module: a chain of FK controls following the tail bones."""
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 TAIL_COLLECTION = "Tail"

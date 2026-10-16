@@ -1,7 +1,7 @@
 import bpy
 
 from ..preferences import get_preferences
-from ..properties.tab_prop import get_active_tab_prop_name
+from .tabs import get_active_tab_prop_name
 
 GITHUB_URL = "https://github.com/ShinoMythmaker/Aetherblend"
 

@@ -1,8 +1,8 @@
 """Hands shared by every hand variant; a variant only decides whether the fingers have IVCS tip bones."""
 from typing import NamedTuple
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 

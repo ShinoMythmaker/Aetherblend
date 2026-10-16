@@ -1,28 +1,32 @@
-﻿import bpy
+import bpy
 
-from ..features.animation.panels import AETHER_PT_ExportPanel
-from ..features.model_import.panels import AETHER_PT_ImportPanel
-from ..features.rig_generator.panels import (
-    AETHER_PT_RigBakeSettingsPanel,
-    AETHER_PT_RigCreation,
-    AETHER_PT_RigLayersPanel,
-    AETHER_PT_RigManipulation,
-    AETHER_PT_RigUIPanel,
-)
 from .info_panel import AETHER_PT_InfoPanel
 
-_SOURCE_PANELS = (
-    AETHER_PT_InfoPanel,
-    AETHER_PT_ImportPanel,
-    AETHER_PT_ExportPanel,
-    AETHER_PT_RigCreation,
-    AETHER_PT_RigManipulation,
-    AETHER_PT_RigLayersPanel,
-    AETHER_PT_RigUIPanel,
-    AETHER_PT_RigBakeSettingsPanel,
-)
-
 _REGISTERED = []
+
+
+def _source_panels():
+    # Imported lazily because the feature panels import from this package.
+    from ..features.animation.panels import AETHER_PT_ExportPanel
+    from ..features.model_import.panels import AETHER_PT_ImportPanel
+    from ..features.rig_edit.panels import AETHER_PT_RigManipulation
+    from ..features.rig_generator.panels import AETHER_PT_RigCreation
+    from ..features.rig_ui.panels import (
+        AETHER_PT_RigBakeSettingsPanel,
+        AETHER_PT_RigLayersPanel,
+        AETHER_PT_RigUIPanel,
+    )
+
+    return (
+        AETHER_PT_InfoPanel,
+        AETHER_PT_ImportPanel,
+        AETHER_PT_ExportPanel,
+        AETHER_PT_RigCreation,
+        AETHER_PT_RigManipulation,
+        AETHER_PT_RigLayersPanel,
+        AETHER_PT_RigUIPanel,
+        AETHER_PT_RigBakeSettingsPanel,
+    )
 
 
 def _build_panel(panel_cls):
@@ -69,7 +73,7 @@ def _mirrored_name(panel_cls):
 
 
 def _unregister_mirrored():
-    for panel_cls in reversed(_SOURCE_PANELS):
+    for panel_cls in reversed(_source_panels()):
         cls = getattr(bpy.types, _mirrored_name(panel_cls), None)
         if cls is None:
             continue
@@ -82,7 +86,7 @@ def _unregister_mirrored():
 def register():
     _unregister_mirrored()
     _REGISTERED.clear()
-    for panel_cls in _SOURCE_PANELS:
+    for panel_cls in _source_panels():
         mirrored = _build_panel(panel_cls)
         bpy.utils.register_class(mirrored)
         _REGISTERED.append(mirrored)

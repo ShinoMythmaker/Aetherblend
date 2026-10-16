@@ -1,8 +1,8 @@
 import bpy
 
 from ...preferences import is_set_enabled
-from ...properties.tab_prop import get_active_tab
-from ...utils.ui_visibility import visible_in_current_area
+from ...ui.tabs import get_active_tab
+from ...ui.visibility import visible_in_current_area
 
 
 class AETHER_PT_ImportPanel(bpy.types.Panel):
@@ -22,16 +22,16 @@ class AETHER_PT_ImportPanel(bpy.types.Panel):
 
         if is_set_enabled('FFXIV'):
             row = layout.row(align=True)
-            row.operator("aether.character_import", text="FFXIV Character", icon = "IMPORT")
+            row.operator("aether.model_import_character", text="FFXIV Character", icon = "IMPORT")
 
             # row = layout.row(align=True)
-            # row.operator("aether.anim_import", text="FFXIV Animation", icon = "IMPORT")
+            # row.operator("aether.animation_import", text="FFXIV Animation", icon = "IMPORT")
 
 
 
 def menu_func_import(self, context):
     """Add the import operator to the File > Import menu"""
-    self.layout.operator("aether.character_import", text="FFXIV Character (Meddle)")
+    self.layout.operator("aether.model_import_character", text="FFXIV Character (Meddle)")
 
 def register():
     bpy.utils.register_class(AETHER_PT_ImportPanel)

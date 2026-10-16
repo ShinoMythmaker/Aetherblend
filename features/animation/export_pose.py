@@ -24,7 +24,7 @@ def pose_export_image_items(_self, _context):
 class AETHER_OT_PoseExport(Operator, ExportHelper):
     """Exports armature pose into a .pose file."""
 
-    bl_idname = "aether.pose_export"
+    bl_idname = "aether.animation_export_pose"
     bl_label = "Export to Pose File"
     bl_options = {'REGISTER'}
 

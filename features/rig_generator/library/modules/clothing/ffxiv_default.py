@@ -1,8 +1,8 @@
 """Clothing module: a skirt whose segments swing with the thighs and shins."""
 from typing import NamedTuple
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 SKIRT_COLLECTION = "Skirt"

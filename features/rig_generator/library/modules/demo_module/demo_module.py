@@ -15,8 +15,8 @@ A step you do not need can simply be deleted.
 """
 import bpy
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 

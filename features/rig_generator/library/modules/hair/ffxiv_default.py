@@ -1,8 +1,8 @@
 """Hair module: every hair and head accessory bone chain becomes a controllable chain."""
 from typing import NamedTuple
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 HEAD_PARENT = ["Head", "j_kao"]

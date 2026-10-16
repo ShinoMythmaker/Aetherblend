@@ -3,8 +3,8 @@ from typing import NamedTuple
 
 import bpy
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 PRIMARY = "Face (Primary)"

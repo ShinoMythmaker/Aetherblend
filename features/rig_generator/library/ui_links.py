@@ -1,4 +1,4 @@
-from .ui_link import UILink
+from ..definitions import UILink
 
 # ---------------------------------------------------------------------------
 # Registry: flag_key -> UILink
@@ -10,7 +10,7 @@ UI_LINKS: dict[str, UILink] = {
     #     title="...",
     #     bone_name="...",          # optional
     #     constraint_name="...",    # optional
-    #     white_list=["..."],       # optional – filter by selected bone
+    #     white_list=["..."],       # optional â€“ filter by selected bone
     #     ui_type="checkbox",       # "checkbox" | "slider" | "dropdown"
     # ),
 

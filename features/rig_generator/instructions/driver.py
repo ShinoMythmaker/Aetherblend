@@ -4,16 +4,17 @@ from typing import NamedTuple
 
 import bpy
 
-from ._bones import get_pose_bone
+from .... import utils
 
 
 class TransformVariable(NamedTuple):
-    """A driver variable that reads one transform channel of a bone of the rig."""
+    """A driver variable that reads one transform channel of a bone, by default of the rig itself."""
 
     bone: str
     channel: str  # e.g. "ROT_X", "LOC_Y", "SCALE_Z"
     rotation_mode: str = "QUATERNION"
     space: str = "LOCAL_SPACE"
+    source: bpy.types.Object | None = None  # another armature to read from instead of the rig
 
 
 class PropertyVariable(NamedTuple):
@@ -36,7 +37,7 @@ def driver(
 
     With `constraint`, the property belongs to that constraint of the bone (for example "influence").
     """
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -90,7 +91,7 @@ def _apply_driver(
 
         driver_variable.type = "TRANSFORMS"
         target = driver_variable.targets[0]
-        target.id = rig
+        target.id = variable.source or rig
         target.bone_target = variable.bone
         target.transform_type = variable.channel
         target.rotation_mode = variable.rotation_mode

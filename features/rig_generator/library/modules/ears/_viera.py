@@ -1,6 +1,6 @@
 """Viera ears shared by every ear variant; a variant only sets the bone prefix."""
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 
 HEAD_COLLECTION = "Head"
 SIDES = (".R", ".L")

@@ -4,7 +4,7 @@ import bpy
 
 from ... import utils
 from ...preferences import get_preferences
-from ...properties.tab_prop import set_active_tab
+from ...ui.tabs import set_active_tab
 from ...utils import addon_dependencies
 from . import template_manager
 
@@ -46,7 +46,7 @@ class _ArmatureSelectionHelpers:
         return armature
 
 class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator):
-    bl_idname = "aether.generate_full_rig"
+    bl_idname = "aether.rig_generator_generate_full"
     bl_label = "Generate Full Rig"
     bl_description = ("Generate meta rig, rigify rig, and link them in one operation")
     bl_options = {'REGISTER', 'UNDO'}
@@ -70,7 +70,7 @@ class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
 
             state = rig_generator.generate_meta_rig(
                 armature,
-                cleanup_existing=lambda: bpy.ops.aether.reset_rig(),
+                cleanup_existing=lambda: bpy.ops.aether.rig_generator_reset(),
             )
             if not state:
                 self.report({'ERROR'}, "Meta rig generation failed")
@@ -92,7 +92,7 @@ class AETHER_OT_Generate_Full_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
             bpy.context.window.cursor_set('DEFAULT')
 
 class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator):
-    bl_idname = "aether.generate_meta_rig"
+    bl_idname = "aether.rig_generator_generate_meta"
     bl_label = "Generate Meta Rig"
     bl_description = "Generate only the meta rig without running Rigify"
     bl_options = {'REGISTER', 'UNDO'}
@@ -116,7 +116,7 @@ class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
 
             state = rig_generator.generate_meta_rig(
                 armature,
-                cleanup_existing=lambda: bpy.ops.aether.reset_rig(),
+                cleanup_existing=lambda: bpy.ops.aether.rig_generator_reset(),
             )
             if not state:
                 self.report({'ERROR'}, "Meta rig generation failed")
@@ -130,7 +130,7 @@ class AETHER_OT_Generate_Meta_Rig(_ArmatureSelectionHelpers, bpy.types.Operator)
             bpy.context.window.cursor_set('DEFAULT')
 
 class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
-    bl_idname = "aether.clean_up_rig"
+    bl_idname = "aether.rig_generator_clean_up"
     bl_label = "Remove Rigify Rig"
     bl_description = ("Removes Rigify Control bones while preserving Original animation Data")
     bl_options = {'REGISTER', 'UNDO'}
@@ -204,7 +204,7 @@ class AETHER_OT_Clean_Up_Rig(bpy.types.Operator):
         return {'FINISHED'}
 
 class AETHER_OT_Reset_Rig(bpy.types.Operator):
-    bl_idname = "aether.reset_rig"
+    bl_idname = "aether.rig_generator_reset"
     bl_label = "Reset Original Rig"
     bl_description = ("Resets the armature to its original state (removes animation data)")
     bl_options = {'REGISTER', 'UNDO'}
@@ -214,7 +214,7 @@ class AETHER_OT_Reset_Rig(bpy.types.Operator):
         if not armature or armature.type != 'ARMATURE':
             return {'CANCELLED'}
 
-        result = bpy.ops.aether.clean_up_rig()
+        result = bpy.ops.aether.rig_generator_clean_up()
         if result != {'FINISHED'}:
             self.report({'ERROR'}, "Clean Up process Failed")
             return {'CANCELLED'}

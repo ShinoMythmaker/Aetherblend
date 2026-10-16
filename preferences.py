@@ -31,7 +31,7 @@ def get_preferences():
 class AETHER_OT_Toggle_Feature_Set(bpy.types.Operator):
     """Toggle one feature set used for dependency checks and UI state."""
 
-    bl_idname = "aether.toggle_feature_set"
+    bl_idname = "aether.preferences_toggle_feature_set"
     bl_label = "Toggle Feature Set"
     bl_description = "Enable or disable one feature set"
 
@@ -225,7 +225,7 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             else:
                 toggle_text = "On" if is_enabled else "Off"
                 toggle_icon = 'CHECKMARK' if is_enabled else 'X'
-                toggle_op = header.operator("aether.toggle_feature_set", text=toggle_text, icon=toggle_icon, depress=is_enabled)
+                toggle_op = header.operator("aether.preferences_toggle_feature_set", text=toggle_text, icon=toggle_icon, depress=is_enabled)
                 toggle_op.feature_set = feature_set
 
             grouped_addons = sorted(

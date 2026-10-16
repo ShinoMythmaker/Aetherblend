@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import bpy
 
-from ._bones import get_pose_bone
+from .... import utils
 
 
 def _activate(rig: bpy.types.Object, pose_bone: bpy.types.PoseBone, rigify_type: str) -> None:
@@ -28,7 +28,7 @@ def limbs_leg(
     tweak_collection: str | None = None,
 ) -> None:
     """Rigify type limbs.leg."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -41,7 +41,7 @@ def limbs_leg(
 
 def basic_super_copy(rig: bpy.types.Object, bone: str, *, widget_type: str | None = None) -> None:
     """Rigify type basic.super_copy: a simple control bone."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -59,7 +59,7 @@ def basic_raw_copy(
     widget_type: str | None = None,
 ) -> None:
     """Rigify type basic.raw_copy: copies the bone as is; `parent` only applies together with relink_constraints."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -82,7 +82,7 @@ def limbs_spline_tentacle(
     sik_stretch_control: str | None = None,
 ) -> None:
     """Rigify type limbs.spline_tentacle."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -103,7 +103,7 @@ def basic_copy_chain(
     make_controls: bool | None = None,
 ) -> None:
     """Rigify type basic.copy_chain."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -124,7 +124,7 @@ def limbs_arm(
     auto_align_extremity: bool = False,
 ) -> None:
     """Rigify type limbs.arm."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -147,7 +147,7 @@ def spines_basic_spine(
     pivot_position: int | None = None,
 ) -> None:
     """Rigify type spines.basic_spine."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -162,7 +162,7 @@ def spines_basic_spine(
 
 def spines_super_head(rig: bpy.types.Object, bone: str, *, tweak_collection: str | None = None) -> None:
     """Rigify type spines.super_head."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -181,7 +181,7 @@ def limbs_super_finger(
     extra_ik_collection: str | None = None,
 ) -> None:
     """Rigify type limbs.super_finger: fingers and toes; the extra IK collection is only referenced if it exists."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -202,7 +202,7 @@ def limbs_super_finger(
 
 def limbs_super_palm(rig: bpy.types.Object, bone: str, *, palm_both_sides: bool = False) -> None:
     """Rigify type limbs.super_palm: a palm control shared by the neighbouring fingers."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -237,14 +237,14 @@ def _skin_chain_parameters(
 
 def face_skin_eye(rig: bpy.types.Object, bone: str) -> None:
     """Rigify type face.skin_eye."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if pose_bone:
         _activate(rig, pose_bone, "face.skin_eye")
 
 
 def face_skin_jaw(rig: bpy.types.Object, bone: str, *, jaw_mouth_influence: float | None = None) -> None:
     """Rigify type face.skin_jaw."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -262,7 +262,7 @@ def skin_basic_chain(
     use_scale: Sequence[bool] | None = None,
 ) -> None:
     """Rigify type skin.basic_chain."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -291,7 +291,7 @@ def skin_stretchy_chain(
     secondary_collection: str | None = None,
 ) -> None:
     """Rigify type skin.stretchy_chain."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -329,7 +329,7 @@ def skin_glue(
     add_constraint_influence: float | None = None,
 ) -> None:
     """Rigify type skin.glue."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -355,7 +355,7 @@ def skin_anchor(
     hide: bool | None = None,
 ) -> None:
     """Rigify type skin.anchor."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 

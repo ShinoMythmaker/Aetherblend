@@ -1,7 +1,7 @@
 import bpy
 
-from ...properties.tab_prop import get_active_tab
-from ...utils.ui_visibility import visible_in_current_area
+from ...ui.tabs import get_active_tab
+from ...ui.visibility import visible_in_current_area
 
 
 class AETHER_PT_ExportPanel(bpy.types.Panel):
@@ -21,15 +21,15 @@ class AETHER_PT_ExportPanel(bpy.types.Panel):
 
         # Export Operators
         row = layout.row(align=True)
-        row.operator("aether.pose_export", text="Pose Export", icon = "EXPORT")
+        row.operator("aether.animation_export_pose", text="Pose Export", icon = "EXPORT")
         row = layout.row(align=True)
-        row.operator("aether.anim_export", text="Anim Export", icon = "EXPORT")
+        row.operator("aether.animation_export_anim", text="Anim Export", icon = "EXPORT")
 
 
 def menu_func_export(self, context):
     """Add the export operator to the File > Export menu"""
-    self.layout.operator("aether.pose_export", text="AB Pose")
-    self.layout.operator("aether.anim_export", text="AB Animation")
+    self.layout.operator("aether.animation_export_pose", text="AB Pose")
+    self.layout.operator("aether.animation_export_anim", text="AB Animation")
 
 def register():
     bpy.utils.register_class(AETHER_PT_ExportPanel)

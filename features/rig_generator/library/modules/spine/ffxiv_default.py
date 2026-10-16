@@ -1,6 +1,6 @@
 """Spine module: torso, chest, neck and head with the pivot and hara links."""
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 TORSO_COLLECTION = "Torso"

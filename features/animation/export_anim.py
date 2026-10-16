@@ -10,7 +10,7 @@ from ...utils.axis_conversion import AXIS_ITEMS
 
 
 class AETHER_OT_AnimExport(Operator, ExportHelper):
-    bl_idname = "aether.anim_export"
+    bl_idname = "aether.animation_export_anim"
     bl_label = "Export Animation"
     bl_options = {'REGISTER', 'UNDO'}
     bl_description = "Export animation with axis conversion"

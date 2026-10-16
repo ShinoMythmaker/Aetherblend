@@ -1,5 +1,5 @@
 """Adds the buttons that show the helper bone collections of the rig."""
-from ....module import RigModule
+from ....definitions import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 

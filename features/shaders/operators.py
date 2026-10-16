@@ -58,7 +58,7 @@ _LIMBAL_SHADER_CUSTOM_MAPPING = [
 class AETHER_OT_S_Iris(bpy.types.Operator):
     """Apply AetherBlend Iris node-group setup to iris materials."""
 
-    bl_idname = "aether.shader_iris"
+    bl_idname = "aether.shaders_iris"
     bl_label = "Set Up Iris"
 
     group_name: ClassVar[str] = "[AetherBlend] Eye Scaling"
@@ -139,7 +139,7 @@ class AETHER_OT_S_Iris(bpy.types.Operator):
 class AETHER_OT_S_Limbal(bpy.types.Operator):
     """Apply AetherBlend Limbal Rings node-group setup to iris materials."""
 
-    bl_idname = "aether.shader_limbal"
+    bl_idname = "aether.shaders_limbal"
     bl_label = "Set Up Limbal Rings"
 
     group_name: ClassVar[str] = "[AetherBlend] Limbal Rings"
@@ -213,7 +213,7 @@ class AETHER_OT_S_Limbal(bpy.types.Operator):
 class AETHER_OT_S_FFGear(bpy.types.Operator):
     """Run FFGear shader import for meshes bound to the selected armature."""
 
-    bl_idname = "aether.shader_ffgear"
+    bl_idname = "aether.shaders_ffgear"
     bl_label = "Set Up FFGEAR"
 
     filter_glob: bpy.props.StringProperty(default="*.nofilesplease", options={'HIDDEN'}) #type: ignore
@@ -262,7 +262,7 @@ class AETHER_OT_S_FFGear(bpy.types.Operator):
 class AETHER_OT_S_Meddle(bpy.types.Operator):
     """Run Meddle shader import for meshes bound to the selected armature."""
 
-    bl_idname = "aether.shader_meddle"
+    bl_idname = "aether.shaders_meddle"
     bl_label = "Set Up Meddle"
 
     filter_glob: bpy.props.StringProperty(default="*.nofilesplease", options={'HIDDEN'}) #type: ignore

@@ -1,6 +1,6 @@
 """Miqo'te ears: one controllable bone per ear."""
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 HEAD_COLLECTION = "Head"

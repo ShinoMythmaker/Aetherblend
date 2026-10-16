@@ -102,13 +102,6 @@ def apply_material_property_to_socket(input_socket, material_prop):
     for idx in range(min(target_len, len(source_values))):
         input_socket.default_value[idx] = source_values[idx]
 
-def get_socket_by_node_label(node_tree, node_label, socket_name):
-    for node in node_tree.nodes:
-        if node.label == node_label:
-            for socket in node.inputs:
-                if socket.name == socket_name:
-                    return socket
-    return None
 
 def get_input_socket_by_node_name(node_tree, node_name, socket_name):
     for node in node_tree.nodes:

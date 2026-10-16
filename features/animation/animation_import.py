@@ -1,4 +1,4 @@
-﻿"""Animation import and retargeting for FFXIV animations to AetherBlend rigs."""
+"""Animation import and retargeting for FFXIV animations to AetherBlend rigs."""
 
 import tempfile
 import uuid
@@ -7,9 +7,8 @@ import bpy
 from bpy.props import EnumProperty, StringProperty
 from bpy_extras.io_utils import ImportHelper
 
-from ..rig_generator.drivers import Driver, TransformChannelVariable
-from ..rig_generator.operations import DriverOperation, ParentBoneOperation
 from ...utils.axis_conversion import AXIS_ITEMS
+from ..rig_generator import instructions
 
 # FFXIV bone names to AetherBlend FK control mapping
 # TODO: Implement retargeting logic
@@ -72,7 +71,7 @@ RETARGET_MAP = {
 
 
 class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
-    bl_idname = "aether.anim_import"
+    bl_idname = "aether.animation_import"
     bl_label = "Import Animation"
     bl_options = {'REGISTER', 'UNDO'}
     bl_description = "Import and retarget in-game animation to AetherBlend rig"
@@ -145,7 +144,6 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
 
         transform_type_X_rot = "ROT_Z"
         transform_type_Y_rot = "ROT_Y"
-        transform_type_Z_rot = "ROT_X"
 
         # if source_bone == "n_hara":
         #     transform_type_X = "LOC_Y"
@@ -171,150 +169,26 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
             loc_y_expr = f"{'-' if invert_loc[1] else ''}{source_bone}_loc_y"
             loc_z_expr = f"{'-' if invert_loc[2] else ''}{source_bone}_loc_z"
 
-            driver_X = DriverOperation(
-                driver_name=f"{target_bone}_anim_driver_X",
-                bone_name=target_bone,
-                property=["rotation_quaternion", 1],  # Targeting the X component of the quat
-                driver=Driver(
-                    expression=rot_z_expr,
-                    type='SCRIPTED',
-                    variables=[
-                        TransformChannelVariable(
-                            name=f"{source_bone}_rot_z",
-                            target_bone=source_bone,
-                            target_object=source,
-                            transform_type=transform_type_X_rot,
-                            transform_space="LOCAL_SPACE",
-                            rotation_mode="QUATERNION",
-                        ),
-                    ],
-                )
+            # (property, index, expression, variable suffix, source channel)
+            drivers = (
+                ("rotation_quaternion", 1, rot_z_expr, "rot_z", transform_type_X_rot),
+                ("rotation_quaternion", 3, rot_x_expr, "rot_x", "ROT_X"),
+                ("rotation_quaternion", 2, rot_y_expr, "rot_y", transform_type_Y_rot),
+                ("rotation_quaternion", 0, rot_w_expr, "rot_w", "ROT_W"),
+                ("location", 0, loc_z_expr, "loc_z", transform_type_X),
+                ("location", 1, loc_y_expr, "loc_y", transform_type_Y),
+                ("location", 2, loc_x_expr, "loc_x", transform_type_Z),
             )
-
-            driver_Z = DriverOperation(
-                driver_name=f"{target_bone}_anim_driver_Z",
-                bone_name=target_bone,
-                property=["rotation_quaternion", 3],  # Targeting the Z component of the quat
-                driver=Driver(
-                    expression=rot_x_expr,
-                    type='SCRIPTED',
-                    variables=[
-                        TransformChannelVariable(
-                            name=f"{source_bone}_rot_x",
-                            target_bone=source_bone,
-                            target_object=source,
-                            transform_type="ROT_X",
-                            transform_space="LOCAL_SPACE",
-                            rotation_mode="QUATERNION",
-                        ),
-                    ],
+            for property_path, index, expression, suffix, channel in drivers:
+                name = f"{source_bone}_{suffix}"
+                instructions.driver(
+                    target,
+                    target_bone,
+                    property_path,
+                    index=index,
+                    expression=expression,
+                    variables={name: instructions.TransformVariable(source_bone, channel, source=source)},
                 )
-            )
-
-            driver_Y = DriverOperation(
-                driver_name=f"{target_bone}_anim_driver_Y",
-                bone_name=target_bone,
-                property=["rotation_quaternion", 2],  # Targeting the Y component of the quat
-                driver=Driver(
-                    expression=rot_y_expr,
-                    type='SCRIPTED',
-                    variables=[
-                        TransformChannelVariable(
-                            name=f"{source_bone}_rot_y",
-                            target_bone=source_bone,
-                            target_object=source,
-                            transform_type=transform_type_Y_rot,
-                            transform_space="LOCAL_SPACE",
-                            rotation_mode="QUATERNION",
-                        ),
-                    ],
-                )
-            )
-
-            driver_W = DriverOperation(
-                driver_name=f"{target_bone}_anim_driver_W",
-                bone_name=target_bone,
-                property=["rotation_quaternion", 0],  # Targeting the W component of the quat
-                driver=Driver(
-                    expression=rot_w_expr,
-                    type='SCRIPTED',
-                    variables=[
-                        TransformChannelVariable(
-                            name=f"{source_bone}_rot_w",
-                            target_bone=source_bone,
-                            target_object=source,
-                            transform_type="ROT_W",
-                            transform_space="LOCAL_SPACE",
-                            rotation_mode="QUATERNION",
-                        ),
-                    ],
-                )
-            )
-
-            driver_loc_X= DriverOperation(
-                driver_name=f"{target_bone}_anim_driver_loc_X",
-                bone_name=target_bone,
-                property=["location", 0],  # Targeting the X component of the location
-                driver=Driver(
-                    expression=loc_z_expr,
-                    type='SCRIPTED',
-                    variables=[
-                        TransformChannelVariable(
-                            name=f"{source_bone}_loc_z",
-                            target_bone=source_bone,
-                            target_object=source,
-                            transform_type=transform_type_X,
-                            transform_space="LOCAL_SPACE",
-                        ),
-                    ],
-                )
-            )
-
-            driver_loc_Y= DriverOperation(
-                driver_name=f"{target_bone}_anim_driver_loc_Y",
-                bone_name=target_bone,
-                property=["location", 1],  # Targeting the Y component of the location
-                driver=Driver(
-                    expression=loc_y_expr,
-                    type='SCRIPTED',
-                    variables=[
-                        TransformChannelVariable(
-                            name=f"{source_bone}_loc_y",
-                            target_bone=source_bone,
-                            target_object=source,
-                            transform_type=transform_type_Y,
-                            transform_space="LOCAL_SPACE",
-                        ),
-                    ],
-                )
-            )
-
-            driver_loc_Z= DriverOperation(
-                driver_name=f"{target_bone}_anim_driver_loc_Z",
-                bone_name=target_bone,
-                property=["location", 2],  # Targeting the Z component of the location
-                driver=Driver(
-                    expression=loc_x_expr,
-                    type='SCRIPTED',
-                    variables=[
-                        TransformChannelVariable(
-                            name=f"{source_bone}_loc_x",
-                            target_bone=source_bone,
-                            target_object=source,
-                            transform_type=transform_type_Z,
-                            transform_space="LOCAL_SPACE",
-                        ),
-                    ],
-                )
-            )
-
-            driver_Y.apply(target_armature)
-            driver_Z.apply(target_armature)
-            driver_X.apply(target_armature)
-            driver_W.apply(target_armature)
-            driver_loc_X.apply(target_armature)
-            driver_loc_Y.apply(target_armature)
-            driver_loc_Z.apply(target_armature) # Yikes - Oats
 
         except Exception as e:
             self.report({'ERROR'}, f"Failed to retarget '{source_bone_name}' to '{target_bone_name}': {str(e)}")
@@ -398,8 +272,6 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
                 bpy.context.window.cursor_set('DEFAULT')
                 return {'CANCELLED'}
 
-            parent_op_bones_hara=["Spine_fk.001", "Spine_fk.002"]
-
             parent_op_bones_leg={"knee.L" : "thigh_fk.L",
                                  "shin_fk.L" : "knee.L",
                                  "knee.R" : "thigh_fk.R",
@@ -412,9 +284,11 @@ class AETHER_OT_AnimImport(bpy.types.Operator, ImportHelper):
             bpy.context.view_layer.objects.active = target_armature
             target_armature.select_set(True)
 
+            bpy.ops.object.mode_set(mode='EDIT')
             for bone_name, parent_target in parent_op_bones_leg.items():
-                ParentOP=ParentBoneOperation(bone_name=bone_name, parent=(parent_target,))
-                ParentOP.apply(armature=target_armature)
+                instructions.parent(target_armature, bone_name, parent_target)
+            bpy.ops.object.mode_set(mode='POSE')
+            bpy.ops.object.mode_set(mode='POSE')
 
             for ffbone, mapping in RETARGET_MAP.items():
                 self.retarget_bone_animation(

@@ -1,7 +1,7 @@
 """Constraint instructions: add a constraint to a bone of the rig."""
 import bpy
 
-from ._bones import get_pose_bone
+from .... import utils
 
 
 def copy_transforms(
@@ -18,7 +18,7 @@ def copy_transforms(
     influence: float = 1.0,
 ) -> None:
     """Make a bone copy the transforms of the target bone."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -45,7 +45,7 @@ def damped_track(
     influence: float = 1.0,
 ) -> None:
     """Make a bone point at the target bone."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -69,7 +69,7 @@ def limit_location(
     owner_space: str = "LOCAL",
 ) -> None:
     """Limit the location of a bone per axis; None leaves that side of the axis free."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -98,7 +98,7 @@ def copy_location(
     influence: float = 1.0,
 ) -> None:
     """Make a bone copy the location of the target bone."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 

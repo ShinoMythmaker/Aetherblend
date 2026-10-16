@@ -1,21 +1,19 @@
+"""Rig generator feature: build a rig from a template of rig modules."""
 from . import (
-    aether_rig_generator,
-    constraints,
-    drivers,
+    definitions,
+    generator,
     instructions,
-    module,
+    library,
+    operators,
     panels,
     properties,
-    rig_edit_operators,
-    rig_operators,
     rigify,
     template_manager,
-    ui_operators,
 )
 
-__all__ = ['constraints', 'drivers', 'instructions', 'module', 'aether_rig_generator', 'rigify']
+__all__ = ['definitions', 'generator', 'instructions', 'library', 'rigify']
 
-modules = (properties, template_manager, rig_operators, ui_operators, rig_edit_operators, panels)
+modules = (properties, template_manager, operators, panels)
 
 def register():
     for mod in modules:

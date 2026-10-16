@@ -1,10 +1,10 @@
-﻿"""Arm module: IK/FK arms with clavicle, elbow and pauldron helpers."""
+"""Arm module: IK/FK arms with clavicle, elbow and pauldron helpers."""
 from typing import NamedTuple
 
 import bpy
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 

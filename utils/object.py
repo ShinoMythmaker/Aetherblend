@@ -195,26 +195,3 @@ def import_ffgear_shader(filepath, imported_objects):
     except Exception as e:
         print(f"[AetherBlend] Failed to append FFGear shaders: {e}")
         return False
-
-def remove_shapekey(obj: bpy.types.Object, shapekey_name: str, enable_backup: bool = False, backup_shapekey_name: str = None) -> None:
-    """Removes the specified shapekey from the object if it exists, or handles backup unmuting.
-    """
-    if obj.type != 'MESH' or not obj.data.shape_keys:
-        return
-
-    if enable_backup:
-        if backup_shapekey_name:
-            sk = obj.data.shape_keys.key_blocks.get(backup_shapekey_name)
-            if sk:
-                sk.mute = False
-            else:
-                for key_block in obj.data.shape_keys.key_blocks:
-                    key_block.mute = False
-        else:
-            for key_block in obj.data.shape_keys.key_blocks:
-                key_block.mute = False
-
-        if obj.data.shape_keys:
-            sk = obj.data.shape_keys.key_blocks.get(shapekey_name)
-            if sk:
-                obj.shape_key_remove(sk)

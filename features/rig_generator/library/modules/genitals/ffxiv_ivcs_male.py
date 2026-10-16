@@ -1,6 +1,6 @@
 """Male IVCS genitals."""
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 COLLECTION = "Genitals (Male)"

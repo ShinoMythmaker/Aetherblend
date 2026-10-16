@@ -5,7 +5,6 @@ import bpy
 
 from .... import utils
 from . import constraints, rigify
-from ._bones import get_pose_bone
 
 LINKED_PROPERTY = "ab_linked"
 
@@ -17,7 +16,7 @@ def collection(rig: bpy.types.Object, bones: Sequence[str], collection_name: str
 
 def prop(rig: bpy.types.Object, bone: str, property_name: str, value: float | int | str) -> None:
     """Set a custom property on a bone."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if pose_bone:
         pose_bone[property_name] = value
 
@@ -34,7 +33,7 @@ def restrict(
     inherit_scale: str | None = None,
 ) -> None:
     """Lock transform channels, make a bone unselectable or change what it inherits; a single bool applies to all axes."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if not pose_bone:
         return
 
@@ -57,7 +56,7 @@ def restrict(
 
 def pose(rig: bpy.types.Object, bone: str, *, scale: tuple[float, float, float]) -> None:
     """Set the pose scale of a bone."""
-    pose_bone = get_pose_bone(rig, bone)
+    pose_bone = utils.armature.get_pose_bone(rig, bone)
     if pose_bone:
         pose_bone.scale = scale
 
@@ -65,8 +64,8 @@ def pose(rig: bpy.types.Object, bone: str, *, scale: tuple[float, float, float])
 def link(rig: bpy.types.Object, source_bone: str, target: str, *, location_only: bool = False) -> None:
     """Make an original bone follow the generated bone `target` through its LINK copy."""
     link_bone = f"LINK-{source_bone}"
-    link_pose_bone = get_pose_bone(rig, link_bone)
-    if not get_pose_bone(rig, source_bone) or not link_pose_bone:
+    link_pose_bone = utils.armature.get_pose_bone(rig, link_bone)
+    if not utils.armature.get_pose_bone(rig, source_bone) or not link_pose_bone:
         return
 
     if location_only:

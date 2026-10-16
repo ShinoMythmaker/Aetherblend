@@ -1,6 +1,6 @@
-﻿import bpy
+import bpy
 
-from .operations import BoneRestrictionOperation
+from ..rig_generator import instructions
 
 EYELID_ANCHOR_BONES = [
     "lid.anchor.B.L.001", "lid.anchor.B.L.002", "lid.anchor.B.L.003",
@@ -9,7 +9,7 @@ EYELID_ANCHOR_BONES = [
 
 
 class AETHER_OT_Solo_Bone_Collections(bpy.types.Operator):
-    bl_idname = "aether.solo_bone_collections"
+    bl_idname = "aether.rig_ui_solo_collections"
     bl_label = "Solo Selected"
     bl_description = "Toggle solo for bone collections."
     bl_options = {'REGISTER', 'UNDO'}
@@ -55,7 +55,7 @@ class AETHER_OT_Solo_Bone_Collections(bpy.types.Operator):
 ######
 
 class AETHER_OT_EyeLidOffsetEditStart(bpy.types.Operator):
-    bl_idname = "aether.eyelid_offset_edit_start"
+    bl_idname = "aether.rig_ui_eyelid_edit_start"
     bl_label = "Start Editing Eye Lid Offset"
     bl_description = "Begin interactively editing the eye lid control offset by dragging in the 3D view"
     bl_options = {'REGISTER', 'UNDO'}
@@ -72,14 +72,13 @@ class AETHER_OT_EyeLidOffsetEditStart(bpy.types.Operator):
             collection.is_solo = True
 
         for bone_name in EYELID_ANCHOR_BONES:
-            RestrictOp = BoneRestrictionOperation(time="Post", bone_name=bone_name, lock_location=[False, False, False], lock_rotation=[False, False, False], lock_scale=[False, False, False])
-            RestrictOp.apply(armature=armature)
+            instructions.restrict(armature, bone_name, lock_location=False, lock_rotation=False, lock_scale=False)
 
         return {'FINISHED'}
 
 
 class AETHER_OT_EyeLidOffsetEditEnd(bpy.types.Operator):
-    bl_idname = "aether.eyelid_offset_edit_end"
+    bl_idname = "aether.rig_ui_eyelid_edit_end"
     bl_label = "End Editing Eye Lid Offset"
     bl_description = "Finish interactively editing the eye lid control offset and apply the changes"
     bl_options = {'REGISTER', 'UNDO'}
@@ -94,8 +93,7 @@ class AETHER_OT_EyeLidOffsetEditEnd(bpy.types.Operator):
             collection.is_solo = False
 
         for bone_name in EYELID_ANCHOR_BONES:
-            RestrictOp = BoneRestrictionOperation(time="Post", bone_name=bone_name, lock_location=[True, True, True], lock_rotation=[True, True, True], lock_scale=[True, True, True])
-            RestrictOp.apply(armature=armature)
+            instructions.restrict(armature, bone_name, lock_location=True, lock_rotation=True, lock_scale=True)
 
         return {'FINISHED'}
 

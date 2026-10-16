@@ -1,8 +1,8 @@
 """IVCS toes: five toes per foot with finger-style Rigify controls."""
 from typing import NamedTuple
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 

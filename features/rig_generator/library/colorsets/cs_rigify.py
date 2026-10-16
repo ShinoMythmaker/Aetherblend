@@ -1,4 +1,4 @@
-﻿from ...rigify.settings import ColorSet
+from ...rigify.settings import ColorSet
 
 CS_RIGIFY = {
         "ik_right": ColorSet(name="IK_Right", normal="#CC0000", select="#98E5FF", active="#C4FFFF"),

@@ -1,8 +1,8 @@
 """Mouth module: manual controls, one plain control per lip, teeth and tongue bone."""
 import bpy
 
+from ....definitions import RigModule
 from ....instructions import *
-from ....module import RigModule
 from ....rigify.settings import BoneCollection, UI_Collections
 
 PRIMARY = "Face (Primary)"

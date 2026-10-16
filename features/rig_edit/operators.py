@@ -5,7 +5,7 @@ from ...utils import armature as armature_utils
 
 
 class AETHER_OT_SetBoneInheritScale(Operator):
-    bl_idname = "aether.set_bone_inherit_scale"
+    bl_idname = "aether.rig_edit_set_inherit_scale"
     bl_label = "Set Inherit Scale"
     bl_description = "Set inherit scale for bones in LINK collection"
     bl_options = {'REGISTER', 'UNDO'}
@@ -47,7 +47,7 @@ class AETHER_OT_SetBoneInheritScale(Operator):
         return {'FINISHED'}
 
 class AETHER_OT_DeleteNoAnim(Operator):
-    bl_idname = "aether.delete_no_anim"
+    bl_idname = "aether.rig_edit_delete_no_anim"
     bl_label = "Delete NoAnim"
     bl_description = "Deletes all bones containing the 'noanim' flag."
     bl_options = {'REGISTER', 'UNDO'}
@@ -74,7 +74,7 @@ class AETHER_OT_DeleteNoAnim(Operator):
 
 
 class AETHER_OT_RemoveGameSupport(Operator):
-    bl_idname = "aether.remove_game_support"
+    bl_idname = "aether.rig_edit_remove_game_support"
     bl_label = "Remove Game Support"
     bl_description = (
         "Removes bones and systems used for game/engine compatibility. "
@@ -154,7 +154,6 @@ class AETHER_OT_RemoveGameSupport(Operator):
                 for vertex_group in mesh.vertex_groups:
                     new_name = transplant_map.get(vertex_group.name)
                     if new_name:
-                        old_name = vertex_group.name
                         vertex_group.name = new_name
 
             bpy.ops.object.mode_set(mode='EDIT')
