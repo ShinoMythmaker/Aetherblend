@@ -35,7 +35,11 @@ AetherBlend started as an IK rig generator and has grown into a broader toolkit 
 
 The add-on is still in beta, and its tools and workflows are being refined.
 
-## Rig controls in action
+## A rig built around your character
+
+AetherBlend builds on Rigify, with substantial changes for FFXIV's armature and additional controls. It generates a metarig fitted to your character's proportions and custom scaling.
+
+Rather than replacing the game's armature, AetherBlend links its original bones to the generated control rig. This preserves game compatibility while giving you Blender controls for posing and animation.
 
 <table>
   <tr>
@@ -48,15 +52,23 @@ The add-on is still in beta, and its tools and workflows are being refined.
     <td width="32%" align="center"><img src="docs/assets/img/heels_demo.gif" width="260" alt="Heel controls demonstration" /></td>
     <td width="32%" align="center"><img src="docs/assets/img/spline_demo.gif" width="260" alt="Spline controls demonstration" /></td>
   </tr>
-  <tr>
-    <th colspan="2" align="center">Eye controls</th>
-    <th align="center">GPose export</th>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><img src="docs/assets/img/eyes_demo.gif" width="540" alt="Eye controls demonstration" /></td>
-    <td align="center"><img src="docs/assets/img/gpose_demo.gif" width="260" alt="GPose export demonstration" /></td>
-  </tr>
 </table>
+
+### Eye and iris controls
+
+The gaze control moves both the eyes and surrounding facial bones for more expressive poses. Custom iris shaders bring FFXIV's iris controls into Blender.
+
+<p align="center">
+  <img src="docs/assets/img/eyes_demo.gif" width="600" alt="Gaze and iris controls demonstration" />
+</p>
+
+### Back to GPose
+
+Export poses for use in GPose, with thumbnail support to help identify them later.
+
+<p align="center">
+  <img src="docs/assets/img/gpose_demo.gif" width="420" alt="GPose export with thumbnail support demonstration" />
+</p>
 
 ## Road to 1.0
 
