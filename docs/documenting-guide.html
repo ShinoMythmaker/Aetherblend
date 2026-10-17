@@ -23,7 +23,6 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="">Installation</a>
-<a href="import-and-rig-character.html" class="">Import and Rig a Character</a>
 <h4>Development</h4>
 <a href="development-guide.html" class="">Development Guide</a>
 <a href="documenting-guide.html" class="active">Documenting Guide</a>
@@ -32,8 +31,7 @@
 <h1>Documenting Guide</h1>
 <p>Write only useful task guides for AetherBlend users and practical setup or
 quickstart pages for contributors. Put user workflows in <strong>Guides</strong> and
-contributor workflows or conventions in <strong>Development</strong>. Keep API details in
-the code rather than maintaining operator, ABI or rig-module catalogs.</p>
+contributor workflows or conventions in <strong>Development</strong>.</p>
 <p>The site is built from Markdown in <code>docs/src/</code>; <code>docs/build.py</code> generates the
 HTML served from <code>docs/</code>. The generated pages are committed, so rebuild after
 editing Markdown.</p>
@@ -103,11 +101,83 @@ Content here.
 <li>A user guide should state prerequisites, give short numbered steps and say
   what success looks like. A development page should help a contributor finish
   one practical setup or workflow.</li>
-<li>Keep pages concise and low-maintenance. Include verified details needed for
-  the task; avoid API inventories, implementation tours and duplicated
-  instructions. Use a link to an existing guide or a short inline fact when
-  useful.</li>
+<li>Keep pages concise and low-maintenance. </li>
 </ul>
+<h2 id="author-variables">Author Variables<a class="headerlink" href="#author-variables" title="Permanent link">#</a></h2>
+<p>Use double braces in Markdown or HTML, for example <code>{{blender_min}}</code> or
+<code>[Download AetherBlend]({{latest_release_zip}})</code>. The build replaces these values
+in page content, including <code>Home.md</code>, which supplies the landing-page text.
+The home page also owns its layout using HTML and Markdown sections; its
+<code>&lt;!-- documentation-cards --&gt;</code> marker inserts the navigation cards automatically.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>5.2</code></td>
+<td>Minimum Blender version from the add-on manifest (major.minor)</td>
+</tr>
+<tr>
+<td><code>0.3.7</code></td>
+<td>AetherBlend version from the add-on manifest</td>
+</tr>
+<tr>
+<td><code>https://github.com/ShinoMythmaker/Aetherblend</code></td>
+<td>AetherBlend GitHub project URL</td>
+</tr>
+<tr>
+<td><code>https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&amp;blender_version_min=5.2.0</code></td>
+<td>AetherBlend drag-and-drop install URL</td>
+</tr>
+<tr>
+<td><code>https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip</code></td>
+<td>AetherBlend plain ZIP download URL</td>
+</tr>
+<tr>
+<td><code>0.2.0</code></td>
+<td>Meddle Tools release version</td>
+</tr>
+<tr>
+<td><code>https://github.com/PassiveModding/MeddleTools</code></td>
+<td>Meddle Tools GitHub project URL</td>
+</tr>
+<tr>
+<td><code>https://github.com/PassiveModding/MeddleTools/releases/download/0.2.0/MeddleTools-0.2.0.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&amp;blender_version_min=5.2.0</code></td>
+<td>Meddle Tools drag-and-drop install URL</td>
+</tr>
+<tr>
+<td><code>https://github.com/PassiveModding/MeddleTools/releases/download/0.2.0/MeddleTools-0.2.0.zip</code></td>
+<td>Meddle Tools plain ZIP download URL</td>
+</tr>
+<tr>
+<td><code>1.3.2</code></td>
+<td>FFGear release version</td>
+</tr>
+<tr>
+<td><code>https://github.com/kajupe/FFGear</code></td>
+<td>FFGear GitHub project URL</td>
+</tr>
+<tr>
+<td><code>https://github.com/kajupe/FFGear/releases/download/1.3.3/FFGear-1.3.3.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&amp;blender_version_min=4.2.0</code></td>
+<td>FFGear drag-and-drop install URL</td>
+</tr>
+<tr>
+<td><code>https://github.com/kajupe/FFGear/releases/download/1.3.3/FFGear-1.3.3.zip</code></td>
+<td>FFGear plain ZIP download URL</td>
+</tr>
+</tbody>
+</table></div>
+<p>Release values come from the shared Blender repository's newest release
+compatible with AetherBlend's minimum Blender version, not an independent
+GitHub "latest" lookup. <code>*_repo</code> links add the repository and Blender-version
+parameters to the ZIP URL; they are not repository JSON URLs. <code>meddle_*</code> means
+the <strong>Meddle Tools Blender add-on</strong>, not the Meddle game plugin.</p>
+<p>To show placeholder syntax literally, prefix each opening brace with a
+backslash. Visual code wrapping does not change copied snippet text.</p>
 <h2 id="build-the-site">Build the Site<a class="headerlink" href="#build-the-site" title="Permanent link">#</a></h2>
 <p>From the repository root:</p>
 <div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">docs</span><span class="p">\</span><span class="n">build</span><span class="p">.</span><span class="n">py</span>
@@ -115,10 +185,9 @@ Content here.
 
 <p>The builder reads version and minimum Blender facts from
 <code>blender_manifest.toml</code>, renders Markdown to HTML and fetches the master
-<code>repo.json</code> for dependency links. If that request fails, it warns and uses
-release-page fallbacks.</p>
-<p>Inspect the build output and <code>git status</code>. Confirm the changed page, navigation
-and links look right, and check generated diffs for unrelated changes.</p>
+<code>repo.json</code> for release metadata.
+If release metadata is unavailable or invalid, the build stops with an error
+before rewriting generated pages.</p>
 <h2 id="preview-in-vs-code">Preview in VS Code<a class="headerlink" href="#preview-in-vs-code" title="Permanent link">#</a></h2>
 <p>The pages use relative links, so serve the <code>docs</code> folder with a small local web server:</p>
 <ol>
@@ -144,6 +213,7 @@ and links look right, and check generated diffs for unrelated changes.</p>
 <ul>
 <li><a href="#setup">Setup</a></li>
 <li><a href="#choose-and-edit-a-page">Choose and Edit a Page</a></li>
+<li><a href="#author-variables">Author Variables</a></li>
 <li><a href="#build-the-site">Build the Site</a></li>
 <li><a href="#preview-in-vs-code">Preview in VS Code</a></li>
 <li><a href="#before-you-finish">Before You Finish</a></li>

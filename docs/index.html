@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AetherBlend – Posing and animation for FFXIV in Blender</title>
-<meta name="description" content="AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.">
+<meta name="description" content="">
 <link rel="icon" href="assets/img/logo.png">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/pygments.css">
@@ -26,22 +26,27 @@
   <p class="lead">AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.</p>
   <p class="note">Note: AetherBlend is currently in beta and some features may not work as intended.</p>
   <div class="btn-row">
-    <a class="drop-link large" data-latest-zip href="https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&amp;blender_version_min=5.2.0" draggable="true"
+    <a class="drop-link large" href="https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&blender_version_min=5.2.0" draggable="true"
        title="Drag this button into a Blender window to install">Drag into Blender</a>
     <a class="btn" href="installation.html">Installation guide</a>
     <a class="btn" href="https://github.com/ShinoMythmaker/Aetherblend">View on GitHub</a>
   </div>
 </section>
+
 <div class="landing">
   <div class="showcase"><img src="assets/img/showcase.jpg" alt="AetherBlend showcase"></div>
   <section>
-    <h2>What is AetherBlend?</h2>
-    <p>AetherBlend is a plugin for Blender built to allow the animation of character models from Final Fantasy XIV. It generates an armature using custom rigging and existing rig types provided by Blender's Rigify add-on. The generation process is dynamic and thus highly compatible with most player character and humanoid non-player character armatures. AetherBlend was built with modding in mind, meaning that poses and animations created using it can easily be imported into the game using existing tools such as Brio, XAT and VFXEditor.</p>
-    <p>Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation. IK-rig pose and animation import and Aetherbridge (streaming Blender animations into the game, with lighting and camera syncing planned) are still in development, while we continue to refine our editable, modular rig templates.</p>
+
+<h2>What is AetherBlend?</h2>
+
+<p>AetherBlend is a plugin for Blender built to allow the animation of character models from Final Fantasy XIV. It generates an armature using custom rigging and existing rig types provided by Blender's Rigify add-on. The generation process is dynamic and thus highly compatible with most player character and humanoid non-player character armatures. AetherBlend was built with modding in mind, meaning that poses and animations created using it can easily be imported into the game using existing tools such as Brio, XAT and VFXEditor.</p>
+
+<p>Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation.</p>
+
   </section>
   <section>
     <h2>Documentation</h2>
-    <div class="cards"><a class="card" href="installation.html"><h3>Installation</h3><p>Requirements and how to install the add-on.</p></a><a class="card" href="import-and-rig-character.html"><h3>Import and Rig a Character</h3><p>Import a character model and generate its AetherBlend rig.</p></a><a class="card" href="development-guide.html"><h3>Development Guide</h3><p>Set up, make a focused change, validate it and prepare a pull request.</p></a><a class="card" href="documenting-guide.html"><h3>Documenting Guide</h3><p>Edit the documentation, build the site and preview it in VS Code.</p></a><a class="card" href="style-guide.html"><h3>Style Guide</h3><p>Readable conventions for contributing code.</p></a></div>
+    <div class="cards"><a class="card" href="installation.html"><h3>Installation</h3><p>Requirements and how to install the add-on.</p></a><a class="card" href="development-guide.html"><h3>Development Guide</h3><p>Set up, make a focused change, validate it and prepare a pull request.</p></a><a class="card" href="documenting-guide.html"><h3>Documenting Guide</h3><p>Edit the documentation, build the site and preview it in VS Code.</p></a><a class="card" href="style-guide.html"><h3>Style Guide</h3><p>A few conventions to help your code feel at home.</p></a></div>
   </section>
   <section>
     <h2>Support &amp; Feedback</h2>
@@ -55,23 +60,21 @@
     </div>
   </section>
   <section>
-    <h2>Acknowledgements</h2>
-    <div class="thanks"><ul>
-<li>
-<p>A heartfelt thank you to <a href="https://github.com/ExplosiveOats">Oats</a>, my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!</p>
-</li>
-<li>
-<p><a href="https://x.com/RoseHikari24">Zed</a> and <a href="https://x.com/CC_VibesXIV">CC</a>, two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!</p>
-</li>
-<li>
-<p><a href="https://github.com/PassiveModding">PassiveModding</a> - Thanks for <a href="https://github.com/PassiveModding/Meddle">Meddle</a>, and <a href="https://github.com/PassiveModding/MeddleTools">Meddle Tools</a>, while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. </p>
-</li>
-<li>
-<p><a href="https://github.com/sleepybnuuy">sleepybunny</a> for providing an excellent base for the C+ application with <a href="https://github.com/sleepybnuuy/bustomize">bustomize</a></p>
-</li>
-<li>
-<p>Ofcourse everyone that showed interest in not only AetherBlend but also <a href="https://github.com/MekuMaki/Mektools">Mektools</a> and <a href="https://github.com/ShinoMythmaker/Myth-Tools">Mythtools</a> aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!</p>
-</li>
+
+<h2>Acknowledgements</h2>
+
+<div class="thanks"><ul>
+
+<li><p>A heartfelt thank you to <a href="https://github.com/ExplosiveOats">Oats</a>, my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!</p></li>
+
+<li><p><a href="https://x.com/RoseHikari24">Zed</a> and <a href="https://x.com/CC_VibesXIV">CC</a>, two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!</p></li>
+
+<li><p><a href="https://github.com/PassiveModding">PassiveModding</a> - Thanks for <a href="https://github.com/PassiveModding/Meddle">Meddle</a>, and <a href="https://github.com/PassiveModding/MeddleTools">Meddle Tools</a>, while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution.</p></li>
+
+<li><p><a href="https://github.com/sleepybnuuy">sleepybunny</a> for providing an excellent base for the C+ application with <a href="https://github.com/sleepybnuuy/bustomize">bustomize</a></p></li>
+
+<li><p>Ofcourse everyone that showed interest in not only AetherBlend but also <a href="https://github.com/MekuMaki/Mektools">Mektools</a> and <a href="https://github.com/ShinoMythmaker/Myth-Tools">Mythtools</a> aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!</p></li>
+
 </ul></div>
   </section>
 </div>

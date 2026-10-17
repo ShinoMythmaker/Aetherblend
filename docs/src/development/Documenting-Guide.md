@@ -9,8 +9,7 @@ aliases: Working-On-The-Docs
 
 Write only useful task guides for AetherBlend users and practical setup or
 quickstart pages for contributors. Put user workflows in **Guides** and
-contributor workflows or conventions in **Development**. Keep API details in
-the code rather than maintaining operator, ABI or rig-module catalogs.
+contributor workflows or conventions in **Development**.
 
 The site is built from Markdown in `docs/src/`; `docs/build.py` generates the
 HTML served from `docs/`. The generated pages are committed, so rebuild after
@@ -62,10 +61,40 @@ Content here.
 - A user guide should state prerequisites, give short numbered steps and say
   what success looks like. A development page should help a contributor finish
   one practical setup or workflow.
-- Keep pages concise and low-maintenance. Include verified details needed for
-  the task; avoid API inventories, implementation tours and duplicated
-  instructions. Use a link to an existing guide or a short inline fact when
-  useful.
+- Keep pages concise and low-maintenance. 
+
+## Author Variables
+
+Use double braces in Markdown or HTML, for example `\{\{blender_min}}` or
+`[Download AetherBlend](\{\{latest_release_zip}})`. The build replaces these values
+in page content, including `Home.md`, which supplies the landing-page text.
+The home page also owns its layout using HTML and Markdown sections; its
+`<!-- documentation-cards -->` marker inserts the navigation cards automatically.
+
+| Variable | Value |
+|----------|-------|
+| `{{blender_min}}` | Minimum Blender version from the add-on manifest (major.minor) |
+| `{{ab_version}}` | AetherBlend version from the add-on manifest |
+| `{{ab_github}}` | AetherBlend GitHub project URL |
+| `{{latest_release_repo}}` | AetherBlend drag-and-drop install URL |
+| `{{latest_release_zip}}` | AetherBlend plain ZIP download URL |
+| `{{meddle_version}}` | Meddle Tools release version |
+| `{{meddle_github}}` | Meddle Tools GitHub project URL |
+| `{{meddle_latest_repo}}` | Meddle Tools drag-and-drop install URL |
+| `{{meddle_latest_zip}}` | Meddle Tools plain ZIP download URL |
+| `{{ffgear_version}}` | FFGear release version |
+| `{{ffgear_github}}` | FFGear GitHub project URL |
+| `{{ffgear_latest_repo}}` | FFGear drag-and-drop install URL |
+| `{{ffgear_latest_zip}}` | FFGear plain ZIP download URL |
+
+Release values come from the shared Blender repository's newest release
+compatible with AetherBlend's minimum Blender version, not an independent
+GitHub "latest" lookup. `*_repo` links add the repository and Blender-version
+parameters to the ZIP URL; they are not repository JSON URLs. `meddle_*` means
+the **Meddle Tools Blender add-on**, not the Meddle game plugin.
+
+To show placeholder syntax literally, prefix each opening brace with a
+backslash. Visual code wrapping does not change copied snippet text.
 
 ## Build the Site
 
@@ -77,11 +106,9 @@ From the repository root:
 
 The builder reads version and minimum Blender facts from
 `blender_manifest.toml`, renders Markdown to HTML and fetches the master
-`repo.json` for dependency links. If that request fails, it warns and uses
-release-page fallbacks.
-
-Inspect the build output and `git status`. Confirm the changed page, navigation
-and links look right, and check generated diffs for unrelated changes.
+`repo.json` for release metadata.
+If release metadata is unavailable or invalid, the build stops with an error
+before rewriting generated pages.
 
 ## Preview in VS Code
 

@@ -9,11 +9,6 @@ summary: Requirements and how to install the add-on.
 - Blender {{blender_min}} or newer.
 - Rigify for rig generation. It ships with Blender but may need to be enabled
   manually.
-- Meddle Tools and FFGear are optional add-ons for their respective shader
-  imports. AetherBlend can import and rig models without them.
-
-## Installation
-You can install AetherBlend with drag and drop, manually, or with Blender's repository feature:
 
 ### Drag and drop
 The quickest way. Drag a button below into an open Blender window.
@@ -25,17 +20,17 @@ The quickest way. Drag a button below into an open Blender window.
 <div class="drop-stack">
   <div class="drop-row required">
     <span class="tag">Required</span>
-    <a class="drop-link large" href="{{aetherblend_link}}" draggable="true">Drag AetherBlend into Blender</a>
+    <a class="drop-link large" href="{{latest_release_repo}}" draggable="true">Drag AetherBlend into Blender</a>
     <p>The add-on itself. Drop it <strong>twice</strong>: first to add the repository, then to install.</p>
   </div>
   <div class="drop-row recommended">
     <span class="tag">Recommended</span>
-    <a class="drop-link subtle" href="{{meddle_link}}" draggable="true">Drag Meddle Tools into Blender</a>
+    <a class="drop-link subtle" href="{{meddle_latest_repo}}" draggable="true">Drag Meddle Tools into Blender</a>
     <p>Needed only for Meddle shader import. You can skip it for model import and rigging.</p>
   </div>
   <div class="drop-row optional">
     <span class="tag">Optional</span>
-    <a class="drop-link subtle" href="{{ffgear_link}}" draggable="true">Drag FFGear into Blender</a>
+    <a class="drop-link subtle" href="{{ffgear_latest_repo}}" draggable="true">Drag FFGear into Blender</a>
     <p>Extra gear shaders. Not needed for AetherBlend to work.</p>
   </div>
 </div>
@@ -50,9 +45,9 @@ If dragging does nothing, use one of the methods below.
 3. Select "Add Remote Repository"
 4. Paste the following URL into the required repository field:
 
-    ```
-    https://raw.githubusercontent.com/ShinoMythmaker/FFXIV-Blender-Plugins/refs/heads/main/repo.json
-    ```
+```
+https://raw.githubusercontent.com/ShinoMythmaker/FFXIV-Blender-Plugins/refs/heads/main/repo.json
+```
 
 5. Select **Check for Updates on Startup**.
 6. Select **Create**.
@@ -63,7 +58,7 @@ Using this feature will allow Blender to automatically keep AetherBlend up to da
 <img width="532" height="286" alt="image" src="https://github.com/user-attachments/assets/84ce6f77-33b8-4cec-a68f-30572fd5bc90" />
 
 ### Manual
-1. Download the newest .zip from the releases [page](https://github.com/ShinoMythmaker/Aetherblend/releases)
+1. Download the newest .zip [here]({{latest_release_zip}})
 2. Open your preferences menu in Blender and navigate to the add-ons section
 3. From the dropdown in the top right of the window, select "Install from Disk" and navigate to your downloaded release of AetherBlend
 

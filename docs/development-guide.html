@@ -23,14 +23,13 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="">Installation</a>
-<a href="import-and-rig-character.html" class="">Import and Rig a Character</a>
 <h4>Development</h4>
 <a href="development-guide.html" class="active">Development Guide</a>
 <a href="documenting-guide.html" class="">Documenting Guide</a>
 <a href="style-guide.html" class="">Style Guide</a></aside>
 <main><article>
 <h1>Development Guide</h1>
-<p>Use this checklist for a code change. For Markdown and site work, see the
+<p>Use this checklist for a code change. For Doc and site work, see the
 <a href="documenting-guide.html">Documenting Guide</a>; code conventions are in the
 <a href="style-guide.html">Style Guide</a>.</p>
 <h2 id="set-up">Set up<a class="headerlink" href="#set-up" title="Permanent link">#</a></h2>
@@ -55,19 +54,15 @@ and use <strong>Blender: Build and Start</strong> to launch the add-on.</p>
    change in the owning feature.</li>
 <li>Run checks from the repository root:</li>
 </ol>
-<p><code>powershell
-   .venv\Scripts\python.exe -m ruff check .
-   .venv\Scripts\python.exe -m compileall -q .</code></p>
+<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">.</span>
+<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">compileall</span> <span class="n">-q</span> <span class="p">.</span>
+</code></pre></div>
+
 <ol>
 <li>In Blender, exercise the changed workflow, toggle the owning feature off and
    on, and check the system console. Static checks do not replace this test.</li>
-<li>If a user or contributor workflow changes, update its concise guide; API
-   contracts are defined by the code. See the <a href="documenting-guide.html">Documenting Guide</a>.</li>
-<li>Review <code>git diff</code>, summarize validation and Blender testing in the pull
-   request, then push your branch to your fork and open a pull request against
-   the main repository.</li>
 </ol>
-<div class="page-nav"><a class="prev" href="import-and-rig-character.html"><small>Previous</small>Import and Rig a Character</a><a class="next" href="documenting-guide.html"><small>Next</small>Documenting Guide</a></div>
+<div class="page-nav"><a class="prev" href="installation.html"><small>Previous</small>Installation</a><a class="next" href="documenting-guide.html"><small>Next</small>Documenting Guide</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>

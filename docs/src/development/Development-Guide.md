@@ -7,7 +7,7 @@ aliases: Contributing
 ---
 # Development Guide
 
-Use this checklist for a code change. For Markdown and site work, see the
+Use this checklist for a code change. For Doc and site work, see the
 [Documenting Guide](Documenting-Guide); code conventions are in the
 [Style Guide](Style-Guide).
 
@@ -38,15 +38,10 @@ and use **Blender: Build and Start** to launch the add-on.
    change in the owning feature.
 2. Run checks from the repository root:
 
-   ```powershell
-   .venv\Scripts\python.exe -m ruff check .
-   .venv\Scripts\python.exe -m compileall -q .
-   ```
+```powershell
+.venv\Scripts\python.exe -m ruff check .
+.venv\Scripts\python.exe -m compileall -q .
+```
 
 3. In Blender, exercise the changed workflow, toggle the owning feature off and
    on, and check the system console. Static checks do not replace this test.
-4. If a user or contributor workflow changes, update its concise guide; API
-   contracts are defined by the code. See the [Documenting Guide](Documenting-Guide).
-5. Review `git diff`, summarize validation and Blender testing in the pull
-   request, then push your branch to your fork and open a pull request against
-   the main repository.

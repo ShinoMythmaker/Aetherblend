@@ -1,6 +1,6 @@
 """Build the static documentation site.
 
-Reads Markdown from ``docs/src`` and ``README.md`` and writes plain HTML pages into ``docs``.
+Reads Markdown from ``docs/src`` and writes plain HTML pages into ``docs``.
 Run from anywhere with ``python docs/build.py``. Requires the ``markdown`` and ``pygments`` packages.
 """
 
@@ -107,38 +107,51 @@ def drag_link(archive_url: str, blender_min: str) -> str:
     return f"{archive_url}?repository={repository}&blender_version_min={blender_min}"
 
 
-def master_plugin_links() -> dict[str, str]:
-    """Return drag-and-drop links for Meddle Tools and FFGear taken from the master repository's repo.json."""
-    wanted = {"meddle_tools": "meddle_link", "FFGear": "ffgear_link"}
-    fallback = {
-        "meddle_link": "https://github.com/PassiveModding/MeddleTools/releases/latest",
-        "ffgear_link": "https://github.com/kajupe/FFGear/releases/latest",
-    }
+def release_facts() -> dict[str, str]:
+    """Read the newest Blender-compatible releases from the shared repository."""
     try:
         with urllib.request.urlopen(MASTER_REPO_JSON, timeout=15) as response:  # noqa: S310
             entries = json.load(response)["data"]
-    except (OSError, ValueError, KeyError):
-        print("[AetherBlend] Could not read the master repo.json; using release page links.")
-        return fallback
-    ours = version_key(MANIFEST["blender_version_min"])
-    links = dict(fallback)
-    for plugin_id, key in wanted.items():
-        usable = [e for e in entries if e.get("id") == plugin_id and version_key(e["blender_version_min"]) <= ours]
-        if usable:
-            best = max(usable, key=lambda e: version_key(e["version"]))
-            links[key] = drag_link(best["archive_url"], best["blender_version_min"])
-    return links
+        if not isinstance(entries, list):
+            raise ValueError("Repository data must be a list.")
+        facts: dict[str, str] = {}
+        ours = version_key(MANIFEST["blender_version_min"])
+        for plugin_id, prefix in (("AetherBlend", ""), ("meddle_tools", "meddle_"), ("FFGear", "ffgear_")):
+            usable = []
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    raise ValueError("Repository entries must be objects.")
+                if entry.get("id") != plugin_id:
+                    continue
+                for field in ("version", "website", "archive_url", "blender_version_min"):
+                    if not isinstance(entry.get(field), str) or not entry[field]:
+                        raise ValueError(f"{plugin_id}: missing or invalid {field}.")
+                if version_key(entry["blender_version_min"]) > ours:
+                    continue
+                maximum = entry.get("blender_version_max")
+                if maximum and ours >= version_key(maximum):
+                    continue
+                usable.append(entry)
+            if not usable:
+                raise ValueError(f"No compatible release found for {plugin_id}.")
+            best = max(usable, key=lambda entry: version_key(entry["version"]))
+            facts[f"{prefix}latest_zip" if prefix else "latest_release_zip"] = best["archive_url"]
+            facts[f"{prefix}latest_repo" if prefix else "latest_release_repo"] = drag_link(
+                best["archive_url"], best["blender_version_min"]
+            )
+            if prefix:
+                facts[f"{prefix}version"] = best["version"]
+                facts[f"{prefix}github"] = best["website"].rstrip("/")
+        return facts
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        raise SystemExit(f"[AetherBlend] Could not load release metadata: {error}") from error
 
 
-AETHERBLEND_ARCHIVE = f"{REPO_URL}/releases/download/v{VERSION}/Aetherblend-v{VERSION}.zip"
-AETHERBLEND_LINK = drag_link(AETHERBLEND_ARCHIVE, MANIFEST["blender_version_min"])
 FACTS = {
-    "version": VERSION,
+    "ab_version": VERSION,
     "blender_min": BLENDER_MIN,
-    "repo": REPO_URL,
-    "aetherblend_link": AETHERBLEND_LINK,
-    "repo_link": MASTER_REPO_JSON,
-    **master_plugin_links(),
+    "ab_github": REPO_URL,
+    **release_facts(),
 }
 PAGES = load_pages()
 GROUPS: dict[str, tuple[Page, ...]] = {}
@@ -151,22 +164,9 @@ for _page in PAGES:
 
 
 def apply_facts(text: str) -> str:
-    """Replace ``{{version}}``, ``{{blender_min}}`` and ``{{repo}}`` placeholders."""
-    return re.sub(r"\{\{\s*(\w+)\s*\}\}", lambda m: FACTS.get(m.group(1), m.group(0)), text)
-
-# I have remopved the drag and drop link from the readme me making this kidna not deprciated. We keep it incase we need it again
-# def sync_readme_download() -> None:
-#     """Point the README drag-and-drop link at the manifest version."""
-#     path = ROOT / "README.md"
-#     text = path.read_text(encoding="utf-8")
-#     url = f"{REPO_URL}/releases/download/v{VERSION}/Aetherblend-v{VERSION}.zip"
-#     updated = re.sub(
-#         r'(href=")[^"]*releases/download/[^"?]*(\?[^"]*?)blender_version_min=[\d.]+',
-#         lambda m: f"{m.group(1)}{url}{m.group(2)}blender_version_min={MANIFEST['blender_version_min']}",
-#         text,
-#     )
-#     if updated != text:
-#         path.write_text(updated, encoding="utf-8")
+    """Replace author placeholders with manifest and release metadata."""
+    rendered = re.sub(r"\{\{\s*(\w+)\s*\}\}", lambda m: FACTS.get(m.group(1), m.group(0)), text)
+    return rendered.replace(r"\{\{", "{{")
 
 
 def resolve_link(href: str) -> str | None:
@@ -290,82 +290,22 @@ def build_page(page: Page) -> str:
     return shell(f"{title} · AetherBlend", content)
 
 
-def readme_section(readme: str, heading: str) -> str:
-    """Return the text under a ``## heading`` of the README."""
-    match = re.search(rf"^##\s+{re.escape(heading)}.*?\n(.*?)(?=^##\s|^---\s*$|\Z)", readme, re.S | re.M)
-    return match.group(1).strip() if match else ""
-
-
-def strip_html_tags(text: str) -> str:
-    """Remove raw HTML tags and non-breaking space markers from README text."""
-    text = re.sub(r"<[^>]+>", "", text)
-    return re.sub(r"^&nbsp;\s*$", "", text, flags=re.M).strip()
-
-
 def build_index() -> str:
-    """Render the landing page from the README and the wiki home text."""
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    intro = re.search(r"^(AetherBlend is a plugin designed.*?)\n(Note:.*?)\n", readme, re.M)
-    lead = intro.group(1) if intro else "AetherBlend is a Blender add-on for posing and animating FFXIV characters."
-    note = intro.group(2) if intro else ""
-    goal = render_markdown(strip_html_tags(readme_section(readme, "What is the goal")))[0]
-    thanks = readme_section(readme, "Acknowledgements")
-    thanks_html = render_markdown(strip_html_tags(thanks))[0]
-    download_url = AETHERBLEND_LINK
-    discord = re.search(r"https://discord\.gg/\w+", readme)
-    discord_url = discord.group(0) if discord else REPO_URL
-    home = (SRC / "Home.md").read_text(encoding="utf-8") if (SRC / "Home.md").exists() else ""
-    about = re.search(r"^(AetherBlend is a plugin for Blender built.*?)$", home, re.M)
-    about_html = render_markdown(about.group(1))[0] if about else ""
-
+    """Render the landing page from Home.md and the navigation metadata."""
+    home = (SRC / "Home.md").read_text(encoding="utf-8")
+    title, text = split_title(home, "AetherBlend")
+    body, _ = render_markdown(text)
     cards = "".join(
         f'<a class="card" href="{page.slug}.html"><h3>{html.escape(page.title)}</h3>'
         f"<p>{html.escape(page.summary)}</p></a>"
         for page in PAGES
         if page.summary
     )
+    body = body.replace("<!-- documentation-cards -->", f'<div class="cards">{cards}</div>')
     content = f"""{header_html()}
-<section class="hero">
-  <img class="logo" src="assets/img/logo.png" alt="AetherBlend">
-  <div><span class="badge">Blender {BLENDER_MIN}+ &middot; v{VERSION} &middot; Beta</span></div>
-  <p class="lead">{html.escape(lead)}</p>
-  <p class="note">{html.escape(note)}</p>
-  <div class="btn-row">
-    <a class="drop-link large" data-latest-zip href="{html.escape(download_url)}" draggable="true"
-       title="Drag this button into a Blender window to install">Drag into Blender</a>
-    <a class="btn" href="installation.html">Installation guide</a>
-    <a class="btn" href="{REPO_URL}">View on GitHub</a>
-  </div>
-</section>
-<div class="landing">
-  <div class="showcase"><img src="assets/img/showcase.jpg" alt="AetherBlend showcase"></div>
-  <section>
-    <h2>What is AetherBlend?</h2>
-    {about_html}
-    {goal}
-  </section>
-  <section>
-    <h2>Documentation</h2>
-    <div class="cards">{cards}</div>
-  </section>
-  <section>
-    <h2>Support &amp; Feedback</h2>
-    <div class="cards support">
-      <a class="card" href="{discord_url}"><span class="ico ico-chat"></span><h3>Join the Discord</h3>
-        <p>Ask questions, share your work and follow development.</p></a>
-      <a class="card" href="{REPO_URL}/issues"><span class="ico ico-bug"></span><h3>Report a bug</h3>
-        <p>Found something broken? Open an issue on GitHub.</p></a>
-      <a class="card" href="{REPO_URL}/issues"><span class="ico ico-idea"></span><h3>Suggest a feature</h3>
-        <p>Tell us what would make AetherBlend better for you.</p></a>
-    </div>
-  </section>
-  <section>
-    <h2>Acknowledgements</h2>
-    <div class="thanks">{thanks_html}</div>
-  </section>
-</div>
+{body}
 <footer class="site-footer">AetherBlend &middot; <a href="{REPO_URL}">GitHub</a></footer>"""
-    return shell("AetherBlend – Posing and animation for FFXIV in Blender", content, lead)
+    return shell(title, content)
 
 
 def main() -> None:
@@ -375,7 +315,6 @@ def main() -> None:
     )
     for old in DOCS.glob("*.html"):
         old.unlink()
-    # sync_readme_download()
     (DOCS / "index.html").write_text(build_index(), encoding="utf-8")
     for page in PAGES:
         (DOCS / f"{page.slug}.html").write_text(build_page(page), encoding="utf-8")

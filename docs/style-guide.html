@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AetherBlend Style Guide · AetherBlend</title>
+<title>Style Guide · AetherBlend</title>
 <meta name="description" content="">
 <link rel="icon" href="assets/img/logo.png">
 <link rel="stylesheet" href="assets/style.css">
@@ -23,95 +23,77 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="">Installation</a>
-<a href="import-and-rig-character.html" class="">Import and Rig a Character</a>
 <h4>Development</h4>
 <a href="development-guide.html" class="">Development Guide</a>
 <a href="documenting-guide.html" class="">Documenting Guide</a>
 <a href="style-guide.html" class="active">Style Guide</a></aside>
 <main><article>
-<h1>AetherBlend Style Guide</h1>
-<p>Use these principles to keep code readable and safe to disable. They describe
-conventions, not repository layout; cite stable IDs (<code>R-x.y</code>) in reviews.
-Lint settings live in <code>ruff.toml</code>; run <code>.venv\Scripts\python.exe -m ruff check .</code>.</p>
-<h2 id="structure">Structure<a class="headerlink" href="#structure" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>R-1.1</strong> Features are self-contained; removing one and its registry entry
-  must leave other features working.</li>
-<li><strong>R-1.2</strong> A feature imports another only through its <code>__all__</code>.</li>
-<li><strong>R-1.3</strong> Shared code belongs in shared packages, grouped by what it operates on.</li>
-<li><strong>R-1.4</strong> Each package has a one-line docstring. Feature packages define
-  <code>__all__</code>, <code>register()</code> and <code>unregister()</code>.</li>
-</ul>
-<h2 id="lifecycle-and-user-data">Lifecycle and user data<a class="headerlink" href="#lifecycle-and-user-data" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>R-2.1</strong> Register feature modules in order and unregister them in reverse.</li>
-<li><strong>R-2.2</strong> Cleanup removes everything the feature registers, including classes,
-  properties, handlers, timers, keymaps and icons.</li>
-<li><strong>R-2.3</strong> Registration and cleanup are idempotent.</li>
-<li><strong>R-2.4</strong> Imports have no registration or Blender-data side effects.</li>
-<li><strong>R-2.5</strong> Data stored in <code>.blend</code> files survives add-on disable and re-enable.</li>
-<li><strong>R-2.7</strong> Register Blender classes explicitly in their defining module;
-  unregister them there in reverse order.</li>
-<li><strong>R-2.8</strong> Register property groups, then operators, then panels; unregister
-  in reverse.</li>
-</ul>
-<h2 id="names-and-imports">Names and imports<a class="headerlink" href="#names-and-imports" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>R-3.1</strong> Feature IDs and class names use the feature package name.</li>
-<li><strong>R-3.2</strong> Operator IDs are lowercase with exactly one dot.</li>
-<li><strong>R-3.3</strong> A panel's <code>bl_idname</code> matches its class name.</li>
-<li><strong>R-3.4</strong> Blender classes use <code>AETHER_&lt;TYPE&gt;_&lt;feature&gt;_&lt;name&gt;</code>. Functions and
-  variables use <code>lower_snake_case</code>, constants use <code>ALL_CAPS</code>, and private
-  helpers start with <code>_</code>.</li>
-<li><strong>R-3.5</strong> Operator IDs are public to scripts; list renames in the changelog.</li>
-<li><strong>R-8.1</strong> Order imports: standard library, third party, then local.</li>
-<li><strong>R-8.2</strong> Prefer module imports. Wildcard imports require an explicit <code>__all__</code>.</li>
-<li><strong>R-8.3</strong> Use relative imports within a feature; follow <strong>R-1.2</strong> across features.</li>
-<li><strong>R-8.4</strong> Keep imports at module scope unless a local import prevents a
-  circular import; explain that exception in a comment.</li>
-</ul>
-<h2 id="functions-and-blender-interaction">Functions and Blender interaction<a class="headerlink" href="#functions-and-blender-interaction" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>R-4.2</strong> Keep operators focused on Blender's operator lifecycle and reporting;
-  put reusable logic in helpers or feature modules.</li>
-<li><strong>R-4.3</strong> Operator messages are clear and actionable.</li>
-<li><strong>R-4.4</strong> Data-changing operators should support undo.</li>
-<li><strong>R-4.5</strong> Operator properties have a <code>name</code> and <code>description</code>.</li>
-<li><strong>R-4.6</strong> Restore changed mode, selection, cursor and active object, including
-  on errors.</li>
-<li><strong>R-5.1</strong> Type every function argument and return value.</li>
-<li><strong>R-5.2</strong> Prefer specific Blender types; use <code>Any</code> only when no better type fits.</li>
-<li><strong>R-5.3</strong> Operator <code>execute</code>, <code>invoke</code> and <code>modal</code> return <code>set[str]</code>;
-  <code>poll</code> returns <code>bool</code>.</li>
-<li><strong>R-6.2</strong> Public functions have a one-line imperative docstring.</li>
-<li><strong>R-6.5</strong> Blender properties have a user-facing description.</li>
-<li><strong>R-6.7</strong> Comments explain why, not what.</li>
-<li><strong>R-7.2</strong> Utilities changing mode restore the original mode, including on errors.</li>
-</ul>
+<h1>Style Guide</h1>
+<p>Welcome! Keep changes focused and code easy to read. These are the essentials;
+Ruff handles the formatting details.</p>
+<h2 id="1-feature-layout">1. Feature layout<a class="headerlink" href="#1-feature-layout" title="Permanent link">#</a></h2>
+<p><strong>R-1.1</strong> Keep each feature self-contained. A typical feature looks like this;
+only add files you need:</p>
+<div class="codehilite"><pre><span></span><code>features/my_feature/
+    __init__.py     # Public exports, register() and unregister()
+    operators.py   # Blender actions and user reporting
+    panels.py      # UI layout
+    properties.py  # Blender property definitions
+</code></pre></div>
+
+<p><strong>R-1.3</strong> Keep feature logic beside these files in purpose-named modules.
+Code needed by multiple features goes in <code>utils/</code> or <code>ui/</code>.
+<strong>R-8.2</strong> Prefer module imports and relative imports within a feature.
+<strong>R-1.2</strong> Use another feature only through its <code>__all__</code> public API.</p>
+<h2 id="naming">Naming<a class="headerlink" href="#naming" title="Permanent link">#</a></h2>
+<p><strong>R-3.1</strong> Use the feature's package name in Blender IDs and class names:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operator ID</td>
+<td><code>aether.my_feature_do_thing</code></td>
+</tr>
+<tr>
+<td>Operator class</td>
+<td><code>AETHER_OT_my_feature_do_thing</code></td>
+</tr>
+<tr>
+<td>Panel / menu / property group</td>
+<td><code>AETHER_PT_…</code> / <code>AETHER_MT_…</code> / <code>AETHER_PG_…</code></td>
+</tr>
+<tr>
+<td>Function or variable</td>
+<td><code>lower_snake_case</code></td>
+</tr>
+<tr>
+<td>Constant / private helper</td>
+<td><code>ALL_CAPS</code> / <code>_helper</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>R-3.3</strong> A panel's <code>bl_idname</code> matches its class name.
+<strong>R-3.5</strong> Ask before renaming public IDs or saved properties; existing files and scripts rely on them.</p>
 <h2 id="errors-and-output">Errors and output<a class="headerlink" href="#errors-and-output" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>R-9.1</strong> Console output starts with <code>[AetherBlend]</code>.</li>
-<li><strong>R-9.2</strong> Operators use <code>self.report</code>; utilities use <code>print</code>.</li>
-<li><strong>R-9.3</strong> Never use a bare <code>except:</code>; catch specific exceptions.</li>
-</ul>
-<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>R-10.1</strong> Edit Markdown in <code>docs/src/</code>, not generated HTML. Rebuild with
-  <code>.venv\Scripts\python.exe docs\build.py</code>; keep page names unique and use
-  <code>Guides</code> or <code>Development</code> frontmatter. Use build placeholders for version
-  and minimum Blender facts.</li>
-<li><strong>R-10.4</strong> Keep this guide at <code>docs/src/development/Style-Guide.md</code>.</li>
-</ul>
+<p><strong>R-9.1</strong> Start console messages with <code>[AetherBlend]</code>.
+<strong>R-9.2</strong> Use <code>self.report({"ERROR"}, "What went wrong and what to do next")</code>
+in operators and <code>print("[AetherBlend] ...")</code> in utilities.
+<strong>R-9.3</strong> Catch specific exceptions and make failures visible rather than silently continuing.</p>
+<p>Before sharing, clean up registrations on disable (<strong>R-2.2</strong>), preserve user
+data (<strong>R-2.5</strong>) and restore any mode you changed (<strong>R-4.6</strong>).
+Follow the <a href="development-guide.html">Development Guide</a> for checks and Blender testing.</p>
 <div class="page-nav"><a class="prev" href="documenting-guide.html"><small>Previous</small>Documenting Guide</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>
-<li><a href="#structure">Structure</a></li>
-<li><a href="#lifecycle-and-user-data">Lifecycle and user data</a></li>
-<li><a href="#names-and-imports">Names and imports</a></li>
-<li><a href="#functions-and-blender-interaction">Functions and Blender interaction</a></li>
+<li><a href="#1-feature-layout">1. Feature layout</a></li>
+<li><a href="#naming">Naming</a></li>
 <li><a href="#errors-and-output">Errors and output</a></li>
-<li><a href="#documentation">Documentation</a></li>
 </ul>
 </div>
 </aside>

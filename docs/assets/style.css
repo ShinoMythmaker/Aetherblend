@@ -112,9 +112,9 @@ pre, .codehilite {
 .codehilite pre { margin: 0; padding: 0; border: 0; background: none !important; }
 pre code, .codehilite code { background: none; border: 0; padding: 0; font-size: .86rem; }
 .code-block { position: relative; min-width: 0; margin: 1.2em 0; }
-.code-block > pre, .code-block > .codehilite { margin: 0; padding-top: 52px; }
+.code-block > pre, .code-block > .codehilite { margin: 0; padding: 16px 120px 16px 18px; }
 .code-copy {
-  position: absolute; top: 8px; right: 8px; padding: 5px 10px;
+  position: absolute; top: 10px; right: 10px; padding: 3px 10px;
   border: 1px solid var(--border); border-radius: 6px;
   background: var(--panel); color: var(--text); font: inherit; font-size: .8rem; cursor: pointer;
 }
