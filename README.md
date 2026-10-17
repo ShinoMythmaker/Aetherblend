@@ -7,8 +7,8 @@
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
     <img src="https://img.shields.io/badge/Blender-5.2.0%2B-orange">
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
-    <a class="github-button" href="https://github.com/ShinoMythmaker/Aetherblend" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star ShinoMythmaker/Aetherblend on GitHub">Star</a>
 </p>
+&nbsp;
 
 AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
 Note: AetherBlend is currently in beta and some features may not work as intended.
@@ -24,12 +24,14 @@ Note: AetherBlend is currently in beta and some features may not work as intende
   <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="240" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>&nbsp;&nbsp;&nbsp;
   <a href="https://discord.gg/NEF7TdXGqH"><img width="240" alt="Discord" src="assets/brand/btn-discord.svg" /></a>
 </p>
+&nbsp;
 
 ## What is the goal of AetherBlend
 
 Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation. IK-rig pose and animation import and Aetherbridge (streaming Blender animations into the game, with lighting and camera syncing planned) are still in development, while we continue to refine our editable, modular rig templates.
 
 &nbsp;
+
 
 ## Acknowledgements
 - A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
@@ -45,4 +47,3 @@ Our goal is to make custom FFXIV characters animation-ready in Blender: generate
 ---
 &nbsp; 
 
-<script async defer src="https://buttons.github.io/buttons.js"></script>

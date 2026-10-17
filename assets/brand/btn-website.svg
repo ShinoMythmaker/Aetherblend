@@ -1,15 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="180" height="52" viewBox="0 0 180 52" role="img" aria-label="Visit our website">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#164e63"/>
-      <stop offset="1" stop-color="#312e81"/>
+      <stop offset="0" stop-color="#1c2c38"/>
+      <stop offset="1" stop-color="#161d29"/>
     </linearGradient>
     <linearGradient id="border" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#67e8f9"/>
-      <stop offset="1" stop-color="#a78bfa"/>
+      <stop offset="0" stop-color="#5bc0de" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#243044"/>
     </linearGradient>
   </defs>
-  <rect x="1" y="1" width="178" height="50" rx="12" fill="url(#bg)" stroke="url(#border)" stroke-width="2"/>
-  <text x="20" y="32" fill="#ffffff" font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif" font-size="17" font-weight="700">Visit Website</text>
-  <path d="M152 20l6 6-6 6M142 26h16" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="2" y="5" width="176" height="46" rx="10" fill="#07111c" fill-opacity="0.35"/>
+  <rect x="1" y="1" width="178" height="46" rx="10" fill="url(#bg)" stroke="url(#border)"/>
+  <path d="M13 2h154" fill="none" stroke="#f2f5fa" stroke-opacity="0.06"/>
+  <text x="17" y="30" fill="#f2f5fa" font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif" font-size="16" font-weight="600">Visit Website</text>
+  <rect x="140" y="12" width="26" height="24" rx="7" fill="#5bc0de" fill-opacity="0.1"/>
+  <path d="M153 19l5 5-5 5M147 24h11" fill="none" stroke="#5bc0de" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
