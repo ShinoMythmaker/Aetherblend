@@ -1,12 +1,13 @@
 <br>
 <p align="center">
   <img height="90" align="middle" alt="AetherBlend" src="assets/brand/Aether Blend Logo-min.png" />&nbsp;&nbsp;
-  <a href="https://shinomythmaker.github.io/Aetherblend/"><img width="240" height="90" align="middle" alt="Explore our website for guides, setup and quickstarts" src="assets/brand/btn-website.svg" /></a>
+  <a href="https://shinomythmaker.github.io/Aetherblend/"><img width="180" height="52" align="middle" alt="Visit our website" src="assets/brand/btn-website.svg" /></a>
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
     <img src="https://img.shields.io/badge/Blender-5.2.0%2B-orange">
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
+    <a class="github-button" href="https://github.com/ShinoMythmaker/Aetherblend" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star ShinoMythmaker/Aetherblend on GitHub">Star</a>
 </p>
 
 AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
@@ -43,3 +44,5 @@ Our goal is to make custom FFXIV characters animation-ready in Blender: generate
 
 ---
 &nbsp; 
+
+<script async defer src="https://buttons.github.io/buttons.js"></script>

@@ -1,11 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="90" viewBox="0 0 240 90" role="img" aria-label="Explore our website for guides, setup and quickstarts">
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="52" viewBox="0 0 180 52" role="img" aria-label="Visit our website">
   <defs>
-    <linearGradient id="arrow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#218ca6" stop-opacity="0.2"/>
-      <stop offset="1" stop-color="#419fb5"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#164e63"/>
+      <stop offset="1" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="border" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset="1" stop-color="#a78bfa"/>
     </linearGradient>
   </defs>
-  <text x="14" y="34" fill="#419fb5" font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif" font-size="20" font-weight="600">Explore our website</text>
-  <text x="14" y="54" fill="#7c929e" font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif" font-size="12">Guides, setup and quickstarts</text>
-  <path d="M14 69C86 80 166 79 222 64M211 59l12 5-7 11" fill="none" stroke="url(#arrow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="1" y="1" width="178" height="50" rx="12" fill="url(#bg)" stroke="url(#border)" stroke-width="2"/>
+  <text x="20" y="32" fill="#ffffff" font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif" font-size="17" font-weight="700">Visit Website</text>
+  <path d="M152 20l6 6-6 6M142 26h16" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
