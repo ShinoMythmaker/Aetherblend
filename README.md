@@ -35,17 +35,37 @@ AetherBlend started as an IK rig generator and has grown into a broader toolkit 
 
 The add-on is still in beta, and its tools and workflows are being refined.
 
+## Rig controls in action
+
+<table>
+  <tr>
+    <th align="center">IK controls</th>
+    <th align="center">Heel controls</th>
+    <th align="center">Spline controls</th>
+  </tr>
+  <tr>
+    <td width="33%" align="center"><img src="docs/assets/img/ik_demo.gif" width="260" alt="IK controls demonstration" /></td>
+    <td width="33%" align="center"><img src="docs/assets/img/heels_demo.gif" width="260" alt="Heel controls demonstration" /></td>
+    <td width="33%" align="center"><img src="docs/assets/img/spline_demo.gif" width="260" alt="Spline controls demonstration" /></td>
+  </tr>
+</table>
+
+<p align="center">
+  <strong>Eye controls</strong><br><br>
+  <img src="docs/assets/img/eyes_demo.gif" width="500" alt="Eye controls demonstration" />
+</p>
+
 ## Road to 1.0
 
 The feature scope for 1.0. Available tools are still being refined during beta.
 
 ### Available in beta
 
-- [x] Full rig generation
-- [x] C+ application
 - [x] Character import
-- [x] Animation export
+- [x] C+ application
+- [x] Full rig generation
 - [x] GPose export
+- [x] Animation export
 - [x] VFX toolkits
 
 ### Still to come
@@ -59,13 +79,13 @@ The feature scope for 1.0. Available tools are still being refined during beta.
 
 
 ## Acknowledgements
-- A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
+- A special thank you to [Oats](https://github.com/ExplosiveOats), co-developer, for the care and dedication she brings to AetherBlend and its community. I'm deeply grateful she joined the team and that we get to build this project together.
 
-- [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. 
+- [PassiveModding](https://github.com/PassiveModding), creator of [Meddle](https://github.com/PassiveModding/Meddle) and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), for tools that helped inspire AetherBlend.
 
-- [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
+- [sleepybunny](https://github.com/sleepybnuuy), whose [bustomize](https://github.com/sleepybnuuy/bustomize) provided the foundation for AetherBlend's C+ application.
 
-- Ofcourse everyone that showed interest in not only AetherBlend but also [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!
+- The AetherBlend, [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) communities, and my Patreon supporters, for their continued support.
 
 ---
 &nbsp; 
