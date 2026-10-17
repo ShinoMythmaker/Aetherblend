@@ -2,7 +2,7 @@
 title: Development Guide
 group: Development
 order: 100
-summary: Set up, make a focused change, validate it and prepare a pull request.
+summary: A quick setup guide to help you start contributing.
 aliases: Contributing
 ---
 # Development Guide

@@ -109,4 +109,7 @@ The feature scope for 1.0. Available tools are still being refined during beta.
   </tr>
 </table>
 
-&nbsp; 
+<p align="center">
+  <a href="https://aetherblend.mythmaker-studio.com/">AetherBlend</a> made by <a href="https://mythmaker-studio.com/">Mythmaker Studio</a><br>
+  <em>Available for commissions</em>
+</p>

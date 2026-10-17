@@ -2,7 +2,7 @@
 title: Style Guide
 group: Development
 order: 120
-summary: A few conventions to help your code feel at home.
+summary: A few conventions to help keep the code clean.
 ---
 # Style Guide
 

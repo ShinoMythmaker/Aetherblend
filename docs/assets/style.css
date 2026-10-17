@@ -233,7 +233,10 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 .available li::before { background: var(--accent); border-color: var(--accent); }
 .roadmap-card small { display: block; color: var(--muted); line-height: 1.5; }
 .showcase { margin-top: -8px; }
-.showcase img { width: 100%; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+.showcase img, .project-support > img {
+  width: 100%; border-radius: 16px; border: 1px solid var(--border);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 20px; }
 .card {
   display: block; padding: 22px; border-radius: var(--radius); border: 1px solid var(--border);
@@ -269,7 +272,7 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 .project-support-copy { min-width: 0; }
 .project-support-copy p { margin: 0 0 16px; }
 .project-support-copy .membership-note { color: var(--muted); font-size: .88rem; }
-.project-support > img { display: block; width: 100%; border-radius: var(--radius); }
+.project-support > img { display: block; }
 .project-support-actions { display: flex; flex-wrap: wrap; gap: 12px 24px; }
 .project-support-actions a { font-size: .95rem; font-weight: 600; }
 .project-support-actions a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }

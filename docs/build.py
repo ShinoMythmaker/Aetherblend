@@ -225,6 +225,8 @@ def header_html(prefix: str = "") -> str:
   <nav class="header-links">
     {links}
     <a href="{REPO_URL}">GitHub</a>
+    <a href="{prefix}index.html#support-project">Support</a>
+    <a href="https://mythmaker-studio.com/">Studio</a>
     <a class="cta" href="{REPO_URL}/releases/latest">Download</a>
   </nav>
 </header>"""

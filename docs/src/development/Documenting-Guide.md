@@ -2,7 +2,7 @@
 title: Documenting Guide
 group: Development
 order: 110
-summary: Edit the documentation, build the site and preview it in VS Code.
+summary: Help others by writing guides for features and workflows.
 aliases: Working-On-The-Docs
 ---
 # Documenting Guide
