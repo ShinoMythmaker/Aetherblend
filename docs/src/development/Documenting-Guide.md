@@ -73,19 +73,19 @@ The home page also owns its layout using HTML and Markdown sections; its
 
 | Variable | Value |
 |----------|-------|
-| `{{blender_min}}` | Minimum Blender version from the add-on manifest (major.minor) |
-| `{{ab_version}}` | AetherBlend version from the add-on manifest |
-| `{{ab_github}}` | AetherBlend GitHub project URL |
-| `{{latest_release_repo}}` | AetherBlend drag-and-drop install URL |
-| `{{latest_release_zip}}` | AetherBlend plain ZIP download URL |
-| `{{meddle_version}}` | Meddle Tools release version |
-| `{{meddle_github}}` | Meddle Tools GitHub project URL |
-| `{{meddle_latest_repo}}` | Meddle Tools drag-and-drop install URL |
-| `{{meddle_latest_zip}}` | Meddle Tools plain ZIP download URL |
-| `{{ffgear_version}}` | FFGear release version |
-| `{{ffgear_github}}` | FFGear GitHub project URL |
-| `{{ffgear_latest_repo}}` | FFGear drag-and-drop install URL |
-| `{{ffgear_latest_zip}}` | FFGear plain ZIP download URL |
+| `\{\{blender_min}}` | Minimum Blender version from the add-on manifest (major.minor) |
+| `\{\{ab_version}}` | AetherBlend version from the add-on manifest |
+| `\{\{ab_github}}` | AetherBlend GitHub project URL |
+| `\{\{latest_release_repo}}` | AetherBlend drag-and-drop install URL |
+| `\{\{latest_release_zip}}` | AetherBlend plain ZIP download URL |
+| `\{\{meddle_version}}` | Meddle Tools release version |
+| `\{\{meddle_github}}` | Meddle Tools GitHub project URL |
+| `\{\{meddle_latest_repo}}` | Meddle Tools drag-and-drop install URL |
+| `\{\{meddle_latest_zip}}` | Meddle Tools plain ZIP download URL |
+| `\{\{ffgear_version}}` | FFGear release version |
+| `\{\{ffgear_github}}` | FFGear GitHub project URL |
+| `\{\{ffgear_latest_repo}}` | FFGear drag-and-drop install URL |
+| `\{\{ffgear_latest_zip}}` | FFGear plain ZIP download URL |
 
 Release values come from the shared Blender repository's newest release
 compatible with AetherBlend's minimum Blender version, not an independent
