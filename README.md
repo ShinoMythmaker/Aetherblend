@@ -44,16 +44,19 @@ The add-on is still in beta, and its tools and workflows are being refined.
     <th align="center">Spline controls</th>
   </tr>
   <tr>
-    <td width="33%" align="center"><img src="docs/assets/img/ik_demo.gif" width="260" alt="IK controls demonstration" /></td>
-    <td width="33%" align="center"><img src="docs/assets/img/heels_demo.gif" width="260" alt="Heel controls demonstration" /></td>
-    <td width="33%" align="center"><img src="docs/assets/img/spline_demo.gif" width="260" alt="Spline controls demonstration" /></td>
+    <td width="32%" align="center"><img src="docs/assets/img/ik_demo.gif" width="260" alt="IK controls demonstration" /></td>
+    <td width="32%" align="center"><img src="docs/assets/img/heels_demo.gif" width="260" alt="Heel controls demonstration" /></td>
+    <td width="32%" align="center"><img src="docs/assets/img/spline_demo.gif" width="260" alt="Spline controls demonstration" /></td>
+  </tr>
+  <tr>
+    <th colspan="2" align="center">Eye controls</th>
+    <th align="center">GPose export</th>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="docs/assets/img/eyes_demo.gif" width="540" alt="Eye controls demonstration" /></td>
+    <td align="center"><img src="docs/assets/img/gpose_demo.gif" width="260" alt="GPose export demonstration" /></td>
   </tr>
 </table>
-
-<p align="center">
-  <strong>Eye controls</strong><br><br>
-  <img src="docs/assets/img/eyes_demo.gif" width="500" alt="Eye controls demonstration" />
-</p>
 
 ## Road to 1.0
 
