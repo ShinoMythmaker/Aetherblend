@@ -41,12 +41,12 @@ only add files you need:</p>
     properties.py  # Blender property definitions
 </code></pre></div>
 
-<p><strong>R-1.3</strong> Keep feature logic beside these files in purpose-named modules.
+<p><strong>R-1.2</strong> Keep feature logic beside these files in purpose-named modules.
 Code needed by multiple features goes in <code>utils/</code> or <code>ui/</code>.
-<strong>R-8.2</strong> Prefer module imports and relative imports within a feature.
-<strong>R-1.2</strong> Use another feature only through its <code>__all__</code> public API.</p>
+<strong>R-1.3</strong> Prefer module imports and relative imports within a feature.
+<strong>R-1.4</strong> Use another feature only through its <code>__all__</code> public API.</p>
 <h2 id="naming">Naming<a class="headerlink" href="#naming" title="Permanent link">#</a></h2>
-<p><strong>R-3.1</strong> Use the feature's package name in Blender IDs and class names:</p>
+<p><strong>R-2.1</strong> Use the feature's package name in Blender IDs and class names:</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -77,16 +77,14 @@ Code needed by multiple features goes in <code>utils/</code> or <code>ui/</code>
 </tr>
 </tbody>
 </table></div>
-<p><strong>R-3.3</strong> A panel's <code>bl_idname</code> matches its class name.
-<strong>R-3.5</strong> Ask before renaming public IDs or saved properties; existing files and scripts rely on them.</p>
+<p><strong>R-2.2</strong> A panel's <code>bl_idname</code> matches its class name.
+<strong>R-2.3</strong> Ask before renaming public IDs or saved properties; existing files and scripts rely on them.</p>
 <h2 id="errors-and-output">Errors and output<a class="headerlink" href="#errors-and-output" title="Permanent link">#</a></h2>
-<p><strong>R-9.1</strong> Start console messages with <code>[AetherBlend]</code>.
-<strong>R-9.2</strong> Use <code>self.report({"ERROR"}, "What went wrong and what to do next")</code>
+<p><strong>R-3.1</strong> Start console messages with <code>[AetherBlend]</code>.
+<strong>R-3.2</strong> Use <code>self.report({"ERROR"}, "What went wrong and what to do next")</code>
 in operators and <code>print("[AetherBlend] ...")</code> in utilities.
-<strong>R-9.3</strong> Catch specific exceptions and make failures visible rather than silently continuing.</p>
-<p>Before sharing, clean up registrations on disable (<strong>R-2.2</strong>), preserve user
-data (<strong>R-2.5</strong>) and restore any mode you changed (<strong>R-4.6</strong>).
-Follow the <a href="development-guide.html">Development Guide</a> for checks and Blender testing.</p>
+<strong>R-3.3</strong> Catch specific exceptions and make failures visible rather than silently continuing.</p>
+<p>Follow the <a href="development-guide.html">Development Guide</a> for checks and Blender testing.</p>
 <div class="page-nav"><a class="prev" href="documenting-guide.html"><small>Previous</small>Documenting Guide</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">

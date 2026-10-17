@@ -22,14 +22,14 @@ features/my_feature/
     properties.py  # Blender property definitions
 ```
 
-**R-1.3** Keep feature logic beside these files in purpose-named modules.
+**R-1.2** Keep feature logic beside these files in purpose-named modules.
 Code needed by multiple features goes in `utils/` or `ui/`.
-**R-8.2** Prefer module imports and relative imports within a feature.
-**R-1.2** Use another feature only through its `__all__` public API.
+**R-1.3** Prefer module imports and relative imports within a feature.
+**R-1.4** Use another feature only through its `__all__` public API.
 
 ## Naming
 
-**R-3.1** Use the feature's package name in Blender IDs and class names:
+**R-2.1** Use the feature's package name in Blender IDs and class names:
 
 | Kind | Example |
 |------|---------|
@@ -39,16 +39,15 @@ Code needed by multiple features goes in `utils/` or `ui/`.
 | Function or variable | `lower_snake_case` |
 | Constant / private helper | `ALL_CAPS` / `_helper` |
 
-**R-3.3** A panel's `bl_idname` matches its class name.
-**R-3.5** Ask before renaming public IDs or saved properties; existing files and scripts rely on them.
+**R-2.2** A panel's `bl_idname` matches its class name.
+**R-2.3** Ask before renaming public IDs or saved properties; existing files and scripts rely on them.
 
 ## Errors and output
 
-**R-9.1** Start console messages with `[AetherBlend]`.
-**R-9.2** Use `self.report({"ERROR"}, "What went wrong and what to do next")`
+**R-3.1** Start console messages with `[AetherBlend]`.
+**R-3.2** Use `self.report({"ERROR"}, "What went wrong and what to do next")`
 in operators and `print("[AetherBlend] ...")` in utilities.
-**R-9.3** Catch specific exceptions and make failures visible rather than silently continuing.
+**R-3.3** Catch specific exceptions and make failures visible rather than silently continuing.
 
-Before sharing, clean up registrations on disable (**R-2.2**), preserve user
-data (**R-2.5**) and restore any mode you changed (**R-4.6**).
+
 Follow the [Development Guide](Development-Guide) for checks and Blender testing.
