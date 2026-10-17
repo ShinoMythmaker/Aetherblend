@@ -12,8 +12,8 @@
 
 
 <p align="center">
-AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
-Note: AetherBlend is currently in beta and some features may not work as intended.
+AetherBlend is a toolkit for FFXIV modding and creative work in Blender, built with game compatibility in mind.
+Currently in beta; tools and workflows are still being refined.
 </p>
 
 <p align="center">
@@ -29,17 +29,37 @@ Note: AetherBlend is currently in beta and some features may not work as intende
 </p>
 &nbsp;
 
-## What is the goal of AetherBlend
+## About AetherBlend
 
-Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation. IK-rig pose and animation import and Aetherbridge (streaming Blender animations into the game, with lighting and camera syncing planned) are still in development, while we continue to refine our editable, modular rig templates.
+AetherBlend started as an IK rig generator and has grown into a broader toolkit for working with FFXIV in Blender. It supports both game modding and creative work in Blender, with game compatibility at the core of its design.
+
+The add-on is still in beta, and its tools and workflows are being refined.
+
+## Road to 1.0
+
+The feature scope for 1.0. Available tools are still being refined during beta.
+
+### Available in beta
+
+- [x] Full rig generation
+- [x] C+ application
+- [x] Character import
+- [x] Animation export
+- [x] GPose export
+- [x] VFX toolkits
+
+### Still to come
+
+- [ ] Animation and GPose import
+- [ ] Action Library
+- [ ] C+ export
+- [ ] AetherBridge: seamless actor streaming between FFXIV and Blender
 
 &nbsp;
 
 
 ## Acknowledgements
 - A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
-
-- [Zed](https://x.com/RoseHikari24) and [CC](https://x.com/CC_VibesXIV), two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!
 
 - [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. 
 
@@ -49,4 +69,3 @@ Our goal is to make custom FFXIV characters animation-ready in Blender: generate
 
 ---
 &nbsp; 
-
