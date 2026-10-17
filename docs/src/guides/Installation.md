@@ -10,12 +10,6 @@ summary: Requirements and how to install the add-on.
 - Rigify for rig generation. It ships with Blender but may need to be enabled
   manually.
 
-In AetherBlend's preferences, **Additional Plugins** shows Rigify as required
-for rig generation, with Meddle Tools and FFGear optional for their shader
-integrations. **Missing** means not installed; **Inactive** means installed but
-disabled in Blender. Use **Enable** to activate an installed plugin.
-FFXIV tools are available without choosing a feature set.
-
 ### Drag and drop
 The quickest way. Drag a button below into an open Blender window.
 
