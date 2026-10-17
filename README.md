@@ -10,8 +10,11 @@
 </p>
 &nbsp;
 
+
+<p align="center">
 AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
 Note: AetherBlend is currently in beta and some features may not work as intended.
+</p>
 
 <p align="center">
   <img width="100%" alt="AetherBlend showcase" src="assets/demo/showcase_low.jpg" />
