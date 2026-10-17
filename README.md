@@ -37,9 +37,9 @@ The add-on is still in beta, and its tools and workflows are being refined.
 
 ## A rig built around your character
 
-AetherBlend builds on Rigify, with substantial changes for FFXIV's armature and additional controls. It generates a metarig fitted to your character's proportions and custom scaling.
+AetherBlend adapts Rigify to FFXIV's armature, adding controls and generating a metarig fitted to your character's proportions and custom scaling.
 
-Rather than replacing the game's armature, AetherBlend links its original bones to the generated control rig. This preserves game compatibility while giving you Blender controls for posing and animation.
+The original game bones are linked to the control rig rather than replaced, preserving game compatibility while giving you Blender controls for posing and animation.
 
 <table>
   <tr>
@@ -48,22 +48,18 @@ Rather than replacing the game's armature, AetherBlend links its original bones 
     <th align="center">Spline controls</th>
   </tr>
   <tr>
-    <td width="32%" align="center"><img src="docs/assets/img/ik_demo.gif" width="260" alt="IK controls demonstration" /></td>
-    <td width="32%" align="center"><img src="docs/assets/img/heels_demo.gif" width="260" alt="Heel controls demonstration" /></td>
-    <td width="32%" align="center"><img src="docs/assets/img/spline_demo.gif" width="260" alt="Spline controls demonstration" /></td>
+    <td width="33%" align="center"><img src="docs/assets/img/ik_demo.gif" width="255" alt="IK controls demonstration" /></td>
+    <td width="33%" align="center"><img src="docs/assets/img/heels_demo.gif" width="255" alt="Heel controls demonstration" /></td>
+    <td width="33%" align="center"><img src="docs/assets/img/spline_demo.gif" width="255" alt="Spline controls demonstration" /></td>
   </tr>
-</table>
-
-### From Blender to the game
-
-<table>
   <tr>
-    <td width="32%" align="center" valign="middle">
-      <img src="docs/assets/img/gpose_demo.gif" width="260" alt="GPose export with thumbnail support demonstration" />
+    <td align="center" valign="middle">
+      <img src="docs/assets/img/gpose_demo.gif" width="255" alt="GPose export with thumbnail support demonstration" />
     </td>
-    <td valign="middle">
-      <p>Game compatibility guides how we build our tools, from pose export for GPose to animation export for modding.</p>
-      <p>Our aim is for poses and motion to look the same in Blender and in-game.</p>
+    <td colspan="2" valign="middle">
+      <h3>From Blender to the game</h3>
+      <p>Game compatibility is central to AetherBlend, including pose export for GPose and animation export for modding.</p>
+      <p>The goal is to keep poses and motion consistent between Blender and FFXIV.</p>
     </td>
   </tr>
 </table>
