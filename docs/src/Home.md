@@ -104,6 +104,28 @@
       </a>
     </div>
   </section>
+  <section class="project-support" aria-labelledby="support-project">
+      <div class="project-support-copy">
+        <h2 id="support-project">Support development</h2>
+        <p>If you'd like to support development, you can make a one-time donation through PayPal or become a member on Patreon.</p>
+        <p class="membership-note">Benefits vary by membership tier and include tutoring, credits in video guides, and recognition in the add-on's contributor list.</p>
+        <div class="project-support-actions">
+          <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC">Donate via PayPal &nearr;</a>
+          <a href="https://www.patreon.com/ShinoMythmaker">Join Patreon &nearr;</a>
+        </div>
+      </div>
+      <img src="assets/img/thank_you.png" width="1000" height="500" loading="lazy" alt="Thank you to our supporters">
+  </section>
+  <section class="project-support commissions" aria-labelledby="commissions">
+      <img src="assets/img/commissions_demo.jpg" width="612" height="343" loading="lazy" alt="A selection of character and animation work by Mythmaker Studio">
+      <div class="project-support-copy">
+        <h2 id="commissions">Need something custom?</h2>
+        <p>We create 3D renders, build custom Blender rigs and add-ons, and offer technical supervision for projects. From artwork to tools, we can help bring your ideas to life and make your workflows less tedious.</p>
+        <div class="project-support-actions">
+          <a href="https://mythmaker-studio.com">Visit Mythmaker Studio &rarr;</a>
+        </div>
+      </div>
+  </section>
   <section aria-labelledby="acknowledgements">
     <p class="eyebrow">The people behind it</p>
     <h2 id="acknowledgements">Acknowledgements</h2>

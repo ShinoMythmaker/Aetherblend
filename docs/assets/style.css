@@ -261,6 +261,18 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 .star-callout .btn { gap: 10px; }
 .star-callout svg { flex-shrink: 0; color: var(--accent); }
 .star-callout .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.project-support {
+  display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: center; gap: 40px; padding-top: 32px; border-top: 1px solid var(--border);
+}
+.project-support.commissions { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+.project-support-copy { min-width: 0; }
+.project-support-copy p { margin: 0 0 16px; }
+.project-support-copy .membership-note { color: var(--muted); font-size: .88rem; }
+.project-support > img { display: block; width: 100%; border-radius: var(--radius); }
+.project-support-actions { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.project-support-actions a { font-size: .95rem; font-weight: 600; }
+.project-support-actions a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .thanks ul { list-style: none; display: grid; gap: 12px; margin: 16px 0 0; padding: 0; }
 .thanks li { margin: 0; }
 .thanks p { margin: 0; padding: 14px 18px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); }
@@ -276,11 +288,13 @@ h2:hover .headerlink, h3:hover .headerlink { opacity: .6; }
 @media (max-width: 600px) {
   .landing { padding-right: 20px; padding-left: 20px; }
   .landing section { margin-top: 48px; }
-  .rig-demos, .roadmap, .thanks ul, .compatibility, .landing .cards { grid-template-columns: minmax(0, 1fr); }
+  .rig-demos, .roadmap, .thanks ul, .compatibility, .landing .cards,
+  .project-support, .project-support.commissions { grid-template-columns: minmax(0, 1fr); }
   .compatibility { gap: 16px; }
   .compatibility > img { max-width: 360px; justify-self: center; }
   .compatibility-copy { padding: 8px; }
   .roadmap-card { padding: 22px; }
+  .project-support { gap: 24px; }
   .hero img.logo { width: 100%; max-width: 360px; height: auto; }
 }
 
