@@ -97,4 +97,13 @@ The feature scope for 1.0. Available tools are still being refined during beta.
 - The AetherBlend, [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) communities, and my Patreon supporters, for their continued support.
 
 ---
+
+<p align="center">
+  If AetherBlend is useful to you, consider starring the repository on GitHub.<br>
+  It helps others discover the project and makes it easy to find again.
+</p>
+<p align="center">
+  <a href="https://github.com/ShinoMythmaker/Aetherblend"><img src="docs/assets/img/gib_star.gif" width="400" alt="How to star AetherBlend on GitHub" /></a>
+</p>
+
 &nbsp; 
