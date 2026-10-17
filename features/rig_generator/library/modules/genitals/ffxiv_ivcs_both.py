@@ -3,18 +3,11 @@
 import bpy
 
 from .... import definitions
-from ....rigify import settings
 from . import ffxiv_ivcs_female, ffxiv_ivcs_male
 
 
 class Module(definitions.RigModule):
     name = "XIV-IVCS Both"
-    ui_collections = settings.UI_Collections(
-        [
-            *ffxiv_ivcs_male.Module.ui_collections.collections,
-            *ffxiv_ivcs_female.Module.ui_collections.collections,
-        ]
-    )
 
     def __init__(self) -> None:
         self.parts = [ffxiv_ivcs_female.Module(), ffxiv_ivcs_male.Module()]

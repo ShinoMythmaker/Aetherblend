@@ -4,38 +4,6 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
-
-
-def _ui_collections() -> settings.UI_Collections:
-    collections: list[settings.BoneCollection] = []
-    for side in definitions.SIDES:
-        collections += [
-            settings.BoneCollection(
-                name=f"Arm{side.suffix} (IK)",
-                ui=True,
-                color_set=f"IK_{side.name}",
-                row_index=1,
-                title=f"Arm IK{side.suffix}",
-            ),
-            settings.BoneCollection(
-                name=f"Arm{side.suffix} (FK)",
-                ui=True,
-                color_set=f"FK_{side.name}",
-                row_index=2,
-                title=f"Arm FK{side.suffix}",
-                visible=False,
-            ),
-            settings.BoneCollection(
-                name=f"Arm{side.suffix} (Tweak)",
-                ui=True,
-                color_set=f"Tweak_{side.name}",
-                row_index=3,
-                title=f"Tweak{side.suffix}",
-                visible=False,
-            ),
-        ]
-    return settings.UI_Collections(collections)
 
 
 class Module(definitions.RigModule):
@@ -54,7 +22,6 @@ class Module(definitions.RigModule):
         "n_kataarmor_r",
         "n_hhiji_r",
     ]
-    ui_collections = _ui_collections()
 
     # ------------------------------------------------------------------------
 

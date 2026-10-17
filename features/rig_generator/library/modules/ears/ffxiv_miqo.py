@@ -4,16 +4,10 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
     name = "XIV-Miqo"
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(name="Head", ui=True, color_set="Head", row_index=0, title="Head", visible=True),
-        ]
-    )
 
     # ------------------------------------------------------------------------
 

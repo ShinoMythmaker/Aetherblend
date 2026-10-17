@@ -45,3 +45,13 @@ and use **Blender: Build and Start** to launch the add-on.
 
 3. In Blender, exercise the changed workflow, toggle the owning feature off and
    on, and check the system console. Static checks do not replace this test.
+
+## Curate rig UI layouts
+
+Choose **UI Layout** beside **Colorset** before generating or regenerating a rig.
+Layouts live in `features/rig_generator/library/ui_layouts/`: copy a preset's
+`BoneCollection` list and register it in that folder's `UI_LAYOUTS` dictionary.
+List order controls left-to-right order; equal `row_index` values share a row,
+and skipped row numbers add spacing. Set `title`, `color_set` and `visible`
+there, not in rig modules. Empty collections remain part of the layout;
+modules only assign bones to collections and provide their own UI flags.

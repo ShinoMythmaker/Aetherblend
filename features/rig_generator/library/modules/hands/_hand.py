@@ -6,7 +6,6 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Finger(typing.NamedTuple):
@@ -35,23 +34,6 @@ def required_bones(has_tip_bones: bool) -> list[str]:
             if has_tip_bones and finger is not THUMB:
                 bones.append(f"iv_{finger.source}_c_{side.source}")
     return bones
-
-
-def ui_collections() -> settings.UI_Collections:
-    """Build finger control collections in shared side order."""
-    return settings.UI_Collections(
-        [
-            settings.BoneCollection(
-                name=f"Fingers{side.suffix}",
-                ui=True,
-                color_set=f"Fingers_{side.name}",
-                row_index=1,
-                title=f"Fingers{side.suffix}",
-                visible=False,
-            )
-            for side in definitions.SIDES
-        ]
-    )
 
 
 class Hands(definitions.RigModule):

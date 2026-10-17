@@ -1,5 +1,5 @@
 from ...definitions import Template
-from ..modules import arms, clothing, ears, face, genitals, hair, hands, legs, mouth, spine, tail, toes, ui
+from ..modules import arms, clothing, ears, face, genitals, hair, hands, legs, mouth, spine, tail, toes
 
 FFXIV_DEFAULT = Template(
     name="FFXIV-Default",
@@ -16,6 +16,5 @@ FFXIV_DEFAULT = Template(
         [clothing.ffxiv_default],
         [tail.ffxiv_spline, tail.ffxiv_fk],
         [genitals.ffxiv_ivcs_both],
-        [ui.debug],
     ],
 )

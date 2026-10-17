@@ -6,7 +6,6 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Pattern(typing.NamedTuple):
@@ -25,14 +24,6 @@ PATTERNS = (
 
 class Module(definitions.RigModule):
     name = "XIV-Default"
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(name="Hair", ui=True, color_set="Head", row_index=1, title="Hair", visible=False),
-            settings.BoneCollection(
-                name="Accessory", ui=True, color_set="Head", row_index=1, title="Accessory", visible=False
-            ),
-        ]
-    )
 
     def __init__(self) -> None:
         self.chains: list[tuple[list[str], str]] = []

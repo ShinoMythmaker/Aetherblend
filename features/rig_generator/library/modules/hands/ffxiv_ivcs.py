@@ -36,4 +36,3 @@ class Module(_hand.Hands):
         "iv_ko_c_l",
     ]
     has_tip_bones = True
-    ui_collections = _hand.ui_collections()

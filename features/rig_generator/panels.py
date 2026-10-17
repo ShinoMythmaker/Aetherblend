@@ -73,6 +73,10 @@ class AETHER_PT_rig_generator_creation(bpy.types.Panel):
         row.label(text="Colorset", icon="COLOR")
         row.prop(aether_rig, "selected_colorset", text="")
 
+        row = layout.row(align=True)
+        row.label(text="UI Layout", icon="PRESET")
+        row.prop(aether_rig, "selected_ui_layout", text="")
+
 
 def register() -> None:
     """Register this module's classes."""

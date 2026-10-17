@@ -4,7 +4,6 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
@@ -16,11 +15,6 @@ class Module(definitions.RigModule):
         "n_sippo_d",
         "n_sippo_e",
     ]
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(name="Tail", ui=True, color_set="Torso_Tweak", row_index=1, title="Tail"),
-        ]
-    )
 
     # ------------------------------------------------------------------------
 

@@ -7,9 +7,11 @@ import bpy
 
 @dataclass
 class BoneCollection:
+    """One curated collection's Rigify display settings and initial visibility."""
+
     name: str
     ui: bool = False
-    color_set: str = None
+    color_set: str | None = None
     row_index: int = 0
     title: str = ""
     visible: bool = True
@@ -26,7 +28,7 @@ class BoneCollection:
 
         return coll
 
-    def create_ui(self, armature: bpy.types.Object) -> type[tuple[bpy.types.BoneCollection | None, bool]]:
+    def create_ui(self, armature: bpy.types.Object) -> tuple[bpy.types.BoneCollection | None, bool]:
         """Create the bone collection UI in the armature."""
         if not armature or armature.type != "ARMATURE":
             return None, False
@@ -35,38 +37,16 @@ class BoneCollection:
         show_collection = True
         if coll:
             if self.ui:
-                if self.color_set:
-                    coll.rigify_color_set_name = self.color_set
+                coll.rigify_color_set_name = self.color_set or ""
                 coll.rigify_ui_row = self.row_index
                 coll.rigify_ui_title = self.title
+            coll.is_visible = self.visible
 
             if not self.visible:
                 show_collection = False
 
             return coll, show_collection
         return None, True
-
-
-class UI_Collections:
-    collections: list[BoneCollection]
-
-    def __init__(self, collections: list[BoneCollection] | None = None) -> None:
-        self.collections = collections if collections else []
-
-    def add(self, diff: "UI_Collections") -> None:
-        """Add another UI_Collections to this one, changing row IDs to avoid conflicts."""
-        max_row_index = max((coll.row_index for coll in self.collections), default=0)
-
-        for coll in diff.collections:
-            new_coll = BoneCollection(
-                name=coll.name,
-                ui=coll.ui,
-                color_set=coll.color_set,
-                row_index=coll.row_index + max_row_index + 1,
-                title=coll.title,
-                visible=coll.visible,
-            )
-            self.collections.append(new_coll)
 
 
 @dataclass(frozen=True)

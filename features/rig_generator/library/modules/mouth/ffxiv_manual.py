@@ -4,39 +4,10 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
     name = "XIV-Manual"
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(
-                name="Face (Primary)",
-                ui=True,
-                color_set="Face_Primary",
-                row_index=1,
-                title="Face (Primary)",
-                visible=True,
-            ),
-            settings.BoneCollection(
-                name="Face (Secondary)",
-                ui=True,
-                color_set="Face_Secondary",
-                row_index=1,
-                title="Face (Secondary)",
-                visible=False,
-            ),
-            settings.BoneCollection(
-                name="Face (Misc)",
-                ui=True,
-                color_set="Face_Secondary",
-                row_index=2,
-                title="Face (Misc)",
-                visible=False,
-            ),
-        ]
-    )
 
     # ------------------------------------------------------------------------
 

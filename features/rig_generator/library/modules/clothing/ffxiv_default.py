@@ -4,7 +4,6 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
@@ -29,13 +28,6 @@ class Module(definitions.RigModule):
         "j_sk_b_b_r",
         "j_sk_b_c_r",
     ]
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(
-                name="Skirt", ui=True, color_set="Head", row_index=1, title="Skirt", visible=False
-            ),
-        ]
-    )
     ui_flags = ("Skirt Automation",)
 
     # ------------------------------------------------------------------------

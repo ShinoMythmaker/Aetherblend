@@ -41,6 +41,13 @@ class AETHER_PG_rig_generator_rig(bpy.types.PropertyGroup):
         default=0,
     )  # type: ignore
 
+    selected_ui_layout: bpy.props.EnumProperty(
+        name="UI Layout",
+        description="Bone collection layout applied when generating or regenerating the rig",
+        items=template_manager.get_ui_layout_items,
+        default=0,
+    )  # type: ignore
+
     link_inherit_scale: bpy.props.EnumProperty(
         name="LINK Inherit Scale",
         description="Inherit scale setting for LINK collection bones",

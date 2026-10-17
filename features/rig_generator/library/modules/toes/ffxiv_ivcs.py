@@ -4,7 +4,6 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
@@ -31,19 +30,6 @@ class Module(definitions.RigModule):
         "iv_asi_ko_b_l",
         "iv_asi_ko_b_r",
     ]
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(
-                name=f"IVCS_Toes{side.suffix}",
-                ui=True,
-                color_set="IVCS",
-                row_index=1,
-                title=f"Toes{side.suffix}",
-                visible=False,
-            )
-            for side in definitions.SIDES
-        ]
-    )
 
     # ------------------------------------------------------------------------
 
@@ -130,7 +116,7 @@ class Module(definitions.RigModule):
             abi.collection(
                 rig,
                 [f"Hallux_Toe{side.suffix}", f"Hallux_Toe{side.suffix}.001"],
-                f"IVCS_Toes{side.suffix}",
+                f"Toes{side.suffix}",
             )
             abi.link(rig, f"iv_asi_oya_a_{side.source}", f"DEF-Hallux_Toe{side.suffix}")
             abi.link(rig, f"iv_asi_oya_b_{side.source}", f"DEF-Hallux_Toe{side.suffix}.001")
@@ -138,7 +124,7 @@ class Module(definitions.RigModule):
             abi.collection(
                 rig,
                 [f"Index_Toe{side.suffix}", f"Index_Toe{side.suffix}.001"],
-                f"IVCS_Toes{side.suffix}",
+                f"Toes{side.suffix}",
             )
             abi.link(rig, f"iv_asi_hito_a_{side.source}", f"DEF-Index_Toe{side.suffix}")
             abi.link(rig, f"iv_asi_hito_b_{side.source}", f"DEF-Index_Toe{side.suffix}.001")
@@ -146,7 +132,7 @@ class Module(definitions.RigModule):
             abi.collection(
                 rig,
                 [f"Middle_Toe{side.suffix}", f"Middle_Toe{side.suffix}.001"],
-                f"IVCS_Toes{side.suffix}",
+                f"Toes{side.suffix}",
             )
             abi.link(rig, f"iv_asi_naka_a_{side.source}", f"DEF-Middle_Toe{side.suffix}")
             abi.link(rig, f"iv_asi_naka_b_{side.source}", f"DEF-Middle_Toe{side.suffix}.001")
@@ -154,7 +140,7 @@ class Module(definitions.RigModule):
             abi.collection(
                 rig,
                 [f"Ring_Toe{side.suffix}", f"Ring_Toe{side.suffix}.001"],
-                f"IVCS_Toes{side.suffix}",
+                f"Toes{side.suffix}",
             )
             abi.link(rig, f"iv_asi_kusu_a_{side.source}", f"DEF-Ring_Toe{side.suffix}")
             abi.link(rig, f"iv_asi_kusu_b_{side.source}", f"DEF-Ring_Toe{side.suffix}.001")
@@ -162,7 +148,7 @@ class Module(definitions.RigModule):
             abi.collection(
                 rig,
                 [f"Pinky_Toe{side.suffix}", f"Pinky_Toe{side.suffix}.001"],
-                f"IVCS_Toes{side.suffix}",
+                f"Toes{side.suffix}",
             )
             abi.link(rig, f"iv_asi_ko_a_{side.source}", f"DEF-Pinky_Toe{side.suffix}")
             abi.link(rig, f"iv_asi_ko_b_{side.source}", f"DEF-Pinky_Toe{side.suffix}.001")

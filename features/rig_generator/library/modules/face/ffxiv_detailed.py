@@ -5,36 +5,11 @@ import bpy
 from ......utils import object as object_utils
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
     name = "XIV-Default"
-    ui_flags = ["Eye Lid Edit Mode"]
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(name="Head", ui=True, color_set="Head", row_index=1, title="Head"),
-            settings.BoneCollection(
-                name="Face (Primary)",
-                ui=True,
-                color_set="Face_Primary",
-                row_index=2,
-                title="Face (Primary)",
-                visible=True,
-            ),
-            settings.BoneCollection(
-                name="Face (Secondary)",
-                ui=True,
-                color_set="Face_Secondary",
-                row_index=2,
-                title="Face (Secondary)",
-                visible=False,
-            ),
-            settings.BoneCollection(
-                name="Eyes (Macro)", ui=True, color_set="Face_Primary", row_index=3, title="Eyes (Macro)", visible=True
-            ),
-        ]
-    )
+    ui_flags = ("Eye Lid Edit Mode",)
 
     # ------------------------------------------------------------------------
 

@@ -4,23 +4,10 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
     name = "XIV-IVCS Female"
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(
-                name="Genitals (Female)",
-                ui=True,
-                color_set="IVCS",
-                row_index=1,
-                title="Genitals (Female)",
-                visible=False,
-            ),
-        ]
-    )
 
     # ------------------------------------------------------------------------
 

@@ -4,7 +4,6 @@ import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify.settings import BoneCollection, UI_Collections
 
 
 class Module(definitions.RigModule):
@@ -21,57 +20,6 @@ class Module(definitions.RigModule):
         "j_asi_d_r",
         "j_asi_e_r",
     ]
-
-    ui_collections = UI_Collections(
-        [
-            BoneCollection(
-                name="Leg.L (IK)",
-                ui=True,
-                color_set="IK_Left",
-                row_index=1,
-                title="Leg IK.L",
-            ),
-            BoneCollection(
-                name="Leg.L (FK)",
-                ui=True,
-                color_set="FK_Left",
-                row_index=2,
-                title="Leg FK.L",
-                visible=False,
-            ),
-            BoneCollection(
-                name="Leg.L (Tweak)",
-                ui=True,
-                color_set="Tweak_Left",
-                row_index=3,
-                title="Tweak.L",
-                visible=False,
-            ),
-            BoneCollection(
-                name="Leg.R (IK)",
-                ui=True,
-                color_set="IK_Right",
-                row_index=1,
-                title="Leg IK.R",
-            ),
-            BoneCollection(
-                name="Leg.R (FK)",
-                ui=True,
-                color_set="FK_Right",
-                row_index=2,
-                title="Leg FK.R",
-                visible=False,
-            ),
-            BoneCollection(
-                name="Leg.R (Tweak)",
-                ui=True,
-                color_set="Tweak_Right",
-                row_index=3,
-                title="Tweak.R",
-                visible=False,
-            ),
-        ]
-    )
 
     # ------------------------------------------------------------------------
 

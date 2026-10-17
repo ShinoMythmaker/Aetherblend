@@ -40,12 +40,18 @@ class AetherRigGenerator:
     name: str
     module_groups: list[list[RigModule]]  # instances created from the template's module classes
     color_sets: "dict[str, rigify.ColorSet]"
+    ui_layout: list[rigify.BoneCollection]
 
     def __init__(
-        self, name: str, color_sets: "dict[str, rigify.ColorSet]", modules: list[list[type[RigModule]]] | None = None
+        self,
+        name: str,
+        color_sets: "dict[str, rigify.ColorSet]",
+        ui_layout: list[rigify.BoneCollection],
+        modules: list[list[type[RigModule]]] | None = None,
     ) -> None:
         self.name = name
         self.color_sets = color_sets
+        self.ui_layout = ui_layout
         self.module_groups = [[module_class() for module_class in group] for group in (modules or []) if group]
 
     # ------------------------------
@@ -70,11 +76,7 @@ class AetherRigGenerator:
 
         self._run_meta_edit(meta_rig, valid_modules)
 
-        ui_collections = rigify.settings.UI_Collections()
-        for module in valid_modules:
-            if module.ui_collections:
-                ui_collections.add(module.ui_collections)
-        visible_collections = self._create_ui_collections(meta_rig, ui_collections)
+        visible_collections = self._create_ui_collections(meta_rig)
 
         self._run_meta_pose(meta_rig, valid_modules, original_bone_names)
         self._sort_original_bones(meta_rig)
@@ -106,6 +108,8 @@ class AetherRigGenerator:
         self._append_widgets(armature)
         self._run_final_steps(armature, state.modules)
         self._update_deform_bones(armature)
+        # Rigify can add or reorder collections; keep the curated layout authoritative.
+        state.visible_collections = self._create_ui_collections(armature)
         self._hide_generated_collections(armature, state.visible_collections)
         self._finalize_generated_rig(armature, meta_rig)
         return True
@@ -344,16 +348,21 @@ class AetherRigGenerator:
             item = armature.aether_rig.ui_flags.add()
             item.value = flag
 
-    def _create_ui_collections(
-        self, meta_rig: bpy.types.Object, ui_collections: rigify.settings.UI_Collections
-    ) -> list[bpy.types.BoneCollection]:
+    def _create_ui_collections(self, meta_rig: bpy.types.Object) -> list[bpy.types.BoneCollection]:
+        """Apply the curated layout in order, including collections without bones."""
         visible_collections: list[bpy.types.BoneCollection] = []
 
-        for collection in ui_collections.collections:
+        for collection in meta_rig.data.collections_all:
+            collection.rigify_ui_row = 0
+
+        for index, collection in enumerate(self.ui_layout):
             collection.create(meta_rig)
             bone_collection, show_collection = collection.create_ui(meta_rig)
-            if show_collection and bone_collection:
-                visible_collections.append(bone_collection)
+            if bone_collection:
+                bone_collection.parent = None
+                meta_rig.data.collections.move(meta_rig.data.collections.find(bone_collection.name), index)
+                if show_collection:
+                    visible_collections.append(bone_collection)
 
         return visible_collections
 

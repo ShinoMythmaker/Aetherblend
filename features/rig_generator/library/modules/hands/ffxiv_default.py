@@ -27,4 +27,3 @@ class Module(_hand.Hands):
         "j_ko_a_l",
         "j_ko_b_l",
     ]
-    ui_collections = _hand.ui_collections()

@@ -1,5 +1,5 @@
 from ...definitions import Template
-from ..modules import arms, clothing, ears, genitals, hair, hands, legs, spine, tail, toes, ui
+from ..modules import arms, clothing, ears, genitals, hair, hands, legs, spine, tail, toes
 
 FFXIV_PRE_DT = Template(
     name="FFXIV-PreDT",
@@ -14,6 +14,5 @@ FFXIV_PRE_DT = Template(
         [clothing.ffxiv_default],
         [tail.ffxiv_fk, tail.ffxiv_spline],
         [genitals.ffxiv_ivcs_both],
-        [ui.debug],
     ],
 )

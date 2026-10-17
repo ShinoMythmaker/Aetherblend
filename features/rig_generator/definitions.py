@@ -6,8 +6,6 @@ from typing import Literal, NamedTuple
 
 import bpy
 
-from . import rigify
-
 
 class Side(NamedTuple):
     """Naming conventions for one body side."""
@@ -31,7 +29,6 @@ class RigModule:
 
     name: str = ""
     requires: Sequence[str] = ()
-    ui_collections: rigify.settings.UI_Collections | None = None
     ui_flags: Sequence[str] = ()
 
     def missing_bones(self, available: Container[str]) -> list[str]:
@@ -74,7 +71,7 @@ class UILink:
     ui_type: UI_Type | None = "checkbox"
     ui_params: dict | None = None  # Additional parameters for the UI element
     override: Literal["EyeLidControl"] | None = (
-        None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)  # noqa: E501
+        None  # Special cases where the link doesn't directly correspond to a property (e.g. custom UI behavior for eye lid controls)
     )
 
     def eye_lid_control_draw(self, context: bpy.types.Context, layout: bpy.types.UILayout) -> None:

@@ -1,10 +1,9 @@
-"""Demonstrate visible direct calls and definitions.SIDES; see the rig-module guide."""
+"""Demonstrate direct rig instructions; collection display belongs in a UI layout."""
 
 import bpy
 
 from .... import definitions
 from .... import instructions as abi
-from ....rigify import settings
 
 
 class Module(definitions.RigModule):
@@ -15,16 +14,6 @@ class Module(definitions.RigModule):
     requires = [
         "j_example_bone",
     ]
-
-    # Bone collections shown in the rig UI.
-    ui_collections = settings.UI_Collections(
-        [
-            settings.BoneCollection(name="Demo (IK)", ui=True, color_set="IK_Left", row_index=1, title="Demo IK"),
-            settings.BoneCollection(
-                name="Demo (FK)", ui=True, color_set="FK_Left", row_index=2, title="Demo FK", visible=False
-            ),
-        ]
-    )
 
     # ------------------------------------------------------------------------
 
