@@ -1,7 +1,7 @@
 <br>
 <p align="center">
-  <img height="90" align="middle" alt="AetherBlend" src="assets/brand/Aether Blend Logo-min.png" />&nbsp;&nbsp;
-  <a href="https://shinomythmaker.github.io/Aetherblend/"><img width="180" height="52" align="middle" alt="Visit our website" src="assets/brand/btn-website.svg" /></a>
+  <img height="90" align="middle" alt="AetherBlend" src="docs/assets/img/logo.png" />&nbsp;&nbsp;
+  <a href="https://shinomythmaker.github.io/Aetherblend/"><img width="180" height="52" align="middle" alt="Visit our website" src="docs/assets/img/btn-website.svg" /></a>
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
@@ -17,15 +17,15 @@ Currently in beta; tools and workflows are still being refined.
 </p>
 
 <p align="center">
-  <img width="100%" alt="AetherBlend showcase" src="assets/demo/showcase_low.jpg" />
+  <img width="100%" alt="AetherBlend showcase" src="docs/assets/img/showcase.jpg" />
 </p>
 
 &nbsp;
 
 <p align="center">
-  <a href="https://shinomythmaker.github.io/Aetherblend/index.html"><img width="240" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>&nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="240" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>&nbsp;&nbsp;&nbsp;
-  <a href="https://discord.gg/NEF7TdXGqH"><img width="240" alt="Discord" src="assets/brand/btn-discord.svg" /></a>
+  <a href="https://shinomythmaker.github.io/Aetherblend/index.html"><img width="240" alt="Installation and Guides" src="docs/assets/img/btn-installation.svg" /></a>&nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="240" alt="Report a Bug" src="docs/assets/img/btn-bug.svg" /></a>&nbsp;&nbsp;&nbsp;
+  <a href="https://discord.gg/NEF7TdXGqH"><img width="240" alt="Discord" src="docs/assets/img/btn-discord.svg" /></a>
 </p>
 &nbsp;
 
