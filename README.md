@@ -18,13 +18,10 @@ Note: AetherBlend is currently in beta and some features may not work as intende
 &nbsp;
 
 <p align="center">
-  <a href="https://shinomythmaker.github.io/Aetherblend/"><img width="360" alt="Visit the AetherBlend website for guides and quickstarts" src="assets/brand/btn-website.svg" /></a>
-</p>
-
-<p align="center">
-  <a href="https://shinomythmaker.github.io/Aetherblend/index.html"><img width="240" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>&nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="240" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>&nbsp;&nbsp;&nbsp;
-  <a href="https://discord.gg/NEF7TdXGqH"><img width="240" alt="Discord" src="assets/brand/btn-discord.svg" /></a>
+  <a href="https://shinomythmaker.github.io/Aetherblend/index.html"><img width="180" alt="Installation and Guides" src="assets/brand/btn-installation.svg" /></a>&nbsp;&nbsp;
+  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="180" alt="Report a Bug" src="assets/brand/btn-bug.svg" /></a>&nbsp;&nbsp;
+  <a href="https://discord.gg/NEF7TdXGqH"><img width="180" alt="Discord" src="assets/brand/btn-discord.svg" /></a>&nbsp;&nbsp;
+  <a href="https://shinomythmaker.github.io/Aetherblend/"><img width="211" alt="Visit the AetherBlend website for guides and quickstarts" src="assets/brand/btn-website.svg" /></a>
 </p>
 
 ## What is the goal of AetherBlend
