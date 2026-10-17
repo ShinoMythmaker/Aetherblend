@@ -54,21 +54,19 @@ Rather than replacing the game's armature, AetherBlend links its original bones 
   </tr>
 </table>
 
-### Eye and iris controls
+### From Blender to the game
 
-The gaze control moves both the eyes and surrounding facial bones for more expressive poses. Custom iris shaders bring FFXIV's iris controls into Blender.
-
-<p align="center">
-  <img src="docs/assets/img/eyes_demo.gif" width="600" alt="Gaze and iris controls demonstration" />
-</p>
-
-### Back to GPose
-
-Export poses for use in GPose, with thumbnail support to help identify them later.
-
-<p align="center">
-  <img src="docs/assets/img/gpose_demo.gif" width="420" alt="GPose export with thumbnail support demonstration" />
-</p>
+<table>
+  <tr>
+    <td width="32%" align="center" valign="middle">
+      <img src="docs/assets/img/gpose_demo.gif" width="260" alt="GPose export with thumbnail support demonstration" />
+    </td>
+    <td valign="middle">
+      <p>Game compatibility guides how we build our tools, from pose export for GPose to animation export for modding.</p>
+      <p>Our aim is for poses and motion to look the same in Blender and in-game.</p>
+    </td>
+  </tr>
+</table>
 
 ## Road to 1.0
 
