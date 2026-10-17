@@ -2,7 +2,6 @@
 
 import bpy
 
-from ...preferences import is_set_enabled
 from ...ui.tabs import get_active_tab
 from ...ui.visibility import visible_in_current_area
 
@@ -22,9 +21,8 @@ class AETHER_PT_import_export_import(bpy.types.Panel):
     def draw(self, context: bpy.types.Context) -> None:
         layout = self.layout
 
-        if is_set_enabled("FFXIV"):
-            row = layout.row(align=True)
-            row.operator("aether.import_export_import_character", text="FFXIV Character", icon="IMPORT")
+        row = layout.row(align=True)
+        row.operator("aether.import_export_import_character", text="FFXIV Character", icon="IMPORT")
 
 
 def menu_func_import(self: bpy.types.Menu, context: bpy.types.Context) -> None:

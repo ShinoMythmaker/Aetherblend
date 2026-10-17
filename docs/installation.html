@@ -35,6 +35,20 @@
 <li>Rigify for rig generation. It ships with Blender but may need to be enabled
   manually.</li>
 </ul>
+<p>In AetherBlend's preferences, <strong>Additional Plugins</strong> shows Rigify as required
+for rig generation, with Meddle Tools and FFGear optional for their shader
+integrations. <strong>Missing</strong> means not installed; <strong>Inactive</strong> means installed but
+disabled in Blender. Use <strong>Enable</strong> to activate an installed plugin.
+FFXIV tools are available without choosing a feature set.</p>
+<h3 id="feature-toggles">Feature toggles<a class="headerlink" href="#feature-toggles" title="Permanent link">#</a></h3>
+<p>Open AetherBlend's preferences and select <strong>Features</strong> to enable or disable
+Import / Export, Rig Generator, Rig Edit, Rig UI, and Shaders. Changes take
+effect immediately and are kept when you save Blender's preferences.
+Disabled features unregister their tools, panels, and properties without deleting
+saved rig or export settings.</p>
+<p>Rig Edit and Rig UI require Rig Generator. Enabling either also enables the
+generator; disabling the generator turns both off. Import / Export and Shaders
+can be toggled separately.</p>
 <h3 id="drag-and-drop">Drag and drop<a class="headerlink" href="#drag-and-drop" title="Permanent link">#</a></h3>
 <p>The quickest way. Drag a button below into an open Blender window.</p>
 <ol>
