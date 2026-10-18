@@ -38,20 +38,21 @@ and use **Blender: Build and Start** to launch the add-on.
    change in the owning feature.
 2. Run checks from the repository root:
 
+### Check for issues
 ```powershell
 .venv\Scripts\python.exe -m ruff check .
-.venv\Scripts\python.exe -m compileall -q .
+```
+### Apply fixes Ruff can make automatically
+```powershell
+.venv\Scripts\python.exe -m ruff check --fix path\to\file.py
+```
+### Format a file
+```powershell
+.venv\Scripts\python.exe -m ruff format path\to\file.py
+```
+### Check formatting without changing files
+```powershell
+.venv\Scripts\python.exe -m ruff format --check .
 ```
 
-3. In Blender, exercise the changed workflow, toggle the owning feature off and
-   on, and check the system console. Static checks do not replace this test.
-
-## Curate rig UI layouts
-
-Choose **UI Layout** beside **Colorset** before generating or regenerating a rig.
-Layouts live in `features/rig_generator/library/ui_layouts/`: copy a preset's
-`BoneCollection` list and register it in that folder's `UI_LAYOUTS` dictionary.
-List order controls left-to-right order; equal `row_index` values share a row,
-and skipped row numbers add spacing. Set `title`, `color_set` and `visible`
-there, not in rig modules. Empty collections remain part of the layout;
-modules only assign bones to collections and provide their own UI flags.
+Instead of using `path\to\file.py` u can always use ` . ` to target the whole repository.

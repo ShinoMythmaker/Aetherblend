@@ -63,9 +63,7 @@ class Module(definitions.RigModule):
             abi.rigify.basic_super_copy(rig, f"Chest{side.suffix}", widget_type="bone")
 
         # Control collections
-        abi.collection(
-            rig, ["Spine.001", "Spine.002", "Spine.003", "Spine.004", "Chest.R", "Chest.L"], "Torso"
-        )
+        abi.collection(rig, ["Spine.001", "Spine.002", "Spine.003", "Spine.004", "Chest.R", "Chest.L"], "Torso")
         abi.collection(rig, ["Neck", "Head"], "Head")
         abi.collection(rig, ["n_hara_retarget"], "MCH")
 

@@ -56,29 +56,35 @@ and use <strong>Blender: Build and Start</strong> to launch the add-on.</p>
    change in the owning feature.</li>
 <li>Run checks from the repository root:</li>
 </ol>
+<h3 id="check-for-issues">Check for issues<a class="headerlink" href="#check-for-issues" title="Permanent link">#</a></h3>
 <div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">.</span>
-<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">compileall</span> <span class="n">-q</span> <span class="p">.</span>
 </code></pre></div>
 
-<ol>
-<li>In Blender, exercise the changed workflow, toggle the owning feature off and
-   on, and check the system console. Static checks do not replace this test.</li>
-</ol>
-<h2 id="curate-rig-ui-layouts">Curate rig UI layouts<a class="headerlink" href="#curate-rig-ui-layouts" title="Permanent link">#</a></h2>
-<p>Choose <strong>UI Layout</strong> beside <strong>Colorset</strong> before generating or regenerating a rig.
-Layouts live in <code>features/rig_generator/library/ui_layouts/</code>: copy a preset's
-<code>BoneCollection</code> list and register it in that folder's <code>UI_LAYOUTS</code> dictionary.
-List order controls left-to-right order; equal <code>row_index</code> values share a row,
-and skipped row numbers add spacing. Set <code>title</code>, <code>color_set</code> and <code>visible</code>
-there, not in rig modules. Empty collections remain part of the layout;
-modules only assign bones to collections and provide their own UI flags.</p>
+<h3 id="apply-fixes-ruff-can-make-automatically">Apply fixes Ruff can make automatically<a class="headerlink" href="#apply-fixes-ruff-can-make-automatically" title="Permanent link">#</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">-</span><span class="n">-fix</span> <span class="n">path</span><span class="p">\</span><span class="n">to</span><span class="p">\</span><span class="n">file</span><span class="p">.</span><span class="n">py</span>
+</code></pre></div>
+
+<h3 id="format-a-file">Format a file<a class="headerlink" href="#format-a-file" title="Permanent link">#</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">format</span> <span class="n">path</span><span class="p">\</span><span class="n">to</span><span class="p">\</span><span class="n">file</span><span class="p">.</span><span class="n">py</span>
+</code></pre></div>
+
+<h3 id="check-formatting-without-changing-files">Check formatting without changing files<a class="headerlink" href="#check-formatting-without-changing-files" title="Permanent link">#</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">format</span> <span class="p">-</span><span class="n">-check</span> <span class="p">.</span>
+</code></pre></div>
+
+<p>Instead of using <code>path\to\file.py</code> u can always use <code>.</code> to target the whole repository.</p>
 <div class="page-nav"><a class="prev" href="installation.html"><small>Previous</small>Installation</a><a class="next" href="documenting-guide.html"><small>Next</small>Documenting Guide</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>
 <li><a href="#set-up">Set up</a></li>
-<li><a href="#make-and-validate-a-change">Make and validate a change</a></li>
-<li><a href="#curate-rig-ui-layouts">Curate rig UI layouts</a></li>
+<li><a href="#make-and-validate-a-change">Make and validate a change</a><ul>
+<li><a href="#check-for-issues">Check for issues</a></li>
+<li><a href="#apply-fixes-ruff-can-make-automatically">Apply fixes Ruff can make automatically</a></li>
+<li><a href="#format-a-file">Format a file</a></li>
+<li><a href="#check-formatting-without-changing-files">Check formatting without changing files</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </aside>

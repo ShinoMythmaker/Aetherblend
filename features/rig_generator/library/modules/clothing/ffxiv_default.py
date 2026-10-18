@@ -358,8 +358,7 @@ class Module(definitions.RigModule):
                 "rotation_quaternion",
                 index=3,
                 expression=(
-                    f"((RotZ {sideways_comparison} 0) * ({middle_sign}RotZ * sk_auto) "
-                    "/ (1 + (abs(RotZ) - 0.1) * 1))"
+                    f"((RotZ {sideways_comparison} 0) * ({middle_sign}RotZ * sk_auto) / (1 + (abs(RotZ) - 0.1) * 1))"
                 ),
                 variables={"RotZ": thigh_sideways, "sk_auto": automation},
             )
