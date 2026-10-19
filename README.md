@@ -92,9 +92,11 @@ The feature scope for 1.0. Available tools are still being refined during beta.
 
 - [PassiveModding](https://github.com/PassiveModding), creator of [Meddle](https://github.com/PassiveModding/Meddle) and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), for tools that helped inspire AetherBlend.
 
+- [Kaj](https://github.com/kajupe), creator of [FFGear](https://github.com/kajupe/FFGear), for letting us implement it into AetherBlend aswell as consulting.
+
 - [sleepybunny](https://github.com/sleepybnuuy), whose [bustomize](https://github.com/sleepybnuuy/bustomize) provided the foundation for AetherBlend's C+ application.
 
-- The AetherBlend, [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) communities, and my Patreon supporters, for their continued support.
+- The AetherBlend, [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) communities, and our Patreon supporters, for their continued support.
 
 ---
 

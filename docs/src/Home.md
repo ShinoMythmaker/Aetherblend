@@ -133,9 +133,10 @@
       <p class="thanks-featured">A special thank you to <a href="https://github.com/ExplosiveOats">Oats</a>, co-developer, for the care and dedication she brings to AetherBlend and its community. I'm deeply grateful she joined the team and that we get to build this project together.</p>
       <ul>
         <li><p><a href="https://github.com/PassiveModding">PassiveModding</a>, creator of <a href="https://github.com/PassiveModding/Meddle">Meddle</a> and <a href="{{meddle_github}}">Meddle Tools</a>, for tools that helped inspire AetherBlend.</p></li>
+        <li><p><a href="https://github.com/kajupe">Kaj</a>, creator of <a href="https://github.com/kajupe/FFGear">FFGear</a>, for letting us implement it into AetherBlend aswell as consulting.</p></li>
         <li><p><a href="https://github.com/sleepybnuuy">sleepybunny</a>, whose <a href="https://github.com/sleepybnuuy/bustomize">bustomize</a> provided the foundation for AetherBlend's C+ application.</p></li>
+        <li><p>The AetherBlend, <a href="https://github.com/MekuMaki/Mektools">Mektools</a> and <a href="https://github.com/ShinoMythmaker/Myth-Tools">Mythtools</a> communities, and our Patreon supporters, for their continued support.</p></li>
       </ul>
-      <p class="thanks-community">The AetherBlend, <a href="https://github.com/MekuMaki/Mektools">Mektools</a> and <a href="https://github.com/ShinoMythmaker/Myth-Tools">Mythtools</a> communities, and my Patreon supporters, for their continued support.</p>
     </div>
   </section>
 </div>
