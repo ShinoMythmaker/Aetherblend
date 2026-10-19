@@ -13,7 +13,7 @@ Use this checklist for a code change. For Doc and site work, see the
 
 ## Set up
 
-Install Git, Python 3.11+, Blender {{blender_min}}+ and
+Install Git, Python 3.13+, Blender {{blender_min}}+ and
 [VS Code](https://code.visualstudio.com/) with the Python extension.
 
 ```powershell
@@ -26,7 +26,6 @@ python -m venv .venv
 ```
 
 Use your fork URL when appropriate. The final command downloads the add-on's
-bundled wheels; rerun it when the manifest dependencies change.
 
 In VS Code, select `.venv` with **Python: Select Interpreter**. For Blender
 integration, install the [Blender Development extension](https://marketplace.visualstudio.com/items?itemName=JacquesLucke.blender-development)

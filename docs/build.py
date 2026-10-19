@@ -6,7 +6,9 @@ Run from anywhere with ``python docs/build.py``. Requires the ``markdown`` and `
 
 import html
 import json
+import os
 import re
+import sys
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
@@ -67,7 +69,7 @@ def load_pages() -> tuple[Page, ...]:
         if "group" not in meta:
             continue
         if path.stem in names:
-            raise SystemExit(f"Duplicate page name '{path.stem}': {names[path.stem]} and {path}")
+            raise ValueError(f"Duplicate page name '{path.stem}': {names[path.stem]} and {path}")
         names[path.stem] = path
         pages.append(
             Page(
@@ -90,10 +92,20 @@ def read_manifest() -> dict[str, str]:
     return dict(re.findall(r'^(\w+)\s*=\s*"([^"]*)"', text, re.M))
 
 
-MANIFEST = read_manifest()
-VERSION = MANIFEST["version"]
-BLENDER_MIN = ".".join(MANIFEST["blender_version_min"].split(".")[:2])
+MANIFEST: dict[str, str] = {}
+FACTS: dict[str, str] = {}
+PAGES: tuple[Page, ...] = ()
+GROUPS: dict[str, tuple[Page, ...]] = {}
+SLUGS: dict[str, str] = {}
 MASTER_REPO_JSON = "https://raw.githubusercontent.com/ShinoMythmaker/FFXIV-Blender-Plugins/refs/heads/main/repo.json"
+
+
+def print_status(message: str, color: str = "36", *, error: bool = False) -> None:
+    """Print a build status message with color when the output supports it."""
+    stream = sys.stderr if error else sys.stdout
+    use_color = (stream.isatty() or os.environ.get("GITHUB_ACTIONS") == "true") and "NO_COLOR" not in os.environ
+    text = f"[build.py] {message}"
+    print(f"\033[{color}m{text}\033[0m" if use_color else text, file=stream)
 
 
 def version_key(version: str) -> tuple[int, ...]:
@@ -136,31 +148,13 @@ def release_facts() -> dict[str, str]:
                 raise ValueError(f"No compatible release found for {plugin_id}.")
             best = max(usable, key=lambda entry: version_key(entry["version"]))
             facts[f"{prefix}latest_zip" if prefix else "latest_release_zip"] = best["archive_url"]
-            facts[f"{prefix}latest_repo" if prefix else "latest_release_repo"] = drag_link(
-                best["archive_url"], best["blender_version_min"]
-            )
+            facts[f"{prefix}latest_repo" if prefix else "latest_release_repo"] = drag_link(best["archive_url"], best["blender_version_min"])
             if prefix:
                 facts[f"{prefix}version"] = best["version"]
                 facts[f"{prefix}github"] = best["website"].rstrip("/")
         return facts
     except (OSError, ValueError, KeyError, TypeError) as error:
-        raise SystemExit(f"[AetherBlend] Could not load release metadata: {error}") from error
-
-
-FACTS = {
-    "ab_version": VERSION,
-    "blender_min": BLENDER_MIN,
-    "ab_github": REPO_URL,
-    **release_facts(),
-}
-PAGES = load_pages()
-GROUPS: dict[str, tuple[Page, ...]] = {}
-for _page in PAGES:
-    GROUPS[_page.group] = (*GROUPS.get(_page.group, ()), _page)
-SLUGS = {page.name.lower(): page.slug for page in PAGES}
-SLUGS["home"] = "index"
-for _page in PAGES:
-    SLUGS.update({alias.lower(): _page.slug for alias in _page.aliases})
+        raise ValueError(f"Could not load release metadata: {error}") from error
 
 
 def apply_facts(text: str) -> str:
@@ -298,8 +292,7 @@ def build_index() -> str:
     title, text = split_title(home, "AetherBlend")
     body, _ = render_markdown(text)
     cards = "".join(
-        f'<a class="card" href="{page.slug}.html"><h3>{html.escape(page.title)}</h3>'
-        f"<p>{html.escape(page.summary)}</p></a>"
+        f'<a class="card" href="{page.slug}.html"><h3>{html.escape(page.title)}</h3><p>{html.escape(page.summary)}</p></a>'
         for page in PAGES
         if page.summary
     )
@@ -310,18 +303,51 @@ def build_index() -> str:
     return shell(title, content)
 
 
-def main() -> None:
-    """Generate every page and the code highlighting stylesheet."""
-    (DOCS / "assets" / "pygments.css").write_text(
-        HtmlFormatter(style="github-dark").get_style_defs(".codehilite"), encoding="utf-8"
-    )
-    for old in DOCS.glob("*.html"):
-        old.unlink()
-    (DOCS / "index.html").write_text(build_index(), encoding="utf-8")
-    for page in PAGES:
-        (DOCS / f"{page.slug}.html").write_text(build_page(page), encoding="utf-8")
-    print(f"[AetherBlend] Built {len(PAGES) + 1} pages in {DOCS}")
+def main() -> int:
+    """Generate the site, report progress, and return an exit code."""
+    global MANIFEST, FACTS, PAGES, GROUPS, SLUGS
+
+    stage = "reading the Blender manifest"
+    print_status("Building documentation...")
+    try:
+        MANIFEST = read_manifest()
+        stage = "loading release metadata"
+        print_status("Loading variable data (release metadata)...")
+        FACTS = {
+            "ab_version": MANIFEST["version"],
+            "blender_min": ".".join(MANIFEST["blender_version_min"].split(".")[:2]),
+            "ab_github": REPO_URL,
+            **release_facts(),
+        }
+        stage = "discovering documentation pages"
+        PAGES = load_pages()
+        GROUPS = {}
+        SLUGS = {page.name.lower(): page.slug for page in PAGES}
+        SLUGS["home"] = "index"
+        for page in PAGES:
+            GROUPS[page.group] = (*GROUPS.get(page.group, ()), page)
+            SLUGS.update({alias.lower(): page.slug for alias in page.aliases})
+
+        stage = "writing the highlighting stylesheet"
+        (DOCS / "assets" / "pygments.css").write_text(HtmlFormatter(style="github-dark").get_style_defs(".codehilite"), encoding="utf-8")
+        stage = "removing previous HTML pages"
+        for old in DOCS.glob("*.html"):
+            old.unlink()
+
+        stage = "building index.html"
+        print_status("Building index.html...")
+        (DOCS / "index.html").write_text(build_index(), encoding="utf-8")
+        for page in PAGES:
+            stage = f"building {page.slug}.html"
+            print_status(f"Building {page.slug}.html...")
+            (DOCS / f"{page.slug}.html").write_text(build_page(page), encoding="utf-8")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print_status(f"FAILED while {stage}: {exc}", "31", error=True)
+        return 1
+
+    print_status("SUCCESS: Documentation built.", "32")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
