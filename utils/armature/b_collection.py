@@ -15,11 +15,7 @@ def _get_collection_bone_names(armature: bpy.types.Object, collection_name: str)
         return bone_names
 
     if armature.mode.startswith("EDIT"):
-        return {
-            bone.name
-            for bone in armature.data.edit_bones
-            if any(coll.name == collection_name for coll in bone.collections)
-        }
+        return {bone.name for bone in armature.data.edit_bones if any(coll.name == collection_name for coll in bone.collections)}
 
     return set()
 
@@ -44,6 +40,10 @@ def assign_bones(armature: bpy.types.Object, bone_names: list[str], collection_n
 def get_bones(armature: bpy.types.Object, collection_name: str) -> dict[str, bpy.types.Bone]:
     """Return a dictionary of bone names to data bones contained within a collection."""
     bone_names = _get_collection_bone_names(armature, collection_name)
-    return {
-        bone_name: armature.data.bones.get(bone_name) for bone_name in bone_names if bone_name in armature.data.bones
-    }
+    return {bone_name: armature.data.bones.get(bone_name) for bone_name in bone_names if bone_name in armature.data.bones}
+
+
+def get_pose_bones(armature: bpy.types.Object, collection_name: str) -> dict[str, bpy.types.PoseBone]:
+    """Return pose bones assigned to the named bone collection."""
+    bone_names = _get_collection_bone_names(armature, collection_name)
+    return {bone_name: armature.pose.bones.get(bone_name) for bone_name in bone_names if bone_name in armature.pose.bones}

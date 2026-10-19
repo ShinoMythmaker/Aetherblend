@@ -59,12 +59,20 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
         name="Meddle Import", subtype="DIR_PATH", description="Select the default directory for importing Meddle files"
     )  # type: ignore
 
+    default_cplus_import_path: StringProperty(
+        name="C+ Import", subtype="DIR_PATH", description="Select the default directory for importing MCDF files"
+    )  # type: ignore
+
     default_pose_export_path: StringProperty(
         name="Pose Export", subtype="DIR_PATH", description="Select the default directory for saving pose files"
     )  # type: ignore
 
     default_anim_export_path: StringProperty(
         name="Anim Export", subtype="DIR_PATH", description="Select the default directory for saving animation files"
+    )  # type: ignore
+
+    default_vfx_export_path: StringProperty(
+        name="VFX Export", subtype="DIR_PATH", description="Select the default directory for saving VFX files"
     )  # type: ignore
 
     # default_pose_import_path: StringProperty(
@@ -131,9 +139,11 @@ class AetherBlendPreferences(bpy.types.AddonPreferences):
             box = layout.box()
             box.label(text="Default File Paths", icon="FILE_FOLDER")
             box.prop(self, "default_meddle_import_path")
+            box.prop(self, "default_cplus_import_path")
             # box.prop(self, "default_pose_import_path")
             box.prop(self, "default_pose_export_path")
             box.prop(self, "default_anim_export_path")
+            box.prop(self, "default_vfx_export_path")
 
         elif self.tabs == "CONTRIBUTION":
             main_box = layout.box()

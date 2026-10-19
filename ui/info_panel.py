@@ -36,9 +36,7 @@ class AETHER_PT_ui_info(bpy.types.Panel):
     def draw(self, context: bpy.types.Context) -> None:
         layout = self.layout
 
-        layout.operator(
-            "wm.url_open", text="Support & Links", icon="HEART"
-        ).url = "https://www.patreon.com/ShinoMythmaker"
+        layout.operator("wm.url_open", text="Support & Links", icon="HEART").url = "https://www.patreon.com/ShinoMythmaker"
 
         row = layout.row()
         row.operator("wm.url_open", text="Wiki", icon="HELP").url = f"{GITHUB_URL}/wiki"
@@ -59,8 +57,12 @@ class AETHER_PT_ui_info(bpy.types.Panel):
             rig_id = armature.data.get("rig_id")
             has_rig_id = rig_id is not None
 
-        split = layout.split(factor=0.25, align=True)
+        split = layout.split(factor=0.2, align=True)
         split.prop_enum(tabs, active_tab_prop, "IMPORT_EXPORT", icon="FILE", text="")
+        split = split.split(factor=0.25, align=True)
+        col = split.column(align=True)
+        col.enabled = has_armature
+        col.prop_enum(tabs, active_tab_prop, "CPLUS", icon="MODIFIER", text="")
         split = split.split(factor=0.333, align=True)
         col = split.column(align=True)
         col.enabled = has_armature

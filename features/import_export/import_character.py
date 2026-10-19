@@ -25,14 +25,10 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         description="The glTF format requires discontinuous normals, UVs, and other vertex attributes to be stored as separate vertices, as required for rendering on typical graphics hardware. This option attempts to combine co -located vertices where possible. Currently cannot combine verts with different normals.",  # noqa: E501
         default=False,
     )  # type: ignore
-    s_import_collection: BoolProperty(
-        name="Import-Collection", description="Stores all import in a seperatre Collection", default=True
-    )  # type: ignore
+    s_import_collection: BoolProperty(name="Import-Collection", description="Stores all import in a seperatre Collection", default=True)  # type: ignore
 
     s_merge_skin: BoolProperty(name="Merge Skin", description="Merges all skin objects", default=True)  # type: ignore
-    s_merge_by_material: BoolProperty(
-        name="Merge by Material", description="Merges all objects with the same material", default=True
-    )  # type: ignore
+    s_merge_by_material: BoolProperty(name="Merge by Material", description="Merges all objects with the same material", default=True)  # type: ignore
 
     s_import_with_meddle_shaders: BoolProperty(
         name="Use Meddle Shaders",
@@ -60,6 +56,11 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
     )  # type: ignore
     s_apply_pose_track: BoolProperty(
         name="Apply Pose Track", description="Applies the pose track to the rest pose on Import", default=False
+    )  # type: ignore
+    s_create_backup_armature: BoolProperty(
+        name="Create Backup Armature",
+        description="Create a backup armature for C+ reversion after import",
+        default=True,
     )  # type: ignore
 
     # Bone Axis Orientation (FBX-style)
@@ -191,6 +192,10 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         split.label(text=" ")
         split.prop(self, "s_apply_pose_track")
 
+        split = col.split(factor=indent)
+        split.label(text=" ")
+        split.prop(self, "s_create_backup_armature")
+
         # Bone Orientation Section
         box = layout.box()
         row = box.row()
@@ -218,9 +223,7 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         bpy.context.window.cursor_set("WAIT")
 
         if not self.filepath or not (
-            self.filepath.lower().endswith(".gltf")
-            or self.filepath.lower().endswith(".glb")
-            or self.filepath.lower().endswith(".fbx")
+            self.filepath.lower().endswith(".gltf") or self.filepath.lower().endswith(".glb") or self.filepath.lower().endswith(".fbx")
         ):
             self.report({"ERROR"}, "[AetherBlend] Invalid file format. Please select a .gltf, .glb, or .fbx file.")
             return {"CANCELLED"}
@@ -248,24 +251,16 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
                 ok = utils.object.import_meddle_shader(self.filepath, imported_objects)
                 meddle_shader_ok = bool(ok)
                 if not ok:
-                    self.report(
-                        {"WARNING"}, "[AetherBlend] Meddle shader import skipped or failed; keeping default shaders"
-                    )
+                    self.report({"WARNING"}, "[AetherBlend] Meddle shader import skipped or failed; keeping default shaders")
             except Exception as e:
-                self.report(
-                    {"ERROR"}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}"
-                )
+                self.report({"ERROR"}, f"[AetherBlend] Failed to import Meddle shaders. Applying default shaders instead: {e}")
         if self.s_import_with_ffgear_shaders:
             try:
                 ok = utils.object.import_ffgear_shader(self.filepath, imported_objects)
                 if not ok:
-                    self.report(
-                        {"WARNING"}, "[AetherBlend] FFGear shader import skipped or failed; keeping default shaders"
-                    )
+                    self.report({"WARNING"}, "[AetherBlend] FFGear shader import skipped or failed; keeping default shaders")
             except Exception as e:
-                self.report(
-                    {"ERROR"}, f"[AetherBlend] Failed to import FFGear Shaders. Applying default shaders instead: {e}"
-                )
+                self.report({"ERROR"}, f"[AetherBlend] Failed to import FFGear Shaders. Applying default shaders instead: {e}")
 
         bpy.ops.object.select_all(action="DESELECT")
 
@@ -280,9 +275,7 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
 
             # Apply bone axis conversion if enabled
             if self.use_bone_axis_conversion:
-                utils.axis_conversion.apply_bone_axis_to_armature(
-                    armature, self.primary_bone_axis, self.secondary_bone_axis
-                )
+                utils.axis_conversion.apply_bone_axis_to_armature(armature, self.primary_bone_axis, self.secondary_bone_axis)
 
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode="EDIT")
@@ -290,7 +283,20 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
             bpy.ops.armature.assign_to_collection(new_collection_name="Original")
             bpy.ops.object.mode_set(mode="OBJECT")
 
+            cplus = getattr(armature, "aether_cplus", None)
+            if cplus:
+                cplus.cplus_primary_axis = self.primary_bone_axis if self.use_bone_axis_conversion else "Y"
+                cplus.cplus_secondary_axis = self.secondary_bone_axis if self.use_bone_axis_conversion else "X"
+
             utils.object.select_only(armature)
+
+            if self.s_create_backup_armature:
+                try:
+                    result = bpy.ops.aether.create_backup_armature("EXEC_DEFAULT")
+                    if "FINISHED" not in result:
+                        self.report({"WARNING"}, "[AetherBlend] Character imported, but C+ backup creation did not finish")
+                except RuntimeError as exc:
+                    self.report({"WARNING"}, f"[AetherBlend] Character imported, but C+ backup creation failed: {exc}")
 
             if meddle_shader_ok and self.s_import_ab_iris_shader:
                 try:

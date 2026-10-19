@@ -74,6 +74,44 @@ def find_meshes(armature: bpy.types.Object) -> list[bpy.types.Object]:
     return meshes
 
 
+def unparent_all_bones(armature: bpy.types.Object) -> None:
+    """Temporarily unparent every edit bone in the armature."""
+    original_mode = armature.mode
+    _select_single(armature)
+    bpy.ops.object.mode_set(mode="EDIT")
+    try:
+        for bone in armature.data.edit_bones:
+            bone.parent = None
+    finally:
+        bpy.ops.object.mode_set(mode=original_mode)
+
+
+def snapshot_parenting(armature: bpy.types.Object) -> dict[str, str | None]:
+    """Return the parent name for every bone in the armature."""
+    original_mode = armature.mode
+    _select_single(armature)
+    bpy.ops.object.mode_set(mode="EDIT")
+    try:
+        return {bone.name: bone.parent.name if bone.parent else None for bone in armature.data.edit_bones}
+    finally:
+        bpy.ops.object.mode_set(mode=original_mode)
+
+
+def restore_bone_parenting(armature: bpy.types.Object, parent_map: dict[str, str | None]) -> None:
+    """Restore bone parenting from a mapping returned by snapshot_parenting."""
+    original_mode = armature.mode
+    _select_single(armature)
+    bpy.ops.object.mode_set(mode="EDIT")
+    try:
+        edit_bones = armature.data.edit_bones
+        for bone_name, parent_name in parent_map.items():
+            bone = edit_bones.get(bone_name)
+            if bone:
+                bone.parent = edit_bones.get(parent_name) if parent_name else None
+    finally:
+        bpy.ops.object.mode_set(mode=original_mode)
+
+
 def _apply_as_shapekey(
     mesh_obj: bpy.types.Object,
     armature_obj: bpy.types.Object,
@@ -111,9 +149,7 @@ def _apply_as_shapekey(
     bpy.ops.object.mode_set(mode=original_mode)
 
 
-def apply_all_as_shapekey(
-    armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True
-) -> list:
+def apply_all_as_shapekey(armature_obj: bpy.types.Object, shapekey_name: str = "Armature_Shapekey", disable_all: bool = True) -> list:
     """Apply armature modifiers as shapekeys to all meshes using this armature."""
     meshes = find_meshes(armature_obj)
     for mesh_obj in meshes:
@@ -193,9 +229,7 @@ def exist(armature: bpy.types.Object, bone_names: list[str]) -> bool:
     return all(armature.data.bones.get(name) is not None for name in bone_names)
 
 
-def _iter_channelbag_fcurves(
-    action: bpy.types.Action, anim_data: bpy.types.AnimData
-) -> Iterator[tuple[Any, bpy.types.FCurve]]:
+def _iter_channelbag_fcurves(action: bpy.types.Action, anim_data: bpy.types.AnimData) -> Iterator[tuple[Any, bpy.types.FCurve]]:
     """Yield (channelbag, fcurve) pairs, supporting both legacy and Blender 4.4+ layered actions."""
     # Legacy actions (Blender < 4.4) expose fcurves directly on the action.
     legacy_fcurves = getattr(action, "fcurves", None)
@@ -230,11 +264,7 @@ def delete_keyframes(armature: bpy.types.Object, bone_names: list[str]) -> None:
         for suffix in ("location", "rotation_euler", "rotation_quaternion", "scale"):
             data_paths.add(f"{base}.{suffix}")
 
-    to_remove = [
-        (fcurves_coll, fc)
-        for fcurves_coll, fc in _iter_channelbag_fcurves(action, anim_data)
-        if fc.data_path in data_paths
-    ]
+    to_remove = [(fcurves_coll, fc) for fcurves_coll, fc in _iter_channelbag_fcurves(action, anim_data) if fc.data_path in data_paths]
     for fcurves_coll, fc in to_remove:
         fcurves_coll.remove(fc)
 
@@ -289,9 +319,7 @@ def remove_copy_rotation_constraints(armature: bpy.types.Object, bone_names: lis
             pose_bone.constraints.remove(constraint)
 
 
-def bone_chain(
-    armature: bpy.types.Object, reference_bone_names: list[str], prefix: str = "", parent_bone: str | None = None
-) -> list[str]:
+def bone_chain(armature: bpy.types.Object, reference_bone_names: list[str], prefix: str = "", parent_bone: str | None = None) -> list[str]:
     """Create a bone chain from reference bones and return the new names."""
     if not reference_bone_names:
         return []

@@ -51,6 +51,29 @@ def uses_armature(obj: bpy.types.Object, armature: bpy.types.Object) -> bool:
     return False
 
 
+def remove_shapekey(
+    obj: bpy.types.Object,
+    shapekey_name: str,
+    enable_backup: bool = False,
+    backup_shapekey_name: str | None = None,
+) -> None:
+    """Remove a shape key and optionally unmute a backup key afterward."""
+    if obj.type != "MESH" or not obj.data.shape_keys:
+        return
+
+    if enable_backup:
+        backup = obj.data.shape_keys.key_blocks.get(backup_shapekey_name) if backup_shapekey_name else None
+        if backup:
+            backup.mute = False
+        else:
+            for key_block in obj.data.shape_keys.key_blocks:
+                key_block.mute = False
+
+    shapekey = obj.data.shape_keys.key_blocks.get(shapekey_name)
+    if shapekey:
+        obj.shape_key_remove(shapekey)
+
+
 def has_material_property(obj: bpy.types.Object, property_name: str, property_value: Any = None) -> bool:
     """Return True if object has a material with the given custom property value."""
     if not obj.data or not hasattr(obj.data, "materials"):

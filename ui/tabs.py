@@ -5,9 +5,10 @@ from bpy.props import EnumProperty
 
 TAB_ITEMS = [
     ("IMPORT_EXPORT", "Import/Export", "Import and Export tools", "IMPORT", 0),
-    ("GENERATE", "Generate", "Rig generation tools", "ARMATURE_DATA", 1),
-    ("RIG_LAYERS", "Rig Layers", "Rig layers", "BONE_DATA", 2),
-    ("RIG_UI", "Rig UI", "Rig UI and bake settings", "PROPERTIES", 3),
+    ("CPLUS", "C+", "Customize Plus tools", "MODIFIER", 1),
+    ("GENERATE", "Generate", "Rig generation tools", "ARMATURE_DATA", 2),
+    ("RIG_LAYERS", "Rig Layers", "Rig layers", "BONE_DATA", 3),
+    ("RIG_UI", "Rig UI", "Rig UI and bake settings", "PROPERTIES", 4),
 ]
 
 
