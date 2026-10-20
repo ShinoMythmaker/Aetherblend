@@ -13,31 +13,38 @@ class Module(definitions.RigModule):
 
     name = "FFXIV Player Ears"
     _enabled: bool = False
+    _earring_enabled: bool = False
     _default_enabled: bool = False
     _viera_enabled: bool = False
     _prefix: str = ""
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+
+        """Create controls for common earring bones"""
+        common_earring_bones = [f"n_ear_{segment}_{side.source}" for side in definitions.SIDES for segment in "ab"]
+        self._earring_bones_enabled = abi.require_bones(rig, common_earring_bones, self.name)
+        if self._earring_bones_enabled:
+            for side in definitions.SIDES:
+                abi.extend(rig,
+                    f"EarRing_A{side.suffix}",
+                    f"n_ear_a_{side.source}",
+                    start_point="head",
+                    axis="-X",
+                    parent=["Head", "j_kao"]                
+                )
+                abi.extend(rig,
+                    f"EarRing_B{side.suffix}",
+                    f"n_ear_b_{side.source}",
+                    start_point="head",
+                    axis="-X",
+                    parent=["EarRing_A{side.suffix}", f"n_ear_a_{side.source}"]
+                )
+
         """Create default controls and, when selected, two-bone Viera chains."""
         self._enabled = self._default_enabled = self._viera_enabled = False
         self._prefix = ""
         if self.toggles is None:
             raise ValueError(f"{self.name} requires template toggles with an ears property")
-        for side in definitions.SIDES:
-            abi.extend(rig,
-                f"EarRing_A{side.suffix}",
-                f"n_ear_a_{side.source}",
-                start_point="head",
-                axis="-X",
-                parent=["Head", "j_kao"]                
-            )
-            abi.extend(rig,
-                f"EarRing_B{side.suffix}",
-                f"n_ear_b_{side.source}",
-                start_point="head",
-                axis="-X",
-                parent=["EarRing_A{side.suffix}", f"n_ear_a_{side.source}"]
-            )
         if self.toggles.ears == "NONE":
             return
         if self.toggles.ears not in {"DEFAULT", "VIERA"}:
@@ -84,13 +91,14 @@ class Module(definitions.RigModule):
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
         """Configure controls and map only the selected ears to deform bones."""
-        for side in definitions.SIDES:
-            abi.rigify.basic_super_copy(rig, f"EarRing_A{side.suffix}", widget_type="bone"),
-            abi.collection(rig, [f"EarRing_A{side.suffix}"], "Accessory"),
-            abi.link(rig, f"n_ear_a_{side.source}", f"DEF-EarRing_A{side.suffix}")
-            abi.rigify.basic_super_copy(rig, f"EarRing_B{side.suffix}", widget_type="bone"),
-            abi.collection(rig, [f"EarRing_B{side.suffix}"], "Accessory"),
-            abi.link(rig, f"n_ear_b_{side.source}", f"DEF-EarRing_B{side.suffix}")
+        if self._earring_bones_enabled:
+            for side in definitions.SIDES:
+                abi.rigify.basic_super_copy(rig, f"EarRing_A{side.suffix}", widget_type="bone"),
+                abi.collection(rig, [f"EarRing_A{side.suffix}"], "Accessory"),
+                abi.link(rig, f"n_ear_a_{side.source}", f"DEF-EarRing_A{side.suffix}")
+                abi.rigify.basic_super_copy(rig, f"EarRing_B{side.suffix}", widget_type="bone"),
+                abi.collection(rig, [f"EarRing_B{side.suffix}"], "Accessory"),
+                abi.link(rig, f"n_ear_b_{side.source}", f"DEF-EarRing_B{side.suffix}")
         if not self._enabled:
             return
         for side in definitions.SIDES:
