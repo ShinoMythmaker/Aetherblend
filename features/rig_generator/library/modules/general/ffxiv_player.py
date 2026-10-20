@@ -13,4 +13,4 @@ class Module(definitions.RigModule):
 
     def final_pose(self, rig: bpy.types.Object) -> None:
         """Set the generated root control's widget scale."""
-        abi.widget(rig, "root", scale_factor=0.2)
+        abi.widget(rig, "root",widget_name="AB_WGT_logo_ffxiv")
