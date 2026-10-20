@@ -1,0 +1,10 @@
+.*
+*/.*
+tests/*
+docs/*
+get_dependencies.py
+README.md
+repo.json
+ruff.toml
+release_ignore
+*__pycache__*

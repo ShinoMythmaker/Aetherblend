@@ -1,138 +1,141 @@
+"""Customize+ panels for C+ import, application, and axis conversion."""
+
 import bpy
-from ...properties.tab_prop import get_active_tab
-from ...utils.ui_visibility import visible_in_current_area
+
+from ...ui.tabs import get_active_tab
+from ...ui.visibility import visible_in_current_area
+
 
 class AETHER_PT_CustomizePlus(bpy.types.Panel):
+    """Provide Customize+ controls for the active armature."""
+
     bl_label = "Customize Plus"
     bl_idname = "AETHER_PT_customize_plus"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'  
-    bl_category = 'AetherBlend'
-    bl_order = 2 
-    
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AetherBlend"
+    bl_order = 2
+
     @classmethod
-    def poll(cls, context):
-        if not visible_in_current_area(context):
-            return False
-        if get_active_tab(context) != 'CPLUS':
-            return False
-
+    def poll(cls, context: bpy.types.Context) -> bool:
+        """Show this panel for armatures with C+ settings in the C+ tab."""
         armature = context.active_object
-        return (
-            armature is not None 
-            and armature.type == 'ARMATURE'
-            and getattr(armature, 'aether_cplus', None)
+        return bool(
+            visible_in_current_area(context)
+            and get_active_tab(context) == "CPLUS"
+            and armature is not None
+            and armature.type == "ARMATURE"
+            and getattr(armature, "aether_cplus", None)
         )
-    
-    def draw(self, context):
+
+    def draw(self, context: bpy.types.Context) -> None:
+        """Draw the C+ import and apply controls."""
         armature = context.active_object
-        if not armature or armature.type != 'ARMATURE':
+        if armature is None or armature.type != "ARMATURE":
             return
-        cplus = getattr(armature, 'aether_cplus', None)
-        aether_rig = getattr(armature, 'aether_rig', None)
 
-
+        settings = armature.aether_cplus
         layout = self.layout
-        col = layout.column(align=True)
+        column = layout.column(align=True)
+        if armature.data.collections.get("Original") is None:
+            row = column.box().row()
+            row.alignment = "CENTER"
+            row.label(text="Missing Original Bone Collection", icon="ERROR")
+            return
 
-        if armature.data.collections.get("Original") is None:   ## This check should later be not needed, the Original Bone col should not be a requirement for rig manipulation. Instead we should use deform bones
-            box = col.box()
-            box_row = box.row()
-            box_row.alignment = 'CENTER'
-            box_row.label(text="Missing Original Bone Collection", icon="ERROR")
-        else:
+        import_row = column.row(align=True)
+        import_row.operator("aether.paste_cplus_from_clipboard", text="Clipboard", icon="PASTEDOWN")
+        import_row.operator("aether.parse_cplus_from_mcdf", text="MCDF", icon="IMPORT")
 
-            import_row = col.row(align=True)
-            import_row.operator("aether.paste_cplus_from_clipboard", text="Clipboard", icon="PASTEDOWN")
-            import_row.operator("aether.parse_cplus_from_mcdf", text="MCDF", icon="IMPORT")
+        column.separator()
+        code_row = column.row(align=True)
+        label_column = code_row.column(align=True)
+        label_column.scale_x = 0.8
+        label_column.label(text="C+ String")
+        field_column = code_row.column(align=True)
+        field_column.scale_x = 1.2
+        field_column.prop(settings, "code", text="")
 
-            col.separator()
-
-            row = col.row(align=True)
-            label_col = row.column(align=True)
-            label_col.scale_x = 0.8
-            label_col.label(text="C+ String")
-            
-            field_col = row.column(align=True)
-            field_col.scale_x = 1.2
-            field_col.prop(cplus, "code", text="")
-
-            if (bool(cplus.code)):
-                col.separator()
-                box = col.box()
-                box_row = box.row()
-                box_row.alignment = 'CENTER'
-                if(cplus.applied):
-                    box_row.label(text="C+ currently applied", icon="RECORD_ON")
-                else:
-                    box_row.label(text="C+ not applied", icon="PAUSE")
-
-            col.separator()
-
-            row = col.row(align=True)
-            if aether_rig.rigified:
-                row = col.row(align=True)
-                row.operator("aether.clean_up_rig", text="Clean Up Rig", icon="BRUSH_DATA")
+        if settings.code:
+            column.separator()
+            status = column.box().row()
+            status.alignment = "CENTER"
+            if settings.applied:
+                status.label(text="C+ currently applied", icon="RECORD_ON")
             else:
-                ref_col = row.column(align=True)
-                ref_col.scale_x = 2.0
-                if cplus.backup_armature:
-                    ref_col.operator("aether.create_backup_armature", text="Update Backup", icon="RECOVER_LAST")
-                else:
-                    ref_col.operator("aether.create_backup_armature", text="Create Backup", icon="DUPLICATE")
-                
-                arrow_col = row.column(align=True)
-                arrow_col.scale_x = 0.3
-                arrow_col.label(text="→")
+                status.label(text="C+ not applied", icon="PAUSE")
 
-                cplus_col = row.column(align=True)
-                cplus_col.scale_x = 2.0
+        column.separator()
+        rig_settings = getattr(armature, "aether_rig", None)
+        if rig_settings and rig_settings.rigified:
+            column.operator("aether.rig_generator_clean_up", text="Clean Up Rig", icon="BRUSH_DATA")
+            return
 
-                cplus_col.enabled = bool(cplus.code) and bool(cplus.backup_armature)
-                if cplus.applied:
-                    cplus_col.operator("aether.revert_cplus_to_backup", text="Revert to Backup", icon="LOOP_BACK")
-                else:
-                    cplus_col.operator("aether.q_apply_cplus_string", text="Quick Apply", icon="CHECKBOX_HLT")
+        actions = column.row(align=True)
+        backup_column = actions.column(align=True)
+        backup_column.scale_x = 2.0
+        if settings.backup_armature:
+            backup_column.operator("aether.create_backup_armature", text="Update Backup", icon="RECOVER_LAST")
+        else:
+            backup_column.operator("aether.create_backup_armature", text="Create Backup", icon="DUPLICATE")
+
+        arrow_column = actions.column(align=True)
+        arrow_column.scale_x = 0.3
+        arrow_column.label(text="→")
+
+        apply_column = actions.column(align=True)
+        apply_column.scale_x = 2.0
+        apply_column.enabled = bool(settings.code) and bool(settings.backup_armature)
+        if settings.applied:
+            apply_column.operator("aether.revert_cplus_to_backup", text="Revert", icon="LOOP_BACK")
+        else:
+            apply_column.operator("aether.q_apply_cplus_string", text="Quick Apply", icon="CHECKBOX_HLT")
 
 
 class AETHER_PT_CustomizePlus_AxisConversion(bpy.types.Panel):
+    """Configure the axes associated with the imported character."""
+
     bl_label = "Axis Conversion"
     bl_idname = "AETHER_PT_customize_plus_axis_conversion"
     bl_parent_id = "AETHER_PT_customize_plus"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AetherBlend"
 
     @classmethod
-    def poll(cls, context):
-        if not visible_in_current_area(context):
-            return False
-        if get_active_tab(context) != 'CPLUS':
-            return False
-
+    def poll(cls, context: bpy.types.Context) -> bool:
+        """Show axis settings when an armature has an Original collection."""
         armature = context.active_object
-        return (
-            armature is not None
-            and armature.type == 'ARMATURE'
-            and getattr(armature, 'aether_cplus', None)
+        return bool(
+            visible_in_current_area(context)
+            and get_active_tab(context) == "CPLUS"
+            and armature is not None
+            and armature.type == "ARMATURE"
+            and getattr(armature, "aether_cplus", None)
             and armature.data.collections.get("Original") is not None
         )
 
-    def draw(self, context):
+    def draw(self, context: bpy.types.Context) -> None:
+        """Draw the C+ axis selection controls."""
         armature = context.active_object
-        cplus = getattr(armature, 'aether_cplus', None)
-        if not cplus:
+        settings = getattr(armature, "aether_cplus", None)
+        if settings is None:
             return
+        column = self.layout.column(align=True)
+        column.prop(settings, "cplus_primary_axis", text="Primary")
+        column.prop(settings, "cplus_secondary_axis", text="Secondary")
 
-        layout = self.layout
-        col = layout.column(align=True)
-        col.prop(cplus, "cplus_primary_axis", text="Primary")
-        col.prop(cplus, "cplus_secondary_axis", text="Secondary")
 
-def register():
-    bpy.utils.register_class(AETHER_PT_CustomizePlus)
-    bpy.utils.register_class(AETHER_PT_CustomizePlus_AxisConversion)
+CLASSES = (AETHER_PT_CustomizePlus, AETHER_PT_CustomizePlus_AxisConversion)
 
-def unregister():
-    bpy.utils.unregister_class(AETHER_PT_CustomizePlus_AxisConversion)
-    bpy.utils.unregister_class(AETHER_PT_CustomizePlus) 
+
+def register() -> None:
+    """Register C+ panels."""
+    for cls in CLASSES:
+        bpy.utils.register_class(cls)
+
+
+def unregister() -> None:
+    """Unregister C+ panels."""
+    for cls in reversed(CLASSES):
+        bpy.utils.unregister_class(cls)

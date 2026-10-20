@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Development Guide · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Guides</a>
+    <a href="development-guide.html">Development</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a href="index.html#support-project">Support</a>
+    <a href="https://mythmaker-studio.com/">Studio</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<h4>Development</h4>
+<a href="development-guide.html" class="active">Development Guide</a>
+<a href="documenting-guide.html" class="">Documenting Guide</a>
+<a href="style-guide.html" class="">Style Guide</a></aside>
+<main><article>
+<h1>Development Guide</h1>
+<p>Use this checklist for a code change. For Doc and site work, see the
+<a href="documenting-guide.html">Documenting Guide</a>; code conventions are in the
+<a href="style-guide.html">Style Guide</a>.</p>
+<h2 id="set-up">Set up<a class="headerlink" href="#set-up" title="Permanent link">#</a></h2>
+<p>Install Git, Python 3.13+, Blender 5.2+ and
+<a href="https://code.visualstudio.com/">VS Code</a> with the Python extension.</p>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ShinoMythmaker/Aetherblend.git
+<span class="nb">cd</span><span class="w"> </span>Aetherblend
+git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span>my-change
+</code></pre></div>
+
+<p>Use your fork URL when appropriate.</p>
+<h3 id="1-create-the-virtual-environment">1. Create the virtual environment<a class="headerlink" href="#1-create-the-virtual-environment" title="Permanent link">#</a></h3>
+<p>From the repository root:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</code></pre></div>
+
+<p>On Linux/macOS, use <code>python3</code> if <code>python</code> isn't available:</p>
+<div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</code></pre></div>
+
+<h3 id="2-select-it-in-vs-code">2. Select it in VS Code<a class="headerlink" href="#2-select-it-in-vs-code" title="Permanent link">#</a></h3>
+<ol>
+<li>Open the Command Palette with <strong>Ctrl+Shift+P</strong> / <strong>Cmd+Shift+P</strong>.</li>
+<li>Run <strong>Python: Select Interpreter</strong>.</li>
+<li>Select the interpreter inside <code>.venv</code>.</li>
+<li>Run <strong>Terminal: Create New Terminal</strong>. With automatic environment activation
+   enabled, VS Code activates <code>.venv</code> in that new terminal.</li>
+</ol>
+<p>Verify that the terminal uses the environment:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import sys; print(sys.executable)"</span>
+</code></pre></div>
+
+<p>The printed path should point inside <code>.venv</code>.</p>
+<p>Selecting the interpreter doesn't necessarily activate an already-open
+terminal - open a new one afterward.</p>
+<h3 id="3-install-dependencies">3. Install dependencies<a class="headerlink" href="#3-install-dependencies" title="Permanent link">#</a></h3>
+<p>In that activated terminal:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip<span class="w"> </span>ruff<span class="w"> </span>tomli-w<span class="w"> </span>markdown<span class="w"> </span>pygments<span class="w"> </span>fake-bpy-module
+python<span class="w"> </span>get_dependencies.py
+</code></pre></div>
+
+<p>The final command downloads the add-on's dependency wheels.</p>
+<p>For Blender integration, install the <a href="https://marketplace.visualstudio.com/items?itemName=JacquesLucke.blender-development">Blender Development extension</a>
+and use <strong>Blender: Build and Start</strong> to launch the add-on.</p>
+<h2 id="make-and-validate-a-change">Make and validate a change<a class="headerlink" href="#make-and-validate-a-change" title="Permanent link">#</a></h2>
+<ol>
+<li>Read the relevant <a href="style-guide.html">Style Guide</a> rules and make one focused
+   change in the owning feature.</li>
+<li>Run checks from the repository root in the activated terminal:</li>
+</ol>
+<h3 id="check-for-issues">Check for issues<a class="headerlink" href="#check-for-issues" title="Permanent link">#</a></h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>.
+</code></pre></div>
+
+<h3 id="apply-fixes-ruff-can-make-automatically">Apply fixes Ruff can make automatically<a class="headerlink" href="#apply-fixes-ruff-can-make-automatically" title="Permanent link">#</a></h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>--fix<span class="w"> </span>path/to/file.py
+</code></pre></div>
+
+<h3 id="format-a-file">Format a file<a class="headerlink" href="#format-a-file" title="Permanent link">#</a></h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>path/to/file.py
+</code></pre></div>
+
+<h3 id="check-formatting-without-changing-files">Check formatting without changing files<a class="headerlink" href="#check-formatting-without-changing-files" title="Permanent link">#</a></h3>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>--check<span class="w"> </span>.
+</code></pre></div>
+
+<p>Instead of using <code>path/to/file.py</code>, you can use <code>.</code> to target the whole repository.</p>
+<div class="page-nav"><a class="prev" href="installation.html"><small>Previous</small>Installation</a><a class="next" href="documenting-guide.html"><small>Next</small>Documenting Guide</a></div>
+</article></main>
+<aside class="toc-col"><h4>On this page</h4><div class="toc">
+<ul>
+<li><a href="#set-up">Set up</a><ul>
+<li><a href="#1-create-the-virtual-environment">1. Create the virtual environment</a></li>
+<li><a href="#2-select-it-in-vs-code">2. Select it in VS Code</a></li>
+<li><a href="#3-install-dependencies">3. Install dependencies</a></li>
+</ul>
+</li>
+<li><a href="#make-and-validate-a-change">Make and validate a change</a><ul>
+<li><a href="#check-for-issues">Check for issues</a></li>
+<li><a href="#apply-fixes-ruff-can-make-automatically">Apply fixes Ruff can make automatically</a></li>
+<li><a href="#format-a-file">Format a file</a></li>
+<li><a href="#check-formatting-without-changing-files">Check formatting without changing files</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

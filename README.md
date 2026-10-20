@@ -1,65 +1,117 @@
 <br>
 <p align="center">
-<img height="90rem" alt="AetherBlend" src="assets/brand/Aether Blend Logo-min.png" />
+  <img height="90" align="middle" alt="AetherBlend" src="docs/assets/img/logo.png" />&nbsp;&nbsp;
+  <a href="https://shinomythmaker.github.io/Aetherblend/"><img width="180" height="52" align="middle" alt="Visit our website" src="docs/assets/img/btn-website.svg" /></a>
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/v/release/ShinoMythmaker/Aetherblend?label=Version&color=blue">
     <img src="https://img.shields.io/badge/Blender-5.2.0%2B-orange">
     <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC"><img alt="Sponsor Badge" src="https://img.shields.io/badge/MythmakerStudio-Sponsor-pink?style=flat"></a>
 </p>
+&nbsp;
 
-
-  
-
-<h3 align="center">
-    <img src="assets/brand/blender-orange.svg" width="20" height="20" alt=""><a href="https://github.com/ShinoMythmaker/Aetherblend/releases/download/v0.3.7/Aetherblend-v0.3.7.zip?repository=https%3A%2F%2Fraw.githubusercontent.com%2FShinoMythmaker%2FFFXIV-Blender-Plugins%2Frefs%2Fheads%2Fmain%2Frepo.json&blender_version_min=5.2.0">  Drag and Drop into Blender</a>
-</h3>
-
-
-AetherBlend is a plugin designed for posing and animation of character models from Final Fantasy XIV in Blender.
-Note: AetherBlend is currently in beta and some features may not work as intended.
 
 <p align="center">
-  <img width="100%" alt="AetherBlend showcase" src="assets/demo/showcase_low.jpg" />
+AetherBlend is a toolkit for FFXIV modding and creative work in Blender, built with game compatibility in mind.
+Currently in beta; tools and workflows are still being refined.
+</p>
+
+<p align="center">
+  <img width="100%" alt="AetherBlend showcase" src="docs/assets/img/showcase.jpg" />
 </p>
 
 &nbsp;
 
-## What is the goal of AetherBlend
-
-Our goal is to make custom FFXIV characters animation-ready in Blender: generate a character-scaled, industry-standard rig while preserving modding and GPosing support. AetherBlend also includes tools for FFXIV VFX creation. IK-rig pose and animation import and Aetherbridge (streaming Blender animations into the game, with lighting and camera syncing planned) are still in development, while we continue to refine our editable, modular rig templates.
-
-
-&nbsp;
-
-## Setup and Getting Started 
-- [Installation Guide](https://github.com/ShinoMythmaker/Aetherblend/wiki/Installation)
-- [Getting Started (WIP)](https://github.com/ShinoMythmaker/Aetherblend/wiki/How-to-AetherBlend-(Alpha))
-&nbsp;
-
-&nbsp;
-
-## Support & Feedback
-
-- Make sure to submit [Issues & Suggestions](https://github.com/ShinoMythmaker/Aetherblend/issues) directly on Github.
-- Check the [wiki](https://github.com/ShinoMythmaker/Aetherblend/wiki/Home) for useful information!
-- To stay up to date or find out more about development, join our [Discord]( https://discord.gg/NEF7TdXGqH)!
-<p><a href="https://discord.gg/NEF7TdXGqH"><img width="100%" alt="7x76q43c9jn51" src="assets/brand/Discord Banner-min.png" /></a>
-    
+<p align="center">
+  <a href="https://shinomythmaker.github.io/Aetherblend/index.html"><img width="240" alt="Installation and Guides" src="docs/assets/img/btn-installation.svg" /></a>&nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/ShinoMythmaker/Aetherblend/issues"><img width="240" alt="Report a Bug" src="docs/assets/img/btn-bug.svg" /></a>&nbsp;&nbsp;&nbsp;
+  <a href="https://discord.gg/NEF7TdXGqH"><img width="240" alt="Discord" src="docs/assets/img/btn-discord.svg" /></a>
 </p>
 &nbsp;
 
+## About AetherBlend
+
+AetherBlend started as an IK rig generator and has grown into a broader toolkit for working with FFXIV in Blender. It supports both game modding and creative work in Blender, with game compatibility at the core of its design.
+
+The add-on is still in beta, and its tools and workflows are being refined.
+
+## A rig built around your character
+
+AetherBlend adapts Rigify to FFXIV's armature, adding controls and generating a metarig fitted to your character's proportions and custom scaling.
+
+The original game bones are linked to the control rig rather than replaced, preserving game compatibility while giving you Blender controls for posing and animation.
+
+<table width="100%">
+  <tr>
+    <th align="center">IK controls</th>
+    <th align="center">Heel controls</th>
+    <th align="center">Spline controls</th>
+  </tr>
+  <tr>
+    <td width="33%" align="center"><img src="docs/assets/img/ik_demo.gif" width="100%" alt="IK controls demonstration" /></td>
+    <td width="33%" align="center"><img src="docs/assets/img/heels_demo.gif" width="100%" alt="Heel controls demonstration" /></td>
+    <td width="33%" align="center"><img src="docs/assets/img/spline_demo.gif" width="100%" alt="Spline controls demonstration" /></td>
+  </tr>
+  <tr>
+    <td align="center" valign="middle">
+      <img src="docs/assets/img/gpose_demo.gif" width="100%" alt="GPose export with thumbnail support demonstration" />
+    </td>
+    <td colspan="2" valign="middle">
+      <h3>Blender-FFXIV backwards compatible</h3>
+      <p>Game compatibility is central to AetherBlend, including pose export for GPose and animation export for modding.</p>
+      <p>The goal is to keep poses and motion consistent between Blender and FFXIV.</p>
+    </td>
+  </tr>
+</table>
+
+## Road to 1.0
+
+The feature scope for 1.0. Available tools are still being refined during beta.
+
+### Available in beta
+
+- [x] Character import
+- [x] C+ application
+- [x] Full rig generation
+- [x] GPose export
+- [x] Animation export
+- [x] VFX toolkits
+
+### Still to come
+
+- [ ] Animation and GPose import
+- [ ] Action Library
+- [ ] C+ export
+- [ ] AetherBridge: seamless actor streaming between FFXIV and Blender
+
 &nbsp;
+
+
 ## Acknowledgements
-💖 A heartfelt thank you to [Oats](https://github.com/ExplosiveOats), my official Co-Dev. Working with her on developing and maintaining AetherBlend has been an absolute privilege. She played a crucial role in getting our beta release across the finish line and continues to go above and beyond helping our community members on Discord every single day. I genuinely couldn't have done this without her, and I'm incredibly excited for everything we'll accomplish together!
+- A special thank you to [Oats](https://github.com/ExplosiveOats), co-developer, for the care and dedication she brings to AetherBlend and its community. I'm deeply grateful she joined the team and that we get to build this project together.
 
-💖 [Zed](https://x.com/RoseHikari24) and [CC](https://x.com/CC_VibesXIV), two of my very closest friends that let me yap for countless hours about issues with this project and kept motivating me to go on. Really without them I think I wouldnt have finished it, thank you!
+- [PassiveModding](https://github.com/PassiveModding), creator of [Meddle](https://github.com/PassiveModding/Meddle) and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), for tools that helped inspire AetherBlend.
 
-💖 [PassiveModding](https://github.com/PassiveModding) - Thanks for [Meddle](https://github.com/PassiveModding/Meddle), and [Meddle Tools](https://github.com/PassiveModding/MeddleTools), while not being a requirement, these tools brought me back to actually bringing my characters into Blender and making me want to create a better Animation solution. 
+- [Kaj](https://github.com/kajupe), creator of [FFGear](https://github.com/kajupe/FFGear), for letting us implement it into AetherBlend aswell as consulting.
 
-💖 [sleepybunny](https://github.com/sleepybnuuy) for providing an excellent base for the C+ application with [bustomize](https://github.com/sleepybnuuy/bustomize)
+- [sleepybunny](https://github.com/sleepybnuuy), whose [bustomize](https://github.com/sleepybnuuy/bustomize) provided the foundation for AetherBlend's C+ application.
 
-💖 Ofcourse everyone that showed interest in not only AetherBlend but also [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) aswell as all my supporters on Patreon. I have pushed content creation away just to work on these other tools, yet you kept supporting me and im more then thankfull for that!
+- The AetherBlend, [Mektools](https://github.com/MekuMaki/Mektools) and [Mythtools](https://github.com/ShinoMythmaker/Myth-Tools) communities, and our Patreon supporters, for their continued support.
 
 ---
-&nbsp; 
+
+<table width="100%">
+  <tr>
+    <td width="35%" align="center" valign="middle">
+      <a href="https://github.com/ShinoMythmaker/Aetherblend"><img src="docs/assets/img/gib_star.gif" width="100%" alt="How to star AetherBlend on GitHub" /></a>
+    </td>
+    <td valign="middle">
+      <p>If AetherBlend is useful to you, consider starring the repository on GitHub. It helps others discover the project and makes it easy to find again.</p>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <a href="https://aetherblend.mythmaker-studio.com/">AetherBlend</a> made by <a href="https://mythmaker-studio.com/">Mythmaker Studio</a><br>
+  <em>Available for commissions</em>
+</p>

@@ -1,0 +1,142 @@
+# AetherBlend – FFXIV modding and creative work in Blender
+
+<section class="hero">
+  <img class="logo" src="assets/img/logo.png" alt="AetherBlend">
+  <div><span class="badge">Blender {{blender_min}}+ &middot; v{{ab_version}} &middot; Beta</span></div>
+  <p class="lead">AetherBlend is a toolkit for FFXIV modding and creative work in Blender, built with game compatibility in mind.</p>
+  <p class="note">Currently in beta; tools and workflows are still being refined.</p>
+  <div class="btn-row">
+    <a class="drop-link large" href="{{latest_release_repo}}" draggable="true"
+       title="Drag this button into a Blender window to install">Drag into Blender</a>
+    <a class="btn" href="Installation">Installation guide</a>
+    <a class="btn" href="{{ab_github}}">View on GitHub</a>
+  </div>
+</section>
+
+<div class="landing">
+  <div class="showcase"><img src="assets/img/showcase.jpg" alt="AetherBlend showcase"></div>
+  <section aria-labelledby="about">
+    <p class="eyebrow">The project</p>
+    <h2 id="about">About AetherBlend</h2>
+    <p>AetherBlend started as an IK rig generator and has grown into a broader toolkit for working with FFXIV in Blender. It supports both game modding and creative work in Blender, with game compatibility at the core of its design.</p>
+    <p class="section-note">The add-on is still in beta, and its tools and workflows are being refined.</p>
+  </section>
+  <section aria-labelledby="character-rig">
+    <p class="eyebrow">Rigging &amp; animation</p>
+    <h2 id="character-rig">A rig built around your character</h2>
+    <p>AetherBlend adapts Rigify to FFXIV's armature, adding controls and generating a metarig fitted to your character's proportions and custom scaling.</p>
+    <p>The original game bones are linked to the control rig rather than replaced, preserving game compatibility while giving you Blender controls for posing and animation.</p>
+    <div class="rig-demos">
+      <figure class="demo-card">
+        <figcaption>IK controls</figcaption>
+        <img src="assets/img/ik_demo.gif" width="500" height="500" loading="lazy" alt="IK controls demonstration">
+      </figure>
+      <figure class="demo-card">
+        <figcaption>Heel controls</figcaption>
+        <img src="assets/img/heels_demo.gif" width="500" height="500" loading="lazy" alt="Heel controls demonstration">
+      </figure>
+      <figure class="demo-card">
+        <figcaption>Spline controls</figcaption>
+        <img src="assets/img/spline_demo.gif" width="500" height="500" loading="lazy" alt="Spline controls demonstration">
+      </figure>
+    </div>
+    <div class="compatibility">
+      <img src="assets/img/gpose_demo.gif" width="500" height="500" loading="lazy" alt="GPose export with thumbnail support demonstration">
+      <div class="compatibility-copy">
+        <p class="eyebrow">Game compatibility</p>
+        <h3>Blender-FFXIV backwards compatible</h3>
+        <p>Game compatibility is central to AetherBlend, including pose export for GPose and animation export for modding.</p>
+        <p>The goal is to keep poses and motion consistent between Blender and FFXIV.</p>
+      </div>
+    </div>
+  </section>
+  <section aria-labelledby="roadmap">
+    <p class="eyebrow">Development</p>
+    <h2 id="roadmap">Road to 1.0</h2>
+    <p>The feature scope for 1.0. Available tools are still being refined during beta.</p>
+    <div class="roadmap">
+      <div class="roadmap-card available">
+        <span class="status-label">Available in beta</span>
+        <h3>What you can use today</h3>
+        <ul>
+          <li>Character import</li>
+          <li>C+ application</li>
+          <li>Full rig generation</li>
+          <li>GPose export</li>
+          <li>Animation export</li>
+          <li>VFX toolkits</li>
+        </ul>
+      </div>
+      <div class="roadmap-card planned">
+        <span class="status-label">Still to come</span>
+        <h3>Planned for 1.0</h3>
+        <ul>
+          <li>Animation and GPose import</li>
+          <li>Action Library</li>
+          <li>C+ export</li>
+          <li>AetherBridge <small>Seamless actor streaming between FFXIV and Blender</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section>
+    <h2>Documentation</h2>
+    <!-- documentation-cards -->
+  </section>
+  <section>
+    <h2>Support &amp; Feedback</h2>
+    <div class="cards support">
+      <a class="card" href="https://discord.gg/NEF7TdXGqH"><span class="ico ico-chat"></span><h3>Join the Discord</h3>
+        <p>Ask questions, share your work and follow development.</p></a>
+      <a class="card" href="{{ab_github}}/issues"><span class="ico ico-bug"></span><h3>Report a bug</h3>
+        <p>Found something broken? Open an issue on GitHub.</p></a>
+      <a class="card" href="{{ab_github}}/issues"><span class="ico ico-idea"></span><h3>Suggest a feature</h3>
+        <p>Tell us what would make AetherBlend better for you.</p></a>
+    </div>
+    <div class="star-callout">
+      <div>
+        <h3>Finding AetherBlend useful?</h3>
+        <p>Consider starring the repository on GitHub. It helps others discover the project and makes it easy to find again.</p>
+      </div>
+      <a class="btn" href="{{ab_github}}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3 2.8 5.7 6.3.9-4.5 4.4 1.1 6.2-5.7-3-5.7 3 1.1-6.2-4.5-4.4 6.3-.9Z"/></svg>
+        Star on GitHub
+      </a>
+    </div>
+  </section>
+  <section class="project-support" aria-labelledby="support-project">
+      <div class="project-support-copy">
+        <h2 id="support-project">Support development</h2>
+        <p>If you'd like to support development, you can make a one-time donation through PayPal or become a member on Patreon.</p>
+        <p class="membership-note">Benefits vary by membership tier and include tutoring, credits in video guides, and recognition in the add-on's contributor list.</p>
+        <div class="project-support-actions">
+          <a href="https://www.paypal.com/donate/?hosted_button_id=VVSSL3GDRSBNC">Donate via PayPal &nearr;</a>
+          <a href="https://www.patreon.com/ShinoMythmaker">Join Patreon &nearr;</a>
+        </div>
+      </div>
+      <img src="assets/img/thank_you.png" width="1000" height="500" loading="lazy" alt="Thank you to our supporters">
+  </section>
+  <section class="project-support commissions" aria-labelledby="commissions">
+      <img src="assets/img/commissions_demo.jpg" width="612" height="343" loading="lazy" alt="A selection of character and animation work by Mythmaker Studio">
+      <div class="project-support-copy">
+        <h2 id="commissions">Need something custom?</h2>
+        <p>We create 3D renders, build custom Blender rigs and add-ons, and offer technical supervision for projects. From artwork to tools, we can help bring your ideas to life and make your workflows less tedious.</p>
+        <div class="project-support-actions">
+          <a href="https://mythmaker-studio.com">Visit Mythmaker Studio &rarr;</a>
+        </div>
+      </div>
+  </section>
+  <section aria-labelledby="acknowledgements">
+    <p class="eyebrow">The people behind it</p>
+    <h2 id="acknowledgements">Acknowledgements</h2>
+    <div class="thanks">
+      <p class="thanks-featured">A special thank you to <a href="https://github.com/ExplosiveOats">Oats</a>, co-developer, for the care and dedication she brings to AetherBlend and its community. I'm deeply grateful she joined the team and that we get to build this project together.</p>
+      <ul>
+        <li><p><a href="https://github.com/PassiveModding">PassiveModding</a>, creator of <a href="https://github.com/PassiveModding/Meddle">Meddle</a> and <a href="{{meddle_github}}">Meddle Tools</a>, for tools that helped inspire AetherBlend.</p></li>
+        <li><p><a href="https://github.com/kajupe">Kaj</a>, creator of <a href="https://github.com/kajupe/FFGear">FFGear</a>, for letting us implement it into AetherBlend aswell as consulting.</p></li>
+        <li><p><a href="https://github.com/sleepybnuuy">sleepybunny</a>, whose <a href="https://github.com/sleepybnuuy/bustomize">bustomize</a> provided the foundation for AetherBlend's C+ application.</p></li>
+        <li><p>The AetherBlend, <a href="https://github.com/MekuMaki/Mektools">Mektools</a> and <a href="https://github.com/ShinoMythmaker/Myth-Tools">Mythtools</a> communities, and our Patreon supporters, for their continued support.</p></li>
+      </ul>
+    </div>
+  </section>
+</div>
