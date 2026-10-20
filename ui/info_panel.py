@@ -39,7 +39,7 @@ class AETHER_PT_ui_info(bpy.types.Panel):
         layout.operator("wm.url_open", text="Support & Links", icon="HEART").url = "https://www.patreon.com/ShinoMythmaker"
 
         row = layout.row()
-        row.operator("wm.url_open", text="Wiki", icon="HELP").url = f"{GITHUB_URL}/wiki"
+        row.operator("wm.url_open", text="Wiki", icon="HELP").url = "https://aetherblend.mythmaker-studio.com/index.html"
         row.operator("wm.url_open", text="Issues", icon="BOOKMARKS").url = f"{GITHUB_URL}/issues"
 
         # Tab selector

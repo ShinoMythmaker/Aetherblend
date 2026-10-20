@@ -20,7 +20,7 @@ class AETHER_PG_ffxiv_player_toggles(bpy.types.PropertyGroup):
         default="DEFAULT",
     )  # type: ignore
     viera_variant: bpy.props.EnumProperty(
-        name="Viera Variant",
+        name="Eartype",
         description="Viera ear chains generated alongside available default ear controls",
         items=[
             ("A", "A", "Viera ears using j_zera bones"),
@@ -40,21 +40,15 @@ class AETHER_PG_ffxiv_player_toggles(bpy.types.PropertyGroup):
         ],
         default="AUTO",
     )  # type: ignore
-    content: bpy.props.EnumProperty(
-        name="Content",
-        description="Whether to generate genital controls",
-        items=[("SFW", "SFW", "Do not generate genital controls"), ("NSFW", "NSFW", "Generate the selected genital controls")],
-        default="SFW",
-    )  # type: ignore
     sex: bpy.props.EnumProperty(
         name="Sex",
-        description="Anatomy generated in NSFW mode",
+        description="Genital controls to generate when IVCS is enabled",
         items=[
-            ("BOTH", "Both", "Generate all available male and female anatomy"),
-            ("MALE", "Male", "Generate only male anatomy"),
-            ("FEMALE", "Female", "Generate only female anatomy"),
+            ("MALE", "Male", "Generate only male anatomy", 1),
+            ("FEMALE", "Female", "Generate only female anatomy", 2),
+            ("OFF", "Off", "Do not generate genital controls", 0),
         ],
-        default="BOTH",
+        default="OFF",
     )  # type: ignore
     mouth: bpy.props.EnumProperty(
         name="Mouth",
@@ -65,14 +59,12 @@ class AETHER_PG_ffxiv_player_toggles(bpy.types.PropertyGroup):
 
 
 def get_ui_layout(toggles: bpy.types.PropertyGroup | None) -> list[BoneCollection]:
-    """Build the FFXIV collection layout for the selected content mode and sex."""
+    """Build the FFXIV collection layout for the selected sex and IVCS mode."""
     if toggles is None:
         raise ValueError("The FFXIV UI layout requires template toggles")
-    if toggles.content not in {"SFW", "NSFW"}:
-        raise ValueError(f"Unknown content mode: {toggles.content}")
-    nsfw = toggles.content == "NSFW"
-    if nsfw and toggles.sex not in {"BOTH", "MALE", "FEMALE"}:
+    if toggles.sex not in {"OFF", "MALE", "FEMALE"}:
         raise ValueError(f"Unknown sex mode: {toggles.sex}")
+    nsfw = toggles.sex != "OFF" and toggles.ivcs != "OFF"
     layout = [
         BoneCollection("Hair", ui=True, color_set="Head", row_index=1, visible=False),
         BoneCollection("Accessory", ui=True, color_set="Head", row_index=1, visible=False),
@@ -103,9 +95,9 @@ def get_ui_layout(toggles: bpy.types.PropertyGroup | None) -> list[BoneCollectio
         BoneCollection("Tail", ui=True, color_set="Torso_Tweak", row_index=25),
     ]
     if nsfw:
-        if toggles.sex in {"BOTH", "MALE"}:
+        if toggles.sex == "MALE":
             layout.append(BoneCollection("Genitals (Male)", ui=True, color_set="IVCS", row_index=27, visible=False))
-        if toggles.sex in {"BOTH", "FEMALE"}:
+        if toggles.sex == "FEMALE":
             layout.append(BoneCollection("Genitals (Female)", ui=True, color_set="IVCS", row_index=27, visible=False))
     layout.extend(
         [
@@ -126,7 +118,7 @@ FFXIV = Template(
     name="FFXIV",
     toggles=AETHER_PG_ffxiv_player_toggles,
     toggle_visibility={
-        "sex": lambda toggles: toggles.content == "NSFW",
+        "sex": lambda toggles: toggles.ivcs in {"AUTO", "ON"},
         "viera_variant": lambda toggles: toggles.ears == "VIERA",
     },
     ui_layout=get_ui_layout,
