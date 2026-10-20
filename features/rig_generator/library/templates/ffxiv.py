@@ -4,7 +4,7 @@ import bpy
 
 from ...definitions import Template
 from ...rigify.settings import BoneCollection
-from ..modules import arms, clothing, ears, face, genitals, hair, hands, legs, spine, tail, toes
+from ..modules import arms, clothing, ears, face, general, genitals, hair, hands, legs, spine, tail, toes
 
 
 class AETHER_PG_ffxiv_player_toggles(bpy.types.PropertyGroup):
@@ -107,7 +107,7 @@ def get_ui_layout(toggles: bpy.types.PropertyGroup | None) -> list[BoneCollectio
             BoneCollection("MCH", ui=True, row_index=31 if nsfw else 30, visible=False),
             BoneCollection("DEF", ui=True, row_index=31 if nsfw else 30, visible=False),
             BoneCollection("ORG", ui=True, row_index=31 if nsfw else 30, visible=False),
-            BoneCollection("Root", ui=True, row_index=33 if nsfw else 32, visible=False),
+            BoneCollection("Root", ui=True, row_index=33 if nsfw else 32, visible=True),
         ]
     )
     return layout
@@ -129,5 +129,6 @@ FFXIV = Template(
         clothing.ffxiv_player,
         tail.ffxiv_player,
         genitals.ffxiv_player,
+        general.ffxiv_player,
     ],
 )

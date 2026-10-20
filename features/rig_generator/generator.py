@@ -324,7 +324,6 @@ class AetherRigGenerator:
         resolve_pending_parents(armature)
 
         enter_mode(armature, "POSE")
-        instructions.widget(armature, "root", scale_factor=0.2)
         for module in modules:
             module.final_pose(armature)
 
