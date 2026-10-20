@@ -79,11 +79,14 @@ class AETHER_PT_rig_generator_creation(bpy.types.Panel):
 
         toggles = template_manager.get_template_toggles(aether_rig)
         if toggles is not None:
+            visibility = template_manager.get_template(aether_rig).toggle_visibility
             toggle_layout = layout.box()
-            # toggle_layout = layout.column()
             toggle_layout.label(text="Template Toggles")
             for prop in toggles.bl_rna.properties:
                 if prop.identifier not in {"rna_type", "name"} and not prop.is_hidden:
+                    condition = visibility.get(prop.identifier)
+                    if condition is not None and not condition(toggles):
+                        continue
                     row = toggle_layout.row(align=True)
                     if prop.type == "ENUM":
                         split = row.split(factor=0.2, align=True)

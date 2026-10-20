@@ -13,13 +13,22 @@ class AETHER_PG_ffxiv_player_toggles(bpy.types.PropertyGroup):
     ears: bpy.props.EnumProperty(
         name="Ears",
         items=[
-            ("DEFAULT", "Def.", "One controllable bone per ear", 0),
-            ("VIERA_A", "A", "Viera ears using j_zera bones", 1),
-            ("VIERA_B", "B", "Viera ears using j_zerb bones", 2),
-            ("VIERA_C", "C", "Viera ears using j_zerc bones", 3),
-            ("VIERA_D", "D", "Viera ears using j_zerd bones", 4),
+            ("DEFAULT", "Default", "One controllable bone per ear", 0),
+            ("NONE", "None", "Do not generate ears", 1),
+            ("VIERA", "Viera", "Default ear controls and the selected Viera ear chains", 2),
         ],
         default="DEFAULT",
+    )  # type: ignore
+    viera_variant: bpy.props.EnumProperty(
+        name="Viera Variant",
+        description="Viera ear chains generated alongside available default ear controls",
+        items=[
+            ("A", "A", "Viera ears using j_zera bones"),
+            ("B", "B", "Viera ears using j_zerb bones"),
+            ("C", "C", "Viera ears using j_zerc bones"),
+            ("D", "D", "Viera ears using j_zerd bones"),
+        ],
+        default="A",
     )  # type: ignore
     ivcs: bpy.props.EnumProperty(
         name="IVCS",
@@ -116,6 +125,10 @@ def get_ui_layout(toggles: bpy.types.PropertyGroup | None) -> list[BoneCollectio
 FFXIV = Template(
     name="FFXIV",
     toggles=AETHER_PG_ffxiv_player_toggles,
+    toggle_visibility={
+        "sex": lambda toggles: toggles.content == "NSFW",
+        "viera_variant": lambda toggles: toggles.ears == "VIERA",
+    },
     ui_layout=get_ui_layout,
     modules=[
         ears.ffxiv_player,
