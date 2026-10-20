@@ -23,6 +23,21 @@ class Module(definitions.RigModule):
         self._prefix = ""
         if self.toggles is None:
             raise ValueError(f"{self.name} requires template toggles with an ears property")
+        for side in definitions.SIDES:
+            abi.extend(rig,
+                f"EarRing_A{side.suffix}",
+                f"n_ear_a_{side.source}",
+                start_point="head",
+                axis="-X",
+                parent=["Head", "j_kao"]                
+            )
+            abi.extend(rig,
+                f"EarRing_B{side.suffix}",
+                f"n_ear_b_{side.source}",
+                start_point="head",
+                axis="-X",
+                parent=["EarRing_A{side.suffix}", f"n_ear_a_{side.source}"]
+            )
         if self.toggles.ears == "NONE":
             return
         if self.toggles.ears not in {"DEFAULT", "VIERA"}:
@@ -66,23 +81,16 @@ class Module(definitions.RigModule):
                     roll=-150 if side is definitions.LEFT else 150,
                     parent=["Head", "j_kao"],
                 )
-            abi.extend(rig,
-                f"EarRing_A{side.suffix}",
-                f"n_ear_a_{side.source}",
-                start_point="head",
-                axis="-X",
-                parent=["Head", "j_kao"]                
-            )
-            abi.extend(rig,
-                f"EarRing_B{side.suffix}",
-                f"n_ear_b_{side.source}",
-                start_point="head",
-                axis="-X",
-                parent=["EarRing_A{side.suffix}", f"n_ear_a_{side.source}"]
-            )
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
         """Configure controls and map only the selected ears to deform bones."""
+        for side in definitions.SIDES:
+            abi.rigify.basic_super_copy(rig, f"EarRing_A{side.suffix}", widget_type="bone"),
+            abi.collection(rig, [f"EarRing_A{side.suffix}"], "Accessory"),
+            abi.link(rig, f"n_ear_a_{side.source}", f"DEF-EarRing_A{side.suffix}")
+            abi.rigify.basic_super_copy(rig, f"EarRing_B{side.suffix}", widget_type="bone"),
+            abi.collection(rig, [f"EarRing_B{side.suffix}"], "Accessory"),
+            abi.link(rig, f"n_ear_b_{side.source}", f"DEF-EarRing_B{side.suffix}")
         if not self._enabled:
             return
         for side in definitions.SIDES:
@@ -95,10 +103,3 @@ class Module(definitions.RigModule):
                 abi.rigify.basic_super_copy(rig, f"Ear{side.suffix}", widget_type="bone")
                 abi.collection(rig, [f"Ear{side.suffix}"], "Head")
                 abi.link(rig, f"j_mimi_{side.source}", f"DEF-Ear{side.suffix}")
-
-                abi.rigify.basic_super_copy(rig, f"EarRing_A{side.suffix}", widget_type="bone"),
-                abi.collection(rig, [f"EarRing_A{side.suffix}"], "Accessory"),
-                abi.link(rig, f"n_ear_a_{side.source}", f"DEF-EarRing_A{side.suffix}")
-                abi.rigify.basic_super_copy(rig, f"EarRing_B{side.suffix}", widget_type="bone"),
-                abi.collection(rig, [f"EarRing_B{side.suffix}"], "Accessory"),
-                abi.link(rig, f"n_ear_b_{side.source}", f"DEF-EarRing_B{side.suffix}")
