@@ -71,6 +71,7 @@ class AETHER_OT_rig_generator_generate_full(_ArmatureSelectionHelpers, bpy.types
                 self.report({"ERROR"}, "Select an available rig template and colorset")
                 return {"CANCELLED"}
 
+            print(f"[AetherBlend] Starting full rig generation for '{armature.name}'.")
             state = rig_generator.generate_meta_rig(
                 armature,
                 cleanup_existing=lambda: bpy.ops.aether.rig_generator_reset(),
@@ -118,6 +119,7 @@ class AETHER_OT_rig_generator_generate_meta(_ArmatureSelectionHelpers, bpy.types
                 self.report({"ERROR"}, "Select an available rig template and colorset")
                 return {"CANCELLED"}
 
+            print(f"[AetherBlend] Starting meta rig generation for '{armature.name}'.")
             state = rig_generator.generate_meta_rig(
                 armature,
                 cleanup_existing=lambda: bpy.ops.aether.rig_generator_reset(),
@@ -188,10 +190,12 @@ class AETHER_OT_rig_generator_clean_up(bpy.types.Operator):
             if delete:
                 edit_bones.remove(bone)
 
-        try:
-            bpy.ops.armature.collection_remove_unused()
-        except RuntimeError:
-            pass
+        bpy.ops.object.mode_set(mode="OBJECT")
+        unused_collections = [
+            collection for collection in armature.data.collections_all if not collection.bones_recursive
+        ]
+        for collection in reversed(unused_collections):
+            armature.data.collections.remove(collection)
 
         armature.aether_rig.rigified = False
 

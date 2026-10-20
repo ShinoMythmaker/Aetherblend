@@ -254,8 +254,3 @@ class Module(definitions.RigModule):
         abi.widget(rig, "Teeth.T", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
         abi.widget(rig, "Teeth.B", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
         abi.widget(rig, "jaw_master_mouth", scale=(0.6, 1.0, 0.3))
-        for side in definitions.SIDES:
-            abi.widget(rig, f"Lip.Middle.T{side.suffix}", scale_factor=0.1)
-            abi.widget(rig, f"Lip.Middle.T{side.suffix}.001", scale_factor=0.1)
-            abi.widget(rig, f"Lip.Middle.B{side.suffix}", scale_factor=0.1)
-            abi.widget(rig, f"Lip.Middle.B{side.suffix}.001", scale_factor=0.1)

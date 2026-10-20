@@ -19,9 +19,13 @@ editing Markdown.
 
 Use the virtual environment from [Development Guide](Development-Guide). Its setup command already installs the two packages the build needs. If you set up the environment another way, install them:
 
-```powershell
-.venv\Scripts\python.exe -m pip install markdown pygments
+```sh
+python -m pip install markdown pygments
 ```
+
+Run these commands from the repository root in a terminal with `.venv` activated.
+In VS Code, select `.venv` with **Python: Select Interpreter**, then open a new
+terminal so automatic environment activation can take effect.
 
 ## Choose and Edit a Page
 
@@ -100,8 +104,8 @@ backslash. Visual code wrapping does not change copied snippet text.
 
 From the repository root:
 
-```powershell
-.venv\Scripts\python.exe docs\build.py
+```sh
+python docs/build.py
 ```
 
 The builder reads version and minimum Blender facts from
@@ -114,17 +118,17 @@ before rewriting generated pages.
 
 The pages use relative links, so serve the `docs` folder with a small local web server:
 
-1. Open a terminal in VS Code and run:
+1. Open a terminal in VS Code with `.venv` activated and run from the repository root:
 
-   ```powershell
-   .venv\Scripts\python.exe -m http.server 8000 --directory docs
+   ```sh
+   python -m http.server 8000 --directory docs
    ```
 
 2. Open the Command Palette (`Ctrl+Shift+P`), run **Simple Browser: Show** and enter `http://localhost:8000`.
 3. Edit Markdown, run the build again and refresh the preview (the server keeps running).
 4. Stop the server with `Ctrl+C` when you are done.
 
-You can also open `docs\index.html` directly in a normal browser, but a server matches how GitHub Pages serves the site.
+You can also open `docs/index.html` directly in a normal browser, but a server matches how GitHub Pages serves the site.
 
 
 ## Before You Finish
