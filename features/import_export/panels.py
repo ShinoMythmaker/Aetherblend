@@ -2,6 +2,7 @@
 
 import bpy
 
+from ...ui.icons import get_icon_id
 from ...ui.tabs import get_active_tab
 from ...ui.visibility import visible_in_current_area
 
@@ -22,12 +23,12 @@ class AETHER_PT_import_export_import(bpy.types.Panel):
         layout = self.layout
 
         row = layout.row(align=True)
-        row.operator("aether.import_export_import_character", text="FFXIV Character", icon="IMPORT")
+        row.operator("aether.import_export_import_character", text="FFXIV Character", icon_value=get_icon_id("ffxiv_logo"))
 
 
 def menu_func_import(self: bpy.types.Menu, context: bpy.types.Context) -> None:
     """Add the import operator to the File > Import menu."""
-    self.layout.operator("aether.import_export_import_character", text="FFXIV Character (Meddle)")
+    self.layout.operator("aether.import_export_import_character", text="AB FFXIV Character", icon_value=get_icon_id("ffxiv_logo"))
 
 
 class AETHER_PT_import_export_export(bpy.types.Panel):

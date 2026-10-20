@@ -14,6 +14,7 @@ from .utils import addon_dependencies
 def register() -> None:
     """Register all addon components."""
     addon_dependencies.print_missing_required_addons()
+    ui.icons.register()
     preferences.register()
     features.register()
     ui.register()
@@ -24,3 +25,4 @@ def unregister() -> None:
     ui.unregister()
     features.unregister()
     preferences.unregister()
+    ui.icons.unregister()
