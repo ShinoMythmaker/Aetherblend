@@ -1,7 +1,7 @@
 """Definitions a rig is built from: modules, templates and UI links."""
 
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal, NamedTuple
 
 import bpy
@@ -50,12 +50,17 @@ class RigModule:
 
 @dataclass(frozen=True)
 class Template:
-    """Ordered modules, a template-owned layout, and optional persistent Blender toggles."""
+    """Ordered modules, layout, and persistent toggles with optional visibility predicates.
+
+    Each toggle_visibility predicate receives the current toggles; omitted properties
+    stay visible. Hiding a property preserves its stored value.
+    """
 
     name: str
     modules: list[type[RigModule]]
     ui_layout: list[BoneCollection] | Callable[[bpy.types.PropertyGroup | None], list[BoneCollection]]
     toggles: type[bpy.types.PropertyGroup] | None = None
+    toggle_visibility: dict[str, Callable[[bpy.types.PropertyGroup], bool]] = field(default_factory=dict)
 
 
 UI_Type = Literal["checkbox", "slider", "dropdown"]
