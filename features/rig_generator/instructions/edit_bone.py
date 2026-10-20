@@ -9,11 +9,12 @@ import bpy
 import mathutils
 
 Point = Literal["head", "tail"]
-Axis = Literal["X", "Y", "Z"]
+Axis = Literal["X", "Y", "Z", "-X", "-Y", "-Z"]
 AxisSpace = Literal["local", "armature", "global"]
 BoneNames = str | Sequence[str]
 
-_AXIS_INDEX = {"X": 0, "Y": 1, "Z": 2}
+_AXIS_INDEX = {"X": 0, "Y": 1, "Z": 2, "-X": 0, "-Y": 1, "-Z": 2}
+_AXIS_SIGN = {"X": 1.0, "Y": 1.0, "Z": 1.0, "-X": -1.0, "-Y": -1.0, "-Z": -1.0}
 _MINIMUM_AXIS_COMPONENT = 0.0001
 
 # Parents whose preferred bone does not exist yet; resolved once every module has run.
@@ -32,11 +33,12 @@ def _axis_direction(
     rig: bpy.types.Object, reference: bpy.types.EditBone, axis: Axis, axis_space: AxisSpace
 ) -> mathutils.Vector:
     index = _AXIS_INDEX[axis]
+    sign = _AXIS_SIGN[axis]
     if axis_space == "local":
-        return mathutils.Vector(reference.matrix.to_3x3().inverted()[index])
+        return mathutils.Vector(reference.matrix.to_3x3().inverted()[index]) * sign
 
     unit_vector = mathutils.Vector((0.0, 0.0, 0.0))
-    unit_vector[index] = 1.0
+    unit_vector[index] = sign
     if axis_space == "armature":
         return unit_vector
     return rig.matrix_world.to_3x3().inverted() @ unit_vector
@@ -182,7 +184,7 @@ def center(
     length = (average_length if average_length > 0 else 0.3) * size_factor
 
     direction = mathutils.Vector((0.0, 0.0, 0.0))
-    direction[_AXIS_INDEX[axis]] = length
+    direction[_AXIS_INDEX[axis]] = length * _AXIS_SIGN[axis]
     if inverted:
         head, tail = center_position + direction, center_position
     else:
