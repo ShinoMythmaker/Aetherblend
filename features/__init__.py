@@ -1,17 +1,17 @@
-from . import model_import
-from . import rigging
-from . import cplus
-from . import animation
-from . import vfx
-from . import shaders
-from . import spring_bones
+"""Add-on features. Each feature is a self-contained package that registers its own operators, panels and properties."""
 
-modules = (model_import, rigging, cplus, animation, vfx, shaders, spring_bones)
+from . import cplus, import_export, rig_edit, rig_generator, rig_ui, shaders, vfx
 
-def register():
+__all__ = ["cplus", "import_export", "rig_edit", "rig_generator", "rig_ui", "shaders", "vfx"]
+
+modules = (import_export, cplus, rig_generator, rig_edit, rig_ui, shaders, vfx)
+
+
+def register() -> None:
     for mod in modules:
         mod.register()
 
-def unregister():
-    for mod in modules:
+
+def unregister() -> None:
+    for mod in reversed(modules):
         mod.unregister()

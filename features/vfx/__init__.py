@@ -1,9 +1,19 @@
+"""VFX model-creation and export tools."""
+
 from . import operators, panels
 
-def register():
-    operators.register()
-    panels.register()
+__all__ = ["operators", "panels"]
 
-def unregister():
-    panels.unregister()
-    operators.unregister()
+modules = (operators, panels)
+
+
+def register() -> None:
+    """Register the VFX feature."""
+    for mod in modules:
+        mod.register()
+
+
+def unregister() -> None:
+    """Unregister the VFX feature."""
+    for mod in reversed(modules):
+        mod.unregister()

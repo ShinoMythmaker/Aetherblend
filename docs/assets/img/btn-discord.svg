@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="64" viewBox="0 0 300 64" role="img" aria-label="Discord">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c2038"/>
+      <stop offset="1" stop-color="#141b27"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="298" height="62" rx="12" fill="url(#bg)" stroke="#3a3f7a" stroke-width="2"/>
+  <g transform="translate(100 20)" fill="none" stroke="#8b7cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+    <path d="M8 10h.01M12 10h.01M16 10h.01"/>
+  </g>
+  <text x="136" y="38" fill="#e6ebf3" font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif" font-size="17" font-weight="700">Discord</text>
+</svg>

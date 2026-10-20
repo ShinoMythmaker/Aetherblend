@@ -1,191 +1,158 @@
+"""Decoding helpers for Customize+ strings and MCDF files."""
+
 import json
-import zlib
-import bpy
-import mathutils
 import math
+import zlib
+from io import BytesIO
+from typing import Any, BinaryIO
+
+import bpy
 import lz4.block
+import mathutils
 
-from collections import defaultdict
-from mathutils import Matrix
-from io import BufferedIOBase, BytesIO
 
-def translate_hash(the_hasherrrr: bytes) -> tuple[int, dict]:
-    """
-    Decompresses a C+ string, returning the version and data dict.
-    """
-    inflated = zlib.decompress(the_hasherrrr, zlib.MAX_WBITS | 16)
-    version = inflated[0]
-    json_str = inflated.decode('utf-8')
-    data = json.loads(json_str[1:])
-    return version, data
+def translate_hash(compressed: bytes) -> tuple[int, dict[str, Any]]:
+    """Decompress a Customize+ string and return its version and data."""
+    inflated = zlib.decompress(compressed, zlib.MAX_WBITS | 16)
+    return inflated[0], json.loads(inflated[1:].decode("utf-8"))
 
-def get_bone_values(cplus_dict: dict, value_key: str) -> dict:
-    """
-    Extracts bone values for a given key from the C+ data dict.
-    """
-    bones = cplus_dict.get('Bones', {})
-    new_bones = defaultdict(dict)
-    for key in bones.keys():
-        if value_key not in bones[key]:
+
+def get_bone_values(cplus_dict: dict[str, Any], value_key: str) -> dict[str, dict[str, float]]:
+    """Extract complete XYZ transform values for one transform type."""
+    result: dict[str, dict[str, float]] = {}
+    for bone_name, bone_data in cplus_dict.get("Bones", {}).items():
+        values = bone_data.get(value_key)
+        if not values:
             continue
 
-        values = bones[key][value_key]
-        if value_key in ['Translation', 'Rotation']:
-            if 'X' not in values:
-                values['X'] = 0.0
-            
-            if 'Y' not in values:
-                values['Y'] = 0.0
-
-            if 'Z' not in values:
-                values['Z'] = 0.0
-
-            if values['X'] == values['Y'] == values['Z'] == 0.0:
-                continue
-        new_bones[key] = values
-    return new_bones
-
-def apply_transforms(
-    armature: bpy.types.Object, 
-    scale_dict: dict, 
-    rot_dict: dict, 
-    pos_dict: dict, 
-    bones: dict[str, bpy.types.PoseBone] = None,
-) -> None:
-    """Applies C+ pose transforms (scale, rotation, translation) to *bones*.
-    """
-    original_mode = armature.mode
-    
-    if bones is None:
-        bones = armature.pose.bones
-    
-    # Apply C+ transforms (bones must be in Y/X orientation at this point)
-    bpy.ops.object.mode_set(mode='POSE')
-    bpy.context.view_layer.objects.active = armature
-    
-    for posebone in bones.values():
-        scale_vector = scale_dict.get(posebone.name)
-        if scale_vector:
-            posebone.scale = mathutils.Vector((scale_vector['X'], scale_vector['Y'], scale_vector['Z']))
-
-        rotation = rot_dict.get(posebone.name)
-        if rotation:
-            rot_radians = mathutils.Vector((
-                math.radians(rotation['X']),
-                math.radians(rotation['Y']),
-                math.radians(rotation['Z'])
-            ))
-            euler_rot = mathutils.Euler(rot_radians, 'XYZ')
-            posebone.rotation_quaternion.rotate(euler_rot)
-
-        translation = pos_dict.get(posebone.name)
-        if translation:
-            posebone.location += mathutils.Vector((translation['X'], translation['Y'], translation['Z']))
-    
-    bpy.ops.object.mode_set(mode=original_mode)
-
-def read_size(reader: BufferedIOBase, size: int) -> int | None:
-    """
-    Reads the specified size of bytes, and returns the value as an integer.
-    Returns None if no more data can be read.
-    """
-    byte = reader.read(size)
-
-    if not byte:
-        return None
-
-    return int.from_bytes(byte, byteorder='little')
-
-def read_byte(reader: BufferedIOBase) -> int | None:
-    """
-    Reads a byte and returns the value as an integer.
-    Returns None if no more data can be read.
-    """
-    return read_size(reader, 1)
-
-def read_int(reader: BufferedIOBase) -> int | None:
-    """
-    Reads an integer and returns the value.
-    Returns None if no more data can be read.
-    """
-    return read_size(reader, 4)
-
-def read_leb128(reader: BufferedIOBase) -> int:
-    """
-    Reads an LEB128 compressed number and returns the value as an integer.
-    """
-    result = 0
-    shift = 0
-
-    while True:
-        byte = read_byte(reader)
-
-        if byte is None:
-            break
-
-        result |= (byte & 0x7F) << shift
-        shift += 7
-
-        if (byte & 0x80) == 0:
-            break
-
+        default = 1.0 if value_key == "Scaling" else 0.0
+        coordinates = {axis: float(values.get(axis, default)) for axis in ("X", "Y", "Z")}
+        if value_key in {"Translation", "Rotation"} and not any(coordinates.values()):
+            continue
+        result[bone_name] = coordinates
     return result
 
-def get_chunk(file: BufferedIOBase) -> bytes | None:
-    """
-    Reads and processes a chunk, starting from where the file reader position is currently.
-    Returns None if no more data can be read.
-    """
-    magic = read_byte(file)
 
+def apply_transforms(
+    armature: bpy.types.Object,
+    scale_dict: dict[str, dict[str, float]],
+    rot_dict: dict[str, dict[str, float]],
+    pos_dict: dict[str, dict[str, float]],
+    bones: dict[str, bpy.types.PoseBone] | None = None,
+) -> None:
+    """Apply Customize+ scale, rotation, and translation to the specified bones."""
+    original_mode = armature.mode
+    bpy.context.view_layer.objects.active = armature
+    if original_mode != "POSE":
+        bpy.ops.object.mode_set(mode="POSE")
+
+    try:
+        target_bones = bones if bones is not None else armature.pose.bones
+        for pose_bone in target_bones.values():
+            scale = scale_dict.get(pose_bone.name)
+            if scale:
+                pose_bone.scale = mathutils.Vector((scale["X"], scale["Y"], scale["Z"]))
+
+            rotation = rot_dict.get(pose_bone.name)
+            if rotation:
+                euler = mathutils.Euler(
+                    tuple(math.radians(rotation[axis]) for axis in ("X", "Y", "Z")),
+                    "XYZ",
+                )
+                pose_bone.rotation_quaternion.rotate(euler)
+
+            translation = pos_dict.get(pose_bone.name)
+            if translation:
+                pose_bone.location += mathutils.Vector((translation["X"], translation["Y"], translation["Z"]))
+    finally:
+        if original_mode != "POSE":
+            bpy.ops.object.mode_set(mode=original_mode)
+
+
+def read_size(reader: BinaryIO, size: int) -> int | None:
+    """Read a little-endian integer of the requested byte size."""
+    data = reader.read(size)
+    return int.from_bytes(data, byteorder="little") if data else None
+
+
+def read_byte(reader: BinaryIO) -> int | None:
+    """Read one byte as an integer, or return None at end of input."""
+    return read_size(reader, 1)
+
+
+def read_int(reader: BinaryIO) -> int | None:
+    """Read a four-byte integer, or return None at end of input."""
+    return read_size(reader, 4)
+
+
+def read_leb128(reader: BinaryIO) -> int:
+    """Read an unsigned LEB128 integer."""
+    result = 0
+    shift = 0
+    while True:
+        byte = read_byte(reader)
+        if byte is None:
+            raise ValueError("Unexpected end of file while reading LEB128 value")
+        result |= (byte & 0x7F) << shift
+        if byte & 0x80 == 0:
+            return result
+        shift += 7
+        if shift > 63:
+            raise ValueError("LEB128 value is too large")
+
+
+def get_chunk(reader: BinaryIO) -> bytes | None:
+    """Read and decompress one MCDF chunk."""
+    magic = read_byte(reader)
     if magic is None:
         return None
 
-    uncompressed_size = read_leb128(file)
-
-    # Uncompressed
+    uncompressed_size = read_leb128(reader)
     if magic == 2:
-        return file.read(uncompressed_size)
-    # Compressed
-    elif magic == 3:
-        chunk_size = read_leb128(file)
-        chunk_data = file.read(chunk_size)
+        chunk = reader.read(uncompressed_size)
+        if len(chunk) != uncompressed_size:
+            raise ValueError("MCDF chunk ended before its declared size")
+        return chunk
+    if magic == 3:
+        chunk_size = read_leb128(reader)
+        chunk_data = reader.read(chunk_size)
+        if len(chunk_data) != chunk_size:
+            raise ValueError("Compressed MCDF chunk ended before its declared size")
         return lz4.block.decompress(chunk_data, uncompressed_size=uncompressed_size)
-    # Unknown
-    else:
-        raise Exception(f'Unknown Chunk Magic Value: {magic}')
+    raise ValueError(f"Unknown MCDF chunk magic value: {magic}")
+
 
 def get_mcdf_cplus(path: str) -> str | None:
-    """
-    Reads an MCDF file to retrieve it's C+ string.
-    Returns None if there was an error while reading the file.
-    """
+    """Extract the Customize+ string from an MCDF file."""
     try:
-        data = bytearray()
+        contents = bytearray()
+        with open(path, "rb") as source:
+            while (chunk := get_chunk(source)) is not None:
+                contents.extend(chunk)
 
-        with open(path, 'rb') as file:
-            while True:
-                chunk = get_chunk(file)
-
-                if chunk is None:
-                    break
-
-                data.extend(chunk)
-
-        with BytesIO(data) as data_reader:
-            signature = data_reader.read(4).decode('utf-8')
-
-            if signature != 'MCDF':
-                raise Exception(f'"MCDF" expected at the start of the file, got "{signature}" instead.')
-
-            version = read_byte(data_reader)
-
+        with BytesIO(contents) as reader:
+            if reader.read(4) != b"MCDF":
+                raise ValueError("MCDF signature is missing")
+            version = read_byte(reader)
             if version != 1:
-                raise Exception(f'Version {version} is unsupported.')
-
-            mcdf_json_size = read_int(data_reader)
-            mcdf_json = json.loads(data_reader.read(mcdf_json_size).decode('utf-8'))
-            return mcdf_json['CustomizePlusData']
-    except Exception as e:
-        print("[AetherBlend] Failed to parse C+ string from MCDF file:", e)
+                raise ValueError(f"Unsupported MCDF version: {version}")
+            json_size = read_int(reader)
+            if json_size is None:
+                raise ValueError("MCDF JSON size is missing")
+            json_data = reader.read(json_size)
+            if len(json_data) != json_size:
+                raise ValueError("MCDF JSON ended before its declared size")
+            data = json.loads(json_data.decode("utf-8"))
+            return data.get("CustomizePlusData")
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        AttributeError,
+        TypeError,
+        json.JSONDecodeError,
+        zlib.error,
+        lz4.block.LZ4BlockError,
+    ) as exc:
+        print(f"[AetherBlend] Failed to parse C+ string from MCDF file: {exc}")
         return None

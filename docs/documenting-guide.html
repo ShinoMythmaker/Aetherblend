@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documenting Guide · AetherBlend</title>
+<meta name="description" content="">
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/pygments.css">
+</head>
+<body>
+<header class="site-header">
+  <button class="menu-btn" aria-label="Toggle navigation">&#9776;</button>
+  <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
+  <nav class="header-links">
+    <a href="installation.html">Guides</a>
+    <a href="development-guide.html">Development</a>
+    <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
+    <a href="index.html#support-project">Support</a>
+    <a href="https://mythmaker-studio.com/">Studio</a>
+    <a class="cta" href="https://github.com/ShinoMythmaker/Aetherblend/releases/latest">Download</a>
+  </nav>
+</header>
+<div class="layout">
+<aside class="sidebar"><h4>Guides</h4>
+<a href="installation.html" class="">Installation</a>
+<h4>Development</h4>
+<a href="development-guide.html" class="">Development Guide</a>
+<a href="documenting-guide.html" class="active">Documenting Guide</a>
+<a href="style-guide.html" class="">Style Guide</a></aside>
+<main><article>
+<h1>Documenting Guide</h1>
+<p>Write only useful task guides for AetherBlend users and practical setup or
+quickstart pages for contributors. Put user workflows in <strong>Guides</strong> and
+contributor workflows or conventions in <strong>Development</strong>.</p>
+<p>The site is built from Markdown in <code>docs/src/</code>; <code>docs/build.py</code> generates the
+HTML served from <code>docs/</code>. The generated pages are committed, so rebuild after
+editing Markdown.</p>
+<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
+<p>Use the virtual environment from <a href="development-guide.html">Development Guide</a>. Its setup command already installs the two packages the build needs. If you set up the environment another way, install them:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>markdown<span class="w"> </span>pygments
+</code></pre></div>
+
+<p>Run these commands from the repository root in a terminal with <code>.venv</code> activated.
+In VS Code, select <code>.venv</code> with <strong>Python: Select Interpreter</strong>, then open a new
+terminal so automatic environment activation can take effect.</p>
+<h2 id="choose-and-edit-a-page">Choose and Edit a Page<a class="headerlink" href="#choose-and-edit-a-page" title="Permanent link">#</a></h2>
+<p>First update an existing guide if it covers the workflow. Add a page only for
+a distinct user task or contributor workflow. Keep navigable sources in
+<code>guides/</code> or <code>development/</code>; <code>Home.md</code> is the landing page. Every Markdown
+source with a <code>group</code> frontmatter value appears in navigation, so use only
+<code>Guides</code> or <code>Development</code>.</p>
+<div class="codehilite"><pre><span></span><code>---
+title: My Page
+group: Development
+order: 220
+sub: true
+<span class="gu">summary: One line shown on the landing page card.</span>
+<span class="gu">---</span>
+<span class="gh"># My Page</span>
+
+Content here.
+</code></pre></div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>title</code></td>
+<td>Name in the navigation. Defaults to the file name</td>
+</tr>
+<tr>
+<td><code>group</code></td>
+<td>Navigation section, for example <code>Guides</code> or <code>Development</code></td>
+</tr>
+<tr>
+<td><code>order</code></td>
+<td>Sort position. Lower comes first</td>
+</tr>
+<tr>
+<td><code>sub</code></td>
+<td><code>true</code> shows the page indented under the previous one</td>
+</tr>
+<tr>
+<td><code>summary</code></td>
+<td>Short text for the landing page card</td>
+</tr>
+<tr>
+<td><code>aliases</code></td>
+<td>Comma-separated names that resolve source links to this page; they do not create HTML redirects</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>File names must be unique across all folders. The output is flat, so <code>Style-Guide.md</code> becomes <code>style-guide.html</code>.</li>
+<li>Link to other pages by file name without extension, like <code>[Style Guide](Style-Guide)</code>. The build turns it into the right HTML link.</li>
+<li>Code blocks with a language (<code>```python</code>) are syntax highlighted.</li>
+<li>Code blocks wrap on narrow screens and have a <strong>Copy</strong> button; keep examples
+  focused and ensure they copy as intended.</li>
+<li>A user guide should state prerequisites, give short numbered steps and say
+  what success looks like. A development page should help a contributor finish
+  one practical setup or workflow.</li>
+<li>Keep pages concise and low-maintenance. </li>
+</ul>
+<h2 id="author-variables">Author Variables<a class="headerlink" href="#author-variables" title="Permanent link">#</a></h2>
+<p>Use double braces in Markdown or HTML, for example <code>{{blender_min}}</code> or
+<code>[Download AetherBlend]({{latest_release_zip}})</code>. The build replaces these values
+in page content, including <code>Home.md</code>, which supplies the landing-page text.
+The home page also owns its layout using HTML and Markdown sections; its
+<code>&lt;!-- documentation-cards --&gt;</code> marker inserts the navigation cards automatically.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{{blender_min}}</code></td>
+<td>Minimum Blender version from the add-on manifest (major.minor)</td>
+</tr>
+<tr>
+<td><code>{{ab_version}}</code></td>
+<td>AetherBlend version from the add-on manifest</td>
+</tr>
+<tr>
+<td><code>{{ab_github}}</code></td>
+<td>AetherBlend GitHub project URL</td>
+</tr>
+<tr>
+<td><code>{{latest_release_repo}}</code></td>
+<td>AetherBlend drag-and-drop install URL</td>
+</tr>
+<tr>
+<td><code>{{latest_release_zip}}</code></td>
+<td>AetherBlend plain ZIP download URL</td>
+</tr>
+<tr>
+<td><code>{{meddle_version}}</code></td>
+<td>Meddle Tools release version</td>
+</tr>
+<tr>
+<td><code>{{meddle_github}}</code></td>
+<td>Meddle Tools GitHub project URL</td>
+</tr>
+<tr>
+<td><code>{{meddle_latest_repo}}</code></td>
+<td>Meddle Tools drag-and-drop install URL</td>
+</tr>
+<tr>
+<td><code>{{meddle_latest_zip}}</code></td>
+<td>Meddle Tools plain ZIP download URL</td>
+</tr>
+<tr>
+<td><code>{{ffgear_version}}</code></td>
+<td>FFGear release version</td>
+</tr>
+<tr>
+<td><code>{{ffgear_github}}</code></td>
+<td>FFGear GitHub project URL</td>
+</tr>
+<tr>
+<td><code>{{ffgear_latest_repo}}</code></td>
+<td>FFGear drag-and-drop install URL</td>
+</tr>
+<tr>
+<td><code>{{ffgear_latest_zip}}</code></td>
+<td>FFGear plain ZIP download URL</td>
+</tr>
+</tbody>
+</table></div>
+<p>Release values come from the shared Blender repository's newest release
+compatible with AetherBlend's minimum Blender version, not an independent
+GitHub "latest" lookup. <code>*_repo</code> links add the repository and Blender-version
+parameters to the ZIP URL; they are not repository JSON URLs. <code>meddle_*</code> means
+the <strong>Meddle Tools Blender add-on</strong>, not the Meddle game plugin.</p>
+<p>To show placeholder syntax literally, prefix each opening brace with a
+backslash. Visual code wrapping does not change copied snippet text.</p>
+<h2 id="build-the-site">Build the Site<a class="headerlink" href="#build-the-site" title="Permanent link">#</a></h2>
+<p>From the repository root:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>docs/build.py
+</code></pre></div>
+
+<p>The builder reads version and minimum Blender facts from
+<code>blender_manifest.toml</code>, renders Markdown to HTML and fetches the master
+<code>repo.json</code> for release metadata.
+If release metadata is unavailable or invalid, the build stops with an error
+before rewriting generated pages.</p>
+<h2 id="preview-in-vs-code">Preview in VS Code<a class="headerlink" href="#preview-in-vs-code" title="Permanent link">#</a></h2>
+<p>The pages use relative links, so serve the <code>docs</code> folder with a small local web server:</p>
+<ol>
+<li>Open a terminal in VS Code with <code>.venv</code> activated and run from the repository root:</li>
+</ol>
+<p><code>sh
+   python -m http.server 8000 --directory docs</code></p>
+<ol>
+<li>Open the Command Palette (<code>Ctrl+Shift+P</code>), run <strong>Simple Browser: Show</strong> and enter <code>http://localhost:8000</code>.</li>
+<li>Edit Markdown, run the build again and refresh the preview (the server keeps running).</li>
+<li>Stop the server with <code>Ctrl+C</code> when you are done.</li>
+</ol>
+<p>You can also open <code>docs/index.html</code> directly in a normal browser, but a server matches how GitHub Pages serves the site.</p>
+<h2 id="before-you-finish">Before You Finish<a class="headerlink" href="#before-you-finish" title="Permanent link">#</a></h2>
+<ul>
+<li>Rebuild so generated HTML matches the Markdown.</li>
+<li>Preview the changed page and check its navigation and local links.</li>
+<li>Include the Markdown source and generated HTML in the change.</li>
+</ul>
+<div class="page-nav"><a class="prev" href="development-guide.html"><small>Previous</small>Development Guide</a><a class="next" href="style-guide.html"><small>Next</small>Style Guide</a></div>
+</article></main>
+<aside class="toc-col"><h4>On this page</h4><div class="toc">
+<ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#choose-and-edit-a-page">Choose and Edit a Page</a></li>
+<li><a href="#author-variables">Author Variables</a></li>
+<li><a href="#build-the-site">Build the Site</a></li>
+<li><a href="#preview-in-vs-code">Preview in VS Code</a></li>
+<li><a href="#before-you-finish">Before You Finish</a></li>
+</ul>
+</div>
+</aside>
+</div>
+<footer class="site-footer">AetherBlend documentation &middot; <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
