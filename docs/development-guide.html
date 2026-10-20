@@ -37,46 +37,78 @@
 <h2 id="set-up">Set up<a class="headerlink" href="#set-up" title="Permanent link">#</a></h2>
 <p>Install Git, Python 3.13+, Blender 5.2+ and
 <a href="https://code.visualstudio.com/">VS Code</a> with the Python extension.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">ShinoMythmaker</span><span class="p">/</span><span class="n">Aetherblend</span><span class="p">.</span><span class="n">git</span>
-<span class="nb">cd </span><span class="n">Aetherblend</span>
-<span class="n">git</span> <span class="k">switch</span> <span class="n">-c</span> <span class="n">my-change</span>
-<span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">venv</span>
-<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-upgrade</span> <span class="n">pip</span> <span class="n">ruff</span> <span class="n">tomli-w</span> <span class="n">markdown</span> <span class="n">pygments</span> <span class="n">fake-bpy-module</span>
-<span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">get_dependencies</span><span class="p">.</span><span class="n">py</span>
+<div class="codehilite"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ShinoMythmaker/Aetherblend.git
+<span class="nb">cd</span><span class="w"> </span>Aetherblend
+git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span>my-change
 </code></pre></div>
 
-<p>Use your fork URL when appropriate. The final command downloads the add-on's</p>
-<p>In VS Code, select <code>.venv</code> with <strong>Python: Select Interpreter</strong>. For Blender
-integration, install the <a href="https://marketplace.visualstudio.com/items?itemName=JacquesLucke.blender-development">Blender Development extension</a>
+<p>Use your fork URL when appropriate.</p>
+<h3 id="1-create-the-virtual-environment">1. Create the virtual environment<a class="headerlink" href="#1-create-the-virtual-environment" title="Permanent link">#</a></h3>
+<p>From the repository root:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</code></pre></div>
+
+<p>On Linux/macOS, use <code>python3</code> if <code>python</code> isn't available:</p>
+<div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</code></pre></div>
+
+<h3 id="2-select-it-in-vs-code">2. Select it in VS Code<a class="headerlink" href="#2-select-it-in-vs-code" title="Permanent link">#</a></h3>
+<ol>
+<li>Open the Command Palette with <strong>Ctrl+Shift+P</strong> / <strong>Cmd+Shift+P</strong>.</li>
+<li>Run <strong>Python: Select Interpreter</strong>.</li>
+<li>Select the interpreter inside <code>.venv</code>.</li>
+<li>Run <strong>Terminal: Create New Terminal</strong>. With automatic environment activation
+   enabled, VS Code activates <code>.venv</code> in that new terminal.</li>
+</ol>
+<p>Verify that the terminal uses the environment:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import sys; print(sys.executable)"</span>
+</code></pre></div>
+
+<p>The printed path should point inside <code>.venv</code>.</p>
+<p>Selecting the interpreter doesn't necessarily activate an already-open
+terminal - open a new one afterward.</p>
+<h3 id="3-install-dependencies">3. Install dependencies<a class="headerlink" href="#3-install-dependencies" title="Permanent link">#</a></h3>
+<p>In that activated terminal:</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip<span class="w"> </span>ruff<span class="w"> </span>tomli-w<span class="w"> </span>markdown<span class="w"> </span>pygments<span class="w"> </span>fake-bpy-module
+python<span class="w"> </span>get_dependencies.py
+</code></pre></div>
+
+<p>The final command downloads the add-on's dependency wheels.</p>
+<p>For Blender integration, install the <a href="https://marketplace.visualstudio.com/items?itemName=JacquesLucke.blender-development">Blender Development extension</a>
 and use <strong>Blender: Build and Start</strong> to launch the add-on.</p>
 <h2 id="make-and-validate-a-change">Make and validate a change<a class="headerlink" href="#make-and-validate-a-change" title="Permanent link">#</a></h2>
 <ol>
 <li>Read the relevant <a href="style-guide.html">Style Guide</a> rules and make one focused
    change in the owning feature.</li>
-<li>Run checks from the repository root:</li>
+<li>Run checks from the repository root in the activated terminal:</li>
 </ol>
 <h3 id="check-for-issues">Check for issues<a class="headerlink" href="#check-for-issues" title="Permanent link">#</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">.</span>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>.
 </code></pre></div>
 
 <h3 id="apply-fixes-ruff-can-make-automatically">Apply fixes Ruff can make automatically<a class="headerlink" href="#apply-fixes-ruff-can-make-automatically" title="Permanent link">#</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">check</span> <span class="p">-</span><span class="n">-fix</span> <span class="n">path</span><span class="p">\</span><span class="n">to</span><span class="p">\</span><span class="n">file</span><span class="p">.</span><span class="n">py</span>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>--fix<span class="w"> </span>path/to/file.py
 </code></pre></div>
 
 <h3 id="format-a-file">Format a file<a class="headerlink" href="#format-a-file" title="Permanent link">#</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">format</span> <span class="n">path</span><span class="p">\</span><span class="n">to</span><span class="p">\</span><span class="n">file</span><span class="p">.</span><span class="n">py</span>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>path/to/file.py
 </code></pre></div>
 
 <h3 id="check-formatting-without-changing-files">Check formatting without changing files<a class="headerlink" href="#check-formatting-without-changing-files" title="Permanent link">#</a></h3>
-<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">ruff</span> <span class="n">format</span> <span class="p">-</span><span class="n">-check</span> <span class="p">.</span>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>--check<span class="w"> </span>.
 </code></pre></div>
 
-<p>Instead of using <code>path\to\file.py</code> u can always use <code>.</code> to target the whole repository.</p>
+<p>Instead of using <code>path/to/file.py</code>, you can use <code>.</code> to target the whole repository.</p>
 <div class="page-nav"><a class="prev" href="installation.html"><small>Previous</small>Installation</a><a class="next" href="documenting-guide.html"><small>Next</small>Documenting Guide</a></div>
 </article></main>
 <aside class="toc-col"><h4>On this page</h4><div class="toc">
 <ul>
-<li><a href="#set-up">Set up</a></li>
+<li><a href="#set-up">Set up</a><ul>
+<li><a href="#1-create-the-virtual-environment">1. Create the virtual environment</a></li>
+<li><a href="#2-select-it-in-vs-code">2. Select it in VS Code</a></li>
+<li><a href="#3-install-dependencies">3. Install dependencies</a></li>
+</ul>
+</li>
 <li><a href="#make-and-validate-a-change">Make and validate a change</a><ul>
 <li><a href="#check-for-issues">Check for issues</a></li>
 <li><a href="#apply-fixes-ruff-can-make-automatically">Apply fixes Ruff can make automatically</a></li>

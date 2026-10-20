@@ -39,9 +39,12 @@ HTML served from <code>docs/</code>. The generated pages are committed, so rebui
 editing Markdown.</p>
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">#</a></h2>
 <p>Use the virtual environment from <a href="development-guide.html">Development Guide</a>. Its setup command already installs the two packages the build needs. If you set up the environment another way, install them:</p>
-<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">markdown</span> <span class="n">pygments</span>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>markdown<span class="w"> </span>pygments
 </code></pre></div>
 
+<p>Run these commands from the repository root in a terminal with <code>.venv</code> activated.
+In VS Code, select <code>.venv</code> with <strong>Python: Select Interpreter</strong>, then open a new
+terminal so automatic environment activation can take effect.</p>
 <h2 id="choose-and-edit-a-page">Choose and Edit a Page<a class="headerlink" href="#choose-and-edit-a-page" title="Permanent link">#</a></h2>
 <p>First update an existing guide if it covers the workflow. Add a page only for
 a distinct user task or contributor workflow. Keep navigable sources in
@@ -182,7 +185,7 @@ the <strong>Meddle Tools Blender add-on</strong>, not the Meddle game plugin.</p
 backslash. Visual code wrapping does not change copied snippet text.</p>
 <h2 id="build-the-site">Build the Site<a class="headerlink" href="#build-the-site" title="Permanent link">#</a></h2>
 <p>From the repository root:</p>
-<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">python</span><span class="p">.</span><span class="n">exe</span> <span class="n">docs</span><span class="p">\</span><span class="n">build</span><span class="p">.</span><span class="n">py</span>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>docs/build.py
 </code></pre></div>
 
 <p>The builder reads version and minimum Blender facts from
@@ -193,16 +196,16 @@ before rewriting generated pages.</p>
 <h2 id="preview-in-vs-code">Preview in VS Code<a class="headerlink" href="#preview-in-vs-code" title="Permanent link">#</a></h2>
 <p>The pages use relative links, so serve the <code>docs</code> folder with a small local web server:</p>
 <ol>
-<li>Open a terminal in VS Code and run:</li>
+<li>Open a terminal in VS Code with <code>.venv</code> activated and run from the repository root:</li>
 </ol>
-<p><code>powershell
-   .venv\Scripts\python.exe -m http.server 8000 --directory docs</code></p>
+<p><code>sh
+   python -m http.server 8000 --directory docs</code></p>
 <ol>
 <li>Open the Command Palette (<code>Ctrl+Shift+P</code>), run <strong>Simple Browser: Show</strong> and enter <code>http://localhost:8000</code>.</li>
 <li>Edit Markdown, run the build again and refresh the preview (the server keeps running).</li>
 <li>Stop the server with <code>Ctrl+C</code> when you are done.</li>
 </ol>
-<p>You can also open <code>docs\index.html</code> directly in a normal browser, but a server matches how GitHub Pages serves the site.</p>
+<p>You can also open <code>docs/index.html</code> directly in a normal browser, but a server matches how GitHub Pages serves the site.</p>
 <h2 id="before-you-finish">Before You Finish<a class="headerlink" href="#before-you-finish" title="Permanent link">#</a></h2>
 <ul>
 <li>Rebuild so generated HTML matches the Markdown.</li>

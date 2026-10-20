@@ -1,4 +1,4 @@
-"""FFXIV player genital controls selected by content mode and sex."""
+"""FFXIV player genital controls selected by sex and IVCS mode."""
 
 import bpy
 
@@ -7,7 +7,7 @@ from . import _female, _male
 
 
 class Module(definitions.RigModule):
-    """Build selected anatomy, using available bones when both sexes are enabled."""
+    """Build only the selected anatomy when IVCS is enabled."""
 
     name = "FFXIV Player Genitals"
 
@@ -17,20 +17,20 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
-        """Select anatomy once and build only the requested NSFW controls."""
+        """Select anatomy once and build only the requested genital controls."""
         self.parts = []
         if self.toggles is None:
             raise ValueError(f"{self.name} requires template toggles")
-        if self.toggles.content == "SFW":
+        if self.toggles.ivcs == "OFF":
             return
-        if self.toggles.content != "NSFW":
-            raise ValueError(f"Unknown content mode: {self.toggles.content}")
         sex = self.toggles.sex
-        if sex not in {"BOTH", "FEMALE", "MALE"}:
+        if sex == "OFF":
+            return
+        if sex not in {"FEMALE", "MALE"}:
             raise ValueError(f"Unknown sex mode: {sex}")
-        if sex in {"BOTH", "FEMALE"}:
+        if sex == "FEMALE":
             self.parts.append(_female.Module())
-        if sex in {"BOTH", "MALE"}:
+        if sex == "MALE":
             self.parts.append(_male.Module())
         for part in self.parts:
             part.toggles = self.toggles

@@ -375,12 +375,10 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
-        """Parent the generated thumb master controls."""
+        """Parent the two generated palm controls on each side."""
         if not self._enabled:
             return
         # Palm hierarchy
         for side in definitions.SIDES:
             abi.parent(rig, f"palm.01{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])
-            abi.parent(rig, f"palm.02{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])
-            abi.parent(rig, f"palm.03{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])
-            abi.parent(rig, f"palm.04{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])
+            abi.parent(rig, f"palm{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])

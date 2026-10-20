@@ -91,7 +91,7 @@ class Module(definitions.RigModule):
                 f"j_asi_b_{side.source}",
                 start_point="head",
                 size_factor=1.5,
-                parent="spine.001",
+                parent=["Spine.001", "j_kosi"],
             )
             abi.extend(
                 rig,
@@ -99,7 +99,7 @@ class Module(definitions.RigModule):
                 f"j_asi_b_{side.source}",
                 start_point="head",
                 size_factor=1.5,
-                parent="spine.001",
+                parent=["Spine.001", "j_kosi"],
             )
             abi.extend(
                 rig,
@@ -107,7 +107,7 @@ class Module(definitions.RigModule):
                 f"j_asi_c_{side.source}",
                 start_point="head",
                 size_factor=0.2,
-                parent="spine.001",
+                parent=["Spine.001", "j_kosi"],
             )
 
     # ------------------------------------------------------------------------

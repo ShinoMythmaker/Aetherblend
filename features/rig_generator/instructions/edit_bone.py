@@ -44,11 +44,14 @@ def _axis_direction(
     return rig.matrix_world.to_3x3().inverted() @ unit_vector
 
 
-def _assign_parent(rig: bpy.types.Object, bone_name: str, candidates: Sequence[str], connected: bool) -> bool:
+def _assign_parent(
+    rig: bpy.types.Object, bone_name: str, candidates: Sequence[str], connected: bool, *, report_failure: bool = True
+) -> bool:
     edit_bones = rig.data.edit_bones
     edit_bone = edit_bones.get(bone_name)
     if not edit_bone:
-        print(f"[AetherBlend] Cannot parent '{bone_name}': bone not found.")
+        if report_failure:
+            print(f"[AetherBlend] Cannot parent '{bone_name}': bone not found.")
         return False
 
     for candidate in candidates:
@@ -58,7 +61,8 @@ def _assign_parent(rig: bpy.types.Object, bone_name: str, candidates: Sequence[s
             edit_bone.parent = parent_bone
             return True
 
-    print(f"[AetherBlend] Cannot parent '{bone_name}': none of {list(candidates)} exist.")
+    if report_failure:
+        print(f"[AetherBlend] Cannot parent '{bone_name}': none of {list(candidates)} exist.")
     return False
 
 
@@ -251,7 +255,7 @@ def bridge(
     new_bone.use_connect = True
 
     if start_parent:
-        _assign_parent(rig, start_bone, _as_list(start_parent), False)
+        parent(rig, start_bone, start_parent)
     if connect_end:
         edit_end.parent = new_bone
         edit_end.use_connect = True
@@ -350,12 +354,15 @@ def parallel(
 
 
 def parent(rig: bpy.types.Object, bone: str, new_parent: BoneNames, *, connected: bool = False) -> None:
-    """Parent a bone to the first existing bone of new_parent."""
-    _assign_parent(rig, bone, _as_list(new_parent), connected)
+    """Parent a bone, retrying unresolved requests at the end of the edit phase."""
+    candidates = _as_list(new_parent)
+    _pending_parents[:] = [request for request in _pending_parents if request[0] != bone]
+    if not _assign_parent(rig, bone, candidates, connected, report_failure=False):
+        _pending_parents.append((bone, candidates, connected))
 
 
 def resolve_pending_parents(rig: bpy.types.Object) -> None:
-    """Parent bones whose preferred parent did not exist when they were created."""
+    """Make the final parenting attempts for this edit phase and report unresolved requests."""
     for bone_name, candidates, connected in _pending_parents:
         _assign_parent(rig, bone_name, candidates, connected)
     _pending_parents.clear()

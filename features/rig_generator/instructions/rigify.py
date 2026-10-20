@@ -12,15 +12,22 @@ def _activate(rig: bpy.types.Object, pose_bone: bpy.types.PoseBone, rigify_type:
     pose_bone.rigify_type = rigify_type
 
 
-def _set_collection_reference(
-    rigify_parameters: bpy.types.PropertyGroup, reference_property: str, collection_name: str
-) -> None:
+def _set_collection_reference(rigify_parameters: bpy.types.PropertyGroup, reference_property: str, collection_name: str) -> None:
     """Replace a rigify collection reference list with a single reference to the named collection."""
     references = getattr(rigify_parameters, reference_property)
     references.clear()
     bpy.ops.pose.rigify_collection_ref_add(prop_name=reference_property)
     if len(references) > 0:
         references[-1].name = collection_name
+
+
+def _set_control_collection(rigify_parameters: bpy.types.PropertyGroup, control: str, collection_name: str | None) -> None:
+    """Disable collection overrides when controls should keep their inherited collections."""
+    setattr(rigify_parameters, f"{control}_layers_extra", collection_name is not None)
+    if collection_name is None:
+        getattr(rigify_parameters, f"{control}_coll_refs").clear()
+    else:
+        _set_collection_reference(rigify_parameters, f"{control}_coll_refs", collection_name)
 
 
 def limbs_leg(
@@ -36,10 +43,8 @@ def limbs_leg(
         return
 
     _activate(rig, pose_bone, "limbs.leg")
-    if fk_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "fk_coll_refs", fk_collection)
-    if tweak_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "tweak_coll_refs", tweak_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "fk", fk_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "tweak", tweak_collection)
 
 
 def basic_super_copy(rig: bpy.types.Object, bone: str, *, widget_type: str | None = None) -> None:
@@ -92,10 +97,8 @@ def limbs_spline_tentacle(
     _activate(rig, pose_bone, "limbs.spline_tentacle")
     if sik_stretch_control:
         pose_bone.rigify_parameters.sik_stretch_control = sik_stretch_control
-    if fk_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "fk_coll_refs", fk_collection)
-    if tweak_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "tweak_coll_refs", tweak_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "fk", fk_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "tweak", tweak_collection)
 
 
 def basic_copy_chain(
@@ -135,10 +138,8 @@ def limbs_arm(
     if rotation_axis:
         pose_bone.rigify_parameters.rotation_axis = rotation_axis
         pose_bone.rigify_parameters.auto_align_extremity = auto_align_extremity
-    if fk_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "fk_coll_refs", fk_collection)
-    if tweak_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "tweak_coll_refs", tweak_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "fk", fk_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "tweak", tweak_collection)
 
 
 def spines_basic_spine(
@@ -155,10 +156,8 @@ def spines_basic_spine(
         return
 
     _activate(rig, pose_bone, "spines.basic_spine")
-    if fk_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "fk_coll_refs", fk_collection)
-    if tweak_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "tweak_coll_refs", tweak_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "fk", fk_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "tweak", tweak_collection)
     if pivot_position is not None:
         pose_bone.rigify_parameters.pivot_pos = pivot_position
 
@@ -170,8 +169,7 @@ def spines_super_head(rig: bpy.types.Object, bone: str, *, tweak_collection: str
         return
 
     _activate(rig, pose_bone, "spines.super_head")
-    if tweak_collection:
-        _set_collection_reference(pose_bone.rigify_parameters, "tweak_coll_refs", tweak_collection)
+    _set_control_collection(pose_bone.rigify_parameters, "tweak", tweak_collection)
 
 
 def limbs_super_finger(
@@ -192,13 +190,12 @@ def limbs_super_finger(
     rigify_parameters = pose_bone.rigify_parameters
     if primary_rotation_axis:
         rigify_parameters.primary_rotation_axis = primary_rotation_axis
-    if tweak_collection:
-        _set_collection_reference(rigify_parameters, "tweak_coll_refs", tweak_collection)
-    if extra_ik_collection:
-        rigify_parameters.extra_ik_layers_extra = True
-        rigify_parameters.extra_ik_coll_refs.clear()
-        if extra_ik_collection in rig.data.collections:
-            _set_collection_reference(rigify_parameters, "extra_ik_coll_refs", extra_ik_collection)
+    _set_control_collection(rigify_parameters, "tweak", tweak_collection)
+    _set_control_collection(
+        rigify_parameters,
+        "extra_ik",
+        extra_ik_collection if extra_ik_collection and extra_ik_collection in rig.data.collections else None,
+    )
     if extra_ik_control:
         rigify_parameters.make_extra_ik_control = True
 
