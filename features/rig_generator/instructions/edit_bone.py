@@ -384,3 +384,11 @@ def find_chains(rig: bpy.types.Object, pattern: str) -> list[list[str]]:
 def has_bone(rig: bpy.types.Object, bone: str) -> bool:
     """Whether the bone exists in the rig while it is in edit mode."""
     return bone in rig.data.edit_bones
+
+
+def require_bones(rig: bpy.types.Object, bones: Sequence[str], module_name: str) -> bool:
+    """Let a module check its own source bones and report why it cannot build."""
+    missing = [bone for bone in bones if not has_bone(rig, bone)]
+    if missing:
+        print(f"[AetherBlend] Skipping module '{module_name}': missing bones {missing}")
+    return not missing

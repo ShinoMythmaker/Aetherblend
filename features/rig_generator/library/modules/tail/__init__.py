@@ -1,6 +1,5 @@
-"""Rig module 'tail' and its variants."""
+"""FFXIV player spline tail generation."""
 
-from .ffxiv_fk import Module as ffxiv_fk
-from .ffxiv_spline import Module as ffxiv_spline
+from .ffxiv_player import Module as ffxiv_player
 
-__all__ = ["ffxiv_fk", "ffxiv_spline"]
+__all__ = ["ffxiv_player"]

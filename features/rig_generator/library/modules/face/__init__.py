@@ -1,5 +1,5 @@
-"""Rig module 'face' and its variants."""
+"""FFXIV player face and selected mouth generation."""
 
-from .ffxiv_detailed import Module as ffxiv_detailed
+from .ffxiv_player import Module as ffxiv_player
 
-__all__ = ["ffxiv_detailed"]
+__all__ = ["ffxiv_player"]

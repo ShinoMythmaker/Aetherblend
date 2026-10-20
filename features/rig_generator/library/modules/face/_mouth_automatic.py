@@ -7,11 +7,12 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Automated"
+    """Build the automated jaw, lips, teeth, and tongue for the face module."""
 
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Build the automated mouth control chains."""
         # Jaw chain
         abi.center(rig, "jaw_master_ref", ["j_f_dlip_01_r", "j_f_dlip_01_l"], axis="Y", parent="Head")
         abi.connect(rig, "jaw_master", "j_f_ago", "jaw_master_ref", parent="Head")
@@ -137,6 +138,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure automated jaw and lip behavior and deform mappings."""
         # Jaw controls
         abi.rigify.face_skin_jaw(rig, "jaw_master", jaw_mouth_influence=1)
         abi.collection(rig, ["jaw_master"], "Face (Primary)")
@@ -236,6 +238,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
+        """Attach secondary lips to the generated primary lip offsets."""
         # Secondary lips follow the offset bones made for the main lip chains.
         for side in definitions.SIDES:
             abi.parent(rig, f"Lip.Sec.T{side.suffix}", f"MCH-Lip_offset.T{side.suffix}.001")
@@ -246,6 +249,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Configure teeth and automated mouth widgets."""
         # Teeth and mouth widgets
         abi.widget(rig, "Teeth.T", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
         abi.widget(rig, "Teeth.B", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)

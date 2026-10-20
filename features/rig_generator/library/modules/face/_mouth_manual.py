@@ -7,11 +7,12 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Manual"
+    """Build independent jaw, lip, teeth, and tongue controls for the face module."""
 
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Build independent manual mouth controls."""
         # Jaw bones
         abi.center(rig, "jaw_ref", ["j_f_dlip_01_r", "j_f_dlip_01_l"], axis="Y", parent="Head")
         abi.connect(rig, "Jaw", "j_f_ago", "jaw_ref", parent="Head")
@@ -143,6 +144,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure manual controls and deform mappings."""
         # Jaw controls
         abi.collection(rig, ["jaw_ref"], "MCH")
         abi.rigify.basic_super_copy(rig, "Jaw", widget_type="jaw")
@@ -203,6 +205,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Configure teeth widgets."""
         # Teeth widgets
         abi.widget(rig, "Teeth.T", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)
         abi.widget(rig, "Teeth.B", rotation_degrees=(0.0, 0.0, 180.0), scale_factor=1.7)

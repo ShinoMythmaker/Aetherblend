@@ -5,9 +5,12 @@ import bpy
 from ...ui.tabs import get_active_tab
 from ...ui.visibility import visible_in_current_area
 from ...utils import addon_dependencies
+from . import template_manager
 
 
 class AETHER_PT_rig_generator_creation(bpy.types.Panel):
+    """Generation actions and settings for the active armature."""
+
     bl_label = "Create Rig"
     bl_idname = "AETHER_PT_rig_generator_creation"
     bl_space_type = "VIEW_3D"
@@ -31,6 +34,7 @@ class AETHER_PT_rig_generator_creation(bpy.types.Panel):
         )
 
     def draw(self, context: bpy.types.Context) -> None:
+        """Draw generation actions and the selected template's persistent toggles."""
         addon_enabled = addon_dependencies.is_addon_enabled(module_name="rigify")
         if not addon_enabled:
             layout = self.layout
@@ -73,9 +77,19 @@ class AETHER_PT_rig_generator_creation(bpy.types.Panel):
         row.label(text="Colorset", icon="COLOR")
         row.prop(aether_rig, "selected_colorset", text="")
 
-        row = layout.row(align=True)
-        row.label(text="UI Layout", icon="PRESET")
-        row.prop(aether_rig, "selected_ui_layout", text="")
+        toggles = template_manager.get_template_toggles(aether_rig)
+        if toggles is not None:
+            box = layout.box()
+            box.label(text="Template Toggles")
+            for prop in toggles.bl_rna.properties:
+                if prop.identifier not in {"rna_type", "name"} and not prop.is_hidden:
+                    row = box.row(align=True)
+                    if prop.type == "ENUM":
+                        split = row.split(factor=0.2, align=True)
+                        split.label(text=prop.name)
+                        split.row(align=True).prop(toggles, prop.identifier, expand=True)
+                    else:
+                        row.prop(toggles, prop.identifier)
 
 
 def register() -> None:

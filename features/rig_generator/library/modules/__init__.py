@@ -1,6 +1,6 @@
 """Rig modules, one package per body part."""
 
-from . import arms, clothing, ears, face, genitals, hair, hands, legs, mouth, spine, tail, toes
+from . import arms, clothing, ears, face, genitals, hair, hands, legs, spine, tail, toes
 
 __all__ = [
     "arms",
@@ -11,7 +11,6 @@ __all__ = [
     "hair",
     "hands",
     "legs",
-    "mouth",
     "spine",
     "tail",
     "toes",

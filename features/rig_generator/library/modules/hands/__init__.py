@@ -1,6 +1,5 @@
-"""Rig module 'hands' and its variants."""
+"""FFXIV player hand generation with selectable IVCS support."""
 
-from .ffxiv_default import Module as ffxiv_default
-from .ffxiv_ivcs import Module as ffxiv_ivcs
+from .ffxiv_player import Module as ffxiv_player
 
-__all__ = ["ffxiv_default", "ffxiv_ivcs"]
+__all__ = ["ffxiv_player"]

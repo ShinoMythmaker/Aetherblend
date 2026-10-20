@@ -68,7 +68,7 @@ class AETHER_OT_rig_generator_generate_full(_ArmatureSelectionHelpers, bpy.types
 
             rig_generator = template_manager.get_rig_generator(armature.aether_rig)
             if not rig_generator:
-                self.report({"ERROR"}, "Select an available rig template, colorset and UI layout")
+                self.report({"ERROR"}, "Select an available rig template and colorset")
                 return {"CANCELLED"}
 
             state = rig_generator.generate_meta_rig(
@@ -115,7 +115,7 @@ class AETHER_OT_rig_generator_generate_meta(_ArmatureSelectionHelpers, bpy.types
 
             rig_generator = template_manager.get_rig_generator(armature.aether_rig)
             if not rig_generator:
-                self.report({"ERROR"}, "Select an available rig template, colorset and UI layout")
+                self.report({"ERROR"}, "Select an available rig template and colorset")
                 return {"CANCELLED"}
 
             state = rig_generator.generate_meta_rig(

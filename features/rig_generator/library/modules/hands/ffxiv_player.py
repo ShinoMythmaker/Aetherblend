@@ -1,4 +1,4 @@
-"""Hands shared by every hand variant; a variant only decides whether the fingers have IVCS tip bones."""
+"""FFXIV player hands with optional IVCS finger tips."""
 
 import typing
 
@@ -26,7 +26,7 @@ LONG_FINGERS = (
 
 
 def required_bones(has_tip_bones: bool) -> list[str]:
-    """Return the legacy hand bone sequence for callers outside the variants."""
+    """Return the source bones used by the requested hand style."""
     bones = []
     for side in definitions.SIDES:
         for finger in (THUMB, *LONG_FINGERS):
@@ -36,12 +36,28 @@ def required_bones(has_tip_bones: bool) -> list[str]:
     return bones
 
 
-class Hands(definitions.RigModule):
-    has_tip_bones = False
+class Module(definitions.RigModule):
+    """Choose standard or IVCS fingers from template toggles and available bones."""
+
+    name = "FFXIV Player Hands"
+    has_tip_bones: bool = False
+    _enabled: bool = False
 
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Check the selected source bones and create palm and finger chains."""
+        if self.toggles is None:
+            raise ValueError(f"{self.name} requires template toggles")
+        mode = self.toggles.ivcs
+        if mode not in {"AUTO", "ON", "OFF"}:
+            raise ValueError(f"Unknown IVCS mode: {mode}")
+        self.has_tip_bones = mode != "OFF" and all(abi.has_bone(rig, bone) for bone in required_bones(True))
+        self._enabled = abi.require_bones(rig, required_bones(self.has_tip_bones), self.name)
+        if not self._enabled:
+            return
+        if mode == "ON" and not self.has_tip_bones:
+            print(f"[AetherBlend] {self.name}: IVCS tip bones are incomplete; generating standard fingers.")
         for side in definitions.SIDES:
             # Palm bones
             abi.extend(
@@ -246,6 +262,9 @@ class Hands(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure finger controls, collections, and source mappings."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             fingers_collection = f"Fingers{side.suffix}"
 
@@ -356,6 +375,9 @@ class Hands(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
+        """Parent the generated thumb master controls."""
+        if not self._enabled:
+            return
         # Palm hierarchy
         for side in definitions.SIDES:
             abi.parent(rig, f"palm.01{side.suffix}", [f"hand{side.suffix}", f"j_te_{side.source}"])

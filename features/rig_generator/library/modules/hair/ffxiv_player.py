@@ -23,7 +23,9 @@ PATTERNS = (
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Default"
+    """Build FFXIV player hair and head accessory controls."""
+
+    name = "FFXIV Player Hair"
 
     def __init__(self) -> None:
         self.chains: list[tuple[list[str], str]] = []
@@ -31,6 +33,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Discover and build hair and accessory chains."""
         self.chains = []
         # Hair and accessory chains
         for pattern in PATTERNS:
@@ -71,6 +74,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure the discovered controls and deform mappings."""
         # Chain controls
         for chain, collection_name in self.chains:
             bones = [f"HAIR_{source}" for source in chain]

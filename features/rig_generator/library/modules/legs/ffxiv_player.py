@@ -7,8 +7,11 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Default"
-    requires = [
+    """Build legs only when both source chains are available."""
+
+    name = "FFXIV Player Legs"
+    _enabled: bool = False
+    _source_bones = [
         "j_asi_a_l",
         "j_asi_b_l",
         "j_asi_c_l",
@@ -24,6 +27,10 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Check the source bones and create both leg chains and helpers."""
+        self._enabled = abi.require_bones(rig, self._source_bones, self.name)
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Leg chain
             abi.connect(
@@ -106,6 +113,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure leg controls, collections, and deform mappings."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Leg and knee rig types
             abi.rigify.limbs_leg(
@@ -145,6 +155,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
+        """Parent the generated knee helpers."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Knee hierarchy
             abi.parent(rig, f"MCH-knee{side.suffix}", f"DEF-thigh{side.suffix}.001")
@@ -154,6 +167,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Configure knee tracking and leg stretch."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Knee tracking and leg stretch
             abi.constraints.damped_track(rig, f"MCH-knee{side.suffix}", target=f"MCH-knee_target{side.suffix}")

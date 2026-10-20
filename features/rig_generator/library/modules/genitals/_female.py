@@ -7,11 +7,12 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-IVCS Female"
+    """Build the available female anatomy for the player genitals module."""
 
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Build controls for the available female source bones."""
         # Optional control bones
         if abi.has_bone(rig, "iv_kuritto") and abi.has_bone(rig, "j_kosi"):
             abi.connect(rig, "Clitoris", "iv_kuritto", "j_kosi", parent=["Spine.001", "j_kosi"])
@@ -29,6 +30,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure available female controls and deform mappings."""
         # Controls and source-to-deform mappings
         if "Clitoris" in rig.pose.bones:
             abi.rigify.skin_basic_chain(rig, "Clitoris", control_orientation_bone="Spine.001")
@@ -54,8 +56,8 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Configure widgets only for controls created by this helper."""
         # Control widgets
-        abi.widget(rig, "Clitoris", scale_factor=0.2)
-        abi.widget(rig, "Vulva.R", scale_factor=0.2)
-        abi.widget(rig, "Vulva.L", scale_factor=0.2)
-        abi.widget(rig, "Vulva", scale_factor=0.2)
+        for name in ("Clitoris", "Vulva.R", "Vulva.L", "Vulva"):
+            if name in rig.pose.bones:
+                abi.widget(rig, name, scale_factor=0.2)

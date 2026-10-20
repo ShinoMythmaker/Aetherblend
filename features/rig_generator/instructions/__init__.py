@@ -14,6 +14,7 @@ from .edit_bone import (
     offset,
     parallel,
     parent,
+    require_bones,
 )
 from .edit_bone import resolve_pending_parents as resolve_pending_parents
 from .pose_bone import armature_prop, collection, link, pose, prop, restrict
@@ -42,6 +43,7 @@ __all__ = [
     "pose",
     "prop",
     "restrict",
+    "require_bones",
     "rigify",
     "widget",
 ]

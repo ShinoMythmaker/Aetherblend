@@ -7,8 +7,11 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Default"
-    requires = [
+    """Build arms only when their source chains and helpers are available."""
+
+    name = "FFXIV Player Arms"
+    _enabled: bool = False
+    _source_bones = [
         "j_sako_l",
         "j_ude_a_l",
         "j_ude_b_l",
@@ -26,6 +29,10 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Check the source bones and create both arm chains and helpers."""
+        self._enabled = abi.require_bones(rig, self._source_bones, self.name)
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Pauldron helpers
             abi.extend(
@@ -83,6 +90,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure arm controls, collections, and deform mappings."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Arm and helper controls
             abi.rigify.basic_raw_copy(rig, f"MCH-pauldron{side.suffix}")
@@ -117,6 +127,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Apply pauldron follow behavior and control settings."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Pauldron follow
             abi.collection(rig, [f"MCH-pauldron{side.suffix}"], "MCH")

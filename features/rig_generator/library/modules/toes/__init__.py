@@ -1,5 +1,5 @@
-"""Rig module 'toes' and its variants."""
+"""FFXIV player toe generation with selectable IVCS support."""
 
-from .ffxiv_ivcs import Module as ffxiv_ivcs
+from .ffxiv_player import Module as ffxiv_player
 
-__all__ = ["ffxiv_ivcs"]
+__all__ = ["ffxiv_player"]

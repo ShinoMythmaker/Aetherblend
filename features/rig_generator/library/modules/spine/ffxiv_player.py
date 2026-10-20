@@ -7,8 +7,11 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Default"
-    requires = [
+    """Build the torso and head when the source spine is complete."""
+
+    name = "FFXIV Player Spine"
+    _enabled: bool = False
+    _source_bones = [
         "j_kosi",
         "j_sebo_a",
         "j_sebo_b",
@@ -21,6 +24,10 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Check the source spine and create torso and head controls."""
+        self._enabled = abi.require_bones(rig, self._source_bones, self.name)
+        if not self._enabled:
+            return
         # Spine chain
         abi.connect(rig, "Spine.001", "j_kosi", "j_kosi", start_point="tail", end_point="head")
         abi.connect(rig, "Spine.002", "j_sebo_a", "j_sebo_b", parent="Spine.001", connected=True)
@@ -49,6 +56,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure torso and head controls and deform mappings."""
+        if not self._enabled:
+            return
         # Torso and head controls
         abi.rigify.spines_basic_spine(
             rig,
@@ -81,6 +91,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
+        """Parent the retarget helper into the generated torso."""
+        if not self._enabled:
+            return
         # Retarget hierarchy
         abi.parent(rig, "MCH-Spine.001", "n_hara_retarget")
         abi.parent(rig, "MCH-Spine.002", "n_hara_retarget")
@@ -89,6 +102,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Configure chest widgets and root tracking."""
+        if not self._enabled:
+            return
         # Chest widgets and root tracking
         for side in definitions.SIDES:
             abi.widget(rig, f"Chest{side.suffix}", translation=[0, 0.05, 0])

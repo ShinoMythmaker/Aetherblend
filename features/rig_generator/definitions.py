@@ -1,10 +1,12 @@
 """Definitions a rig is built from: modules, templates and UI links."""
 
-from collections.abc import Container, Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Literal, NamedTuple
 
 import bpy
+
+from .rigify.settings import BoneCollection
 
 
 class Side(NamedTuple):
@@ -25,15 +27,13 @@ class RigModule:
 
     The generator runs the steps in this order: meta_edit and meta_pose on the meta rig,
     then, after rigify generated the rig, final_edit and final_pose on the final rig.
+    Modules own their bone checks and fallback choices. The selected template's
+    persistent Blender properties are available through self.toggles in every step.
     """
 
     name: str = ""
-    requires: Sequence[str] = ()
     ui_flags: Sequence[str] = ()
-
-    def missing_bones(self, available: Container[str]) -> list[str]:
-        """Return the required bones that are not available."""
-        return [bone for bone in self.requires if bone not in available]
+    toggles: bpy.types.PropertyGroup | None = None
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
         """Edit the meta rig (edit mode)."""
@@ -50,10 +50,12 @@ class RigModule:
 
 @dataclass(frozen=True)
 class Template:
-    """A rig template: priority groups of modules where the first usable module of each group wins."""
+    """Ordered modules, a template-owned layout, and optional persistent Blender toggles."""
 
     name: str
-    modules: list[list[type[RigModule]]]
+    modules: list[type[RigModule]]
+    ui_layout: list[BoneCollection] | Callable[[bpy.types.PropertyGroup | None], list[BoneCollection]]
+    toggles: type[bpy.types.PropertyGroup] | None = None
 
 
 UI_Type = Literal["checkbox", "slider", "dropdown"]

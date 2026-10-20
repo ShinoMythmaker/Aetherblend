@@ -3,13 +3,20 @@
 import bpy
 
 from . import template_manager
+from .library import TEMPLATES
+
+_TOGGLE_CLASSES = tuple(dict.fromkeys(template.toggles for template in TEMPLATES.values() if template.toggles))
 
 
 class AETHER_PG_rig_generator_string_item(bpy.types.PropertyGroup):
+    """A UI flag resolved by the modules during generation."""
+
     value: bpy.props.StringProperty(name="Value", default="", options={"HIDDEN"})  # type: ignore
 
 
 class AETHER_PG_rig_generator_rig(bpy.types.PropertyGroup):
+    """Persistent generation settings stored on an armature object."""
+
     meta_rig: bpy.props.PointerProperty(
         name="Meta Rig",
         type=bpy.types.Object,
@@ -38,13 +45,6 @@ class AETHER_PG_rig_generator_rig(bpy.types.PropertyGroup):
         name="Colorset",
         description="Select a colorset (replaces template default)",
         items=template_manager.get_colorset_items,
-        default=0,
-    )  # type: ignore
-
-    selected_ui_layout: bpy.props.EnumProperty(
-        name="UI Layout",
-        description="Bone collection layout applied when generating or regenerating the rig",
-        items=template_manager.get_ui_layout_items,
         default=0,
     )  # type: ignore
 
@@ -77,6 +77,9 @@ def register() -> None:
     """Register this module's classes."""
     bpy.utils.register_class(AETHER_PG_rig_generator_string_item)
     bpy.utils.register_class(AETHER_PG_rig_generator_rig)
+    for toggle_class in _TOGGLE_CLASSES:
+        bpy.utils.register_class(toggle_class)
+        setattr(AETHER_PG_rig_generator_rig, toggle_class.__name__, bpy.props.PointerProperty(type=toggle_class))
     bpy.types.Object.aether_rig = bpy.props.PointerProperty(type=AETHER_PG_rig_generator_rig)
 
 
@@ -84,5 +87,8 @@ def unregister() -> None:
     """Unregister this module's classes."""
     if hasattr(bpy.types.Object, "aether_rig"):
         del bpy.types.Object.aether_rig
+    for toggle_class in reversed(_TOGGLE_CLASSES):
+        delattr(AETHER_PG_rig_generator_rig, toggle_class.__name__)
+        bpy.utils.unregister_class(toggle_class)
     bpy.utils.unregister_class(AETHER_PG_rig_generator_rig)
     bpy.utils.unregister_class(AETHER_PG_rig_generator_string_item)

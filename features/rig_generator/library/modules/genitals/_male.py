@@ -7,13 +7,15 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-IVCS Male"
+    """Build the available male anatomy for the player genitals module."""
 
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Build complete male source chains and optional testicle controls."""
         # Penis chain
-        if abi.has_bone(rig, "iv_ochinko_a") and abi.has_bone(rig, "iv_ochinko_b"):
+        source_bones = [f"iv_ochinko_{segment}" for segment in "abcdef"]
+        if any(abi.has_bone(rig, bone) for bone in source_bones) and abi.require_bones(rig, source_bones, "FFXIV Player Male Genitals"):
             abi.connect(rig, "Penis", "iv_ochinko_a", "iv_ochinko_b", parent=["Spine.001", "j_kosi"])
             abi.connect(
                 rig,
@@ -64,6 +66,7 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure available male controls and deform mappings."""
         # Penis controls and source-to-deform mappings
         if "Penis" in rig.pose.bones:
             abi.rigify.limbs_spline_tentacle(rig, "Penis", sik_stretch_control="MANUAL_STRETCH")

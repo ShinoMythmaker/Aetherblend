@@ -20,6 +20,8 @@ _WGTS_COLLECTION_NAME = "WGTS"
 
 @dataclass
 class RigGenerationState:
+    """The rigs and module instances shared by all generation stages."""
+
     armature: bpy.types.Object
     meta_rig: bpy.types.Object
     visible_collections: list[bpy.types.BoneCollection]
@@ -38,7 +40,7 @@ class AetherRigGenerator:
     """Generates an armature by running the steps of the selected rig modules in order."""
 
     name: str
-    module_groups: list[list[RigModule]]  # instances created from the template's module classes
+    modules: list[RigModule]
     color_sets: "dict[str, rigify.ColorSet]"
     ui_layout: list[rigify.BoneCollection]
 
@@ -47,12 +49,15 @@ class AetherRigGenerator:
         name: str,
         color_sets: "dict[str, rigify.ColorSet]",
         ui_layout: list[rigify.BoneCollection],
-        modules: list[list[type[RigModule]]] | None = None,
+        modules: list[type[RigModule]] | None = None,
+        toggles: bpy.types.PropertyGroup | None = None,
     ) -> None:
         self.name = name
         self.color_sets = color_sets
         self.ui_layout = ui_layout
-        self.module_groups = [[module_class() for module_class in group] for group in (modules or []) if group]
+        self.modules = [module_class() for module_class in (modules or [])]
+        for module in self.modules:
+            module.toggles = toggles
 
     # ------------------------------
     # Meta rig generation pipeline
@@ -71,14 +76,12 @@ class AetherRigGenerator:
 
         original_bone_names = set(meta_rig.data.bones.keys())
 
-        valid_modules = self._validate_modules(available_bones=original_bone_names)
-        self._sync_ui_flags_property(armature, valid_modules)
-
-        self._run_meta_edit(meta_rig, valid_modules)
+        self._run_meta_edit(meta_rig, self.modules)
+        self._sync_ui_flags_property(armature, self.modules)
 
         visible_collections = self._create_ui_collections(meta_rig)
 
-        self._run_meta_pose(meta_rig, valid_modules, original_bone_names)
+        self._run_meta_pose(meta_rig, self.modules, original_bone_names)
         self._sort_original_bones(meta_rig)
         self._finalize_meta_rig(armature, meta_rig)
 
@@ -86,7 +89,7 @@ class AetherRigGenerator:
             armature=armature,
             meta_rig=meta_rig,
             visible_collections=visible_collections,
-            modules=valid_modules,
+            modules=self.modules,
         )
 
     # ------------------------------
@@ -270,22 +273,6 @@ class AetherRigGenerator:
 
         for color_set in self.color_sets.values():
             color_set.add(meta_rig)
-
-    def _validate_modules(self, available_bones: set[str]) -> list[RigModule]:
-        """Pick the first module of every priority group whose required bones all exist."""
-        valid: list[RigModule] = []
-
-        for module_group in self.module_groups:
-            for module in module_group:
-                missing_bones = module.missing_bones(available_bones)
-                if missing_bones:
-                    print(f"[AetherBlend] Skipping module '{module.name}': missing bones {missing_bones}")
-                    continue
-
-                valid.append(module)
-                break
-
-        return valid
 
     def _run_meta_edit(self, meta_rig: bpy.types.Object, modules: list[RigModule]) -> None:
         enter_mode(meta_rig, "EDIT")

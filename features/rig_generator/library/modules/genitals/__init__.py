@@ -1,7 +1,5 @@
-"""Rig module 'genitals' and its variants."""
+"""FFXIV player genitals selected by content mode and sex."""
 
-from .ffxiv_ivcs_both import Module as ffxiv_ivcs_both
-from .ffxiv_ivcs_female import Module as ffxiv_ivcs_female
-from .ffxiv_ivcs_male import Module as ffxiv_ivcs_male
+from .ffxiv_player import Module as ffxiv_player
 
-__all__ = ["ffxiv_ivcs_both", "ffxiv_ivcs_female", "ffxiv_ivcs_male"]
+__all__ = ["ffxiv_player"]

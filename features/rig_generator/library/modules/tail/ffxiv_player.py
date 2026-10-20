@@ -7,8 +7,11 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Spline"
-    requires = [
+    """Build a spline tail only when all source segments exist."""
+
+    name = "FFXIV Player Tail"
+    _enabled: bool = False
+    _source_bones = [
         "n_sippo_a",
         "n_sippo_b",
         "n_sippo_c",
@@ -19,6 +22,10 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Create the tail chain when its source bones are present."""
+        self._enabled = abi.require_bones(rig, self._source_bones, self.name)
+        if not self._enabled:
+            return
         # Tail chain
         abi.connect(rig, "Tail", "n_sippo_a", "n_sippo_b", parent=["Spine.001", "j_kosi"])
         abi.connect(rig, "Tail.001", "n_sippo_b", "n_sippo_c", parent="Tail", connected=True)
@@ -29,6 +36,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure spline controls and source mappings."""
+        if not self._enabled:
+            return
         # Tail controls
         abi.rigify.limbs_spline_tentacle(rig, "Tail", sik_stretch_control="MANUAL_STRETCH")
         abi.collection(rig, ["Tail", "Tail.001", "Tail.002", "Tail.003", "Tail.004"], "Tail")
@@ -43,6 +53,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Apply spline widgets only when this module built a tail."""
+        if not self._enabled:
+            return
         # Tail widgets
         abi.widget(rig, "Tail-end", scale_factor=0.5)
         abi.widget(rig, "Tail-end01", scale_factor=0.5)

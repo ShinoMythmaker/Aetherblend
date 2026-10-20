@@ -7,17 +7,18 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    # Shown in the log when the module is skipped.
-    name = "Demo"
+    """Demonstrate module-owned validation and generation stages."""
 
-    # Bones that must exist in the source armature. If one is missing, the module is skipped.
-    requires = [
-        "j_example_bone",
-    ]
+    name = "Demo"
+    _enabled: bool = False
 
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Check the demo source bone before creating its controls."""
+        self._enabled = abi.require_bones(rig, ["j_example_bone"], self.name)
+        if not self._enabled:
+            return
         # Demo chain
         abi.connect(rig, "demo_bone", "j_example_bone", "j_example_bone", end_point="tail", parent="Spine.001")
         abi.extend(rig, "demo_bone_tip", "j_example_bone", parent="demo_bone", connected=True)
@@ -25,6 +26,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure the demo controls and source mapping."""
+        if not self._enabled:
+            return
         # Demo controls
         abi.rigify.basic_super_copy(rig, "demo_bone")
         abi.collection(rig, ["demo_bone", "demo_bone_tip"], "Demo (IK)")
@@ -34,12 +38,18 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
+        """Parent the demo tip to its generated deform bone."""
+        if not self._enabled:
+            return
         # Demo hierarchy
         abi.parent(rig, "demo_bone_tip", "DEF-demo_bone")
 
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Add the demo tracking constraint and custom property."""
+        if not self._enabled:
+            return
         # Demo tracking and property
         abi.constraints.damped_track(rig, "demo_bone", target="demo_bone_tip")
         abi.prop(rig, "demo_bone", "Demo_Property", 0)

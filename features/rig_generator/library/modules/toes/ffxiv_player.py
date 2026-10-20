@@ -7,8 +7,11 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-IVCS"
-    requires = [
+    """Build IVCS toe controls only for complete source toe chains."""
+
+    name = "FFXIV Player Toes"
+    _enabled: bool = False
+    _source_bones = [
         "iv_asi_oya_a_l",
         "iv_asi_oya_a_r",
         "iv_asi_oya_b_l",
@@ -34,6 +37,20 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Check the source toe bones and create the control chains."""
+        if self.toggles is None:
+            raise ValueError(f"{self.name} requires template toggles")
+        mode = self.toggles.ivcs
+        if mode not in {"AUTO", "ON", "OFF"}:
+            raise ValueError(f"Unknown IVCS mode: {mode}")
+        self._enabled = False
+        if mode == "OFF":
+            return
+        if mode == "AUTO" and not all(abi.has_bone(rig, bone) for bone in self._source_bones):
+            return
+        self._enabled = abi.require_bones(rig, self._source_bones, self.name)
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Toe chains
             abi.connect(
@@ -110,6 +127,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure toe controls and source mappings."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Toe controls and source-to-deform mappings
             abi.rigify.limbs_super_finger(rig, f"Hallux_Toe{side.suffix}")

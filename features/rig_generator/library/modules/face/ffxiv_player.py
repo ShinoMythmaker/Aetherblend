@@ -1,19 +1,55 @@
-"""Face module: brows, cheeks, nose, nostrils and eyes as skin chains."""
+"""FFXIV player face, including the selected manual or automated mouth."""
 
 import bpy
 
 from ......utils import object as object_utils
 from .... import definitions
 from .... import instructions as abi
+from . import _mouth_automatic, _mouth_manual
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Default"
+    """Build facial controls and the template-selected mouth in every rig stage."""
+
+    name = "FFXIV Player Face"
     ui_flags = ("Eye Lid Edit Mode",)
+
+    def __init__(self) -> None:
+        self._mouth: definitions.RigModule | None = None
+
+    def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Select the mouth mode and build the face before its mouth chains."""
+        if self.toggles is None:
+            raise ValueError(f"{self.name} requires template toggles")
+        mode = self.toggles.mouth
+        if mode not in {"AUTOMATIC", "MANUAL"}:
+            raise ValueError(f"Unknown mouth mode: {mode}")
+        self._mouth = _mouth_manual.Module() if mode == "MANUAL" else _mouth_automatic.Module()
+        self._mouth.toggles = self.toggles
+        self._face_meta_edit(rig)
+        self._mouth.meta_edit(rig)
+
+    def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure both face and selected mouth controls."""
+        self._face_meta_pose(rig)
+        if self._mouth is not None:
+            self._mouth.meta_pose(rig)
+
+    def final_edit(self, rig: bpy.types.Object) -> None:
+        """Apply generated face and selected mouth hierarchies."""
+        self._face_final_edit(rig)
+        if self._mouth is not None:
+            self._mouth.final_edit(rig)
+
+    def final_pose(self, rig: bpy.types.Object) -> None:
+        """Apply face automation and the selected mouth's widgets."""
+        self._face_final_pose(rig)
+        if self._mouth is not None:
+            self._mouth.final_pose(rig)
 
     # ------------------------------------------------------------------------
 
-    def meta_edit(self, rig: bpy.types.Object) -> None:
+    def _face_meta_edit(self, rig: bpy.types.Object) -> None:
         """Build the facial chains and optional eye controls."""
         # Brow chains
         for side in definitions.SIDES:
@@ -262,7 +298,7 @@ class Module(definitions.RigModule):
 
     # ------------------------------------------------------------------------
 
-    def meta_pose(self, rig: bpy.types.Object) -> None:
+    def _face_meta_pose(self, rig: bpy.types.Object) -> None:
         """Configure facial rig types, collections and source mappings."""
         for side in definitions.SIDES:
             # Brow controls and mappings
@@ -469,7 +505,7 @@ class Module(definitions.RigModule):
 
     # ------------------------------------------------------------------------
 
-    def final_edit(self, rig: bpy.types.Object) -> None:
+    def _face_final_edit(self, rig: bpy.types.Object) -> None:
         """Parent the macro controls to the generated head."""
         # Eye control hierarchy
         for control in ("Iris", "Pupil", "Lid"):
@@ -479,7 +515,7 @@ class Module(definitions.RigModule):
 
     # ------------------------------------------------------------------------
 
-    def final_pose(self, rig: bpy.types.Object) -> None:
+    def _face_final_pose(self, rig: bpy.types.Object) -> None:
         """Configure facial widgets and optional eye automation."""
         # Head follow and face widgets
         abi.prop(rig, "head", "head_follow", 1)

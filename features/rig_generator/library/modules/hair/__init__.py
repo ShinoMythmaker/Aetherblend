@@ -1,5 +1,5 @@
-"""Rig module 'hair' and its variants."""
+"""FFXIV player hair and accessory generation."""
 
-from .ffxiv_default import Module as ffxiv_default
+from .ffxiv_player import Module as ffxiv_player
 
-__all__ = ["ffxiv_default"]
+__all__ = ["ffxiv_player"]

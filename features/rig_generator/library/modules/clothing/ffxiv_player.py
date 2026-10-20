@@ -7,8 +7,11 @@ from .... import instructions as abi
 
 
 class Module(definitions.RigModule):
-    name = "XIV-Default"
-    requires = [
+    """Build skirt automation when all source skirt segments are present."""
+
+    name = "FFXIV Player Clothing"
+    _enabled: bool = False
+    _source_bones = [
         "j_sk_f_a_l",
         "j_sk_f_b_l",
         "j_sk_f_c_l",
@@ -33,6 +36,11 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_edit(self, rig: bpy.types.Object) -> None:
+        """Check skirt segments, update UI flags, and build skirt controls."""
+        self._enabled = abi.require_bones(rig, self._source_bones, self.name)
+        self.ui_flags = ("Skirt Automation",) if self._enabled else ()
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Leg tracking helpers
             abi.extend(
@@ -208,6 +216,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def meta_pose(self, rig: bpy.types.Object) -> None:
+        """Configure skirt controls and source mappings."""
+        if not self._enabled:
+            return
         for side in definitions.SIDES:
             # Leg tracking helpers
             abi.rigify.basic_raw_copy(rig, f"MCH-thigh_driv_tgt{side.suffix}")
@@ -270,6 +281,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_edit(self, rig: bpy.types.Object) -> None:
+        """Parent the generated skirt automation helpers."""
+        if not self._enabled:
+            return
         # Skirt hierarchy
         for side in definitions.SIDES:
             abi.parent(rig, f"Skirt_Front{side.suffix}", f"MCH-Skirt_Front{side.suffix}")
@@ -279,6 +293,9 @@ class Module(definitions.RigModule):
     # ------------------------------------------------------------------------
 
     def final_pose(self, rig: bpy.types.Object) -> None:
+        """Configure skirt automation constraints and drivers."""
+        if not self._enabled:
+            return
         # Automation control
         abi.armature_prop(rig, "skirt_automation", 1.0, minimum=0.0, maximum=1.0)
         automation = abi.PropertyVariable("skirt_automation")
