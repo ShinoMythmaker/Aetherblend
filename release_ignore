@@ -1,5 +1,6 @@
 .*
 */.*
+tests/*
 docs/*
 get_dependencies.py
 README.md
