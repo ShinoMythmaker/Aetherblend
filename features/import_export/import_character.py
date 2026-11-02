@@ -189,6 +189,12 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
             self.report({"ERROR"}, "[AetherBlend] Invalid file format. Please select a .gltf, .glb, or .fbx file.")
             return {"CANCELLED"}
 
+        if context.screen:
+            for area in context.screen.areas:
+                for space in area.spaces:
+                    if space.type == "VIEW_3D":
+                        space.show_object_viewport_armature = True
+
         # Import the model
         imported_objects = utils.import_export.import_model(
             self.filepath, self.s_pack_images, self.s_disable_bone_shape, self.s_merge_vertices
