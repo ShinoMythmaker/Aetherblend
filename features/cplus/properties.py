@@ -2,8 +2,6 @@
 
 import bpy
 
-from ...utils.axis_conversion import AXIS_ITEMS
-
 
 class AETHER_PROP_CustomizePlus(bpy.types.PropertyGroup):
     """Store Customize+ data and backup settings on armatures."""
@@ -15,19 +13,6 @@ class AETHER_PROP_CustomizePlus(bpy.types.PropertyGroup):
         type=bpy.types.Object,
         description="Reference to the backup armature for C+ reversion",
         poll=lambda self, obj: obj.type == "ARMATURE",
-    )  # type: ignore
-
-    cplus_primary_axis: bpy.props.EnumProperty(
-        name="Primary Axis",
-        description="Primary bone axis used when applying C+ transforms",
-        items=AXIS_ITEMS,
-        default="X",
-    )  # type: ignore
-    cplus_secondary_axis: bpy.props.EnumProperty(
-        name="Secondary Axis",
-        description="Secondary bone axis used when applying C+ transforms",
-        items=AXIS_ITEMS,
-        default="Y",
     )  # type: ignore
 
 

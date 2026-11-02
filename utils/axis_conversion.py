@@ -4,19 +4,8 @@ import bpy
 from bpy_extras.io_utils import axis_conversion as _bpy_axis_conversion
 from mathutils import Matrix
 
-# ---------------------------------------------------------------------------
-# Shared axis-choice enum items
-# ---------------------------------------------------------------------------
-
-AXIS_ITEMS = (
-    ("X", "X", ""),
-    ("Y", "Y", ""),
-    ("Z", "Z", ""),
-    ("-X", "-X", ""),
-    ("-Y", "-Y", ""),
-    ("-Z", "-Z", ""),
-)
-
+DEFAULT_PRIMARY_BONE_AXIS = "X"
+DEFAULT_SECONDARY_BONE_AXIS = "Y"
 
 # ---------------------------------------------------------------------------
 # Matrix helpers

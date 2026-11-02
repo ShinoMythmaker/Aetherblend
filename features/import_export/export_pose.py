@@ -14,7 +14,7 @@ from bpy_extras.io_utils import ExportHelper
 from mathutils import Matrix
 
 from ...preferences import get_preferences
-from ...utils.axis_conversion import AXIS_ITEMS
+from ...utils.axis_conversion import DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS, get_export_correction_matrix
 
 
 def pose_export_image_items(_self: bpy.types.Operator, _context: bpy.types.Context) -> list[tuple[str, str, str]]:
@@ -26,6 +26,8 @@ def pose_export_image_items(_self: bpy.types.Operator, _context: bpy.types.Conte
 
 
 class AETHER_OT_import_export_export_pose(Operator, ExportHelper):
+    """Export a pose using the standard Blender-to-FFXIV coordinate conversion."""
+
     bl_idname = "aether.import_export_export_pose"
     bl_label = "Export to Pose File"
     bl_description = "Exports armature pose into a .pose file"
@@ -34,27 +36,6 @@ class AETHER_OT_import_export_export_pose(Operator, ExportHelper):
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")  # type: ignore
     filename_ext = ".pose"
     filter_glob: bpy.props.StringProperty(default="*.pose", options={"HIDDEN"})  # type: ignore
-
-    # Axis conversion properties
-    use_pose_axis_conversion: BoolProperty(
-        name="Use Axis Conversion",
-        description="Apply pose axis conversion to match character import settings",
-        default=True,
-    )  # type: ignore
-
-    pose_primary_axis: bpy.props.EnumProperty(
-        name="Primary Axis",
-        description="Primary axis for pose export orientation.",
-        items=AXIS_ITEMS,
-        default="X",
-    )  # type: ignore
-
-    pose_secondary_axis: bpy.props.EnumProperty(
-        name="Secondary Axis",
-        description="Secondary axis for pose export orientation.",
-        items=AXIS_ITEMS,
-        default="Y",
-    )  # type: ignore
 
     pose_author: bpy.props.StringProperty(
         name="Author",
@@ -130,12 +111,8 @@ class AETHER_OT_import_export_export_pose(Operator, ExportHelper):
         return super().invoke(context, event)
 
     def draw(self, _context: bpy.types.Context) -> None:
+        """Draw pose metadata and preview controls."""
         layout = self.layout
-        axis_box = layout.box()
-        axis_box.label(text="Axis")
-        axis_box.prop(self, "use_pose_axis_conversion")
-        axis_box.prop(self, "pose_primary_axis")
-        axis_box.prop(self, "pose_secondary_axis")
 
         pose_box = layout.box()
         pose_box.label(text="Pose File Data")
@@ -229,11 +206,7 @@ class AETHER_OT_import_export_export_pose(Operator, ExportHelper):
                 with context.temp_override(**override):
                     bpy.ops.render.opengl(write_still=False, view_context=True)
             finally:
-                if (
-                    old_armature_visibility is not None
-                    and viewport_space
-                    and hasattr(viewport_space, "show_object_viewport_armature")
-                ):
+                if old_armature_visibility is not None and viewport_space and hasattr(viewport_space, "show_object_viewport_armature"):
                     viewport_space.show_object_viewport_armature = old_armature_visibility
 
             render_result = bpy.data.images.get("Render Result")
@@ -268,18 +241,13 @@ class AETHER_OT_import_export_export_pose(Operator, ExportHelper):
         return None
 
     def execute(self, context: bpy.types.Context) -> set[str]:
+        """Write the active pose in FFXIV coordinates with its metadata."""
         armature = context.object
         if not armature or armature.type != "ARMATURE":
             self.report({"ERROR"}, "No armature selected")
             return {"CANCELLED"}
 
-        from ... import utils as aether_utils
-
-        pose_correction_matrix = Matrix.Identity(4)
-        if self.use_pose_axis_conversion:
-            pose_correction_matrix = aether_utils.axis_conversion.get_export_correction_matrix(
-                self.pose_primary_axis, self.pose_secondary_axis
-            )
+        pose_correction_matrix = get_export_correction_matrix(DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS)
 
         x_rotation = Matrix.Rotation(math.radians(-90), 4, "X")
 
@@ -307,8 +275,7 @@ class AETHER_OT_import_export_export_pose(Operator, ExportHelper):
             bone = armature.pose.bones.get(bone_name)
             if bone:
                 bone_matrix_world = armature.matrix_world @ bone.matrix
-                if self.use_pose_axis_conversion:
-                    bone_matrix_world = bone_matrix_world @ pose_correction_matrix
+                bone_matrix_world = bone_matrix_world @ pose_correction_matrix
                 bone_matrix_world = x_rotation @ bone_matrix_world
 
                 bone_data = {}

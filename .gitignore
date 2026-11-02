@@ -10,6 +10,9 @@ __pycache__/
 .Python
 build/
 tests/
+!/tests/
+/tests/*
+!/tests/test_cplus.py
 develop-eggs/
 dist/
 downloads/
