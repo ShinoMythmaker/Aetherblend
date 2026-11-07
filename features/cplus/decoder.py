@@ -6,6 +6,7 @@ import math
 import warnings
 import zlib
 from collections.abc import Mapping
+from dataclasses import dataclass
 from io import BytesIO
 from typing import Any, BinaryIO
 
@@ -21,6 +22,18 @@ _ROTATION_EDIT_EPSILON = mathutils.Vector((0.1, 0.0, 0.0)).x
 _MATRIX_ERROR_TOLERANCE = 2e-5
 
 
+########
+# C+ String Decoding
+########
+
+
+def _get_bones(cplus_data: Mapping[str, Any]) -> dict[str, Any]:
+    bones = cplus_data.get("Bones")
+    if not isinstance(bones, dict):
+        raise ValueError("The C+ data does not contain a Bones object")
+    return bones
+
+
 def translate_hash(compressed: bytes) -> tuple[int, dict[str, Any]]:
     """Decompress a Customize+ string and return its version and data."""
     inflated = zlib.decompress(compressed, zlib.MAX_WBITS | 16)
@@ -30,15 +43,15 @@ def translate_hash(compressed: bytes) -> tuple[int, dict[str, Any]]:
 
 
 def decode_cplus_string(code: str) -> dict[str, Any]:
-    """Decode gzip or legacy JSON templates without gating on version metadata.
-    """
+    """Decode gzip or legacy JSON templates without gating on version metadata."""
     decoded = base64.b64decode(code.strip(), validate=True)
     if decoded.startswith(b"\x1f\x8b"):
         _, data = translate_hash(decoded)
     else:
         data = json.loads(decoded)
-    if not isinstance(data, dict) or not isinstance(data.get("Bones"), dict):
+    if not isinstance(data, dict):
         raise ValueError("The C+ data does not contain a Bones object")
+    _get_bones(data)
     return data
 
 
@@ -56,6 +69,11 @@ def get_bone_values(cplus_dict: dict[str, Any], value_key: str) -> dict[str, dic
             continue
         result[bone_name] = coordinates
     return result
+
+
+########
+# C+ Bone Data
+########
 
 
 def _transform_vector(data: Mapping[str, Any], key: str) -> mathutils.Vector:
@@ -82,6 +100,66 @@ def _transform_vector(data: Mapping[str, Any], key: str) -> mathutils.Vector:
     return mathutils.Vector(result)
 
 
+@dataclass
+class _BoneTransform:
+    """C+ transform values and propagation settings for one bone."""
+
+    translation: mathutils.Vector
+    rotation: mathutils.Vector
+    scale: mathutils.Vector
+    child_scale: mathutils.Vector
+    propagate_translation: bool
+    propagate_rotation: bool
+    propagate_scale: bool
+    child_scaling_independent: bool
+
+    @classmethod
+    def from_data(cls, name: str, data: Any) -> "_BoneTransform":
+        """Read and validate a bone's values before modifying the armature."""
+        if not isinstance(data, dict):
+            raise ValueError(f"Bone '{name}' must contain a transform object")
+
+        translation = _transform_vector(data, "Translation")
+        rotation = _transform_vector(data, "Rotation")
+        scale = _transform_vector(data, "Scaling")
+        child_scale = _transform_vector(data, "ChildScaling")
+        flags = {}
+        for key in ("PropagateTranslation", "PropagateRotation", "PropagateScale", "ChildScalingIndependent"):
+            value = data.get(key, False)
+            if not isinstance(value, bool):
+                raise ValueError(f"{name}.{key} must be a boolean")
+            flags[key] = value
+
+        return cls(
+            translation=translation,
+            rotation=rotation,
+            scale=scale,
+            child_scale=child_scale,
+            propagate_translation=flags["PropagateTranslation"],
+            propagate_rotation=flags["PropagateRotation"],
+            propagate_scale=flags["PropagateScale"],
+            child_scaling_independent=flags["ChildScalingIndependent"],
+        )
+
+    def is_edited(self) -> bool:
+        """Match the thresholds C+ uses to skip unchanged bones."""
+        translation_edited = any(abs(value) >= _VECTOR_EDIT_EPSILON for value in self.translation)
+        rotation_edited = any(abs(value) >= _ROTATION_EDIT_EPSILON for value in self.rotation)
+        scale_edited = any(abs(value - 1.0) >= _VECTOR_EDIT_EPSILON for value in self.scale)
+        child_scale_edited = self.child_scaling_independent and any(abs(value - 1.0) >= _VECTOR_EDIT_EPSILON for value in self.child_scale)
+        return translation_edited or rotation_edited or scale_edited or child_scale_edited
+
+
+########
+# Model-Space Transform Math
+########
+
+# Mirrors BoneTransform and ModelBone in Customize+
+# Incase anyone is curious here are the main references to the relevant C+ source files:
+# https://github.com/Aether-Tools/CustomizePlus/blob/44d25415b961e0bbba759d1508b6d06acef88d90/CustomizePlus/Core/Data/BoneTransform.cs
+# https://github.com/Aether-Tools/CustomizePlus/blob/44d25415b961e0bbba759d1508b6d06acef88d90/CustomizePlus/Armatures/Data/ModelBone.cs
+
+
 def _rotation_offset(rotation: mathutils.Vector) -> mathutils.Quaternion:
     # Customize+ passes X, Y, Z to .NET's yaw(Y), pitch(X), roll(Z).
     yaw = mathutils.Quaternion((0.0, 1.0, 0.0), math.radians(rotation.x))
@@ -101,16 +179,6 @@ def _model_trs(matrix: mathutils.Matrix, name: str) -> mathutils.Matrix:
             stacklevel=2,
         )
     return result
-
-
-def _is_bone_edited(vectors: Mapping[str, mathutils.Vector], flags: Mapping[str, bool]) -> bool:
-    translation_edited = any(abs(value) >= _VECTOR_EDIT_EPSILON for value in vectors["Translation"])
-    rotation_edited = any(abs(value) >= _ROTATION_EDIT_EPSILON for value in vectors["Rotation"])
-    scale_edited = any(abs(value - 1.0) >= _VECTOR_EDIT_EPSILON for value in vectors["Scaling"])
-    child_scale_edited = flags["ChildScalingIndependent"] and any(
-        abs(value - 1.0) >= _VECTOR_EDIT_EPSILON for value in vectors["ChildScaling"]
-    )
-    return translation_edited or rotation_edited or scale_edited or child_scale_edited
 
 
 def _propagate_to_descendants(
@@ -156,39 +224,32 @@ def calculate_model_transforms(
     translation_factor: float = 1.0,
 ) -> dict[str, mathutils.Matrix]:
     """Evaluate C+ edits in game model space, independently of Blender parenting."""
-    bone_data = cplus_data.get("Bones")
-    if not isinstance(bone_data, dict):
-        raise ValueError("The C+ data does not contain a Bones object")
+    ########
+    # Read Bone Edits
+    ########
+    bone_data = _get_bones(cplus_data)
     if not math.isfinite(translation_factor) or translation_factor <= 0:
         raise ValueError("Translation unit factor must be positive and finite")
-    edits: dict[str, tuple[dict[str, mathutils.Vector], dict[str, bool]]] = {}
-    for bone_name, data in bone_data.items():
-        if not isinstance(data, dict):
-            raise ValueError(f"Bone '{bone_name}' must contain a transform object")
-        vectors = {key: _transform_vector(data, key) for key in ("Translation", "Rotation", "Scaling", "ChildScaling")}
-        flags: dict[str, bool] = {}
-        for key in ("PropagateTranslation", "PropagateRotation", "PropagateScale", "ChildScalingIndependent"):
-            value = data.get(key, False)
-            if not isinstance(value, bool):
-                raise ValueError(f"{bone_name}.{key} must be a boolean")
-            flags[key] = value
-        edits[bone_name] = (vectors, flags)
+    edits = {name: _BoneTransform.from_data(name, data) for name, data in bone_data.items()}
 
+    ########
+    # Transform Bones and Propagate Changes
+    ########
     model_matrices = {name: matrix.copy() for name, matrix in matrices.items()}
     root_edit = None
     for bone_name in model_matrices:
         if bone_name not in edits:
             continue
-        vectors, flags = edits[bone_name]
+        edit = edits[bone_name]
         if bone_name == "n_root" and parents.get(bone_name) is None:
-            root_edit = vectors
+            root_edit = edit
             continue
-        if not _is_bone_edited(vectors, flags):
+        if not edit.is_edited():
             continue
 
-        translation_offset = vectors["Translation"] * translation_factor
-        rotation_offset = _rotation_offset(vectors["Rotation"])
-        scale_multiplier = vectors["Scaling"]
+        translation_offset = edit.translation * translation_factor
+        rotation_offset = _rotation_offset(edit.rotation)
+        scale_multiplier = edit.scale
         original_position, original_rotation, original_scale = model_matrices[bone_name].decompose()
 
         rotation = original_rotation @ rotation_offset
@@ -196,15 +257,15 @@ def calculate_model_transforms(
         position = original_position + rotation @ translation_offset
         model_matrices[bone_name] = mathutils.Matrix.LocRotScale(position, rotation, scale)
 
-        if not (flags["PropagateTranslation"] or flags["PropagateRotation"] or flags["PropagateScale"]):
+        if not (edit.propagate_translation or edit.propagate_rotation or edit.propagate_scale):
             continue
 
-        child_scale = vectors["ChildScaling"] if flags["ChildScalingIndependent"] else scale_multiplier
+        child_scale = edit.child_scale if edit.child_scaling_independent else scale_multiplier
         identity_scale = mathutils.Vector((1.0, 1.0, 1.0))
-        propagate_scale = flags["PropagateScale"] and (
-            scale_multiplier != identity_scale or (flags["ChildScalingIndependent"] and child_scale != identity_scale)
+        propagate_scale = edit.propagate_scale and (
+            scale_multiplier != identity_scale or (edit.child_scaling_independent and child_scale != identity_scale)
         )
-        propagate_rotation = flags["PropagateRotation"] and vectors["Rotation"].length_squared != 0
+        propagate_rotation = edit.propagate_rotation and edit.rotation.length_squared != 0
         _propagate_to_descendants(
             bone_name,
             model_matrices,
@@ -216,16 +277,23 @@ def calculate_model_transforms(
             propagate_scale,
         )
 
-    # n_root edits affect the whole actor rather than a single pose bone.
+    ########
+    # Apply Root Transform to the Whole Actor
+    ########
     if root_edit is not None:
-        root_scale = root_edit["Scaling"]
+        root_scale = root_edit.scale
         root_matrix = mathutils.Matrix.Identity(4)
         if any(value != 0.0 and value != 1.0 for value in root_scale):
             root_matrix = mathutils.Matrix.Diagonal((*root_scale, 1.0))
-        if any(abs(value) >= _VECTOR_EDIT_EPSILON for value in root_edit["Translation"]):
-            root_matrix.translation = root_edit["Translation"] * translation_factor
+        if any(abs(value) >= _VECTOR_EDIT_EPSILON for value in root_edit.translation):
+            root_matrix.translation = root_edit.translation * translation_factor
         model_matrices = {name: _model_trs(root_matrix @ matrix, name) for name, matrix in model_matrices.items()}
     return model_matrices
+
+
+########
+# Apply Transforms to Blender
+########
 
 
 def apply_transforms(
@@ -237,8 +305,7 @@ def apply_transforms(
     gltf_model_space: bool = True,
     translation_factor: float | None = None,
 ) -> dict[str, str]:
-    """Set model-space C+ poses without unparenting or editing rest orientations.
-    """
+    """Set model-space C+ poses without unparenting or editing rest orientations."""
     if armature.type != "ARMATURE" or armature.mode == "EDIT":
         raise ValueError("C+ transforms require an armature in Object or Pose mode")
     if translation_factor is None:
@@ -246,24 +313,28 @@ def apply_transforms(
     target_bones = dict(bones) if bones is not None else {bone.name: bone for bone in armature.pose.bones}
     ordered_bones = sorted(armature.pose.bones, key=lambda bone: len(bone.parent_recursive))
 
-    # Convert model coordinates on the left, and bone-local axes on the right.
+    ########
+    # Convert Blender Bones to Game Coordinates
+    ########
     bone_axis_correction = get_import_correction_matrix(primary_axis, secondary_axis)
     inverse_bone_axis_correction = bone_axis_correction.inverted()
     game_to_blender = mathutils.Matrix.Rotation(math.pi / 2, 4, "X") if gltf_model_space else mathutils.Matrix.Identity(4)
     blender_to_game = game_to_blender.inverted()
+    # Convert model coordinates on the left, and bone-local axes on the right.
     game_matrices = {bone.name: blender_to_game @ bone.matrix @ inverse_bone_axis_correction for bone in ordered_bones}
     parents = {bone.name: bone.parent.name if bone.parent else None for bone in ordered_bones}
 
     # Excluded control bones do not receive named C+ edits, but still follow
     # explicitly propagated transforms so hierarchy evaluation stays coherent.
     filtered_data = dict(cplus_data)
-    bone_data = cplus_data.get("Bones")
-    if not isinstance(bone_data, dict):
-        raise ValueError("The C+ data does not contain a Bones object")
+    bone_data = _get_bones(cplus_data)
     filtered_data["Bones"] = {name: data for name, data in bone_data.items() if name in target_bones}
     game_targets = calculate_model_transforms(game_matrices, parents, filtered_data, translation_factor)
     blender_targets = {name: game_to_blender @ matrix @ bone_axis_correction for name, matrix in game_targets.items()}
 
+    ########
+    # Solve and Apply Blender Pose
+    ########
     original_inheritance = {bone.name: bone.bone.inherit_scale for bone in ordered_bones}
     original_pose_basis = {bone.name: bone.matrix_basis.copy() for bone in ordered_bones}
     pose_applied = False
@@ -301,6 +372,11 @@ def apply_transforms(
                 bone.matrix_basis = original_pose_basis[bone.name]
             bpy.context.view_layer.update()
     return original_inheritance
+
+
+########
+# MCDF File Reading
+########
 
 
 def read_size(reader: BinaryIO, size: int) -> int | None:
