@@ -1,10 +1,6 @@
 """Operators for applying and managing Customize+ armature data."""
 
-import base64
-import binascii
-import json
-import zlib
-from io import BytesIO
+import warnings
 
 import bpy
 from bpy.props import StringProperty
@@ -25,6 +21,9 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
 
     def execute(self, context: bpy.types.Context) -> set[str]:
         """Decode and apply the active armature's Customize+ data."""
+        ########
+        # Check Armature and C+ Settings
+        ########
         armature = context.active_object
         if armature is None or armature.type != "ARMATURE":
             self.report({"ERROR"}, "Please select a valid armature.")
@@ -37,80 +36,107 @@ class AETHER_OT_QuickApplyCustomizePlus(bpy.types.Operator):
         if armature.data.collections.get("Original") is None:
             self.report({"ERROR"}, "The armature is missing its Original bone collection.")
             return {"CANCELLED"}
-
-        try:
-            decoded = base64.b64decode(settings.code.strip(), validate=True)
-            with BytesIO(decoded) as reader:
-                signature = decoder.read_int(reader)
-
-            if signature == 0x88B1F:
-                version, cplus_data = decoder.translate_hash(decoded)
-                # Im Tired of upping the version
-                # if version not in {4, 5, 6}:
-                #     raise ValueError(f"Unsupported C+ version: {version}")
-            else:
-                cplus_data = json.loads(decoded)
-            if not isinstance(cplus_data, dict) or not isinstance(cplus_data.get("Bones"), dict):
-                raise ValueError("The C+ data does not contain a Bones object")
-            scales = decoder.get_bone_values(cplus_data, "Scaling")
-            rotations = decoder.get_bone_values(cplus_data, "Rotation")
-            translations = decoder.get_bone_values(cplus_data, "Translation")
-        except (
-            binascii.Error,
-            UnicodeDecodeError,
-            json.JSONDecodeError,
-            ValueError,
-            OSError,
-            zlib.error,
-            TypeError,
-            AttributeError,
-        ) as exc:
-            self.report({"ERROR"}, f"Invalid or unsupported C+ string: {exc}")
+        if settings.applied:
+            self.report({"ERROR"}, "Revert the existing C+ changes before applying another string.")
             return {"CANCELLED"}
+
+        ########
+        # Decode C+ String and Check Bones
+        ########
+        cplus_data = decoder.decode_cplus_string(settings.code)
 
         original_bones = utils.armature.b_collection.get_pose_bones(armature, "Original")
         if not original_bones:
             self.report({"ERROR"}, "The Original bone collection contains no bones.")
             return {"CANCELLED"}
-        primary_axis = settings.cplus_primary_axis
-        secondary_axis = settings.cplus_secondary_axis
+        missing_bones = sorted(set(cplus_data["Bones"]) - set(original_bones))
+        if missing_bones:
+            self.report({"WARNING"}, f"C+ bones absent from Original collection: {', '.join(missing_bones)}")
 
+        ########
+        # Check Meshes and Save Original State
+        ########
+        meshes = utils.armature.find_meshes(armature)
+        for mesh in meshes:
+            modifiers = [modifier for modifier in mesh.modifiers if modifier.type == "ARMATURE" and modifier.object == armature]
+            if len(modifiers) != 1:
+                self.report({"ERROR"}, f"Mesh '{mesh.name}' needs exactly one modifier referencing this armature to bake C+.")
+                return {"CANCELLED"}
+            if mesh.data.shape_keys and mesh.data.shape_keys.key_blocks.get("CPlus"):
+                self.report({"ERROR"}, f"Mesh '{mesh.name}' already has a CPlus shapekey; revert or remove it first.")
+                return {"CANCELLED"}
+        original_pose = {bone.name: bone.matrix_basis.copy() for bone in armature.pose.bones}
+        original_scale_inheritance = {bone.name: bone.inherit_scale for bone in armature.data.bones}
+        original_shapekeys = {
+            mesh.name: [(key.name, key.mute, key.value) for key in mesh.data.shape_keys.key_blocks]
+            for mesh in meshes
+            if mesh.data.shape_keys
+        }
+        original_rest_pose = {
+            bone.name: (bone.head_local.copy(), bone.tail_local.copy(), bone.matrix_local.copy()) for bone in armature.data.bones
+        }
+
+        ########
+        # Apply Transforms and Bake Shapekeys
+        ########
         utils.object.select_only(armature)
         utils.armature.reset_pose_bones(armature)
-        parent_map = utils.armature.snapshot_parenting(armature)
-        axes_reverted = False
+        applied = False
         try:
-            utils.armature.unparent_all_bones(armature)
-            utils.axis_conversion.revert_bone_axis_on_armature(armature, primary_axis, secondary_axis)
-            axes_reverted = True
-            decoder.apply_transforms(
-                armature,
-                scales,
-                rotations,
-                translations,
-                original_bones,
-            )
+            with warnings.catch_warnings(record=True) as transform_warnings:
+                warnings.simplefilter("always", RuntimeWarning)
+                decoder.apply_transforms(armature, cplus_data, original_bones)
+            for message in dict.fromkeys(str(warning.message) for warning in transform_warnings):
+                self.report({"WARNING"}, message)
+
             meshes = utils.armature.apply_all_as_shapekey(armature, shapekey_name="CPlus")
             failed_meshes = [mesh.name for mesh in meshes if not mesh.data.shape_keys or not mesh.data.shape_keys.key_blocks.get("CPlus")]
             if failed_meshes:
                 raise RuntimeError(f"Could not bake C+ shapekeys on: {', '.join(failed_meshes)}")
             utils.armature.new_rest_pose(armature)
-            utils.axis_conversion.apply_bone_axis_to_armature(armature, primary_axis, secondary_axis)
-            axes_reverted = False
-        except Exception as exc:
+            applied = True
+        except (ValueError, RuntimeError) as exc:
             self.report({"ERROR"}, f"Failed to apply C+ transforms: {exc}")
             return {"CANCELLED"}
         finally:
-            if axes_reverted:
-                utils.axis_conversion.apply_bone_axis_to_armature(armature, primary_axis, secondary_axis)
-            utils.armature.restore_bone_parenting(armature, parent_map)
+            ########
+            # Restore State and Clean Up
+            ########
             utils.object.select_only(armature)
             bpy.ops.object.mode_set(mode="OBJECT")
+            if not applied:
+                bpy.ops.object.mode_set(mode="EDIT")
+                for bone in armature.data.edit_bones:
+                    head, tail, matrix = original_rest_pose[bone.name]
+                    bone.matrix = matrix
+                    bone.head = head
+                    bone.tail = tail
+                bpy.ops.object.mode_set(mode="OBJECT")
+                for mesh in meshes:
+                    if not mesh.data.shape_keys:
+                        continue
+                    cplus_key = mesh.data.shape_keys.key_blocks.get("CPlus")
+                    if cplus_key:
+                        mesh.shape_key_remove(cplus_key)
+                    if mesh.name not in original_shapekeys:
+                        mesh.shape_key_clear()
+                    for name, mute, value in original_shapekeys.get(mesh.name, []):
+                        key = mesh.data.shape_keys.key_blocks.get(name)
+                        if key:
+                            key.mute = mute
+                            key.value = value
+                for bone in armature.pose.bones:
+                    bone.matrix_basis = original_pose[bone.name]
+
+            # Scale inheritance is restored on both success and failure.
+            for bone in armature.data.bones:
+                bone.inherit_scale = original_scale_inheritance[bone.name]
+            context.view_layer.update()
 
         settings.applied = True
         self.report(
             {"INFO"},
-            "C+ transforms applied, shapekeys baked, rest pose set, and parenting restored.",
+            "C+ model-space transforms applied and baked",
         )
         return {"FINISHED"}
 
@@ -125,6 +151,9 @@ class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
 
     def execute(self, context: bpy.types.Context) -> set[str]:
         """Duplicate the active armature as its C+ backup."""
+        ########
+        # Check Armature and Existing Backup
+        ########
         armature = context.active_object
         if armature is None or armature.type != "ARMATURE":
             self.report({"ERROR"}, "Select a valid armature object.")
@@ -144,6 +173,9 @@ class AETHER_OT_CreateBackupArmature(bpy.types.Operator):
             bpy.data.objects.remove(old_backup, do_unlink=True)
             settings.backup_armature = None
 
+        ########
+        # Create Backup
+        ########
         utils.object.select_only(armature)
         backup = utils.armature.duplicate(armature)
         backup.name = f"BACKUP_{armature.name}"
@@ -170,6 +202,9 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
 
     def execute(self, context: bpy.types.Context) -> set[str]:
         """Restore armature bones and remove the applied C+ shapekey."""
+        ########
+        # Check Armature and Backup
+        ########
         armature = context.active_object
         if armature is None or armature.type != "ARMATURE":
             self.report({"ERROR"}, "Select a valid armature object.")
@@ -186,7 +221,11 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
             return {"CANCELLED"}
 
         original_bone_names = [bone.name for bone in original_collection.bones]
-        bone_data: dict[str, tuple[Vector, Vector, float]] = {}
+        backup_bones: dict[str, tuple[Vector, Vector, float]] = {}
+
+        ########
+        # Copy Original Bone Positions from Backup
+        ########
         utils.object.set_visibility(backup, True)
         try:
             utils.object.select_only(backup)
@@ -194,11 +233,14 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
             for bone_name in original_bone_names:
                 bone = backup.data.edit_bones.get(bone_name)
                 if bone:
-                    bone_data[bone_name] = (bone.head.copy(), bone.tail.copy(), bone.roll)
+                    backup_bones[bone_name] = (bone.head.copy(), bone.tail.copy(), bone.roll)
 
+            ########
+            # Restore Bone Positions on Armature
+            ########
             utils.object.select_only(armature)
             bpy.ops.object.mode_set(mode="EDIT")
-            for bone_name, (head, tail, roll) in bone_data.items():
+            for bone_name, (head, tail, roll) in backup_bones.items():
                 bone = armature.data.edit_bones.get(bone_name)
                 if bone:
                     bone.head = head
@@ -209,6 +251,9 @@ class AETHER_OT_RevertToBackup(bpy.types.Operator):
             bpy.ops.object.mode_set(mode="OBJECT")
             utils.object.set_visibility(backup, False)
 
+        ########
+        # Remove C+ Shapekeys
+        ########
         for mesh in utils.armature.find_meshes(armature):
             utils.object.remove_shapekey(mesh, "CPlus", True, "ImportedPose")
 

@@ -1,4 +1,4 @@
-"""Customize+ panels for C+ import, application, and axis conversion."""
+"""Customize+ panels for C+ import and application."""
 
 import bpy
 
@@ -92,50 +92,14 @@ class AETHER_PT_CustomizePlus(bpy.types.Panel):
             apply_column.operator("aether.q_apply_cplus_string", text="Quick Apply", icon="CHECKBOX_HLT")
 
 
-class AETHER_PT_CustomizePlus_AxisConversion(bpy.types.Panel):
-    """Configure the axes associated with the imported character."""
-
-    bl_label = "Axis Conversion"
-    bl_idname = "AETHER_PT_customize_plus_axis_conversion"
-    bl_parent_id = "AETHER_PT_customize_plus"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "AetherBlend"
-
-    @classmethod
-    def poll(cls, context: bpy.types.Context) -> bool:
-        """Show axis settings when an armature has an Original collection."""
-        armature = context.active_object
-        return bool(
-            visible_in_current_area(context)
-            and get_active_tab(context) == "CPLUS"
-            and armature is not None
-            and armature.type == "ARMATURE"
-            and getattr(armature, "aether_cplus", None)
-            and armature.data.collections.get("Original") is not None
-        )
-
-    def draw(self, context: bpy.types.Context) -> None:
-        """Draw the C+ axis selection controls."""
-        armature = context.active_object
-        settings = getattr(armature, "aether_cplus", None)
-        if settings is None:
-            return
-        column = self.layout.column(align=True)
-        column.prop(settings, "cplus_primary_axis", text="Primary")
-        column.prop(settings, "cplus_secondary_axis", text="Secondary")
-
-
-CLASSES = (AETHER_PT_CustomizePlus, AETHER_PT_CustomizePlus_AxisConversion)
+CLASSES = (AETHER_PT_CustomizePlus,)
 
 
 def register() -> None:
     """Register C+ panels."""
-    for cls in CLASSES:
-        bpy.utils.register_class(cls)
+    bpy.utils.register_class(AETHER_PT_CustomizePlus)
 
 
 def unregister() -> None:
     """Unregister C+ panels."""
-    for cls in reversed(CLASSES):
-        bpy.utils.unregister_class(cls)
+    bpy.utils.unregister_class(AETHER_PT_CustomizePlus)

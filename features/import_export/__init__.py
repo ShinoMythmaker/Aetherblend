@@ -1,10 +1,10 @@
 """Import and export feature: import FFXIV characters, export poses and animations."""
 
-from . import export_anim, export_pose, import_character, panels, properties
+from . import export_anim, export_pose, import_character, panels
 
-__all__ = ["export_anim", "export_pose", "import_character", "panels", "properties"]
+__all__ = ["export_anim", "export_pose", "import_character", "panels"]
 
-modules = (properties, import_character, export_anim, export_pose, panels)
+modules = (import_character, export_anim, export_pose, panels)
 
 
 def register() -> None:

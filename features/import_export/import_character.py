@@ -1,16 +1,18 @@
 """Character import operators."""
 
 import bpy
-from bpy.props import BoolProperty, EnumProperty, StringProperty
+from bpy.props import BoolProperty, StringProperty
 
 from ... import utils
 from ...preferences import get_preferences
 from ...ui.tabs import set_active_tab
 from ...utils import addon_dependencies
-from ...utils.axis_conversion import AXIS_ITEMS
+from ...utils.axis_conversion import DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS
 
 
 class AETHER_OT_import_export_import_character(bpy.types.Operator):
+    """Import a character using the standard FFXIV-to-Blender bone orientation."""
+
     bl_idname = "aether.import_export_import_character"
     bl_label = "Import Character"
     bl_description = "Import a character model into Blender with various options"
@@ -61,25 +63,6 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         name="Create Backup Armature",
         description="Create a backup armature for C+ reversion after import",
         default=True,
-    )  # type: ignore
-
-    # Bone Axis Orientation (FBX-style)
-    primary_bone_axis: EnumProperty(
-        name="Primary Bone Axis",
-        description="Primary axis for bone orientation (the bone's length direction).",
-        items=AXIS_ITEMS,
-        default="X",
-    )  # type: ignore
-
-    secondary_bone_axis: EnumProperty(
-        name="Secondary Bone Axis",
-        description="Secondary axis for bone orientation (determines bone roll).",
-        items=AXIS_ITEMS,
-        default="Y",
-    )  # type: ignore
-
-    use_bone_axis_conversion: BoolProperty(
-        name="Use Bone Axis Conversion", description="Apply bone axis conversion (similar to FBX import).", default=True
     )  # type: ignore
 
     def invoke(self, context: bpy.types.Context, event: bpy.types.Event) -> set[str]:
@@ -196,30 +179,8 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         split.label(text=" ")
         split.prop(self, "s_create_backup_armature")
 
-        # Bone Orientation Section
-        box = layout.box()
-        row = box.row()
-        row.label(text="Bone Orientation", icon="BONE_DATA")
-
-        col = box.column(align=True)
-        split = col.split(factor=indent)
-        split.label(text=" ")
-        split.prop(self, "use_bone_axis_conversion")
-
-        if self.use_bone_axis_conversion:
-            split = col.split(factor=indent)
-            left = split.row()
-            left.alignment = "RIGHT"
-            left.label(text="Primary")
-            split.prop(self, "primary_bone_axis", text="")
-
-            split = col.split(factor=indent)
-            left = split.row()
-            left.alignment = "RIGHT"
-            left.label(text="Secondary")
-            split.prop(self, "secondary_bone_axis", text="")
-
     def execute(self, context: bpy.types.Context) -> set[str]:
+        """Import and prepare the model with the standard bone-axis conversion."""
         bpy.context.window.cursor_set("WAIT")
 
         if not self.filepath or not (
@@ -227,6 +188,12 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         ):
             self.report({"ERROR"}, "[AetherBlend] Invalid file format. Please select a .gltf, .glb, or .fbx file.")
             return {"CANCELLED"}
+
+        if context.screen:
+            for area in context.screen.areas:
+                for space in area.spaces:
+                    if space.type == "VIEW_3D":
+                        space.show_object_viewport_armature = True
 
         # Import the model
         imported_objects = utils.import_export.import_model(
@@ -273,20 +240,13 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
             clear_animation_data(armature)
             utils.armature.reset_pose_bones(armature)
 
-            # Apply bone axis conversion if enabled
-            if self.use_bone_axis_conversion:
-                utils.axis_conversion.apply_bone_axis_to_armature(armature, self.primary_bone_axis, self.secondary_bone_axis)
+            utils.axis_conversion.apply_bone_axis_to_armature(armature, DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS)
 
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode="EDIT")
             bpy.ops.armature.select_all(action="SELECT")
             bpy.ops.armature.assign_to_collection(new_collection_name="Original")
             bpy.ops.object.mode_set(mode="OBJECT")
-
-            cplus = getattr(armature, "aether_cplus", None)
-            if cplus:
-                cplus.cplus_primary_axis = self.primary_bone_axis if self.use_bone_axis_conversion else "Y"
-                cplus.cplus_secondary_axis = self.secondary_bone_axis if self.use_bone_axis_conversion else "X"
 
             utils.object.select_only(armature)
 

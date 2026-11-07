@@ -8,14 +8,16 @@ from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
 
 from ...preferences import get_preferences
-from ...utils.axis_conversion import AXIS_ITEMS
+from ...utils.axis_conversion import DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS
 
 
 class AETHER_OT_import_export_export_anim(Operator, ExportHelper):
+    """Export an animation using the standard bone orientation."""
+
     bl_idname = "aether.import_export_export_anim"
     bl_label = "Export Animation"
     bl_options = {"REGISTER", "UNDO"}
-    bl_description = "Export animation with axis conversion"
+    bl_description = "Export animation as FBX or GLB"
 
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")  # type: ignore
     filename_ext = ".fbx"
@@ -37,20 +39,6 @@ class AETHER_OT_import_export_export_anim(Operator, ExportHelper):
         name="Action", description="Action to export", items=get_actions
     )  # type: ignore
 
-    pose_primary_axis: bpy.props.EnumProperty(
-        name="Primary Axis",
-        description="Primary bone axis used for the export",
-        items=AXIS_ITEMS,
-        default="X",
-    )  # type: ignore
-
-    pose_secondary_axis: bpy.props.EnumProperty(
-        name="Secondary Axis",
-        description="Secondary bone axis used for the export",
-        items=AXIS_ITEMS,
-        default="Y",
-    )  # type: ignore
-
     def invoke(self, context: bpy.types.Context, event: bpy.types.Event) -> set[str]:
         if context.active_object and context.active_object.type == "ARMATURE":
             anim_data = context.active_object.animation_data
@@ -62,28 +50,26 @@ class AETHER_OT_import_export_export_anim(Operator, ExportHelper):
         ext = ".fbx" if self.export_format == "FBX" else ".glb"
         filename = base_name + ext
 
-        self.filepath = (
-            os.path.join(prefs.default_anim_export_path, filename) if prefs.default_anim_export_path else filename
-        )
+        self.filepath = os.path.join(prefs.default_anim_export_path, filename) if prefs.default_anim_export_path else filename
         return super().invoke(context, event)
 
     def draw(self, context: bpy.types.Context) -> None:
+        """Draw animation format and action controls."""
         layout = self.layout
         layout.prop(self, "export_format", expand=True)
         layout.separator()
         layout.prop(self, "selected_action")
-        layout.separator()
-        layout.prop(self, "pose_primary_axis")
-        layout.prop(self, "pose_secondary_axis")
 
-    def export_fbx(self, filepath: str) -> None:
+    @staticmethod
+    def export_fbx(filepath: str) -> None:
+        """Export the selected animation with the standard bone axes."""
         bpy.ops.export_scene.fbx(
             filepath=filepath,
             use_selection=True,
             bake_anim=True,
             add_leaf_bones=False,
-            primary_bone_axis=self.pose_primary_axis,
-            secondary_bone_axis=self.pose_secondary_axis,
+            primary_bone_axis=DEFAULT_PRIMARY_BONE_AXIS,
+            secondary_bone_axis=DEFAULT_SECONDARY_BONE_AXIS,
             use_armature_deform_only=True,
             bake_anim_use_all_actions=False,
             bake_anim_use_nla_strips=False,
@@ -128,9 +114,7 @@ class AETHER_OT_import_export_export_anim(Operator, ExportHelper):
                     self.export_fbx(temp_path)
                     bpy.ops.import_scene.fbx(filepath=temp_path)
 
-                    imported = next(
-                        (o for o in context.selected_objects if o.type == "ARMATURE" and o != armature), None
-                    )
+                    imported = next((o for o in context.selected_objects if o.type == "ARMATURE" and o != armature), None)
                     if not imported:
                         raise Exception("Import failed")
 
