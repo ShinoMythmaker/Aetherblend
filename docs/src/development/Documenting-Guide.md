@@ -8,8 +8,9 @@ aliases: Working-On-The-Docs
 # Documenting Guide
 
 Write only useful task guides for AetherBlend users and practical setup or
-quickstart pages for contributors. Put user workflows in **Guides** and
-contributor workflows or conventions in **Development**.
+quickstart pages for contributors. Put user workflows in **Guides**, feature
+reference pages in **Wiki**, and contributor workflows or conventions in
+**Development**.
 
 The site is built from Markdown in `docs/src/`; `docs/build.py` generates the
 HTML served from `docs/`. The generated pages are committed, so rebuild after
@@ -30,10 +31,10 @@ terminal so automatic environment activation can take effect.
 ## Choose and Edit a Page
 
 First update an existing guide if it covers the workflow. Add a page only for
-a distinct user task or contributor workflow. Keep navigable sources in
-`guides/` or `development/`; `Home.md` is the landing page. Every Markdown
+a distinct user task, feature reference, or contributor workflow. Keep navigable
+sources in `guides/`, `wiki/`, or `development/`; `Home.md` is the landing page. Every Markdown
 source with a `group` frontmatter value appears in navigation, so use only
-`Guides` or `Development`.
+`Guides`, `Wiki`, or `Development`.
 
 ```markdown
 ---

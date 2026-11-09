@@ -46,14 +46,6 @@ python3 -m venv .venv
 4. Run **Terminal: Create New Terminal**. With automatic environment activation
    enabled, VS Code activates `.venv` in that new terminal.
 
-Verify that the terminal uses the environment:
-
-```sh
-python -c "import sys; print(sys.executable)"
-```
-
-The printed path should point inside `.venv`.
-
 Selecting the interpreter doesn't necessarily activate an already-open
 terminal - open a new one afterward.
 
