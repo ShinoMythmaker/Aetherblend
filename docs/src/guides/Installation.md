@@ -55,8 +55,6 @@ https://raw.githubusercontent.com/ShinoMythmaker/FFXIV-Blender-Plugins/refs/head
 
 Using this feature will allow Blender to automatically keep AetherBlend up to date.
 
-<img width="532" height="286" alt="image" src="https://github.com/user-attachments/assets/84ce6f77-33b8-4cec-a68f-30572fd5bc90" />
-
 ### Manual
 1. Download the newest .zip [here]({{latest_release_zip}})
 2. Open your preferences menu in Blender and navigate to the add-ons section

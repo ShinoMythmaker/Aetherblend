@@ -15,6 +15,7 @@
   <a class="brand" href="index.html"><img src="assets/img/logo.png" alt="AetherBlend"></a>
   <nav class="header-links">
     <a href="installation.html">Guides</a>
+    <a href="aetherblend-wiki.html">Wiki</a>
     <a href="development-guide.html">Development</a>
     <a href="https://github.com/ShinoMythmaker/Aetherblend">GitHub</a>
     <a href="index.html#support-project">Support</a>
@@ -25,6 +26,9 @@
 <div class="layout">
 <aside class="sidebar"><h4>Guides</h4>
 <a href="installation.html" class="">Installation</a>
+<a href="ressources.html" class="">Resources</a>
+<h4>Wiki</h4>
+<a href="aetherblend-wiki.html" class="">AetherBlend Wiki</a>
 <h4>Development</h4>
 <a href="development-guide.html" class="">Development Guide</a>
 <a href="documenting-guide.html" class="active">Documenting Guide</a>
@@ -32,8 +36,9 @@
 <main><article>
 <h1>Documenting Guide</h1>
 <p>Write only useful task guides for AetherBlend users and practical setup or
-quickstart pages for contributors. Put user workflows in <strong>Guides</strong> and
-contributor workflows or conventions in <strong>Development</strong>.</p>
+quickstart pages for contributors. Put user workflows in <strong>Guides</strong>, feature
+reference pages in <strong>Wiki</strong>, and contributor workflows or conventions in
+<strong>Development</strong>.</p>
 <p>The site is built from Markdown in <code>docs/src/</code>; <code>docs/build.py</code> generates the
 HTML served from <code>docs/</code>. The generated pages are committed, so rebuild after
 editing Markdown.</p>
@@ -47,10 +52,10 @@ In VS Code, select <code>.venv</code> with <strong>Python: Select Interpreter</s
 terminal so automatic environment activation can take effect.</p>
 <h2 id="choose-and-edit-a-page">Choose and Edit a Page<a class="headerlink" href="#choose-and-edit-a-page" title="Permanent link">#</a></h2>
 <p>First update an existing guide if it covers the workflow. Add a page only for
-a distinct user task or contributor workflow. Keep navigable sources in
-<code>guides/</code> or <code>development/</code>; <code>Home.md</code> is the landing page. Every Markdown
+a distinct user task, feature reference, or contributor workflow. Keep navigable
+sources in <code>guides/</code>, <code>wiki/</code>, or <code>development/</code>; <code>Home.md</code> is the landing page. Every Markdown
 source with a <code>group</code> frontmatter value appears in navigation, so use only
-<code>Guides</code> or <code>Development</code>.</p>
+<code>Guides</code>, <code>Wiki</code>, or <code>Development</code>.</p>
 <div class="codehilite"><pre><span></span><code>---
 title: My Page
 group: Development
