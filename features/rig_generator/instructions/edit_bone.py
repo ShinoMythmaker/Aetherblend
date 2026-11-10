@@ -369,19 +369,19 @@ def resolve_pending_parents(rig: bpy.types.Object) -> None:
 
 
 def find_chains(rig: bpy.types.Object, pattern: str) -> list[list[str]]:
-    """Group the bones whose name matches the regular expression into parent-child chains."""
+    """Group matching bones into connected parent-child chains."""
     edit_bones = rig.data.edit_bones
     matching_names = [bone.name for bone in edit_bones if re.match(pattern, bone.name)]
 
     chains: list[list[str]] = []
     for name in matching_names:
         parent_bone = edit_bones[name].parent
-        if parent_bone and re.match(pattern, parent_bone.name):
+        if parent_bone and edit_bones[name].use_connect and re.match(pattern, parent_bone.name):
             continue
         chain = [name]
         current = edit_bones[name]
         while True:
-            matching_children = [child for child in current.children if re.match(pattern, child.name)]
+            matching_children = [child for child in current.children if child.use_connect and re.match(pattern, child.name)]
             if not matching_children:
                 break
             current = matching_children[0]
