@@ -1,74 +1,53 @@
+"""Bridge controls in the import/export tab."""
+
 import bpy
-from bpy.types import Panel
+
+from ...ui.tabs import get_active_tab
+from ...ui.visibility import visible_in_current_area
 
 
-def _build_host_description(armature: bpy.types.Object | None, scene: bpy.types.Scene) -> str:
-    if armature is None or not hasattr(armature, "aether_bridge"):
-        return "Select an armature to configure bridge streaming"
-    props = armature.aether_bridge
-    actor_id = props.actor_id.strip() if getattr(props, "actor_id", "") else ""
-    target = f"/bridge/{actor_id}" if actor_id else "/pose"
-    return f"Streaming to http://{scene.aether_bridge_host}:{scene.aether_bridge_port}{target}"
+class AETHER_PT_BridgePanel(bpy.types.Panel):
+    """Configure actor assignments and pose streaming."""
 
-
-class AETHER_PT_BridgePanel(Panel):
     bl_label = "AetherBridge"
     bl_idname = "AETHER_PT_aetherbridge"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'AetherBlend'
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "AetherBlend"
     bl_order = 6
 
     @classmethod
     def poll(cls, context: bpy.types.Context) -> bool:
-        return True
+        """Show the bridge alongside import and export tools."""
+        return visible_in_current_area(context) and get_active_tab(context) == "IMPORT_EXPORT"
 
     def draw(self, context: bpy.types.Context) -> None:
+        """Draw connection, actor, and stream controls."""
         layout = self.layout
         scene = context.scene
+        row = layout.row(align=True)
+        row.prop(scene, "aether_bridge_host")
+        row.prop(scene, "aether_bridge_port")
+        layout.operator("aether.bridge_refresh_actors", icon="FILE_REFRESH")
         armature = context.active_object
-        if armature is None or not hasattr(armature, "aether_bridge"):
-            layout.label(text="Select an armature to configure bridge streaming")
-            return
-
-        props = armature.aether_bridge
-
-        box = layout.box()
-        box.label(text="Bridge stream settings", icon='URL')
-
-        row = box.row(align=True)
-        row.prop(scene, "aether_bridge_host", text="Host")
-        row.prop(scene, "aether_bridge_port", text="Port")
-
-        box.label(text=_build_host_description(armature, scene), icon='INFO')
-
-        row = box.row(align=True)
-        row.prop(props, "actor_id", text="Actor")
-
-        row = box.row(align=True)
-        row.operator("aether.bridge_refresh_actors", text="Fetch Actors", icon='FILE_REFRESH')
-        row.operator("aether.bridge_clear_actor", text="Clear Actor", icon='X')
-
-        row = box.row(align=True)
-        row.prop(scene, "aether_bridge_stream_enabled", text="Stream", toggle=True)
-
+        if armature and armature.type == "ARMATURE":
+            layout.prop(armature.aether_bridge, "actor")
+            if armature.aether_bridge.actor_id:
+                layout.label(text=f"Assigned actor: {armature.aether_bridge.actor_id}")
+        else:
+            layout.label(text="Select an armature to assign an actor", icon="INFO")
+        layout.prop(scene, "aether_bridge_stream_enabled", toggle=True)
         if scene.aether_bridge_stream_enabled:
-            row = box.row()
-            row.prop(scene, "aether_bridge_stream_fps", text="FPS")
-
-        box.separator()
-        box.label(text="Host/port/stream toggles are shared for all armatures.")
-        box.label(text="Actor assignment is stored per armature.")
-
-
-classes = (AETHER_PT_BridgePanel,)
+            layout.prop(scene, "aether_bridge_stream_fps")
+        if scene.aether_bridge_status:
+            layout.label(text=scene.aether_bridge_status, icon="ERROR")
 
 
 def register() -> None:
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    """Register the bridge panel."""
+    bpy.utils.register_class(AETHER_PT_BridgePanel)
 
 
 def unregister() -> None:
-    for cls in reversed(classes):
-        bpy.utils.unregister_class(cls)
+    """Unregister the bridge panel."""
+    bpy.utils.unregister_class(AETHER_PT_BridgePanel)

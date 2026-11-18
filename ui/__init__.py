@@ -1,9 +1,9 @@
 """Shared UI: icons, tabs, info panel and Properties editor mirrors."""
 
 from . import icons as icons
-from . import info_panel, properties_bridge, tabs
+from . import info_panel, tabs
 
-modules = (tabs, info_panel, properties_bridge)
+modules = (tabs, info_panel)
 
 
 def register() -> None:

@@ -1,298 +1,189 @@
+"""Fetch actors and stream original FFXIV bone poses."""
+
 import json
 import math
 import re
+import time
 import urllib.error
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 
 import bpy
 from mathutils import Matrix
 
-from ...utils.axis_conversion import get_export_correction_matrix
-from .properties import BRIDGE_ACTOR_ITEMS
+from ...utils.axis_conversion import DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS, get_export_correction_matrix
 
-_STREAM_TIMER = None
-_STREAM_EXECUTOR = None
-_STREAM_FUTURE = None
-
-
-def _get_bridge_props(armature: bpy.types.Object) -> bpy.types.PropertyGroup:
-    return armature.aether_bridge if hasattr(armature, "aether_bridge") else None
+_executor: ThreadPoolExecutor | None = None
+_future: Future | None = None
+_scene: bpy.types.Scene | None = None
+_next_frame = 0.0
+_actor_item_history: list[list[tuple[str, str, str, int]]] = []
 
 
-def _build_endpoint(armature: bpy.types.Object) -> str:
-    props = _get_bridge_props(armature)
-    if props is None:
-        return ""
-    scene = bpy.context.scene
-    host = scene.aether_bridge_host.strip() or "127.0.0.1"
-    port = scene.aether_bridge_port
-    actor_id = props.actor_id.strip() if getattr(props, "actor_id", "") else ""
-    if actor_id:
-        return f"http://{host}:{port}/bridge/{actor_id}"
-    return f"http://{host}:{port}/pose"
+def _url(scene: bpy.types.Scene, path: str) -> str:
+    return f"http://{scene.aether_bridge_host.strip()}:{scene.aether_bridge_port}{path}"
 
 
-def _build_state_endpoint(armature: bpy.types.Object, state: str) -> str:
-    props = _get_bridge_props(armature)
-    if props is None:
-        return ""
-    scene = bpy.context.scene
-    host = scene.aether_bridge_host.strip() or "127.0.0.1"
-    port = scene.aether_bridge_port
-    actor_id = props.actor_id.strip() if getattr(props, "actor_id", "") else ""
-    if actor_id:
-        return f"http://{host}:{port}/bridge/{actor_id}/stream/{state}"
-    return f"http://{host}:{port}/stream/{state}"
+def _assigned_rigs(scene: bpy.types.Scene) -> list[bpy.types.Object]:
+    return [obj for obj in scene.objects if obj.type == "ARMATURE" and obj.aether_bridge.actor_id]
 
 
-def _collect_pose_payload(armature: bpy.types.Object) -> dict:
-    props = _get_bridge_props(armature)
-    pose_correction_matrix = Matrix.Identity(4)
-    if props is not None and props.use_axis_conversion:
-        pose_correction_matrix = get_export_correction_matrix(
-            bpy.context.scene.aether_bridge_pose_primary_axis,
-            bpy.context.scene.aether_bridge_pose_secondary_axis,
-        )
+def _validate_rigs(scene: bpy.types.Scene) -> str | None:
+    rigs = _assigned_rigs(scene)
+    if not rigs:
+        return "Assign an actor to at least one armature before streaming"
+    actors = set()
+    for rig in rigs:
+        if rig.aether_bridge.actor_id in actors:
+            return f"Actor {rig.aether_bridge.actor_id} is assigned to multiple armatures"
+        actors.add(rig.aether_bridge.actor_id)
+        if rig.data.collections.get("Original") is None:
+            return f"{rig.name} has no Original bone collection"
+    return None
 
-    x_rotation = Matrix.Rotation(math.radians(-90), 4, 'X')
 
+def _pose_payload(rig: bpy.types.Object) -> dict:
+    collection = rig.data.collections.get("Original")
+    if collection is None:
+        raise ValueError(f"{rig.name} has no Original bone collection")
+    correction = get_export_correction_matrix(DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS)
+    rotation = Matrix.Rotation(math.radians(-90), 4, "X")
+    world = rotation @ rig.matrix_world
     bones = {}
-    for pose_bone in armature.pose.bones:
-        bone_data = armature.data.bones.get(pose_bone.name)
-        if not bone_data or not bone_data.use_deform:
+    for original in collection.bones:
+        bone = rig.pose.bones.get(original.name)
+        if bone is None:
             continue
-
-        clean_bone_name = re.sub(r"\.\d+$", "", pose_bone.name)
-        bone_matrix_world = armature.matrix_world @ pose_bone.matrix
-        if props is not None and props.use_axis_conversion:
-            bone_matrix_world = bone_matrix_world @ pose_correction_matrix
-        bone_matrix_world = x_rotation @ bone_matrix_world
-
-        bones[clean_bone_name] = {
-            "Position": f"{bone_matrix_world.translation.x:.6f}, {bone_matrix_world.translation.y:.6f}, {bone_matrix_world.translation.z:.6f}",
-            "Rotation": f"{bone_matrix_world.to_quaternion().x:.6f}, {bone_matrix_world.to_quaternion().y:.6f}, {bone_matrix_world.to_quaternion().z:.6f}, {bone_matrix_world.to_quaternion().w:.6f}",
-            "Scale": f"{bone_matrix_world.to_scale().x:.8f}, {bone_matrix_world.to_scale().y:.8f}, {bone_matrix_world.to_scale().z:.8f}",
+        matrix = world @ bone.matrix @ correction
+        position, quaternion, scale = matrix.translation, matrix.to_quaternion(), matrix.to_scale()
+        name = re.sub(r"\.\d+$", "", bone.name)
+        if name in bones:
+            raise ValueError(f"{rig.name} has duplicate original bone name {name}")
+        bones[name] = {
+            "Position": f"{position.x:.6f}, {position.y:.6f}, {position.z:.6f}",
+            "Rotation": f"{quaternion.x:.6f}, {quaternion.y:.6f}, {quaternion.z:.6f}, {quaternion.w:.6f}",
+            "Scale": f"{scale.x:.8f}, {scale.y:.8f}, {scale.z:.8f}",
         }
-
-    return {
-        "FileExtension": ".pose",
-        "TypeName": "Aetherblend Pose",
-        "FileVersion": 2,
-        "Bones": bones,
-    }
+    if not bones:
+        raise ValueError(f"{rig.name} has no bones in its Original collection")
+    return {"Type": "pose", "ActorId": rig.aether_bridge.actor_id, "Bones": bones}
 
 
-def _send_frame(endpoint: str, payload: dict) -> int:
-    encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+def _send_poses(url: str, payloads: list[dict]) -> None:
     request = urllib.request.Request(
-        endpoint,
-        data=encoded,
+        url,
+        data=json.dumps({"Type": "poses", "Poses": payloads}, separators=(",", ":")).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with urllib.request.urlopen(request, timeout=1.0) as response:
-        return response.getcode()
+    with urllib.request.urlopen(request, timeout=2) as response:
+        response.read()
 
 
-def _notify_stream_state(armature: bpy.types.Object, state: str) -> None:
-    endpoint = _build_state_endpoint(armature, state)
-    try:
-        status = _send_frame(endpoint, {"event": state})
-        if not 200 <= status < 300:
-            print(f"[AetherBridge] stream {state} notification failed: HTTP {status}")
-    except Exception as error:
-        print(f"[AetherBridge] stream {state} notification failed: {error}")
+def _stop() -> None:
+    global _executor, _future, _scene, _next_frame
+    if bpy.app.timers.is_registered(_tick):
+        bpy.app.timers.unregister(_tick)
+    if _executor is not None:
+        _executor.shutdown(wait=False, cancel_futures=True)
+    _executor = None
+    _future = None
+    _scene = None
+    _next_frame = 0.0
 
 
-def _bridge_stream_worker(endpoint: str, payload: dict) -> None:
-    global _STREAM_FUTURE
-    try:
-        status = _send_frame(endpoint, payload)
-        if not 200 <= status < 300:
-            print(f"[AetherBridge] streaming failed: HTTP {status}")
-    except urllib.error.URLError as error:
-        print(f"[AetherBridge] streaming error: {error}")
-    except Exception as error:
-        print(f"[AetherBridge] streaming error: {error}")
-    finally:
-        _STREAM_FUTURE = None
-
-
-def _get_active_armature() -> bpy.types.Object | None:
-    active = bpy.context.active_object
-    return active if active and active.type == "ARMATURE" else None
-
-
-def _shutdown_stream() -> None:
-    global _STREAM_TIMER, _STREAM_EXECUTOR, _STREAM_FUTURE
-    if _STREAM_TIMER is not None:
-        try:
-            bpy.app.timers.unregister(_STREAM_TIMER)
-        except Exception:
-            pass
-        _STREAM_TIMER = None
-
-    if _STREAM_FUTURE is not None:
-        try:
-            _STREAM_FUTURE.cancel()
-        except Exception:
-            pass
-        _STREAM_FUTURE = None
-
-    if _STREAM_EXECUTOR is not None:
-        _STREAM_EXECUTOR.shutdown(wait=False)
-        _STREAM_EXECUTOR = None
-
-
-def _bridge_stream_timer() -> float | None:
-    global _STREAM_FUTURE, _STREAM_EXECUTOR
-    scene = bpy.context.scene
-    armature = _get_active_armature()
-    if armature is None:
+def _tick() -> float | None:
+    global _future, _next_frame
+    started = time.monotonic()
+    scene = _scene
+    if scene is None or not scene.aether_bridge_stream_enabled:
         return None
-
-    props = _get_bridge_props(armature)
-    if props is None or not bpy.context.scene.aether_bridge_stream_enabled:
-        _shutdown_stream()
+    try:
+        if _future is not None:
+            if not _future.done():
+                return 0.005
+            _future.result()
+            _future = None
+        if started < _next_frame:
+            return _next_frame - started
+        error = _validate_rigs(scene)
+        if error:
+            raise ValueError(error)
+        payloads = [_pose_payload(rig) for rig in _assigned_rigs(scene)]
+        if _executor is None:
+            raise RuntimeError("Bridge streaming executor is not running")
+        _future = _executor.submit(_send_poses, _url(scene, "/pose"), payloads)
+        interval = 1.0 / scene.aether_bridge_stream_fps
+        if not _next_frame:
+            _next_frame = started
+        _next_frame = max(_next_frame, started - interval) + interval
+    except (ValueError, RuntimeError, OSError) as error:
+        print(f"[AetherBridge] Streaming stopped: {error}")
+        scene.aether_bridge_stream_enabled = False
+        scene.aether_bridge_status = str(error)
         return None
-
-    if _STREAM_FUTURE is not None and not _STREAM_FUTURE.done():
-        return 1.0 / max(bpy.context.scene.aether_bridge_stream_fps, 1)
-
-    payload = _collect_pose_payload(armature)
-    if not payload["Bones"]:
-        return 1.0 / max(bpy.context.scene.aether_bridge_stream_fps, 1)
-
-    endpoint = _build_endpoint(armature)
-    if _STREAM_EXECUTOR is None:
-        _STREAM_EXECUTOR = ThreadPoolExecutor(max_workers=1)
-
-    _STREAM_FUTURE = _STREAM_EXECUTOR.submit(_bridge_stream_worker, endpoint, payload)
-    return 1.0 / max(bpy.context.scene.aether_bridge_stream_fps, 1)
+    return max(0.001, _next_frame - time.monotonic())
 
 
-def on_stream_enabled_update(self: bpy.types.PropertyGroup, context: bpy.types.Context) -> None:
-    armature = context.active_object
-    global _STREAM_TIMER
-    if armature is None or not hasattr(armature, "aether_bridge"):
+def update_stream(scene: bpy.types.Scene, _context: bpy.types.Context) -> None:
+    """Start or stop streaming assigned armatures from this scene."""
+    global _executor, _scene
+    if not scene.aether_bridge_stream_enabled:
+        if _scene == scene:
+            _stop()
+        scene.aether_bridge_status = ""
         return
-    props = armature.aether_bridge
-    if bpy.context.scene.aether_bridge_stream_enabled:
-        if _STREAM_TIMER is None:
-            print("[AetherBridge] streaming enabled")
-            _notify_stream_state(armature, "start")
-            _STREAM_TIMER = bpy.app.timers.register(_bridge_stream_timer)
-    else:
-        _shutdown_stream()
-        _notify_stream_state(armature, "stop")
-        print("[AetherBridge] streaming disabled")
+    error = _validate_rigs(scene)
+    if _scene is not None:
+        error = "Streaming is already active in another scene"
+    if not scene.aether_bridge_host.strip():
+        error = "Bridge host cannot be empty"
+    if error:
+        print(f"[AetherBridge] {error}")
+        scene.aether_bridge_stream_enabled = False
+        scene.aether_bridge_status = error
+        return
+    scene.aether_bridge_status = ""
+    _scene = scene
+    _executor = ThreadPoolExecutor(max_workers=1)
+    bpy.app.timers.register(_tick)
 
 
 class AETHER_OT_BridgeRefreshActors(bpy.types.Operator):
+    """Fetch available actor IDs from the bridge receiver."""
+
     bl_idname = "aether.bridge_refresh_actors"
     bl_label = "Fetch Actors"
-    bl_description = "Fetch the actor list from the bridge mock server"
 
     def execute(self, context: bpy.types.Context) -> set[str]:
-        scene = context.scene
-        armature = context.active_object
-        if armature is None or not hasattr(armature, "aether_bridge"):
-            self.report({'ERROR'}, "Select an armature first")
-            return {'CANCELLED'}
-        props = armature.aether_bridge
-        host = scene.aether_bridge_host.strip() or "127.0.0.1"
-        port = scene.aether_bridge_port
-        endpoint = f"http://{host}:{port}/bridge/actors"
+        """Replace the actor choices with the receiver's current list."""
+        from .properties import ACTOR_ITEMS
+
         try:
-            request = urllib.request.Request(endpoint, headers={"Accept": "application/json"}, method="GET")
-            with urllib.request.urlopen(request, timeout=2.0) as response:
-                payload = json.load(response)
-        except Exception as error:
-            self.report({'ERROR'}, f"Could not load actors: {error}")
-            return {'CANCELLED'}
-
-        actors = payload.get("actors", [])
-        global BRIDGE_ACTOR_ITEMS
-        BRIDGE_ACTOR_ITEMS = [
-            (str(actor.get("id", "")), f"{actor.get('id', '')} - {actor.get('name', '')}", "")
-            for actor in actors
-            if actor.get("id")
-        ]
-
-        if BRIDGE_ACTOR_ITEMS:
-            current_values = [item[0] for item in BRIDGE_ACTOR_ITEMS]
-            if props.actor_id not in current_values:
-                props.actor_id = BRIDGE_ACTOR_ITEMS[0][0]
-        else:
-            props.actor_id = ""
-
-        if context.area is not None:
-            context.area.tag_redraw()
-        if context.region is not None:
-            context.region.tag_redraw()
-        self.report({'INFO'}, f"Loaded {len(BRIDGE_ACTOR_ITEMS)} actors")
-        return {'FINISHED'}
-
-
-class AETHER_OT_BridgeClearActor(bpy.types.Operator):
-    bl_idname = "aether.bridge_clear_actor"
-    bl_label = "Clear Actor"
-    bl_description = "Remove the assigned actor and stop streaming"
-
-    def execute(self, context: bpy.types.Context) -> set[str]:
-        armature = context.active_object
-        if armature is None or not hasattr(armature, "aether_bridge"):
-            self.report({'ERROR'}, "Select an armature first")
-            return {'CANCELLED'}
-
-        props = armature.aether_bridge
-        props.actor_id = ""
-        if context.scene.aether_bridge_stream_enabled:
-            context.scene.aether_bridge_stream_enabled = False
-
-        if context.area is not None:
-            context.area.tag_redraw()
-        self.report({'INFO'}, "Actor cleared")
-        return {'FINISHED'}
-
-
-classes = (AETHER_OT_BridgeRefreshActors, AETHER_OT_BridgeClearActor)
+            with urllib.request.urlopen(_url(context.scene, "/actors"), timeout=2) as response:
+                data = json.load(response)
+            actors = data["actors"]
+            if not isinstance(actors, list) or any(not isinstance(actor, str) or not actor or actor == "__NONE__" for actor in actors):
+                raise ValueError("Expected a list of non-empty actor IDs")
+            if len(set(actors)) != len(actors):
+                raise ValueError("Receiver returned duplicate actor IDs")
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            self.report({"ERROR"}, f"Could not fetch actors: {error}")
+            return {"CANCELLED"}
+        items = [("__NONE__", "No actor", "", 0)]
+        items.extend((actor, f"Actor {actor}", "", index) for index, actor in enumerate(actors, 1))
+        _actor_item_history.append(list(ACTOR_ITEMS))
+        ACTOR_ITEMS[:] = items
+        self.report({"INFO"}, f"Loaded {len(actors)} actors")
+        return {"FINISHED"}
 
 
 def register() -> None:
-    from .properties import register as register_properties
-
-    register_properties()
-
-    if not hasattr(bpy.types.Scene, "aether_bridge_pose_primary_axis"):
-        bpy.types.Scene.aether_bridge_pose_primary_axis = bpy.props.EnumProperty(
-            name="Primary Axis",
-            description="Primary axis for bridge pose export orientation",
-            items=[('X', 'X Axis', ''), ('Y', 'Y Axis', ''), ('Z', 'Z Axis', ''), ('-X', '-X Axis', ''), ('-Y', '-Y Axis', ''), ('-Z', '-Z Axis', '')],
-            default='X',
-        )
-    if not hasattr(bpy.types.Scene, "aether_bridge_pose_secondary_axis"):
-        bpy.types.Scene.aether_bridge_pose_secondary_axis = bpy.props.EnumProperty(
-            name="Secondary Axis",
-            description="Secondary axis for bridge pose export orientation",
-            items=[('X', 'X Axis', ''), ('Y', 'Y Axis', ''), ('Z', 'Z Axis', ''), ('-X', '-X Axis', ''), ('-Y', '-Y Axis', ''), ('-Z', '-Z Axis', '')],
-            default='Y',
-        )
+    """Register the actor-fetch operator."""
+    bpy.utils.register_class(AETHER_OT_BridgeRefreshActors)
 
 
 def unregister() -> None:
-    global _STREAM_TIMER
-    _shutdown_stream()
-
-    from .properties import unregister as unregister_properties
-
-    for cls in reversed(classes):
-        bpy.utils.unregister_class(cls)
-
-    unregister_properties()
-
-    if hasattr(bpy.types.Scene, "aether_bridge_pose_primary_axis"):
-        del bpy.types.Scene.aether_bridge_pose_primary_axis
-    if hasattr(bpy.types.Scene, "aether_bridge_pose_secondary_axis"):
-        del bpy.types.Scene.aether_bridge_pose_secondary_axis
+    """Stop streaming and unregister the actor-fetch operator."""
+    _stop()
+    bpy.utils.unregister_class(AETHER_OT_BridgeRefreshActors)

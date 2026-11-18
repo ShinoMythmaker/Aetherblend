@@ -1,74 +1,52 @@
+"""Properties and actor choices for the bridge."""
+
 import bpy
 
-from ...utils.axis_conversion import AXIS_ITEMS
+from .stream import update_stream
 
-BRIDGE_ACTOR_ITEMS: list[tuple[str, str, str]] = []
-
-
-def _get_actor_items(self: bpy.types.PropertyGroup, context: bpy.types.Context) -> list[tuple[str, str, str]]:
-    return BRIDGE_ACTOR_ITEMS or [("", "No actors loaded", "")]
+ACTOR_ITEMS: list[tuple[str, str, str, int]] = [("__NONE__", "No actor", "", 0)]
 
 
-def _on_stream_enabled_update(self: bpy.types.PropertyGroup, context: bpy.types.Context) -> None:
-    from . import stream
+def _actor_items(_self: bpy.types.PropertyGroup, _context: bpy.types.Context) -> list[tuple[str, str, str, int]]:
+    return ACTOR_ITEMS
 
-    stream.on_stream_enabled_update(self, context)
+
+def _get_actor(self: bpy.types.PropertyGroup) -> int:
+    return next((number for actor, _, _, number in ACTOR_ITEMS if actor == self.actor_id), 0)
+
+
+def _set_actor(self: bpy.types.PropertyGroup, value: int) -> None:
+    self.actor_id = next((actor for actor, _, _, number in ACTOR_ITEMS if number == value and number != 0), "")
+
+
+def _update_stream(self: bpy.types.Scene, context: bpy.types.Context) -> None:
+    update_stream(self, context)
 
 
 class AetherBridgeArmatureProperties(bpy.types.PropertyGroup):
-    actor_id: bpy.props.EnumProperty(
-        name="Actor",
-        description="Select the actor to stream to",
-        items=_get_actor_items,
-    )  # type: ignore
+    """Store the actor assigned to an armature."""
 
-    use_axis_conversion: bpy.props.BoolProperty(
-        name="Use Axis Conversion",
-        description="Apply bridge pose axis conversion before sending",
-        default=True,
-    )  # type: ignore
+    actor_id: bpy.props.StringProperty(name="Actor ID")  # type: ignore
+    actor: bpy.props.EnumProperty(name="Actor", items=_actor_items, get=_get_actor, set=_set_actor)  # type: ignore
 
 
 def register() -> None:
+    """Register bridge properties."""
     bpy.utils.register_class(AetherBridgeArmatureProperties)
     bpy.types.Object.aether_bridge = bpy.props.PointerProperty(type=AetherBridgeArmatureProperties)
-
-    bpy.types.Scene.aether_bridge_host = bpy.props.StringProperty(
-        name="Host",
-        description="Hostname or IP address for bridge streaming",
-        default="127.0.0.1",
-    )
-    bpy.types.Scene.aether_bridge_port = bpy.props.IntProperty(
-        name="Port",
-        description="Port used by the bridge target server",
-        default=8080,
-        min=1,
-        max=65535,
-    )
-    bpy.types.Scene.aether_bridge_stream_enabled = bpy.props.BoolProperty(
-        name="Stream Pose",
-        description="Enable continuous pose streaming",
-        default=False,
-        update=_on_stream_enabled_update,
-    )
-    bpy.types.Scene.aether_bridge_stream_fps = bpy.props.IntProperty(
-        name="Stream FPS",
-        description="Target frames per second for bridge streaming",
-        default=15,
-        min=1,
-        max=60,
-    )
+    bpy.types.Scene.aether_bridge_host = bpy.props.StringProperty(name="Host", default="127.0.0.1")
+    bpy.types.Scene.aether_bridge_port = bpy.props.IntProperty(name="Port", default=8080, min=1, max=65535)
+    bpy.types.Scene.aether_bridge_stream_enabled = bpy.props.BoolProperty(name="Stream", update=_update_stream)
+    bpy.types.Scene.aether_bridge_stream_fps = bpy.props.IntProperty(name="FPS", default=30, min=1, max=60)
+    bpy.types.Scene.aether_bridge_status = bpy.props.StringProperty(name="Bridge status", options={"SKIP_SAVE"})
 
 
 def unregister() -> None:
-    if hasattr(bpy.types.Object, "aether_bridge"):
-        del bpy.types.Object.aether_bridge
-    if hasattr(bpy.types.Scene, "aether_bridge_host"):
-        del bpy.types.Scene.aether_bridge_host
-    if hasattr(bpy.types.Scene, "aether_bridge_port"):
-        del bpy.types.Scene.aether_bridge_port
-    if hasattr(bpy.types.Scene, "aether_bridge_stream_enabled"):
-        del bpy.types.Scene.aether_bridge_stream_enabled
-    if hasattr(bpy.types.Scene, "aether_bridge_stream_fps"):
-        del bpy.types.Scene.aether_bridge_stream_fps
+    """Remove bridge properties."""
+    del bpy.types.Scene.aether_bridge_status
+    del bpy.types.Scene.aether_bridge_stream_fps
+    del bpy.types.Scene.aether_bridge_stream_enabled
+    del bpy.types.Scene.aether_bridge_port
+    del bpy.types.Scene.aether_bridge_host
+    del bpy.types.Object.aether_bridge
     bpy.utils.unregister_class(AetherBridgeArmatureProperties)

@@ -1,18 +1,17 @@
-from . import panels, stream, properties
+"""Live pose streaming to AetherBridge."""
 
-"""Customize+ feature: parse, apply, and revert character bone transforms."""
+from . import panels, properties, stream
 
-__all__ = ["panels", "properties", "stream"]
-
-modules = (panels, stream, properties)
+modules = (properties, stream, panels)
 
 
 def register() -> None:
-    """Register the C+ feature."""
-    for mod in modules:
-        mod.register()
+    """Register bridge properties, operators, and panel."""
+    for module in modules:
+        module.register()
+
 
 def unregister() -> None:
-    """Unregister the C+ feature."""
-    for mod in reversed(modules):
-        mod.unregister()
+    """Unregister the bridge in reverse order."""
+    for module in reversed(modules):
+        module.unregister()
