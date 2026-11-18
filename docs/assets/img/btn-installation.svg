@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="64" viewBox="0 0 300 64" role="img" aria-label="Installation and Guides">
+  <rect x="0.5" y="0.5" width="299" height="63" rx="3" fill="#161d29" stroke="#243044"/>
+  <g transform="translate(32 20)" fill="none" stroke="#5bc0de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2v13M6 10l6 6 6-6M3 21h18"/>
+  </g>
+  <text x="68" y="38" fill="#f2f5fa" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="600">Installation and Guides</text>
+</svg>

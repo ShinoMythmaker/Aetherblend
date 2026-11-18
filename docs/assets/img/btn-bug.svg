@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="64" viewBox="0 0 300 64" role="img" aria-label="Report a Bug">
+  <rect x="0.5" y="0.5" width="299" height="63" rx="3" fill="#161d29" stroke="#243044"/>
+  <g transform="translate(76 20)" fill="none" stroke="#5bc0de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="7" width="10" height="13" rx="5"/>
+    <path d="M9 7a3 3 0 0 1 6 0M12 11v9M3 12h4M17 12h4M3 18h4M17 18h4M4 7l3 3M20 7l-3 3"/>
+  </g>
+  <text x="112" y="38" fill="#f2f5fa" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="600">Report a Bug</text>
+</svg>

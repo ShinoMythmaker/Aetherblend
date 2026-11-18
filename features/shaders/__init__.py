@@ -1,12 +1,17 @@
-from . import operators 
-from . import panels
+"""Shaders feature: apply shaders to imported models."""
+
+from . import operators, panels
+
+__all__ = ["operators", "panels"]
 
 modules = (operators, panels)
 
-def register():
+
+def register() -> None:
     for mod in modules:
         mod.register()
 
-def unregister():
+
+def unregister() -> None:
     for mod in modules:
         mod.unregister()

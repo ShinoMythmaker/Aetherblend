@@ -1,0 +1,27 @@
+"""Rig generator feature: build a rig from a template of rig modules."""
+
+from . import (
+    definitions,
+    generator,
+    instructions,
+    library,
+    operators,
+    panels,
+    properties,
+    rigify,
+    template_manager,
+)
+
+__all__ = ["definitions", "generator", "instructions", "library", "rigify"]
+
+modules = (properties, template_manager, operators, panels)
+
+
+def register() -> None:
+    for mod in modules:
+        mod.register()
+
+
+def unregister() -> None:
+    for mod in reversed(modules):
+        mod.unregister()

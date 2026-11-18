@@ -1,54 +1,82 @@
-import bpy
-from collections import defaultdict
+"""Object helpers."""
+
 import os
+from collections import defaultdict
+from collections.abc import Iterable
+from typing import Any
+
+import bpy
 
 from . import addon_dependencies
 
 
-def ensure_mode(mode: str = 'OBJECT'):
+def ensure_mode(mode: str = "OBJECT") -> None:
     """Switches Blender mode only when required."""
     if bpy.context.mode != mode:
         bpy.ops.object.mode_set(mode=mode)
 
 
-def select_only(obj: bpy.types.Object, mode: str = 'OBJECT'):
+def select_only(obj: bpy.types.Object, mode: str = "OBJECT") -> None:
     """Select exactly one object and set it as active."""
     ensure_mode(mode)
-    bpy.ops.object.select_all(action='DESELECT')
+    bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
 
 
-def set_visibility(obj: bpy.types.Object, visible: bool):
-    """Sets viewport visibility for an object."""
+def set_visibility(obj: bpy.types.Object, visible: bool) -> None:
+    """Set viewport visibility for an object."""
     obj.hide_set(not visible)
     obj.hide_viewport = not visible
 
 
 def uses_armature(obj: bpy.types.Object, armature: bpy.types.Object) -> bool:
-    """Returns True if object has constraints/modifiers that reference the armature."""
+    """Return True if object has constraints/modifiers that reference the armature."""
     for constraint in obj.constraints:
-        if hasattr(constraint, 'target') and constraint.target == armature:
+        if hasattr(constraint, "target") and constraint.target == armature:
             return True
 
     for modifier in obj.modifiers:
-        if modifier.type == 'ARMATURE' and modifier.object == armature:
+        if modifier.type == "ARMATURE" and modifier.object == armature:
             return True
 
-    if obj.type != 'ARMATURE' or not obj.pose:
+    if obj.type != "ARMATURE" or not obj.pose:
         return False
 
     for pose_bone in obj.pose.bones:
         for constraint in pose_bone.constraints:
-            if hasattr(constraint, 'target') and constraint.target == armature:
+            if hasattr(constraint, "target") and constraint.target == armature:
                 return True
 
     return False
 
 
-def has_material_property(obj: bpy.types.Object, property_name: str, property_value=None) -> bool:
-    """Returns True if object has a material with the given custom property value."""
-    if not obj.data or not hasattr(obj.data, 'materials'):
+def remove_shapekey(
+    obj: bpy.types.Object,
+    shapekey_name: str,
+    enable_backup: bool = False,
+    backup_shapekey_name: str | None = None,
+) -> None:
+    """Remove a shape key and optionally unmute a backup key afterward."""
+    if obj.type != "MESH" or not obj.data.shape_keys:
+        return
+
+    if enable_backup:
+        backup = obj.data.shape_keys.key_blocks.get(backup_shapekey_name) if backup_shapekey_name else None
+        if backup:
+            backup.mute = False
+        else:
+            for key_block in obj.data.shape_keys.key_blocks:
+                key_block.mute = False
+
+    shapekey = obj.data.shape_keys.key_blocks.get(shapekey_name)
+    if shapekey:
+        obj.shape_key_remove(shapekey)
+
+
+def has_material_property(obj: bpy.types.Object, property_name: str, property_value: Any = None) -> bool:
+    """Return True if object has a material with the given custom property value."""
+    if not obj.data or not hasattr(obj.data, "materials"):
         return False
 
     for material_slot in obj.material_slots:
@@ -65,9 +93,9 @@ def has_material_property(obj: bpy.types.Object, property_name: str, property_va
 def find_by_armature_and_material_property(
     armature: bpy.types.Object,
     property_name: str,
-    property_value=None,
+    property_value: Any = None,
 ) -> list[bpy.types.Object] | None:
-    """Finds objects driven by an armature and matching a material property filter."""
+    """Find objects driven by an armature and matching a material property filter."""
     objects = []
     for obj in bpy.data.objects:
         try:
@@ -78,10 +106,10 @@ def find_by_armature_and_material_property(
     return objects if len(objects) > 0 else None
 
 
-def merge_by_material(objects):
-    """Merges objects that share the same material and returns the updated list of all objects, including non-mesh objects that were not modified."""
+def merge_by_material(objects: Iterable[bpy.types.Object]) -> list[bpy.types.Object]:
+    """Merge objects that share the same material and return the updated list of all objects."""
     material_mesh_groups = defaultdict(list)
-    all_objects = set(objects)  
+    all_objects = set(objects)
 
     for obj in objects:
         try:
@@ -91,20 +119,20 @@ def merge_by_material(objects):
         except ReferenceError:
             print(f"[AetherBlend] Skipping deleted object: {obj}")
 
-    new_objects = set()  
+    new_objects = set()
 
     for material, meshes in material_mesh_groups.items():
         if len(meshes) < 2:
             new_objects.update(meshes)  # Keep unmerged meshes
             continue
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.select_all(action="DESELECT")
         for mesh in meshes:
             mesh.select_set(True)
         bpy.context.view_layer.objects.active = meshes[0]
         bpy.ops.object.join()
         merged_object = bpy.context.view_layer.objects.active
         new_objects.add(merged_object)
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.select_all(action="DESELECT")
 
     non_mesh_objects = set()
     for obj in all_objects:
@@ -113,108 +141,87 @@ def merge_by_material(objects):
                 non_mesh_objects.add(obj)
         except ReferenceError:
             print(f"[AetherBlend] Skipping deleted object: {obj}")
-    
-    updated_objects = new_objects | non_mesh_objects  
+
+    updated_objects = new_objects | non_mesh_objects
 
     return list(updated_objects)
 
-def merge_by_name(objects, name_filter):
-    """Merges all objects in the given list that contain the specified name_filter in their name. Returns an updated object list."""
+
+def merge_by_name(objects: Iterable[bpy.types.Object], name_filter: str) -> list[bpy.types.Object]:
+    """Merge all objects whose name contains name_filter and return the updated object list."""
     filtered_objects = [obj for obj in objects if name_filter.lower() in obj.name.lower() and obj.type == "MESH"]
-    
+
     updated_objects = set(objects)
 
     if len(filtered_objects) < 2:
-        return list(updated_objects)  
+        return list(updated_objects)
 
-    bpy.ops.object.select_all(action='DESELECT')  
+    bpy.ops.object.select_all(action="DESELECT")
     for obj in filtered_objects:
         obj.select_set(True)
 
-    bpy.context.view_layer.objects.active = filtered_objects[0]  
-    bpy.ops.object.join() 
+    bpy.context.view_layer.objects.active = filtered_objects[0]
+    bpy.ops.object.join()
 
     merged_object = bpy.context.view_layer.objects.active
 
-    updated_objects.difference_update(filtered_objects)  
-    updated_objects.add(merged_object) 
+    updated_objects.difference_update(filtered_objects)
+    updated_objects.add(merged_object)
 
-    bpy.ops.object.select_all(action='DESELECT') 
+    bpy.ops.object.select_all(action="DESELECT")
 
-    return list(updated_objects)  
+    return list(updated_objects)
 
-def import_meddle_shader(filepath, imported_objects):
-    """Imports Meddle shaders for the given objects."""
+
+def import_meddle_shader(filepath: str, imported_objects: Iterable[bpy.types.Object]) -> bool:
+    """Import Meddle shaders for the given objects."""
     if not addon_dependencies.is_addon_enabled(module_name="meddle", display_name="Meddle Tools"):
         print("[AetherBlend] Meddle Tools add-on is not enabled")
         return False
 
     for obj in imported_objects:
         try:
-            if obj and obj.type == "MESH": 
+            if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")  
-        
+            print(f"[AetherBlend] Skipping deleted object: {obj}")
+
     character_directory = os.path.dirname(filepath)
-    meddle_cache_directory = os.path.join(character_directory, "cache","")
+    meddle_cache_directory = os.path.join(character_directory, "cache", "")
 
     try:
-        result_import = bpy.ops.meddle.import_shaders('EXEC_DEFAULT')
-        result_apply = bpy.ops.meddle.apply_to_selected('EXEC_DEFAULT', directory=meddle_cache_directory)
-        return ('FINISHED' in result_import) and ('FINISHED' in result_apply)
+        result_import = bpy.ops.meddle.import_shaders("EXEC_DEFAULT")
+        result_apply = bpy.ops.meddle.apply_to_selected("EXEC_DEFAULT", directory=meddle_cache_directory)
+        return ("FINISHED" in result_import) and ("FINISHED" in result_apply)
     except Exception as e:
         print(f"[AetherBlend] Failed to append Meddle shaders: {e}")
         return False
 
-def import_ffgear_shader(filepath, imported_objects):
-    """Imports FFGear shaders for the given objects."""
+
+def import_ffgear_shader(filepath: str, imported_objects: Iterable[bpy.types.Object]) -> bool:
+    """Import FFGear shaders for the given objects."""
     if not addon_dependencies.is_addon_enabled(module_name="ffgear", display_name="FFGear"):
         print("[AetherBlend] FFGear add-on is not enabled")
         return False
 
     for obj in imported_objects:
         try:
-            if obj and obj.type == "MESH": 
+            if obj and obj.type == "MESH":
                 obj.select_set(True)
         except ReferenceError:
-            print(f"Skipping deleted object: {obj}")  
-        
+            print(f"[AetherBlend] Skipping deleted object: {obj}")
+
     character_directory = os.path.dirname(filepath)
-    ffgear_cache_directory = os.path.join(character_directory, "cache","")
+    ffgear_cache_directory = os.path.join(character_directory, "cache", "")
 
     try:
         result = bpy.ops.ffgear.meddle_setup(
-            'EXEC_DEFAULT',
+            "EXEC_DEFAULT",
             directory=ffgear_cache_directory,
             filepath=ffgear_cache_directory,
             use_selected=True,
         )
-        return 'FINISHED' in result
+        return "FINISHED" in result
     except Exception as e:
         print(f"[AetherBlend] Failed to append FFGear shaders: {e}")
         return False
-
-def remove_shapekey(obj: bpy.types.Object, shapekey_name: str, enable_backup: bool = False, backup_shapekey_name: str = None) -> None:
-    """
-    Removes the specified shapekey from the object if it exists, or handles backup unmuting.
-    """
-    if obj.type != 'MESH' or not obj.data.shape_keys:
-        return
-
-    if enable_backup:
-        if backup_shapekey_name:
-            sk = obj.data.shape_keys.key_blocks.get(backup_shapekey_name)
-            if sk:
-                sk.mute = False
-            else:
-                for key_block in obj.data.shape_keys.key_blocks:
-                    key_block.mute = False
-        else:
-            for key_block in obj.data.shape_keys.key_blocks:
-                key_block.mute = False
-                
-        if obj.data.shape_keys:
-            sk = obj.data.shape_keys.key_blocks.get(shapekey_name)
-            if sk:
-                obj.shape_key_remove(sk)

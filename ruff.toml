@@ -1,0 +1,19 @@
+line-length = 140
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "W", "I", "N", "ANN", "D"]
+ignore = [
+    "D203", "D213",  # conflicting docstring styles
+    "D107", "D105",  # no docstring for __init__ / magic methods
+    "D101",          # operator/panel classes use bl_description, not docstrings
+    "D102",          # same for their methods
+    "ANN401",        # allow Any where Blender types are unknown
+    "N801",          # Blender class names like AETHER_OT_x
+    "N999",          # the add-on folder is named AetherBlend
+    "N813",          # rig modules are imported as `from .x import Module as x`
+    "F403", "F405",  # wildcard imports are allowed from modules with __all__ (R-9.2), checked in review
+]
+
+[lint.per-file-ignores]
+"**/templates/**" = ["D", "ANN"]

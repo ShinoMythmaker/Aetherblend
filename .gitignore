@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+tests/
 develop-eggs/
 dist/
 downloads/
@@ -127,3 +128,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Blender backups and logs
+*.blend1
+*.blend2
+*.log
