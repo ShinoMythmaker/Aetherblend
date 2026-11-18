@@ -133,3 +133,6 @@ dmypy.json
 *.blend1
 *.blend2
 *.log
+
+# Tests
+tests/

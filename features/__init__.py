@@ -1,10 +1,10 @@
 """Add-on features. Each feature is a self-contained package that registers its own operators, panels and properties."""
 
-from . import cplus, import_export, rig_edit, rig_generator, rig_ui, shaders, vfx
+from . import cplus, import_export, rig_edit, rig_generator, rig_ui, shaders, vfx, bridge
 
-__all__ = ["cplus", "import_export", "rig_edit", "rig_generator", "rig_ui", "shaders", "vfx"]
+__all__ = ["cplus", "import_export", "rig_edit", "rig_generator", "rig_ui", "shaders", "vfx", "bridge"]
 
-modules = (import_export, cplus, rig_generator, rig_edit, rig_ui, shaders, vfx)
+modules = (import_export, cplus, rig_generator, rig_edit, rig_ui, shaders, vfx, bridge)
 
 
 def register() -> None:

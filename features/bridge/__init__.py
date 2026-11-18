@@ -1,12 +1,18 @@
-from . import panel
-from . import stream
+from . import panels, stream, properties
 
-modules = (panel, stream)
+"""Customize+ feature: parse, apply, and revert character bone transforms."""
 
-def register():
+__all__ = ["panels", "properties", "stream"]
+
+modules = (panels, stream, properties)
+
+
+def register() -> None:
+    """Register the C+ feature."""
     for mod in modules:
         mod.register()
 
-def unregister():
-    for mod in modules:
+def unregister() -> None:
+    """Unregister the C+ feature."""
+    for mod in reversed(modules):
         mod.unregister()
