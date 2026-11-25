@@ -64,6 +64,11 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         description="Create a backup armature for C+ reversion after import",
         default=True,
     )  # type: ignore
+    s_disable_axis_conversion: BoolProperty(
+        name="Disable Axis Conversion",
+        description="Disables the automatic axis conversion on import",
+        default=False,
+    )  # type: ignore
 
     def invoke(self, context: bpy.types.Context, event: bpy.types.Event) -> set[str]:
         prefs = get_preferences()
@@ -179,6 +184,10 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
         split.label(text=" ")
         split.prop(self, "s_create_backup_armature")
 
+        split = col.split(factor=indent)
+        split.label(text=" ")
+        split.prop(self, "s_disable_axis_conversion")
+
     def execute(self, context: bpy.types.Context) -> set[str]:
         """Import and prepare the model with the standard bone-axis conversion."""
         bpy.context.window.cursor_set("WAIT")
@@ -240,7 +249,8 @@ class AETHER_OT_import_export_import_character(bpy.types.Operator):
             clear_animation_data(armature)
             utils.armature.reset_pose_bones(armature)
 
-            utils.axis_conversion.apply_bone_axis_to_armature(armature, DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS)
+            if not self.s_disable_axis_conversion:
+                utils.axis_conversion.apply_bone_axis_to_armature(armature, DEFAULT_PRIMARY_BONE_AXIS, DEFAULT_SECONDARY_BONE_AXIS)
 
             bpy.context.view_layer.objects.active = armature
             bpy.ops.object.mode_set(mode="EDIT")
